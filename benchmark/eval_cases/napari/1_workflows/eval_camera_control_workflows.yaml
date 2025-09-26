@@ -1,0 +1,220 @@
+# Camera Control Workflow Tests for napari-mcp
+# These tests evaluate camera control and navigation workflows in napari
+# Each test focuses on specific camera operations and view control scenarios
+
+# Test 1: Basic Camera Operations - Reset, Get, and Set
+- vars:
+    question: |
+      Load the image "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1_ch0_t14.tif".
+      Get the current camera settings to understand the initial state.
+      Reset the camera to the default view.
+      Get the camera settings again to verify the reset.
+      Take a screenshot to verify the default view.
+      Respond with <1> if the basic camera operations were successful, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 2: Zoom Control Workflow
+- vars:
+    question: |
+      Start with the default camera view and take an initial screenshot.
+      Set the camera zoom to 2.0x magnification.
+      Take a screenshot to verify the zoom in.
+      Set the camera zoom to 0.5x magnification.
+      Take a screenshot to verify the zoom out.
+      Set the camera zoom back to 1.0x.
+      Take a final screenshot to verify the zoom reset.
+      Respond with <1> if all zoom operations were successful, or <0> if any failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 3: Camera Center Positioning
+- vars:
+    question: |
+      Get the current camera center position.
+      Set the camera center to a new position [100, 100].
+      Take a screenshot to verify the center change.
+      Set the camera center to another position [200, 200].
+      Take a screenshot to verify the second center change.
+      Reset the camera to restore the original center.
+      Take a final screenshot to verify the reset.
+      Respond with <1> if all camera center operations were successful, or <0> if any failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 4: 3D Camera Rotation and Angles
+- vars:
+    question: |
+      Switch to 3D view mode.
+      Get the current camera settings to see the 3D parameters.
+      Set camera angles to [30, 45, 0] degrees for x, y, z rotation.
+      Take a screenshot to verify the 3D rotation.
+      Set camera angles to [60, 90, 15] degrees for a different view.
+      Take a screenshot to verify the second rotation.
+      Reset the camera to restore the default 3D view.
+      Take a final screenshot to verify the 3D reset.
+      Respond with <1> if all 3D camera operations were successful, or <0> if any failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 5: Combined Camera Transformations
+- vars:
+    question: |
+      Apply multiple camera transformations simultaneously: set center to [150, 150], zoom to 1.5x, and in 3D mode set angles to [45, 30, 0].
+      Take a screenshot to verify the combined transformation.
+      Apply a different combination: center [250, 250], zoom 0.8x, angles [60, 45, 10].
+      Take a screenshot to verify the second combination.
+      Reset the camera to restore all default settings.
+      Take a final screenshot to verify the complete reset.
+      Respond with <1> if all combined camera transformations were successful, or <0> if any failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 6: Camera Navigation Sequence
+- vars:
+    question: |
+      Perform a camera navigation sequence: start with default view, zoom in to 2.5x, move center to [100, 100], then switch to 3D and rotate to [30, 60, 0].
+      Take a screenshot at each step to document the navigation.
+      Continue the sequence: rotate to [60, 90, 15], zoom out to 1.2x, move center to [200, 200].
+      Take screenshots to document these steps.
+      End with a camera reset to default view.
+      Take a final screenshot to verify the complete navigation sequence.
+      Respond with <1> if the complete camera navigation sequence was successful, or <0> if any step failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 7: View Mode Switching with Camera
+- vars:
+    question: |
+      Start in 2D view mode and set camera zoom to 2.0x.
+      Take a screenshot to verify 2D view with zoom.
+      Switch to 3D view mode and set camera angles to [45, 45, 0].
+      Take a screenshot to verify 3D view with rotation.
+      Switch back to 2D view mode.
+      Take a screenshot to verify return to 2D.
+      Reset the camera to default settings.
+      Take a final screenshot to verify the complete reset.
+      Respond with <1> if all view mode switching with camera control was successful, or <0> if any step failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 8: Camera State Persistence
+- vars:
+    question: |
+      Set up a specific camera configuration: center [175, 175], zoom 1.8x, 3D angles [35, 55, 5].
+      Get the camera settings to verify the configuration.
+      Take a screenshot to document the setup.
+      Perform some other operations (like changing layer opacity or colormap).
+      Get the camera settings again to verify they haven't changed.
+      Take another screenshot to verify the camera state persisted.
+      Respond with <1> if the camera state persisted through other operations, or <0> if it changed unexpectedly. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 9: Camera Boundary Testing
+- vars:
+    question: |
+      Test camera with extreme values: set zoom to 10.0x (very high zoom).
+      Take a screenshot to verify extreme zoom.
+      Set zoom to 0.1x (very low zoom).
+      Take a screenshot to verify extreme zoom out.
+      Set camera center to [0, 0] (corner position).
+      Take a screenshot to verify corner positioning.
+      Set camera center to [500, 500] (far from origin).
+      Take a screenshot to verify far positioning.
+      Reset camera to restore normal settings.
+      Take a final screenshot to verify recovery from extreme values.
+      Respond with <1> if the camera handled extreme values gracefully, or <0> if it failed or crashed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 10: Multi-layer Camera Control
+- vars:
+    question: |
+      Load a second image "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1_ch1_t14.tif".
+      Set up a camera view that shows both layers effectively: center [150, 150], zoom 1.5x.
+      Take a screenshot to verify the multi-layer view.
+      Adjust camera to focus on layer 1: center [100, 100], zoom 2.0x.
+      Take a screenshot to verify layer 1 focus.
+      Adjust camera to focus on layer 2: center [200, 200], zoom 2.0x.
+      Take a screenshot to verify layer 2 focus.
+      Reset camera to show both layers again.
+      Take a final screenshot to verify the balanced multi-layer view.
+      Respond with <1> if the multi-layer camera control was successful, or <0> if any step failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 11: Cleanup - Reset for next test run
+- vars:
+    question: |
+      Delete all loaded layers and reset the camera to default settings.
+      Switch back to 2D view mode.
+      Respond with <1> if the cleanup was successful, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true

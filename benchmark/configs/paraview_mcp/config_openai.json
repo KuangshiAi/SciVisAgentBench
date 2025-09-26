@@ -1,0 +1,33 @@
+{
+  "provider": "openai",
+  "model": "gpt-4o",
+  "base_url": "https://api.openai.com",
+  "price": {
+    "input_per_1m_tokens": "$2.50",
+    "output_per_1m_tokens": "$10.00"
+  },
+  "servers": [
+    {
+      "type": "stdio",
+      "config": {
+        "command": "/Users/kuangshiai/miniconda3/envs/paraview_mcp/bin/python",
+        "args": [
+          "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench/src/mcp_logger.py",
+          "/Users/kuangshiai/miniconda3/envs/paraview_mcp/bin/python",
+          "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench/src/paraview_mcp/paraview_mcp_server.py"
+        ]
+      }
+    },
+    {
+      "type": "stdio",
+      "config": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-filesystem",
+          "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench"
+        ]
+      }
+    }
+  ]
+}

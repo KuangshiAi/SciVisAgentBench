@@ -1,0 +1,124 @@
+# Multi-dimensional Data Navigation Tests for napari-mcp
+# These tests evaluate navigation and exploration of multi-dimensional data (z-stack, time, channels)
+# Focus: Data exploration, dimension navigation, and multi-dimensional data handling
+
+# Test 1: Setup - Load multi-dimensional data
+- vars:
+    question: |
+      Load the "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1_ch0_t14.tif" file in Napari. 
+      This is a multi-dimensional image with z-stack, time, and channel dimensions. 
+      Respond with <1> if the file was successfully loaded or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 2: Dimension Information Retrieval
+- vars:
+    question: |
+      Get dimension information to understand the data structure (z-stack, time, channels).
+      Examine the number of steps in each dimension and current positions.
+      Respond with <1> if you successfully retrieved dimension information, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 3: Z-stack Navigation - Scroll through different depths
+- vars:
+    question: |
+      Navigate through the z-stack of the loaded image. Use set_z_slice to jump to at least 3 different z-slices to examine structures at different depths. 
+      Take a screenshot at each z-slice to verify navigation. 
+      Respond with <1> if you successfully navigated through different z-slices and could see structural changes, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 4: Channel Navigation - Switch between channels
+- vars:
+    question: |
+      Load the second channel "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1_ch1_t14.tif".
+      Use set_channel to switch between channel 0 and channel 1.
+      Take screenshots showing each channel separately.
+      Respond with <1> if you successfully navigated between channels, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 5: Time Series Navigation - Navigate through time points
+- vars:
+    question: |
+      If the data has time dimensions, use set_timestep to navigate through different time points.
+      Take screenshots at different time points to show temporal changes.
+      If no time dimension exists, simulate time navigation by adjusting the current view and taking multiple screenshots.
+      Respond with <1> if you successfully navigated through time points or simulated time navigation, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 6: Multi-dimensional Data Exploration
+- vars:
+    question: |
+      Combine navigation across multiple dimensions: switch to a specific z-slice, then to a specific channel, then to a specific time point.
+      Take screenshots to document the multi-dimensional exploration.
+      Respond with <1> if you successfully explored the data across multiple dimensions, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 7: Dimension Labeling and Organization
+- vars:
+    question: |
+      Set appropriate axis labels for the multi-dimensional data (e.g., ['t', 'z', 'c', 'y', 'x'] for time, z-stack, channel, y, x).
+      Take a screenshot showing the labeled dimensions.
+      Respond with <1> if you successfully set dimension labels, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 8: Cleanup - Reset for next test run
+- vars:
+    question: |
+      Delete all loaded layers and reset the view to prepare for the next test run.
+      Respond with <1> if all layers were successfully deleted and the view was reset, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true

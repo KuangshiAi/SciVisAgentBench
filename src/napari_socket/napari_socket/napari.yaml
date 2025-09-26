@@ -1,0 +1,169 @@
+name: napari-socket
+display_name: Socket Server
+schema_version: "0.2.1"
+
+contributions:
+  commands:
+    # dock-widget command
+    - id: napari-socket.socket_widget
+      title: Socket Server
+      python_name: napari_socket._widget:NapariSocketWidget
+
+    # NEW command exposed over the socket
+    - id: napari-socket.open_file
+      title: Open file via napari
+      python_name: napari_socket._commands:open_file
+
+    - id: napari-socket.remove_layer
+      title: Remove viewer layer
+      python_name: napari_socket._commands:remove_layer
+
+    - id: napari-socket.toggle_ndisplay
+      python_name: napari_socket._commands:toggle_ndisplay
+      title: Toggle 2D/3D view
+
+    - id: napari-socket.iso_contour
+      title: Iso-surface contour rendering
+      python_name: napari_socket._commands:iso_contour
+
+    - id: napari-socket.screenshot
+      title: Take screenshot
+      python_name: napari_socket._commands:screenshot
+
+    - id: napari-socket.list_layers
+      title: List Layers
+      python_name: napari_socket._commands:list_layers
+
+    - id: napari-socket.get_layer_names
+      title: Get Layer Names
+      python_name: napari_socket._commands:get_layer_names
+
+    - id: napari-socket.set_colormap
+      title: Set Colormap
+      python_name: napari_socket._commands:set_colormap
+
+    - id: napari-socket.set_opacity
+      title: Set Opacity
+      python_name: napari_socket._commands:set_opacity
+
+    - id: napari-socket.set_blending
+      title: Set Blending Mode
+      python_name: napari_socket._commands:set_blending
+
+    - id: napari-socket.set_contrast_limits
+      title: Set Contrast Limits
+      python_name: napari_socket._commands:set_contrast_limits
+
+    - id: napari-socket.auto_contrast
+      title: Auto-Contrast
+      python_name: napari_socket._commands:auto_contrast
+
+    - id: napari-socket.set_gamma
+      title: Set Gamma
+      python_name: napari_socket._commands:set_gamma
+
+    - id: napari-socket.set_interpolation
+      title: Set Interpolation
+      python_name: napari_socket._commands:set_interpolation
+
+    - id: napari-socket.set_timestep
+      title: Set Timestep
+      python_name: napari_socket._commands:set_timestep
+
+    - id: napari-socket.get_dims_info
+      title: Get Dimensions Info
+      python_name: napari_socket._commands:get_dims_info
+
+    - id: napari-socket.set_camera
+      title: Set Camera
+      python_name: napari_socket._commands:set_camera
+
+    - id: napari-socket.get_camera
+      title: Get Camera
+      python_name: napari_socket._commands:get_camera
+
+    - id: napari-socket.reset_camera
+      title: Reset Camera
+      python_name: napari_socket._commands:reset_camera
+
+    # Layer Creation & Annotation Functions
+    - id: napari-socket.add_points
+      title: Add Points
+      python_name: napari_socket._commands:add_points
+
+    - id: napari-socket.add_shapes
+      title: Add Shapes
+      python_name: napari_socket._commands:add_shapes
+
+    - id: napari-socket.add_labels
+      title: Add Labels
+      python_name: napari_socket._commands:add_labels
+
+    - id: napari-socket.add_surface
+      title: Add Surface
+      python_name: napari_socket._commands:add_surface
+
+    - id: napari-socket.add_vectors
+      title: Add Vectors
+      python_name: napari_socket._commands:add_vectors
+
+    # Data Export & Save Functions
+    - id: napari-socket.save_layers
+      title: Save Layers
+      python_name: napari_socket._commands:save_layers
+
+    - id: napari-socket.export_screenshot
+      title: Export Screenshot
+      python_name: napari_socket._commands:export_screenshot
+
+    - id: napari-socket.get_layer_data
+      title: Get Layer Data
+      python_name: napari_socket._commands:get_layer_data
+
+    # Advanced Visualization Controls
+    - id: napari-socket.set_scale_bar
+      title: Set Scale Bar
+      python_name: napari_socket._commands:set_scale_bar
+
+    - id: napari-socket.set_axis_labels
+      title: Set Axis Labels
+      python_name: napari_socket._commands:set_axis_labels
+
+    - id: napari-socket.set_view_mode
+      title: Set View Mode
+      python_name: napari_socket._commands:set_view_mode
+
+    - id: napari-socket.set_layer_visibility
+      title: Set Layer Visibility
+      python_name: napari_socket._commands:set_layer_visibility
+
+    # Measurement & Analysis Functions
+    - id: napari-socket.measure_distance
+      title: Measure Distance
+      python_name: napari_socket._commands:measure_distance
+
+    - id: napari-socket.get_layer_statistics
+      title: Get Layer Statistics
+      python_name: napari_socket._commands:get_layer_statistics
+
+    - id: napari-socket.crop_layer
+      title: Crop Layer
+      python_name: napari_socket._commands:crop_layer
+
+    # Time Series & Multi-dimensional Data
+    - id: napari-socket.set_channel
+      title: Set Channel
+      python_name: napari_socket._commands:set_channel
+
+    - id: napari-socket.set_z_slice
+      title: Set Z Slice
+      python_name: napari_socket._commands:set_z_slice
+
+    - id: napari-socket.play_animation
+      title: Play Animation
+      python_name: napari_socket._commands:play_animation
+
+  # link the widget to the first command
+  widgets:
+    - command: napari-socket.socket_widget
+      display_name: Socket Server

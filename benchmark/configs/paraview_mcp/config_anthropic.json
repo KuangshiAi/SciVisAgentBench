@@ -1,0 +1,33 @@
+{
+  "provider": "anthropic",
+  "model": "claude-3-5-haiku-latest",
+  "base_url": "https://api.anthropic.com",
+  "price": {
+    "input_per_1m_tokens": "$0.80",
+    "output_per_1m_tokens": "$4.00"
+  },
+  "servers": [
+    {
+      "type": "stdio",
+      "config": {
+        "command": "/Users/kuangshiai/miniconda3/envs/paraview_mcp/bin/python",
+        "args": [
+          "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench/src/mcp_logger.py",
+          "/Users/kuangshiai/miniconda3/envs/paraview_mcp/bin/python",
+          "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench/src/paraview_mcp/paraview_mcp_server.py"
+        ]
+      }
+    },
+    {
+      "type": "stdio",
+      "config": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-filesystem",
+          "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench"
+        ]
+      }
+    }
+  ]
+}

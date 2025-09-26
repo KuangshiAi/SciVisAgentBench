@@ -1,0 +1,226 @@
+# Scene Understanding Tests for napari-mcp
+# These tests evaluate the agent's ability to analyze and interpret visual content from screenshots
+# Focus: Visual analysis, object counting, color identification, and scene interpretation
+
+# Test 1: Setup - Load multi-channel cell data
+- vars:
+    question: |
+      Load the first image "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1_ch0_t14.tif" and then load the second image "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1_ch1_t14.tif".
+      Set the first channel to green colormap and the second channel to magenta colormap.
+      Use additive blending to combine the channels.
+      Take a screenshot of the combined view.
+      Respond with <1> if the multi-channel setup was successful, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 2: Count Green Cells
+- vars:
+    question: |
+      Take a screenshot of the current view and analyze it.
+      Count how many green-colored cells you can see in the screenshot.
+      Only count cells that are completely visible (not cut off by the edges of the view).
+      Respond with the number of green cells you can count, for example "3" if you see 3 green cells.
+  assert:
+    - type: llm-rubric
+      value: 
+        - It counted the green cells visible in the screenshot
+        - The count is reasonable based on the cell data
+        - Only counted complete cells, not partial ones
+  options:
+    cache: false
+    runSerially: true
+
+# Test 3: Count Magenta Cells
+- vars:
+    question: |
+      Take a screenshot of the current view and analyze it.
+      Count how many magenta-colored cells you can see in the screenshot.
+      Only count cells that are completely visible (not cut off by the edges of the view).
+      Respond with the number of magenta cells you can count, for example "2" if you see 2 magenta cells.
+  assert:
+    - type: llm-rubric
+      value: 
+        - It counted the magenta cells visible in the screenshot
+        - The count is reasonable based on the cell data
+        - Only counted complete cells, not partial ones
+  options:
+    cache: false
+    runSerially: true
+
+# Test 4: Count Yellow/Overlapping Cells
+- vars:
+    question: |
+      Take a screenshot of the current view and analyze it.
+      Look for cells that appear yellow or have a mixed color (where green and magenta channels overlap).
+      Count how many yellow or mixed-color cells you can see.
+      Respond with the number of yellow/mixed-color cells you can count, for example "1" if you see 1 yellow cell.
+  assert:
+    - type: llm-rubric
+      value: 
+        - It identified and counted yellow/mixed-color cells
+        - The count is reasonable based on the overlapping channels
+        - Only counted complete cells, not partial ones
+  options:
+    cache: false
+    runSerially: true
+
+# Test 5: Total Cell Count
+- vars:
+    question: |
+      Take a screenshot of the current view and analyze it.
+      Count the total number of distinct cells you can see, regardless of color.
+      Include green cells, magenta cells, and yellow/mixed-color cells.
+      Only count cells that are completely visible (not cut off by the edges).
+      Respond with the total number of cells you can count, for example "6" if you see 6 total cells.
+  assert:
+    - type: llm-rubric
+      value: 
+        - It counted all distinct cells regardless of color
+        - The total count is reasonable and consistent with previous counts
+        - Only counted complete cells, not partial ones
+  options:
+    cache: false
+    runSerially: true
+
+# Test 6: Cell Size Analysis
+- vars:
+    question: |
+      Take a screenshot of the current view and analyze it.
+      Identify the largest cell and the smallest cell you can see.
+      Describe the relative sizes of the cells (e.g., "most cells are similar in size" or "there is one very large cell").
+      Respond with a description of the cell size distribution you observe.
+  assert:
+    - type: llm-rubric
+      value: 
+        - It identified size differences between cells
+        - The description is reasonable based on the cell data
+        - It provided meaningful observations about cell size distribution
+  options:
+    cache: false
+    runSerially: true
+
+# Test 7: Cell Distribution Analysis
+- vars:
+    question: |
+      Take a screenshot of the current view and analyze it.
+      Describe how the cells are distributed across the field of view.
+      Are they clustered together, evenly distributed, or randomly scattered?
+      Respond with a description of the spatial distribution pattern you observe.
+  assert:
+    - type: llm-rubric
+      value: 
+        - It analyzed the spatial distribution of cells
+        - The description is reasonable based on the cell data
+        - It provided meaningful observations about cell arrangement
+  options:
+    cache: false
+    runSerially: true
+
+# Test 8: Color Intensity Analysis
+- vars:
+    question: |
+      Take a screenshot of the current view and analyze it.
+      Compare the intensity/brightness of the green cells versus the magenta cells.
+      Are the green cells brighter, dimmer, or similar in intensity to the magenta cells?
+      Respond with a comparison of the color intensities you observe.
+  assert:
+    - type: llm-rubric
+      value: 
+        - It compared the intensity of different colored cells
+        - The comparison is reasonable based on the cell data
+        - It provided meaningful observations about color intensity
+  options:
+    cache: false
+    runSerially: true
+
+# Test 9: Cell Shape Analysis
+- vars:
+    question: |
+      Take a screenshot of the current view and analyze it.
+      Describe the shapes of the cells you can see.
+      Are they round, oval, irregular, or do they have other shapes?
+      Respond with a description of the cell shapes you observe.
+  assert:
+    - type: llm-rubric
+      value: 
+        - It analyzed the shapes of the cells
+        - The description is reasonable based on the cell data
+        - It provided meaningful observations about cell morphology
+  options:
+    cache: false
+    runSerially: true
+
+# Test 10: Scene Summary
+- vars:
+    question: |
+      Take a screenshot of the current view and analyze it.
+      Provide a comprehensive summary of what you see in the scene.
+      Include: total cell count, color distribution, size distribution, spatial arrangement, and any other notable features.
+      Respond with a detailed summary of the scene analysis.
+  assert:
+    - type: llm-rubric
+      value: 
+        - It provided a comprehensive scene summary
+        - The summary includes multiple aspects of the analysis
+        - The observations are consistent with previous individual analyses
+        - It demonstrated good scene understanding capabilities
+  options:
+    cache: false
+    runSerially: true
+
+# Test 11: Change View and Re-analyze
+- vars:
+    question: |
+      Zoom in on the cells so they appear larger in the viewport.
+      Take a screenshot of the zoomed-in view.
+      Count the cells again in this new view and compare with your previous count.
+      Respond with the new cell count and whether it matches your previous count.
+  assert:
+    - type: llm-rubric
+      value: 
+        - It successfully zoomed in and took a new screenshot
+        - It counted cells in the new view
+        - It compared the new count with the previous count
+        - The analysis is consistent with the zoom operation
+  options:
+    cache: false
+    runSerially: true
+
+# Test 12: Switch to 3D and Analyze
+- vars:
+    question: |
+      Switch to 3D view mode.
+      Take a screenshot of the 3D view.
+      Analyze the 3D scene and count the cells you can see from this perspective.
+      Compare the 3D cell count with your previous 2D counts.
+      Respond with the 3D cell count and your comparison.
+  assert:
+    - type: llm-rubric
+      value: 
+        - It successfully switched to 3D view and took a screenshot
+        - It counted cells in the 3D view
+        - It compared the 3D count with previous 2D counts
+        - The analysis is reasonable for the 3D perspective
+  options:
+    cache: false
+    runSerially: true
+
+# Test 13: Cleanup - Reset for next test run
+- vars:
+    question: |
+      Delete all loaded layers and reset the view to 2D mode.
+      Respond with <1> if the cleanup was successful, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true

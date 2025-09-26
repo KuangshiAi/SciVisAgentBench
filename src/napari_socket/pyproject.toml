@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=64", "wheel", "napari-plugin-engine~=0.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "napari-socket"
+version = "0.1.0"
+description = "Simple TCP command server for napari"
+authors = [{name = "You"}]
+requires-python = ">=3.9"
+dependencies = ["napari>=0.4.19", "qtpy"]
+
+# tell napari where the manifest is
+[project.entry-points."napari.manifest"]
+napari-socket = "napari_socket:napari.yaml"
+
+[tool.setuptools.packages.find]
+where   = ["."]
+include = ["napari_socket*"]
+
+[tool.setuptools.package-data]
+"napari_socket" = ["napari.yaml"]

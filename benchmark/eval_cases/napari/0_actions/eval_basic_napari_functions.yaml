@@ -1,0 +1,423 @@
+# Basic Napari Function Tests - Action Level
+# These tests evaluate individual napari MCP server functions with simple, single-function calls
+# Each test focuses on testing one specific function with appropriate parameters
+
+# Test 1: open_file - Load a single image file
+- vars:
+    question: |
+      Use the open_file function to load the image file "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1_ch0_t14.tif".
+      Respond with <1> if the file was successfully loaded, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 2: list_layers - Get information about loaded layers
+- vars:
+    question: |
+      Use the list_layers function to get information about all currently loaded layers.
+      Respond with <1> if you successfully retrieved layer information, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 3: set_colormap - Change layer colormap
+- vars:
+    question: |
+      Use the set_colormap function to change the colormap of the loaded layer to 'viridis'.
+      Respond with <1> if the colormap was successfully changed, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 4: set_opacity - Adjust layer transparency
+- vars:
+    question: |
+      Use the set_opacity function to set the opacity of the loaded layer to 0.5 (50% transparent).
+      Respond with <1> if the opacity was successfully changed, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 5: set_blending - Change layer blending mode
+- vars:
+    question: |
+      Use the set_blending function to change the blending mode of the loaded layer to 'additive'.
+      Respond with <1> if the blending mode was successfully changed, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 6: auto_contrast - Auto-adjust contrast
+- vars:
+    question: |
+      Use the auto_contrast function to automatically adjust the contrast of the loaded layer.
+      Respond with <1> if the contrast was successfully auto-adjusted, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 7: set_contrast_limits - Set specific contrast limits
+- vars:
+    question: |
+      Use the set_contrast_limits function to set the contrast limits of the loaded layer to min=0.1 and max=0.9.
+      Respond with <1> if the contrast limits were successfully set, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 8: set_gamma - Adjust gamma correction
+- vars:
+    question: |
+      Use the set_gamma function to set the gamma correction of the loaded layer to 1.5.
+      Respond with <1> if the gamma was successfully adjusted, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 9: set_interpolation - Change interpolation mode
+- vars:
+    question: |
+      Use the set_interpolation function to change the interpolation mode of the loaded layer to 'linear'.
+      Respond with <1> if the interpolation mode was successfully changed, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 10: toggle_view - Switch between 2D and 3D view
+- vars:
+    question: |
+      Use the toggle_view function to switch the view to 3D mode.
+      Respond with <1> if the view was successfully switched to 3D, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 11: get_dims_info - Get dimension information
+- vars:
+    question: |
+      Use the get_dims_info function to get information about the viewer's dimensions.
+      Respond with <1> if you successfully retrieved dimension information, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 12: get_camera - Get current camera settings
+- vars:
+    question: |
+      Use the get_camera function to get the current camera settings.
+      Respond with <1> if you successfully retrieved camera settings, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 13: reset_camera - Reset camera to default view
+- vars:
+    question: |
+      Use the reset_camera function to reset the camera to the default view.
+      Respond with <1> if the camera was successfully reset, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 14: set_camera - Adjust camera settings
+- vars:
+    question: |
+      Use the set_camera function to set the zoom to 2.0.
+      Respond with <1> if the camera zoom was successfully set, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 15: set_layer_visibility - Toggle layer visibility
+- vars:
+    question: |
+      Use the set_layer_visibility function to hide the loaded layer (set visible to false).
+      Respond with <1> if the layer visibility was successfully changed, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 16: set_layer_visibility - Show layer again
+- vars:
+    question: |
+      Use the set_layer_visibility function to show the loaded layer again (set visible to true).
+      Respond with <1> if the layer visibility was successfully changed, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 17: screenshot - Take a screenshot
+- vars:
+    question: |
+      Use the screenshot function to take a screenshot of the current view.
+      Respond with <1> if the screenshot was successfully taken, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 18: get_layer_statistics - Get layer statistics
+- vars:
+    question: |
+      Use the get_layer_statistics function to get basic statistics (min, max, mean, std) for the loaded layer.
+      Respond with <1> if you successfully retrieved layer statistics, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 19: get_layer_data - Extract layer data
+- vars:
+    question: |
+      Use the get_layer_data function to extract the raw data from the loaded layer.
+      Respond with <1> if you successfully extracted layer data, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 20: add_points - Add point annotations
+- vars:
+    question: |
+      Use the add_points function to add two point markers at coordinates [[100, 100], [200, 200]] with the name "test_points".
+      Respond with <1> if the points were successfully added, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 21: add_shapes - Add shape annotations
+- vars:
+    question: |
+      Use the add_shapes function to add a rectangle shape with coordinates [[[50, 50], [150, 50], [150, 150], [50, 150]]] and name "test_rectangle".
+      Respond with <1> if the shape was successfully added, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 22: measure_distance - Measure distance between points
+- vars:
+    question: |
+      Use the measure_distance function to measure the distance between point [100, 100] and point [200, 200].
+      Respond with <1> if the distance was successfully measured, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 23: set_scale_bar - Show scale bar
+- vars:
+    question: |
+      Use the set_scale_bar function to show the scale bar with unit 'um'.
+      Respond with <1> if the scale bar was successfully shown, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 24: set_axis_labels - Set axis labels
+- vars:
+    question: |
+      Use the set_axis_labels function to set axis labels to ['y', 'x'] for the 2D data.
+      Respond with <1> if the axis labels were successfully set, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 25: export_screenshot - Save screenshot to file
+- vars:
+    question: |
+      Use the export_screenshot function to save a screenshot to "test_screenshot.jpg".
+      Respond with <1> if the screenshot was successfully exported, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 26: save_layers - Save layer to file
+- vars:
+    question: |
+      Use the save_layers function to save the loaded layer to "test_layer.tif".
+      Respond with <1> if the layer was successfully saved, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 27: remove_layer - Remove a layer
+- vars:
+    question: |
+      Use the remove_layer function to remove the "test_points" layer.
+      Respond with <1> if the layer was successfully removed, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 28: Error handling - Try to load non-existent file
+- vars:
+    question: |
+      Use the open_file function to try to load a non-existent file "nonexistent.tif".
+      Respond with <1> if the error was handled gracefully (no crash), or <0> if it crashed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 29: Error handling - Try to remove non-existent layer
+- vars:
+    question: |
+      Use the remove_layer function to try to remove a layer that doesn't exist "nonexistent_layer".
+      Respond with <1> if the error was handled gracefully (no crash), or <0> if it crashed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 30: Cleanup - Remove remaining test layers
+- vars:
+    question: |
+      Use the remove_layer function to remove the "test_rectangle" layer to clean up test annotations.
+      Respond with <1> if the layer was successfully removed, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true

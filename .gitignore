@@ -1,0 +1,63 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging artifacts
+build/
+dist/
+*.egg-info/
+
+# Installer logs and temporary files
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Coverage, test output, and cache directories
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+htmlcov/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Environment and virtual environment folders
+.env
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Log files (including the ParaView logs directory)
+*.log
+paraview_logs/
+
+# MCP-related artifacts (if any)
+mcp_debug/
+
+# OS specific files
+.DS_Store
+
+Thumbs.db
+
+# Anonymized datasets folder
+benchmark/anonymized_datasets/
+
+# SciVisAgentBench task folders
+SciVisAgentBench-tasks/
+
+# Exclude communication logs and screenshots (test data)
+communication_logs/
+*.log
+test_results/

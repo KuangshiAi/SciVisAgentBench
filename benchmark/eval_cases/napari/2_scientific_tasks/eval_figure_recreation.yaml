@@ -1,0 +1,32 @@
+# Figure Recreation Tests for napari-mcp
+# These tests evaluate the agent's ability to recreate scientific figures from papers
+# Focus: Loading data, applying appropriate visualization settings, and matching target figures
+
+# Test 1: Recreate C. elegans Infection Figure from BBBC012 Dataset
+- vars:
+    question: |
+      Load the three input images from the BBBC012_v1_images dataset:
+      - "D:/Development/napari-mcp/eval/data/BBBC012_v1_images/input/101210OranePlt2_N13_w1_[723EE621-1D8A-4ED8-9349-884F1342561E].tif"
+      - "D:/Development/napari-mcp/eval/data/BBBC012_v1_images/input/101210OranePlt2_N13_w2_[6C35EF3F-DA59-4416-8D54-435D195DB70E].tif"
+      - "D:/Development/napari-mcp/eval/data/BBBC012_v1_images/input/101210OranePlt2_N13_w3_[F8D79BE3-2A04-4775-858C-AF8326D2CC1A].tif"
+      
+      Apply appropriate colormaps to each channel to recreate the C. elegans infection figure:
+      - Channel 1 (w1): Use a colormap that shows the C. elegans worms clearly
+      - Channel 2 (w2): Use a colormap that shows the infection markers
+      - Channel 3 (w3): Use a colormap that shows additional cellular structures
+      
+      Set appropriate blending modes and opacities to combine the channels effectively.
+      Adjust contrast and gamma as needed to match the target figure.
+      Take a screenshot of your recreation.
+      
+      Compare your screenshot with the target figure "D:/Development/napari-mcp/eval/data/BBBC012_v1_images/assertions/target_celegans_infection_figure.png".
+      
+      Respond with <1> if you successfully recreated the figure and it closely matches the target, or <0> if it failed or doesn't match well. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true

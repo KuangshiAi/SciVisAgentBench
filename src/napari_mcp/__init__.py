@@ -1,0 +1,1 @@
+# napari_mcp package 

@@ -1,0 +1,118 @@
+# Analysis Workflow Tests for napari-mcp
+# These tests evaluate complex analysis workflows that combine multiple napari functions
+# Each test focuses on performing specific analysis tasks
+
+# Test 1: Cell Counting and Measurement Analysis
+- vars:
+    question: |
+      Load the image "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1_ch1_t14.tif" and set it to magenta colormap.
+      Take a screenshot and analyze it to count how many complete cells are visible (not cut off by edges).
+      Add point annotations to mark the center of each counted cell.
+      Measure the distance between the two most distant cells.
+      Respond with the number of complete cells you counted, for example "5" if you see 5 complete cells.
+  assert:
+    - type: llm-rubric
+      value: 
+        - It counted 2 complete cells
+  options:
+    cache: false
+    runSerially: true
+
+# Test 2: Multi-dimensional Data Exploration
+- vars:
+    question: |
+      Load the multi-dimensional image "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1_ch0_t14.tif".
+      Get dimension information to understand the data structure.
+      Navigate through different z-slices to examine structures at different depths.
+      Take screenshots at 3 different z-slices to show structural changes.
+      Respond with <1> if you successfully explored the multi-dimensional data and observed structural changes, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 3: Statistical Analysis and Data Export
+- vars:
+    question: |
+      Get basic statistics (min, max, mean, std) for the loaded layer.
+      Extract the raw layer data and examine its properties.
+      Save the current layer to a file for further analysis.
+      Export a screenshot of the current view for documentation.
+      Respond with <1> if the statistical analysis and data export were successful, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 4: Annotation and Measurement Workflow
+- vars:
+    question: |
+      Add point annotations to mark specific features of interest in the image.
+      Add shape annotations (rectangles or circles) to highlight regions of interest.
+      Measure distances between multiple pairs of points.
+      Take a screenshot showing all annotations and measurements.
+      Respond with <1> if the annotation and measurement workflow was successful, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 5: Time Series Analysis (if applicable)
+- vars:
+    question: |
+      If the data has time dimensions, navigate through different time points.
+      Compare cellular structures between different time points.
+      Take screenshots at different time points to show temporal changes.
+      If no time dimension exists, simulate time series analysis by adjusting the current view and taking multiple screenshots.
+      Respond with <1> if the time series analysis was successful, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 6: Data Cropping and Region of Interest Analysis
+- vars:
+    question: |
+      Define a region of interest by cropping the layer to a specific area.
+      Analyze the cropped region separately from the full dataset.
+      Compare statistics between the full dataset and the cropped region.
+      Take screenshots of both the full view and the cropped region.
+      Respond with <1> if the cropping and region analysis was successful, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 7: Cleanup - Reset for next test run
+- vars:
+    question: |
+      Delete all loaded layers and remove any annotations to prepare for the next test run.
+      Respond with <1> if all layers and annotations were successfully removed, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true

@@ -1,0 +1,28 @@
+{
+    "model": "meta-llama/Llama-3.3-70B-Instruct",
+    "provider": "nebius",
+    "servers": [
+        {
+        "type": "stdio",
+        "config": {
+            "command": "/Users/kuangshiai/miniconda3/envs/napari_mcp/bin/python",
+            "args": [
+            "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench/src/mcp_logger.py",
+            "/Users/kuangshiai/miniconda3/envs/napari_mcp/bin/python",
+            "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench/src/napari_mcp/napari_mcp_server.py"
+            ]
+        }
+        },
+        {
+            "type": "stdio",
+            "config": {
+                "command": "npx",
+                "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench"
+      ]
+            }
+        }
+    ]
+}

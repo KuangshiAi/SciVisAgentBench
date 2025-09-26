@@ -1,0 +1,526 @@
+# Comprehensive Data Identification Test Cases for SciVisAgentBench
+# This test evaluates the ability to identify and understand data content
+# without prior knowledge from metadata or naming patterns
+
+# 1. Aneurism Dataset
+- vars:
+    question: |
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_001/data/data_001_256x256x256_uint8.raw".
+        Use visualization tools to determine what object or structure is contained in this dataset. Save the paraview state as "anonymized_datasets/dataset_001/results/{agent_mode}/dataset_001.pvsm"
+        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_001/results/{agent_mode}/answers.txt"
+  assert:
+    - type: llm-rubric
+      subtype: text
+      value: |
+          The assistant should identify the data shows an aneurism or vascular structure
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          The assistant should identify the data shows an aneurism or vascular structure
+
+# # 2. Backpack Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_002/data/data_002_512x512x373_uint16.raw".
+#         Use visualization tools to determine what object is contained in this dataset. Save the paraview state as "anonymized_datasets/dataset_002/results/{agent_mode}/dataset_002.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_002/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           The assistant should identify that the data shows a backpack
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           The assistant should identify that the data shows a backpack
+
+# 3. Blunt Fin Dataset
+- vars:
+    question: |
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_003/data/data_003_256x128x64_uint8.raw".
+        Use visualization tools to determine what object or structure is in this dataset. Save the paraview state as "anonymized_datasets/dataset_003/results/{agent_mode}/dataset_003.pvsm"
+        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_003/results/{agent_mode}/answers.txt"
+  assert:
+    - type: llm-rubric
+      subtype: text
+      value: |
+          The assistant should identify a fin or aerodynamic strcuture or simulation result in the data
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          The assistant should identify a fin or aerodynamic strcuture or simulation result in the data
+
+# # 4. Bonsai Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_004/data/data_004_256x256x256_uint8.raw".
+#         Use visualization tools to determine what object is contained in this dataset. Save the paraview state as "anonymized_datasets/dataset_004/results/{agent_mode}/dataset_004.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_004/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify a bonsai tree or botanical structure in the data
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify a bonsai tree or botanical structure in the data
+
+# # 5. Boston Teapot Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_005/data/data_005_256x256x178_uint8.raw".
+#         Use visualization tools to determine what object is in this dataset. Save the paraview state as "anonymized_datasets/dataset_005/results/{agent_mode}/dataset_005.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_005/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify a teapot in the visualization
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify a teapot in the visualization
+
+# # 6. Bunny Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_006/data/data_006_512x512x361_uint16.raw".
+#         Use visualization tools to determine what object is in this dataset. Save the paraview state as "anonymized_datasets/dataset_006/results/{agent_mode}/dataset_006.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_006/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify a bunny or rabbit in the 3D scanned data
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify a bunny or rabbit in the 3D scanned data
+
+# # 7. Carp Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_007/data/carp_256x256x512_uint16.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_007/results/{agent_mode}/dataset_007.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_007/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify a carp or fish anatomy
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify a carp or fish anatomy
+
+# # 8. CSAFE Heptane Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_008/data/data_007_302x302x302_uint8.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_008/results/{agent_mode}/dataset_008.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_008/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should recognize combustion or heptane simulation data
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should recognize combustion or heptane simulation data
+
+# # 9. Duct Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_009/data/data_008_193x194x1000_float32.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_009/results/{agent_mode}/dataset_009.pvsm"
+#         Take a screenshot and provide a textual report describing what you observe and save it to "anonymized_datasets/dataset_009/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify flow patterns in a duct geometry
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify flow patterns in a duct geometry
+
+# # 10. Engine Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_010/data/data_009_256x256x128_uint8.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_010/results/{agent_mode}/dataset_010.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_010/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify an engine or mechanical components
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify an engine or mechanical components
+
+# # 11. Foot Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_011/data/data_010_256x256x256_uint8.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_011/results/{agent_mode}/dataset_011.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_011/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify a foot with bone and tissue structures
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify a foot with bone and tissue structures
+
+# # 12. Frog Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_012/data/data_011_256x256x44_uint8.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_012/results/{agent_mode}/dataset_012.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_012/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify a frog specimen with internal anatomy
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify a frog specimen with internal anatomy
+
+# # 13. Fuel Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_013/data/fuel_64x64x64_uint8.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_013/results/{agent_mode}/dataset_013.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_013/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify fuel combustion or related simulation
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify fuel combustion or related simulation
+
+# # 14. Hydrogen Atom Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_014/data/data_012_128x128x128_uint8.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_014/results/{agent_mode}/dataset_014.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_014/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should recognize hydrogen atom orbital or probability distribution
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should recognize hydrogen atom orbital or probability distribution
+
+# # 15. Lobster Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_015/data/data_013_301x324x56_uint8.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_015/results/{agent_mode}/dataset_015.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_015/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify a lobster or crustacean anatomy
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify a lobster or crustacean anatomy
+
+# # 16. Marschner-Lobb Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_016/data/marschner_lobb_41x41x41_uint8.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_016/results/{agent_mode}/dataset_016.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_016/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should recognize Marschner-Lobb synthetic test pattern
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should recognize Marschner-Lobb synthetic test pattern
+
+# # 17. MRI Ventricles Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_017/data/data_014_256x256x124_uint8.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_017/results/{agent_mode}/dataset_017.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_017/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify brain ventricles or ventricular structures
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify brain ventricles or ventricular structures
+
+# # 18. MRI Woman Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_018/data/data_015_256x256x109_uint16.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_018/results/{agent_mode}/dataset_018.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_018/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify human anatomical structures from MRI scan
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify human anatomical structures from MRI scan
+
+# # 19. MRT Angio Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_019/data/data_016_416x512x112_uint16.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_019/results/{agent_mode}/dataset_019.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_019/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify angiography or vascular structures
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify angiography or vascular structures
+
+# # 20. Neghip Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_020/data/data_017_64x64x64_uint8.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_020/results/{agent_mode}/dataset_020.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_020/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should visualize and describe molecule structure
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should visualize and describe molecule structure
+
+# # 21. Neocortical Layer 1 Axons Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_021/data/neocortical_layer_1_axons_1464x1033x76_uint8.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_021/results/{agent_mode}/dataset_021.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_021/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify neural axons or neocortical network structures
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify neural axons or neocortical network structures
+
+# # 22. Nucleon Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_022/data/data_018_41x41x41_uint8.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_022/results/{agent_mode}/dataset_022.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_022/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should visualize nucleon or particle physics data
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should visualize nucleon or particle physics data
+
+# # 23. Pancreas Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_023/data/pancreas_240x512x512_int16.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_023/results/{agent_mode}/dataset_023.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_023/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify pancreas or pancreatic anatomy
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify pancreas or pancreatic anatomy
+
+# # 24. Shockwave Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_024/data/shockwave_64x64x512_uint8.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_024/results/{agent_mode}/dataset_024.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_024/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify shockwave or wave propagation patterns
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify shockwave or wave propagation patterns
+
+# # 25. Silicium Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_025/data/silicium_98x34x34_uint8.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_025/results/{agent_mode}/dataset_025.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_025/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify silicon crystal or material structure
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify silicon crystal or material structure
+
+# # 26. Skull Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_026/data/skull_256x256x256_uint8.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_026/results/{agent_mode}/dataset_026.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_026/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           1. Should identify skull or cranial bone structures
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           1. Should identify skull or cranial bone structures
+
+# # 27. Statue Leg Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_027/data/data_019_341x341x93_uint8.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_027/results/{agent_mode}/dataset_027.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_027/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify a statue leg or sculptural form
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify a statue leg or sculptural form
+
+# # 28. Stent Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_028/data/stent_512x512x174_uint16.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_028/results/{agent_mode}/dataset_028.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_028/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       value: |
+#           Should identify a stent or medical device mesh structure
+
+# # 29. Supernova Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_029/data/data_020_256x256x256_float32.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_029/results/{agent_mode}/dataset_029.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_029/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify supernova or astrophysical explosion simulation
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify supernova or astrophysical explosion simulation
+
+# # 30. TACC Turbulence Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_030/data/tacc_turbulence_256x256x256_float32.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_030/results/{agent_mode}/dataset_030.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_030/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify turbulence or vortex flow structures
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify turbulence or vortex flow structures
+
+# # 31. Tooth Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_031/data/data_021_103x94x161_uint8.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_031/results/{agent_mode}/dataset_031.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_031/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify tooth or dental anatomy
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify tooth or dental anatomy
+
+# # 32. Tornado Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_032/data/data_022_64x64x64_float32_scalar3.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_032/results/{agent_mode}/dataset_032.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_032/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify tornado or vortex flow pattern
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify tornado or vortex flow pattern
+
+# # 33. Visible Male Dataset
+# - vars:
+#     question: |
+#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_033/data/data_023_128x256x256_uint8.raw".
+#         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_033/results/{agent_mode}/dataset_033.pvsm"
+#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_033/results/{agent_mode}/answers.txt"
+#   assert:
+#     - type: llm-rubric
+#       subtype: text
+#       value: |
+#           Should identify human anatomical structures
+#     - type: llm-rubric
+#       subtype: vision
+#       value: |
+#           Should identify human anatomical structures 

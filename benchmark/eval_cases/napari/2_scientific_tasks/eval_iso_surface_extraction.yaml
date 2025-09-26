@@ -1,0 +1,211 @@
+# Iso-surface Extraction Tests for napari-mcp
+# These tests evaluate iso-surface extraction with adaptive threshold adjustment
+# Focus: Visual feedback-based iso-surface threshold optimization and cell segmentation
+
+# Test 1: Setup - Load cell data and switch to 3D view
+- vars:
+    question: |
+      Load the image "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1_ch0_t14.tif".
+      Switch to 3D view mode to enable iso-surface rendering.
+      Take a screenshot of the initial 3D view.
+      Respond with <1> if the 3D view was successfully set up, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 2: Initial Iso-surface with Low Threshold
+- vars:
+    question: |
+      Enable iso-surface rendering with a low threshold value of 0.1.
+      Take a screenshot to see the initial iso-surface.
+      Analyze the screenshot and describe what you see - are the cells visible as surfaces?
+      Respond with <1> if the low threshold iso-surface was applied and you can see surface structures, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 3: Medium Threshold Adjustment
+- vars:
+    question: |
+      Adjust the iso-surface threshold to a medium value of 0.3.
+      Take a screenshot to see how the iso-surface changes.
+      Compare this with the previous screenshot - are the cell surfaces more defined now?
+      Respond with <1> if the medium threshold was applied and the cell surfaces appear more defined, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 4: High Threshold for Cell Boundaries
+- vars:
+    question: |
+      Increase the iso-surface threshold to a high value of 0.6.
+      Take a screenshot to see the high threshold iso-surface.
+      Analyze the screenshot - do you see clear cell boundaries and distinct cellular structures?
+      Respond with <1> if the high threshold shows clear cell boundaries and distinct structures, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 5: Very High Threshold for Cell Centers
+- vars:
+    question: |
+      Set the iso-surface threshold to a very high value of 0.8.
+      Take a screenshot to see the very high threshold iso-surface.
+      Analyze the screenshot - do you see only the brightest parts of the cells (likely cell centers)?
+      Respond with <1> if the very high threshold shows only the brightest cell regions, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 6: Optimal Threshold Selection
+- vars:
+    question: |
+      Based on the previous screenshots, select what you think is the optimal iso-surface threshold for clearly visualizing the cell structures.
+      Apply this optimal threshold and take a screenshot.
+      Describe why you chose this threshold value based on the visual results.
+      Respond with <1> if you successfully applied an optimal threshold that clearly shows cell structures, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 7: Iso-surface with Different Colormaps
+- vars:
+    question: |
+      Keep the optimal iso-surface threshold and try different colormaps to enhance the visualization.
+      Test colormaps like 'viridis', 'plasma', and 'hot' on the iso-surface.
+      Take screenshots showing the iso-surface with different colormaps.
+      Respond with <1> if you successfully applied different colormaps to the iso-surface, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 8: Camera Navigation for Iso-surface Inspection
+- vars:
+    question: |
+      Rotate the camera to view the iso-surface from different angles (front, side, top).
+      Take screenshots from at least 3 different viewing angles.
+      Analyze the screenshots to see if the cell structures are visible from all angles.
+      Respond with <1> if you successfully inspected the iso-surface from multiple angles and could see cell structures, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 9: Iso-surface Threshold Fine-tuning
+- vars:
+    question: |
+      Fine-tune the iso-surface threshold by making small adjustments (e.g., 0.05 increments).
+      Test thresholds around your optimal value (e.g., optimal-0.05, optimal, optimal+0.05).
+      Take screenshots to compare the fine-tuned results.
+      Respond with <1> if you successfully fine-tuned the iso-surface threshold and could see subtle differences, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 10: Iso-surface with Opacity Adjustment
+- vars:
+    question: |
+      Adjust the opacity of the iso-surface to make it semi-transparent (e.g., 0.7).
+      Take a screenshot to see the semi-transparent iso-surface.
+      Try different opacity values (0.5, 0.8, 1.0) and take screenshots.
+      Respond with <1> if you successfully adjusted the iso-surface opacity and could see the transparency effects, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 11: Cell Counting from Iso-surface
+- vars:
+    question: |
+      Use the optimal iso-surface threshold to count the number of distinct cell structures visible.
+      Take a screenshot and analyze it to count the cells.
+      Add point annotations to mark the center of each counted cell.
+      Respond with the number of cells you can count from the iso-surface, for example "5" if you see 5 distinct cell structures.
+  assert:
+    - type: llm-rubric
+      value: 
+        - It counted the visible cell structures from the iso-surface
+        - The count is reasonable based on the cell data
+  options:
+    cache: false
+    runSerially: true
+
+# Test 12: Iso-surface Quality Assessment
+- vars:
+    question: |
+      Assess the quality of the iso-surface extraction by examining the smoothness and completeness of the cell surfaces.
+      Take a screenshot and describe the quality of the iso-surface (smooth, jagged, complete, incomplete).
+      Try adjusting the interpolation mode to 'linear' or 'cubic' to improve surface quality.
+      Take another screenshot to compare the surface quality.
+      Respond with <1> if you successfully assessed and improved the iso-surface quality, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test 13: Cleanup - Reset for next test run
+- vars:
+    question: |
+      Delete the loaded layer and reset the view to 2D mode.
+      Remove any annotations or measurements.
+      Respond with <1> if the cleanup was successful, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
