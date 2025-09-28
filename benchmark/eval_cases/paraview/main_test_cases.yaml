@@ -31,274 +31,356 @@
 
           4. Golden Leaves Visualization: Does the result show the leaves portion in golden color?
 
-# # 2. Carp Dataset
-# - vars:
-#     question: |
-#         Task:
+# 2. Carp Dataset
+- vars:
+    question: |
+        Task:
 
-#         Load the carp dataset from "carp/data/carp_256x256x512_uint16.raw", the information about this dataset:
-#         Carp (Scalar)
-#         Data Scalar Type: unsigned short
-#         Data Byte Order: little Endian
-#         Data Spacing: 0.78125x0.390625x1
-#         Data Extent: 256x256x512
+        Load the carp dataset from "carp/data/carp_256x256x512_uint16.raw", the information about this dataset:
+        Carp (Scalar)
+        Data Scalar Type: unsigned short
+        Data Byte Order: little Endian
+        Data Spacing: 0.78125x0.390625x1
+        Data Extent: 256x256x512
 
-#         Instructions:
+        Instructions:
 
-#         1. Load the dataset into ParaView.
+        1. Load the dataset into ParaView.
 
-#         2. Apply volume rendering to visualize the carp skeleton.
+        2. Apply volume rendering to visualize the carp skeleton.
 
-#         3. Adjust the transfer function to highlight only the bony structures in an X-ray style (suppressing soft tissue).
+        3. Adjust the transfer function to highlight only the bony structures in an X-ray style (suppressing soft tissue).
 
-#         4. Optimize the viewpoint to display the full skeleton, ensuring the head, spine, and fins are all clearly visible in a single frame.
+        4. Optimize the viewpoint to display the full skeleton, ensuring the head, spine, and fins are all clearly visible in a single frame.
 
-#         5. Analyze the visualization and answer the following questions:
-#         Q1: How many distinct fins are visible in the carp skeleton? List their anatomical names and corresponding counts.
-#         Q2: Estimate the ratio of skull length to overall body length, based on the visualization.
+        5. Analyze the visualization and answer the following questions:
+        Q1: How many distinct fins are visible in the carp skeleton? List their anatomical names and corresponding counts.
+        Q2: Estimate the ratio of skull length to overall body length, based on the visualization.
 
-#         6. Save your work:
-#         Save the ParaView state as "carp/results/{agent_mode}/carp.pvsm".
-#         Save the answers to the analysis questions in plain text as "carp/results/{agent_mode}/answers.txt".
-#   assert:
-#     - type: llm-rubric
-#       subtype: vision
-#       value: |
-#           1. Bone Isolation: Are the bones clearly visible while soft tissue and background are suppressed? Thin fin rays should be distinguishable without major loss.
+        6. Save your work:
+        Save the ParaView state as "carp/results/{agent_mode}/carp.pvsm".
+        Save the answers to the analysis questions in plain text as "carp/results/{agent_mode}/answers.txt".
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Bone Isolation: Are the bones clearly visible while soft tissue and background are suppressed? Thin fin rays should be distinguishable without major loss.
 
-#           2. Viewpoint Selection: Does the chosen viewpoint display the entire carp skeleton (head, spine, ribs, fins, tail) without critical occlusion?
+          2. Viewpoint Selection: Does the chosen viewpoint display the entire carp skeleton (head, spine, ribs, fins, tail) without critical occlusion?
 
-#           3. X-ray Appearance: Does the visualization resemble an X-ray (monochrome or grayscale, transparent look, consistent lighting)?
+          3. X-ray Appearance: Does the visualization resemble an X-ray (monochrome or grayscale, transparent look, consistent lighting)?
 
-#           4. Correct Data Setup: Was the dataset loaded with proper spacing (0.78125x0.390625x1.0)? The carp skeleton should appear in its correct proportions without distortion (i.e., the fish shape looks anatomically normal).
+          4. Correct Data Setup: Was the dataset loaded with proper spacing (0.78125x0.390625x1.0)? The carp skeleton should appear in its correct proportions without distortion (i.e., the fish shape looks anatomically normal).
+    - type: llm-rubric
+      subtype: text
+      value: |
+          1. 7 fins are visible: 1 dorsal fin, 2 pectoral fins, 2 pelvic fins, 1 anal fin, and 1 caudal fin.
 
-# # 3. Chameleon Dataset
-# - vars:
-#     question: |
-#         Task:
+          2. The skull length is approximately 22% of the overall body length.
 
-#         Load the chameleon dataset from "chameleon/data/chameleon_256x256x270_float32.raw", the information about this dataset:
-#         chameleon (Scalar)
-#         Data Scalar Type: float
-#         Data Byte Order: little Endian
-#         Data Extent: 256x256x270
-#         Number of Scalar Components: 1
-#         Data loading is very important, make sure you correctly load the dataset according to their features.
+# 3. Chameleon Dataset
+- vars:
+    question: |
+        Task:
 
-#         Apply the volume rendering to visualize the chameleon dataset
+        Load the chameleon dataset from "chameleon/data/chameleon_256x256x270_float32.raw", the information about this dataset:
+        chameleon (Scalar)
+        Data Scalar Type: float
+        Data Byte Order: little Endian
+        Data Extent: 256x256x270
+        Number of Scalar Components: 1
+        Data loading is very important, make sure you correctly load the dataset according to their features.
 
-#         Adjust the transfer function to highlight the bony structures and skin in an X-ray style.
+        Apply the volume rendering to visualize the chameleon dataset
 
-#         Adjust the camera position and focus on the head part of the chameleon
+        Adjust the transfer function to highlight the bony structures and skin in an X-ray style.
 
-#         Please think step by step and make sure to fulfill all the visualization goals mentioned above.
+        Adjust the camera position and focus on the head part of the chameleon
 
-#         Finally, save the paraview state as "chameleon/results/{agent_mode}/chameleon.pvsm"
-#   assert:
-#     - type: llm-rubric
-#       subtype: vision
-#       value: |
-#           1. Overall Visualization Goal: Does the result present a clean, X-ray–style volume rendering where the chameleon's bony structures are clearly emphasized and soft tissue is faint but discernible?
+        Please think step by step and make sure to fulfill all the visualization goals mentioned above.
 
-#           2. Data Loading Correctness: Is the RAW volume loaded with the specified metadata (float32, little-endian, 256×256×270, 1 component) so that the histogram looks reasonable and the anatomy is not flipped or distorted?
+        Finally, save the paraview state as "chameleon/results/{agent_mode}/chameleon.pvsm"
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Overall Visualization Goal: Does the result present a clean, X-ray–style volume rendering where the chameleon's bony structures are clearly emphasized and soft tissue is faint but discernible?
 
-#           3. Transfer Function Quality: Does the grayscale transfer function make low-intensity tissue mostly transparent while assigning higher opacity to bones/skin ridges, yielding good depth cues without over-saturation or banding?
+          2. Data Loading Correctness: Is the RAW volume loaded with the specified metadata (float32, little-endian, 256×256×270, 1 component) so that the histogram looks reasonable and the anatomy is not flipped or distorted?
 
-#           4. Camera & Framing: Is the camera positioned and zoomed to focus on the chameleon's head, keeping it sharply framed (no clipping), with a stable viewpoint that highlights key anatomical details?
+          3. Transfer Function Quality: Does the grayscale transfer function make low-intensity tissue mostly transparent while assigning higher opacity to bones/skin ridges, yielding good depth cues without over-saturation or banding?
 
-# # 4. Engine Dataset
-# - vars:
-#     question: |
-#         Task:
+          4. Camera & Framing: Is the camera positioned and zoomed to focus on the chameleon's head, keeping it sharply framed (no clipping), with a stable viewpoint that highlights key anatomical details?
 
-#         Load the vortex dataset from "engine/data/engine_256x256x128_uint8.raw", the information about this dataset:
-#         engine (Scalar)
-#         Data Scalar Type: float
-#         Data Byte Order: little Endian
-#         Data Extent: 256x256x128
-#         Number of Scalar Components: 1
+# 4. Engine Dataset
+- vars:
+    question: |
+        Task:
 
-#         Instructions:
+        Load the vortex dataset from "engine/data/engine_256x256x128_uint8.raw", the information about this dataset:
+        engine (Scalar)
+        Data Scalar Type: float
+        Data Byte Order: little Endian
+        Data Extent: 256x256x128
+        Number of Scalar Components: 1
 
-#         1. Load the dataset into ParaView.
+        Instructions:
 
-#         2. Apply the volume rendering to visualize the engine dataset
+        1. Load the dataset into ParaView.
 
-#         3. Adjust the transfer function, let the outer part more transparent and the inner part more solid. Use light blue for the outer part and orange for the inner part.
+        2. Apply the volume rendering to visualize the engine dataset
 
-#         4. Save your work:
-#         Save the ParaView state as "engine/results/{agent_mode}/engine.pvsm".
-#   assert:
-#     - type: llm-rubric
-#       subtype: vision
-#       value: |
-#           1. Overall Visualization Goal: How well does the result use volume rendering to clearly present the internal and external structures of the engine dataset?
+        3. Adjust the transfer function, let the outer part more transparent and the inner part more solid. Use light blue for the outer part and orange for the inner part.
 
-#           2. Structural Clarity: Does the visualization emphasize depth so that the outer layers do not obscure the inner structures?
+        4. Save your work:
+        Save the ParaView state as "engine/results/{agent_mode}/engine.pvsm".
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Overall Visualization Goal: How well does the result use volume rendering to clearly present the internal and external structures of the engine dataset?
 
-#           3. Transfer Function Transparency: Is the outer region rendered with higher transparency and the inner region more solid, achieving a clear layering effect?
+          2. Structural Clarity: Does the visualization emphasize depth so that the outer layers do not obscure the inner structures?
 
-#           4. Transfer Function Color Mapping: Are colors correctly assigned so that the outer part is light blue and the inner part is orange, enhancing structural contrast?
+          3. Transfer Function Transparency: Is the outer region rendered with higher transparency and the inner region more solid, achieving a clear layering effect?
 
-# # 5. Solar Plume Dataset
-# - vars:
-#     question: |
-#         Task:
+          4. Transfer Function Color Mapping: Are colors correctly assigned so that the outer part is light blue and the inner part is orange, enhancing structural contrast?
 
-#         Load the tornado dataset from "solar-plume/data/solar-plume_126x126x512_float32_scalar3.raw", the information about this dataset:
-#         solar-plume (Vector)
-#         Data Scalar Type: float
-#         Data Byte Order: little Endian
-#         Data Extent: 126x126x512
-#         Number of Scalar Components: 3
-#         Data loading is very important, make sure you correctly load the dataset according to their features.
+# 5. Solar Plume Dataset
+- vars:
+    question: |
+        Task:
 
-#         Add a "stream tracer" filter under the tornado data to display streamline, set the "Seed type" to "Point Cloud" and set the center of point cloud to 3D position [50, 50, 320] with a radius 30, then hide the point cloud sphere.
+        Load the tornado dataset from "solar-plume/data/solar-plume_126x126x512_float32_scalar3.raw", the information about this dataset:
+        solar-plume (Vector)
+        Data Scalar Type: float
+        Data Byte Order: little Endian
+        Data Extent: 126x126x512
+        Number of Scalar Components: 3
+        Data loading is very important, make sure you correctly load the dataset according to their features.
 
-#         Add a "tube" filter under the "stream tracer" filter to enhance the streamline visualization. Set the radius to 0.5. In the pipeline browser panel, hide everything except the "tube" filter. 
+        Add a "stream tracer" filter under the tornado data to display streamline, set the "Seed type" to "Point Cloud" and set the center of point cloud to 3D position [50, 50, 320] with a radius 30, then hide the point cloud sphere.
 
+        Add a "tube" filter under the "stream tracer" filter to enhance the streamline visualization. Set the radius to 0.5. In the pipeline browser panel, hide everything except the "tube" filter. 
 
-#         Please think step by step and make sure to fulfill all the visualization goals mentioned above.
 
-#         Finally, save the paraview state as "solar-plume/results/{agent_mode}/solar-plume.pvsm"
-#   assert:
-#     - type: llm-rubric
-#       subtype: vision
-#       value: |
-#           1. Overall Visualization Goal: How well does the result achieve the overall goal of showing tornado flow patterns with glyphs and streamlines?
+        Please think step by step and make sure to fulfill all the visualization goals mentioned above.
 
-#           2. Glyph Visualization: Does the result show velocity glyphs that are appropriately sized and visible?
+        Finally, save the paraview state as "solar-plume/results/{agent_mode}/solar-plume.pvsm"
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Overall Visualization Goal: How well does the result achieve the overall goal of showing tornado flow patterns with glyphs and streamlines?
 
-#           3. Streamline Visualization: Does the result show streamlines that follow the flow patterns effectively?
+          2. Glyph Visualization: Does the result show velocity glyphs that are appropriately sized and visible?
 
-#           4. Tube Rendering: Are the streamlines rendered as tubes with appropriate thickness?
+          3. Streamline Visualization: Does the result show streamlines that follow the flow patterns effectively?
 
-# # 6. Supernova Dataset
-# - vars:
-#     question: |
-#         Task:
+          4. Tube Rendering: Are the streamlines rendered as tubes with appropriate thickness?
 
-#         Load the supernova dataset from "supernova/data/supernova_256x256x256_float32.raw", the information about this dataset:
-#         Supernova (Scalar)
-#         Data Scalar Type: float
-#         Data Byte Order: little Endian
-#         Data Spacing: 1x1x1
-#         Data Extent: 256x256x256
-#         Data loading is very important, make sure you correctly load the dataset according to their features.
+# 6. Supernova Dataset
+- vars:
+    question: |
+        Task:
 
-#         Then visualize it and extract two isosurfaces. One of them use color red, showing areas with low density (isovalue 40 and opacity 0.4), while the other use color blue, showing areas with high density (isovalue 150 and opacity 0.8).
+        Load the supernova dataset from "supernova/data/supernova_256x256x256_float32.raw", the information about this dataset:
+        Supernova (Scalar)
+        Data Scalar Type: float
+        Data Byte Order: little Endian
+        Data Spacing: 1x1x1
+        Data Extent: 256x256x256
+        Data loading is very important, make sure you correctly load the dataset according to their features.
 
-#         Please think step by step and make sure to fulfill all the visualization goals mentioned above. Only make the two isosurfaces visible.
+        Then visualize it and extract two isosurfaces. One of them use color red, showing areas with low density (isovalue 40 and opacity 0.4), while the other use color blue, showing areas with high density (isovalue 150 and opacity 0.8).
 
-#         Finally, save the paraview state as "supernova/results/{agent_mode}/supernova.pvsm"
-#   assert:
-#     - type: llm-rubric
-#       subtype: vision
-#       value: |
-#           1. Overall Visualization Goal: How well does the result achieve the overall goal of showing the supernova structure with two distinct isosurfaces representing different density regions?
+        Please think step by step and make sure to fulfill all the visualization goals mentioned above. Only make the two isosurfaces visible.
 
-#           2. Does the red isosurface show low density areas (outside regions) with lower opacity?
+        Finally, save the paraview state as "supernova/results/{agent_mode}/supernova.pvsm"
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Overall Visualization Goal: How well does the result achieve the overall goal of showing the supernova structure with two distinct isosurfaces representing different density regions?
 
-#           3. Does the blue isosurface show high density areas (inside regions) with higher opacity?
+          2. Does the red isosurface show low density areas (outside regions) with lower opacity?
 
-# # 7. Tangaroa Dataset
-# - vars:
-#     question: |
-#         Task:
+          3. Does the blue isosurface show high density areas (inside regions) with higher opacity?
 
-#         Load the tangaroa dataset from "tangaroa_300x180x120_float32_scalar3.raw", the information about this dataset:
-#         tangaroa (Vector)
-#         Data Scalar Type: float
-#         Data Byte Order: little Endian
-#         Data Extent: 300x180x120
-#         Number of Scalar Components: 3
-#         Data loading is very important, make sure you correctly load the dataset according to their features.
+# 7. Tangaroa Dataset
+- vars:
+    question: |
+        Task:
 
-#         Apply "streamline tracer" filter, set the "Seed Type" to point cloud, turn off the "show sphere", set the center to [81.6814, 80.708, 23.5093], and radius to 29.9
+        Load the tangaroa dataset from "tangaroa_300x180x120_float32_scalar3.raw", the information about this dataset:
+        tangaroa (Vector)
+        Data Scalar Type: float
+        Data Byte Order: little Endian
+        Data Extent: 300x180x120
+        Number of Scalar Components: 3
+        Data loading is very important, make sure you correctly load the dataset according to their features.
 
-#         Add "Ribbon" filter to the streamline tracer results and set width to 0.3, set the Display representation to Surface.
+        Apply "streamline tracer" filter, set the "Seed Type" to point cloud, turn off the "show sphere", set the center to [81.6814, 80.708, 23.5093], and radius to 29.9
 
-#         In pipeline browser panel, hide everything except the ribbon filter results.
+        Add "Ribbon" filter to the streamline tracer results and set width to 0.3, set the Display representation to Surface.
 
-#         Please think step by step and make sure to fulfill all the visualization goals mentioned above.
+        In pipeline browser panel, hide everything except the ribbon filter results.
 
-#         Finally, save the paraview state as "tangaroa/results/{agent_mode}/tangaroa.pvsm"
-#   assert:
-#     - type: llm-rubric
-#       subtype: vision
-#       value: |
-#           1. Overall Visualization Goal: How well does the result reveal the tangaroa flow structures using streamlines expanded into surfaces with the Ribbon filter?
+        Please think step by step and make sure to fulfill all the visualization goals mentioned above.
 
-#           2. Streamline Seeding: Are streamlines correctly seeded from a Point Cloud centered at [81.6814, 80.708, 23.5093] with radius 29.9, and is the seed sphere hidden?
+        Finally, save the paraview state as "tangaroa/results/{agent_mode}/tangaroa.pvsm"
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Overall Visualization Goal: How well does the result reveal the tangaroa flow structures using streamlines expanded into surfaces with the Ribbon filter?
 
-#           3. Ribbon Visualization: Are the streamlines rendered with the Ribbon filter, set to width 0.3, with Display representation as Surface, effectively showing flow surfaces?
+          2. Streamline Seeding: Are streamlines correctly seeded from a Point Cloud centered at [81.6814, 80.708, 23.5093] with radius 29.9, and is the seed sphere hidden?
 
-# # 8. Tornado Dataset
-# - vars:
-#     question: |
-#         Task:
+          3. Ribbon Visualization: Are the streamlines rendered with the Ribbon filter, set to width 0.3, with Display representation as Surface, effectively showing flow surfaces?
 
-#         Load the tornado dataset from "tornado/data/tornado_64x64x64_float32_scalar3.raw", the information about this dataset:
-#         Tornado (Vector)
-#         Data Scalar Type: float
-#         Data Byte Order: little Endian
-#         Data Extent: 64x64x64
-#         Number of Scalar Components: 3
-#         Data loading is very important, make sure you correctly load the dataset according to their features.
+# 8. Tornado Dataset
+- vars:
+    question: |
+        Task:
 
-#         Add a "glyph" filter under the tornado data to display velocity glyph, set an appropriate "Scale Factor" so the glyphs are visible.
+        Load the tornado dataset from "tornado/data/tornado_64x64x64_float32_scalar3.raw", the information about this dataset:
+        Tornado (Vector)
+        Data Scalar Type: float
+        Data Byte Order: little Endian
+        Data Extent: 64x64x64
+        Number of Scalar Components: 3
+        Data loading is very important, make sure you correctly load the dataset according to their features.
 
-#         Then add a "stream tracer" filter under the tornado data to generate streamlines. Choose "Point Cloud" as "Seed Type", and do not show sphere.
+        Add a "glyph" filter under the tornado data to display velocity glyph, set an appropriate "Scale Factor" so the glyphs are visible.
 
-#         Add a "tube" filter under the stream tracer you just created to generate tubes for visualizing the streamlines. Set an appropriate radius. Make the stream tracer invisible and the tube visible. At last, render the streamlines as tubes.
+        Then add a "stream tracer" filter under the tornado data to generate streamlines. Choose "Point Cloud" as "Seed Type", and do not show sphere.
 
-#         Please think step by step and make sure to fulfill all the visualization goals mentioned above.
+        Add a "tube" filter under the stream tracer you just created to generate tubes for visualizing the streamlines. Set an appropriate radius. Make the stream tracer invisible and the tube visible. At last, render the streamlines as tubes.
 
-#         Finally, save the paraview state as "tornado/results/{agent_mode}/tornado.pvsm"
-#   assert:
-#     - type: llm-rubric
-#       subtype: vision
-#       value: |
-#           1. Overall Visualization Goal: How well does the result achieve the overall goal of showing tornado flow patterns with glyphs and streamlines?
+        Please think step by step and make sure to fulfill all the visualization goals mentioned above.
 
-#           2. Glyph Visualization: Does the result show velocity glyphs that are appropriately sized and visible?
+        Finally, save the paraview state as "tornado/results/{agent_mode}/tornado.pvsm"
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Overall Visualization Goal: How well does the result achieve the overall goal of showing tornado flow patterns with glyphs and streamlines?
 
-#           3. Streamline Visualization: Does the result show streamlines that follow the flow patterns effectively?
+          2. Glyph Visualization: Does the result show velocity glyphs that are appropriately sized and visible?
 
-#           4. Tube Rendering: Are the streamlines rendered as tubes with appropriate thickness?
+          3. Streamline Visualization: Does the result show streamlines that follow the flow patterns effectively?
 
-# # 9. Vortex Dataset
-# - vars:
-#     question: |
-#         Task:
+          4. Tube Rendering: Are the streamlines rendered as tubes with appropriate thickness?
 
-#         Load the vortex dataset from "vortex/data/vortex_128x128x128_float32.raw", the information about this dataset:
-#         vortex (Scalar)
-#         Data Scalar Type: float
-#         Data Byte Order: little Endian
-#         Data Extent: 128x128x128
-#         Number of Scalar Components: 1
+# 9. Vortex Dataset
+- vars:
+    question: |
+        Task:
 
-#         Instructions:
+        Load the vortex dataset from "vortex/data/vortex_128x128x128_float32.raw", the information about this dataset:
+        vortex (Scalar)
+        Data Scalar Type: float
+        Data Byte Order: little Endian
+        Data Extent: 128x128x128
+        Number of Scalar Components: 1
 
-#         1. Load the dataset into ParaView.
+        Instructions:
 
-#         2. Leverage "contour" filter to achieve iso-surface rendering. In pipeline browser panel, hide everything except the "contour" fileter.
+        1. Load the dataset into ParaView.
 
-#         3. In properties panel of "contour" filter, set isosurface value to -0.2, use Solid Color and set the color as beige.
+        2. Leverage "contour" filter to achieve iso-surface rendering. In pipeline browser panel, hide everything except the "contour" fileter.
 
-#         4. Enable Ambient occlusion by toggle the "Use Ambient Occlusion" button in the Render Passes.
+        3. In properties panel of "contour" filter, set isosurface value to -0.2, use Solid Color and set the color as beige.
 
-#         5. Add head light with light inspector, set "Coords" as Camera, "Intentsity" to 0.2, Type to "Directional".
+        4. Enable Ambient occlusion by toggle the "Use Ambient Occlusion" button in the Render Passes.
 
-#         6. Save your work:
-#         Save the ParaView state as "vortex/results/{agent_mode}/vortex.pvsm".
-#   assert:
-#     - type: llm-rubric
-#       subtype: vision
-#       value: |
-#           1. Overall Visualization Goal: How well does the result present a clear iso-surface rendering of the vortex scalar field at value −0.2?
+        5. Add head light with light inspector, set "Coords" as Camera, "Intentsity" to 0.2, Type to "Directional".
 
-#           2. Contour Appearance: Is the contour rendered with Solid Color set to beige and made the only visible object in the pipeline?
+        6. Save your work:
+        Save the ParaView state as "vortex/results/{agent_mode}/vortex.pvsm".
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Overall Visualization Goal: How well does the result present a clear iso-surface rendering of the vortex scalar field at value −0.2?
 
-#           3. Lighting & Shading: Are Ambient Occlusion and a directional head light (Coords = Camera, Intensity = 0.2) applied?
+          2. Contour Appearance: Is the contour rendered with Solid Color set to beige and made the only visible object in the pipeline?
+
+          3. Lighting & Shading: Are Ambient Occlusion and a directional head light (Coords = Camera, Intensity = 0.2) applied?
+
+# 10. Foot Dataset
+- vars:
+    question: |
+        Task:
+
+        Load the Foot dataset from "foot/data/foot_256x256x256_uint8.raw", the information about this dataset:
+        Foot
+        Description: Rotational C-arm x-ray scan of a human foot. Tissue and bone are present in the dataset.
+        Data Type: uint8
+        Data Byte Order: little Endian
+        Data Spacing: 1x1x1
+        Data Extent: 256x256x256
+        Data loading is very important, make sure you correctly load the dataset according to their features.
+
+        Visualize the anatomical structures:
+        1. Apply volume rendering with an X-ray transfer function that distinguishes soft tissues and bones. Bones with darker color, and soft tissue with lighter color.
+
+        2. Analyze the visualization and answer the following questions:
+        Q1: In the visualization, which structures are fully visible: the phalanges, the metatarsals, or both?
+
+        3. Save your work:
+        Save the ParaView state as "foot/results/{agent_mode}/foot.pvsm".
+        Save the answers to the analysis questions in plain text as "foot/results/{agent_mode}/answers.txt".
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Overall Goal: Does the visualization effectively distinguish between different tissue types in the foot dataset?
+
+          2. X-ray Appearance: Does the visualization resemble an X-ray (monochrome or grayscale, transparent look, consistent lighting)?
+
+    - type: llm-rubric
+      subtype: text
+      value: |
+          1. The phalanges (toe bones) are clearly visible in full, but the metatarsals are only partially visible.
+
+# 11. Lobster Dataset
+- vars:
+    question: |
+        Task:
+
+        Load the Lobster dataset from "lobster/data/lobster_301x324x56_uint8.raw", the information about this dataset:
+        Lobster
+        Description: CT scan of a lobster contained in a block of resin.
+        Data Type: uint8
+        Data Byte Order: little Endian
+        Data Spacing: 1x1x1.4
+        Data Extent: 301x324x56
+        Data loading is very important, make sure you correctly load the dataset according to their features.
+
+        Visualize the scanned specimen:
+        1. Create an isosurface at the specimen boundary, find a proper isovalue to show the whole structure.
+
+        2. Use natural colors appropriate for the specimen (red-orange for lobster)
+
+        3. Analyze the visualization and answer the following questions:
+        Q1: How many walking legs does the lobster in the visualization have?
+
+        4. Save your work:
+        Save the ParaView state as "lobster/results/{agent_mode}/lobster.pvsm".
+        Save the answers to the analysis questions in plain text as "lobster/results/{agent_mode}/answers.txt".
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Overall Goal: Does the visualization clearly show the structure and details of the Lobster?
+
+          2. Boundary Clearity: Are surface details and boundaries of the lobster well-defined?
+
+          3. Correct Color: Is the color of the lobster mimic a real one? (red-orange)
+
+    - type: llm-rubric
+      subtype: text
+      value: |
+          1. The lobster only has 7 walking legs, one of them on the right side of its body is missing.

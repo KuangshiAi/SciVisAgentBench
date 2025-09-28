@@ -1,6 +1,6 @@
 # SciVisAgentBench
 
-SciVisAgentBench is a comprehensive benchmark for evaluating scientific visualization agents. The benchmark supports evaluation of three autonomous agents, ParaView-MCP, napari-MCP, and ChatVis, enabling users to create and manipulate scientific visualizations using natural language instead of complex commands or GUI operations. The benchmark uses YAML files compatible with [promptfoo](https://www.promptfoo.dev/) to store test cases and evaluation metrics. Current version focuses on outcome-based evaluation, using both LLM-as-a-judge and quantitative metrics.
+SciVisAgentBench is a comprehensive benchmark for evaluating scientific visualization agents. The benchmark supports evaluation of three autonomous agents, ParaView-MCP, napari-MCP, and ChatVis, enabling users to create and manipulate scientific visualizations using natural language instead of complex commands or GUI operations. The benchmark uses YAML files compatible with [promptfoo](https://www.promptfoo.dev/) to store test cases and evaluation metrics. This initial version focuses on outcome-based evaluation, using both LLM-as-a-judge and quantitative metrics.
 
 ## ParaView-MCP and napari-MCP Installation
 We suggest installing ParaView-MCP and napari-MCP in two seperated conda virtual environments.
@@ -47,9 +47,9 @@ To set up integration with claude desktop, add the following to claude_desktop_c
 
 ## Download Benchmark Tasks
 
-Download the benchmark tasks from the `main`, the `napari_mcp_evals`, and the `sci_volume_data` branches of the [SciVisAgentBench-tasks](https://github.com/KuangshiAi/SciVisAgentBench-tasks) GitHub repository and place them in your workspace. Follow the instructions there and make sure you download the datasets locally.
+Download the benchmark tasks from our secondary GitHub repo [SciVisAgentBench-tasks](https://github.com/KuangshiAi/SciVisAgentBench-tasks) and place them in your workspace.
 
-Make sure the `SciVisAgentBench-tasks` directory is placed at the same level as the `benchmark` directory, as shown in the project structure:
+Make sure the `SciVisAgentBench-tasks` directory is placed at the same level as the `benchmark` directory, including the `main`, the `napari_mcp_evals`, and the `sci_volume_data` folders, as shown in the project structure:
 
 ```
 SciVisAgentBench/
@@ -59,7 +59,14 @@ SciVisAgentBench/
 └── SciVisAgentBench-tasks/
     ├── main/
     ├── sci_volume_data/
-    └── napari_mcp_evals/
+    ├── napari_mcp_evals/
+    └── download_and_organize.py
+```
+
+Follow the instructions and make sure you download the datasets locally:
+```shell
+cd SciVisAgentBench-tasks
+python download_and_organize.py
 ```
 
 ## MCP Logger and Tiny Agent
@@ -227,3 +234,8 @@ SciVisAgentBench was mainly created by Kuangshi Ai (kai@nd.edu), Shusen Liu (liu
 
 - [ParaView-MCP](https://github.com/LLNL/paraview_mcp)
 - [Napari-MCP](https://github.com/LLNL/napari-mcp)
+
+## License
+
+© 2025 University of Notre Dame.  
+Released under the [MIT License](./LICENSE).
