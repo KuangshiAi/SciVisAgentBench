@@ -237,12 +237,5 @@ SciVisAgentBench was mainly created by Kuangshi Ai (kai@nd.edu), Shusen Liu (liu
 
 ## License
 
-Copyright (c) 2025 University of Notre Dame
+© 2025 University of Notre Dame.  
 Released under the [License](./LICENSE).
-All rights reserved.
-
-Permission is hereby granted, free of charge, to designated collaborators of the SciVisAgentBench project, to use this software and associated documentation files (the "Software") solely for the purposes of research and collaboration agreed upon with the University of Notre Dame.
-
-Any redistribution, modification, sublicensing, or commercial use of this Software is strictly prohibited without prior written permission from the copyright holders.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
