@@ -7,7 +7,7 @@ set -e  # Exit on any error
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BENCHMARK_DIR="$SCRIPT_DIR"
-YAML_FILE="$BENCHMARK_DIR/eval_cases/paraview/sci_volume_test_cases_anonymized.yaml"
+YAML_FILE="$BENCHMARK_DIR/eval_cases/paraview/what_obj_cases_anonymized.yaml"
 CONFIG_FILE="$BENCHMARK_DIR/configs/paraview_mcp/config_openai.json"
 CASES_DIR="$BENCHMARK_DIR/anonymized_datasets"
 OUTPUT_DIR="$BENCHMARK_DIR/test_results/paraview_mcp/what_obj"

@@ -268,15 +268,11 @@ class ChatVisYAMLTestRunner:
         if dataset_match:
             return f"dataset_{dataset_match.group(1)}"
         
-        # Common patterns to extract dataset names (for non-anonymized data)
-        dataset_patterns = [
-            'bonsai', 'carp', 'chameleon', 'engine', 'solar-plume', 
-            'supernova', 'tangaroa', 'tornado', 'vortex'
-        ]
-        
-        for pattern in dataset_patterns:
-            if pattern in task_description.lower():
-                return pattern
+        # Alternative pattern for cases where the file has additional info after dataset name
+        # Like "aneurism/data/aneurism_256x256x256_uint8.raw"
+        path_pattern_extended = re.search(r'([a-zA-Z_][a-zA-Z0-9_]*)/data/\1_[^"]*', task_description)
+        if path_pattern_extended:
+            return path_pattern_extended.group(1)
         
         # Fallback to case index
         return f"case_{index + 1}"

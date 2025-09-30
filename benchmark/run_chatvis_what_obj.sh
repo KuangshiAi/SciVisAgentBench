@@ -7,7 +7,7 @@ set -e  # Exit on any error
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BENCHMARK_DIR="$SCRIPT_DIR"
-YAML_FILE="$BENCHMARK_DIR/eval_cases/paraview/sci_volume_test_cases_anonymized.yaml"
+YAML_FILE="$BENCHMARK_DIR/eval_cases/paraview/what_obj_cases_anonymized.yaml"
 CASES_DIR="$BENCHMARK_DIR/anonymized_datasets"
 
 # Default values
@@ -16,7 +16,7 @@ CONFIG_FILE="$BENCHMARK_DIR/configs/chatvis/config_anthropic.json"
 SPECIFIC_CASE=""
 LIST_CASES=false
 NO_EVAL=false
-OUTPUT_DIR="$BENCHMARK_DIR/test_results/chatvis/main"
+OUTPUT_DIR="$BENCHMARK_DIR/test_results/chatvis/what_obj"
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do

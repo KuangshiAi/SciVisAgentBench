@@ -7,10 +7,10 @@ set -e  # Exit on any error
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BENCHMARK_DIR="$SCRIPT_DIR"
-YAML_FILE="$BENCHMARK_DIR/eval_cases/paraview/main_cases.yaml"
+YAML_FILE="$BENCHMARK_DIR/eval_cases/paraview/category_specific_cases.yaml"
 CONFIG_FILE="$BENCHMARK_DIR/configs/paraview_mcp/config_openai.json"
-CASES_DIR="$BENCHMARK_DIR/../SciVisAgentBench-tasks/main"
-OUTPUT_DIR="$BENCHMARK_DIR/test_results/paraview_mcp/main"
+CASES_DIR="$BENCHMARK_DIR/../SciVisAgentBench-tasks/sci_volume_data"
+OUTPUT_DIR="$BENCHMARK_DIR/test_results/paraview_mcp/category"
 
 # Default values
 EVAL_MODEL="gpt-4o"

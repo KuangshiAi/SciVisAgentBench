@@ -7,7 +7,7 @@ set -e  # Exit on any error
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BENCHMARK_DIR="$SCRIPT_DIR"
-YAML_FILE="$BENCHMARK_DIR/eval_cases/paraview/main_test_cases.yaml"
+YAML_FILE="$BENCHMARK_DIR/eval_cases/paraview/main_cases.yaml"
 CASES_DIR="$BENCHMARK_DIR/../SciVisAgentBench-tasks/main"
 
 # Default values
