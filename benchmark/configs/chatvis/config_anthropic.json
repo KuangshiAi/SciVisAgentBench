@@ -1,0 +1,9 @@
+{
+  "provider": "anthropic",
+  "model": "claude-3-5-haiku-latest",
+  "base_url": "https://api.anthropic.com",
+  "price": {
+    "input_per_1m_tokens": "$0.80",
+    "output_per_1m_tokens": "$4.00"
+  }
+}

@@ -1,0 +1,623 @@
+[
+    {
+        "name": "Create/Configure Two Views",
+        "description": "Creates two RenderViews side by side, each 900x1400, and arranges them in a horizontal layout.",
+        "code_snippet": "from paraview.simple import *;renderView1 = CreateView('RenderView');renderView1.ViewSize = [900, 1400];renderView2 = CreateView('RenderView');renderView2.ViewSize = [900, 1400];layout1 = CreateLayout(name='Layout #1');layout1.SplitHorizontal(0, 0.5);layout1.AssignView(1, renderView1);layout1.AssignView(2, renderView2);layout1.SetSize(1800, 1400)"
+    },
+    {
+        "name": "Load Data rectilinear grid",
+        "description": "Reads the rectilinear grid files for prediction and ground truth, setting the cell arrays to load.",
+        "code_snippet": "predictionvtr = XMLRectilinearGridReader(registrationName='prediction.vtr', FileName=['neg10_prediction.vtr']);predictionvtr.CellArrayStatus = ['Intensity', 'Phase'];ground_truthvtr = XMLRectilinearGridReader(registrationName='ground_truth.vtr', FileName=['neg10_ground_truth.vtr']);ground_truthvtr.CellArrayStatus = ['Intensity', 'Phase']"
+    },
+    {
+        "name": "Isovolume",
+        "description": "Creates an IsoVolume to filter the 'Intensity' variable within the [0.2, 1.0] range.",
+        "code_snippet": "isoVolume1 = IsoVolume(registrationName='IsoVolume1', Input=predictionvtr);isoVolume1.InputScalars = ['POINTS', 'Intensity'];isoVolume1.ThresholdRange = [0.2, 1.0];isoVolume2 = IsoVolume(registrationName='IsoVolume2', Input=ground_truthvtr);isoVolume2.InputScalars = ['POINTS', 'Intensity'];isoVolume2.ThresholdRange = [0.2, 1.0]"
+    },
+    {
+        "name": "Cell Data to Point Data",
+        "description": "The Cell Data to Point Data filter averages the values of the cell attributes of the cells surrounding a point to compute point attributes. The Cell Data to Point Data filter operates on any type of data set, and the output data set is of the same type as the input.",
+        "code_snippet": "cellDatatoPointData2 = CellDatatoPointData(registrationName='CellDatatoPointData2', Input=ground_truthvtr);cellDatatoPointData2.CellDataArraytoprocess = ['Intensity', 'Phase']"
+    },
+    {
+        "name": "Set Coloring (Phase & Viridis)",
+        "description": "Applies the Viridis color map to the 'Phase' variable and shows a color legend.",
+        "code_snippet": "phaseLUT = GetColorTransferFunction('Phase');phaseLUT.ApplyPreset('Viridis (matplotlib)');clip1Display = Show(clip1, renderView1, 'UnstructuredGridRepresentation');clip1Display.ColorArrayName = ['POINTS', 'Phase'];clip1Display.LookupTable = phaseLUT;clip1Display.SetScalarBarVisibility(renderView1, True);clip2Display = Show(clip2, renderView2, 'UnstructuredGridRepresentation');clip2Display.ColorArrayName = ['POINTS', 'Phase'];clip2Display.LookupTable = phaseLUT;clip2Display.SetScalarBarVisibility(renderView2, True)"
+    },
+    {
+        "name": "Annotate Views",
+        "description": "Adds text labels to identify each view (e.g., 'NN Prediction' and 'Ground Truth').",
+        "code_snippet": "text1 = Text(registrationName='Text1');text1.Text = 'NN Prediction';Show(text1, renderView1, 'TextSourceRepresentation');text2 = Text(registrationName='Text2');text2.Text = 'Ground Truth';Show(text2, renderView2, 'TextSourceRepresentation')"
+    },
+    {
+        "name": "Orient Camera",
+        "description": "Positions the camera to look roughly in the (-1, 0, -1) direction, ensuring the data fits in view.",
+        "code_snippet": "SetActiveView(renderView1);renderView1.ResetActiveCameraToNegativeZ();camera1 = GetActiveCamera();camera1.Yaw(45);renderView1.ResetCamera(True, 0.9);SetActiveView(renderView2);renderView2.ResetActiveCameraToNegativeZ();camera2 = GetActiveCamera();camera2.Yaw(45);renderView2.ResetCamera(True, 0.9)"
+    },
+    {
+        "name": "Save Screenshot",
+        "description": "Captures the final layout with both views side by side and writes it to a PNG file.",
+        "code_snippet": "SaveScreenshot('comparison-screenshot.png', layout1)"
+    },
+    {
+        "name": "XMLPolyDataReader",
+        "description": "Reads the VTP dataset file and loads point array variables.",
+        "code_snippet": "mpasvtp = XMLPolyDataReader(registrationName='mpas.vtp', FileName=['/Users/tpeterka/Desktop/mpas.vtp']);mpasvtp.PointArrayStatus = ['type', 'id', 'tag', 'velocity', 'time', 'vertVelocity', 'salinity', 'temperature']"
+    },
+    {
+        "name": "Calculator",
+        "description": "Computes a transformation on velocity components using mathematical expressions.",
+        "code_snippet": "calculator1 = Calculator(registrationName='Calculator1', Input=mpasvtp);calculator1.Function = '(-velocity_X*sin(coordsX*0.0174533) + velocity_Y*cos(coordsX*0.0174533)) * iHat + ...'"
+    },
+    {
+        "name": "Glyph",
+        "description": "The Glyph filter generates a glyph (i.e., an arrow, cone, cube, cylinder, line, sphere, or 2D glyph) at each point or cell in the input dataset. The glyphs can be oriented and scaled by the input scalar and vector arrays. If the arrays are point-centered, glyphs are placed at points in the input dataset. If the arrays are cell-centered, glyphs are placed at the center of cells in the input dataset. A transform that applies to the glyph source can be modified to change the shape of the glyph. This filter operates on any type of data set. Its output is a polygonal dataset.",
+        "code_snippet": "glyph1 = Glyph(registrationName='Glyph1', Input=calculator1, GlyphType='Cone');glyph1.OrientationArray = ['POINTS', 'Result'];glyph1.ScaleArray = ['POINTS', 'No scale array'];glyph1.ScaleFactor = 0.5456282176971436"
+    },
+    {
+        "name": "GetColorTransferFunction",
+        "description": "Creates a color transfer function for mapping scalar values to colors.",
+        "code_snippet": "velocityLUT = GetColorTransferFunction('velocity');velocityLUT.RGBPoints = [0.0, 0.231, 0.298, 0.752, 0.5, 0.865, 0.865, 0.865, 1.0, 0.705, 0.015, 0.149];velocityLUT.ScalarRangeInitialized = 1.0"
+    },
+    {
+        "name": "Save Screenshot",
+        "description": "Captures the current rendering and saves it as an image.",
+        "code_snippet": "SaveScreenshot('/Users/tpeterka/Desktop/velocity_visualization.png', renderView1, ImageResolution=[1920, 1080])"
+    },
+    {
+        "name": "CreateView",
+        "description": "Creates a new render view with specific dimensions.",
+        "code_snippet": "renderView1 = CreateView('RenderView');renderView1.ViewSize = [2294, 1440]"
+      },
+      {
+        "name": "CreateLayout",
+        "description": "Creates a new layout and assigns the render view to it.",
+        "code_snippet": "layout1 = CreateLayout(name='Layout');layout1.AssignView(0, renderView1)"
+      },
+      {
+        "name": "GetColorTransferFunction",
+        "description": "Retrieves and applies a color transfer function to the velocity field.",
+        "code_snippet": "velocityLUT = GetColorTransferFunction('velocity');velocityLUT.ApplyPreset('Cool to Warm', True)"
+      },
+      {
+        "name": "Show (Glyph)",
+        "description": "Displays the glyphs in the render view with a surface representation and velocity coloring.",
+        "code_snippet": "glyph1Display = Show(glyph1, renderView1, 'GeometryRepresentation');glyph1Display.Representation = 'Surface';glyph1Display.ColorArrayName = ['POINTS', 'velocity'];glyph1Display.LookupTable = velocityLUT;glyph1Display.RescaleTransferFunctionToDataRange()"
+      },
+      {
+        "name": "Show (Tube)",
+        "description": "Displays the tubes in the render view with a surface representation and velocity coloring.",
+        "code_snippet": "tube1Display = Show(tube1, renderView1, 'GeometryRepresentation');tube1Display.Representation = 'Surface';tube1Display.ColorArrayName = ['POINTS', 'velocity'];tube1Display.LookupTable = velocityLUT;tube1Display.Diffuse = 0.73;tube1Display.Specular = 1.0;tube1Display.RescaleTransferFunctionToDataRange()"
+      },
+      {
+        "name": "GetScalarBar",
+        "description": "Retrieves and configures the scalar bar (legend) for the velocity field.",
+        "code_snippet": "velocityLUTColorBar = GetScalarBar(velocityLUT, renderView1);velocityLUTColorBar.Title = 'velocity';velocityLUTColorBar.ComponentTitle = 'Magnitude';velocityLUTColorBar.Visibility = 1"
+      },
+      {
+        "name": "ResetActiveCameraToNegativeZ",
+        "description": "Resets the active camera to a predefined position for optimal visualization.",
+        "code_snippet": "renderView1.ResetActiveCameraToNegativeZ();renderView1.ResetCamera(True, 0.9)"
+      },
+      {
+        "name": "SaveScreenshot white",
+        "description": "Saves a screenshot of the render view with specified resolution and background settings.",
+        "code_snippet": "SaveScreenshot('soma-screenshot.png', renderView1, ImageResolution=[2294, 1440], OverrideColorPalette='WhiteBackground')"
+      },
+      {
+        "name": "PointData Reader",
+        "description": "Reads an Exodus II dataset and prints available point data attributes with their ranges.",
+        "code_snippet": "from paraview.simple import *;reader = OpenDataFile('disk_out_ref.ex2');pd = reader.PointData;for ai in pd.values():print(ai.GetName(), ai.GetNumberOfComponents(), end=' ');for i in range(ai.GetNumberOfComponents()):print(ai.GetRange(i), end=' ');print()"
+      },
+      {
+        "name": "GetActiveViewOrCreate",
+        "description": "Colors the dataset representation by the 'Pres' scalar field and updates the scalar bars in the render view.",
+        "code_snippet": "renderView1 = GetActiveViewOrCreate('RenderView');dataDisplay = Show(reader, renderView1);ColorBy(dataDisplay, ('POINTS', 'Pres'));UpdateScalarBars();Show();Render()"
+      },
+      {
+        "name": "PlotOverLine",
+        "description": "Creates a line plot over a predefined line from (0,0,0) to (0,0,10) and writes the data to a CSV file.",
+        "code_snippet": "plot = PlotOverLine();plot.Point1 = [0, 0, 0];plot.Point2 = [0, 0, 10];writer = CreateWriter('line-plot.csv');writer.UpdatePipeline()"
+      },
+      {
+        "name": "SaveScreenshot (Line Plot)",
+        "description": "Displays the line plot in an XYChartView and saves it as a PNG file.",
+        "code_snippet": "plotView = FindViewOrCreate('MyView', viewtype='XYChartView');Show(plot);Render();SaveScreenshot('line-plot.png')"
+      },
+      {
+        "name": "Sphere",
+        "description": "Creates a sphere object using the Sphere source in ParaView.",
+        "code_snippet": "from paraview.simple import *;sphere = Sphere()"
+      },
+      {
+        "name": "Shrink",
+        "description": "Applies a shrink filter to modify the appearance of the sphere.",
+        "code_snippet": "shrink = Shrink()"
+      },
+      {
+        "name": "Sphere Resolution",
+        "description": "Doubles the resolution of the sphere by modifying the ThetaResolution property.",
+        "code_snippet": "sphere.ThetaResolution = sphere.ThetaResolution * 2;"
+      },
+      {
+        "name": "Shrink Factor",
+        "description": "Halves the shrink factor to control the effect of the shrink filter.",
+        "code_snippet": "shrink.ShrinkFactor = shrink.ShrinkFactor / 2;"
+      },
+      {
+        "name": "Extract Edges",
+        "description": "Extracts the edges of the sphere to generate a wireframe representation.",
+        "code_snippet": "wireframe = ExtractEdges(Input=sphere)"
+      },
+      {
+        "name": "Exodus II dataset",
+        "description": "Loads the Exodus II dataset, sets the render view direction, and resets the camera.",
+        "code_snippet": "from paraview.simple import *;import numpy as np;from vtkmodules.numpy_interface import dataset_adapter as dsa;data = OpenDataFile('can.ex2');renderView1 = GetActiveViewOrCreate('RenderView');renderView1.ResetActiveCameraToPositiveY()"
+      },
+      {
+        "name": "Show and Color",
+        "description": "Colors the dataset by the 'EQPS' variable, applies surface representation, and updates the render view.",
+        "code_snippet": "dataDisplay = Show(data, renderView1);dataDisplay.Representation = 'Surface';ColorBy(dataDisplay, ('CELLS', 'EQPS'));dataDisplay.RescaleTransferFunctionToDataRange(True);renderView1.ResetCamera();Render();dataDisplay.SetScalarBarVisibility(renderView1, True)"
+      },
+      {
+        "name": "GetAnimationScenen",
+        "description": "Plays the animation through time steps, rescales data range at the last time step, and replays the animation.",
+        "code_snippet": "animationScene = GetAnimationScene();animationScene.Play();animationScene.GoToLast();dataDisplay.RescaleTransferFunctionToDataRange(True);animationScene.Play()"
+      },
+      {
+        "name": "TemporalInterpolator",
+        "description": "Applies a temporal interpolator filter to the dataset and creates a second render view to compare interpolated data.",
+        "code_snippet": "temporalInterpolator = TemporalInterpolator(Input=data);renderView2 = CreateView('RenderView');layout1 = CreateLayout(name='Layout');layout1.SplitHorizontal(0, 0.5);layout1.AssignView(1, renderView1);layout1.AssignView(2, renderView2)"
+      },
+      {
+        "name": "Show Interpolated Data",
+        "description": "Displays the interpolated data in the second view, links the camera positions, and plays the animation simultaneously.",
+        "code_snippet": "temporalDisplay = Show(temporalInterpolator, renderView2);temporalDisplay.Representation = 'Surface';ColorBy(temporalDisplay, ('CELLS', 'EQPS'));temporalDisplay.RescaleTransferFunctionToDataRange(True);renderView2.ResetCamera();Render();renderView2.CameraPosition = renderView1.CameraPosition;renderView2.CameraFocalPoint = renderView1.CameraFocalPoint;renderView2.CameraViewUp = renderView1.CameraViewUp;animationScene.Play()"
+      },
+      {
+        "name": "SaveAnimation",
+        "description": "Saves the animation displaying the time-varying dataset to a file.",
+        "code_snippet": "SaveAnimation('time-varying.avi', layout1)"
+      },
+      {
+        "name": "Mean of EQPS",
+        "description": "Computes the mean EQPS values over all, first half, and even-numbered time steps.",
+        "code_snippet": "sum_all = 0.0;sum_first_half = 0.0;sum_even = 0.0;num_all = 0;num_first_half = 0;num_even = 0;timesteps = data.TimestepValues;i = 0;for t in timesteps:data.UpdatePipeline(t);mb = dsa.WrapDataObject(FetchData(data)[0]);eqps_0 = mb.CellData['EQPS'].GetArrays()[0];num_cells = eqps_0.GetNumberOfTuples();sum_all += np.sum(eqps_0);num_all += num_cells;if i < len(timesteps) / 2:sum_first_half += np.sum(eqps_0);num_first_half += num_cells;if i % 2 == 0:sum_even += np.sum(eqps_0);num_even += num_cells;i += 1;mean_all = sum_all / num_all;mean_first_half = sum_first_half / num_first_half;mean_even = sum_even / num_even"
+      },
+      {
+        "name": "Variance of EQPS",
+        "description": "Computes the variance of EQPS values over all time steps.",
+        "code_snippet": "sumsq_all = 0.0;for t in timesteps:animationScene.TimeKeeper.Time = t;data.UpdatePipeline();mb = dsa.WrapDataObject(FetchData(GetActiveSource())[0]);eqps_0 = mb.CellData['EQPS'].GetArrays()[0];num_cells = eqps_0.GetNumberOfTuples();for j in range(num_cells):sumsq_all += (eqps_0[j] - mean_all) * (eqps_0[j] - mean_all);var_all = sumsq_all / num_all"
+      },
+      {
+        "name": "Print EQPS",
+        "description": "Prints the computed mean and variance values of EQPS over different time step selections.",
+        "code_snippet": "print('Average EQPS over all time steps:', mean_all);print('Average EQPS over first half of time steps:', mean_first_half);print('Average EQPS over even numbered time steps:', mean_even);print('Variance of EQPS over all time steps:', var_all)"
+      },
+      {
+        "name": "LegacyVTKReader",
+        "description": "loads files stored in VTK’s legacy file format (before VTK 4.2, although still supported). The expected file extension is .vtk. The type of the dataset may be structured grid, uniform rectilinear grid (image/volume), non-uniform rectilinear grid, unstructured grid, or polygonal. This reader also supports file series.",
+        "code_snippet": "from paraview.simple import *;ml100vtk = LegacyVTKReader(registrationName='ml-100.vtk', FileNames=['ml-100.vtk'])"
+      },
+      {
+        "name": "GetActiveSource",
+        "description": "Retrieves the minimum and maximum range of the 'var0' variable from the dataset.",
+        "code_snippet": "source = GetActiveSource();pd = source.PointData;min, max = pd.GetArray(0).GetRange()"
+      },
+      {
+        "name": "Contour",
+        "description": "Filter computes isolines or isosurfaces using a selected point-centered scalar array. The Contour filter operates on any type of data set, but the input is required to have at least one point-centered scalar (single-component) array. The output of this filter is polygonal.",
+        "code_snippet": "contour1 = Contour(registrationName='Contour1', Input=ml100vtk);contour1.ContourBy = ['POINTS', 'var0'];contour1.Isosurfaces = [0.5];contour1.PointMergeMethod = 'Uniform Binning'"
+      },
+      {
+        "name": "Slice",
+        "description": "Extracts the portion of the input dataset that lies along the specified plane. The Slice filter takes any type of dataset or hyper tree grid as input. The output of this filter is polygonal data.",
+        "code_snippet": "slice1 = Slice(registrationName='Slice1', Input=ml100vtk);slice1.SliceType = 'Plane';slice1.HyperTreeGridSlicer = 'Plane';slice1.SliceOffsetValues = [0.0];slice1.PointMergeMethod = 'Uniform Binning'"
+      },
+      {
+        "name": "Set Render View Direction",
+        "description": "Resets the camera to align with the positive X direction.",
+        "code_snippet": "renderView.ResetActiveCameraToPositiveX();renderView.ResetCamera()"
+      },
+      {
+        "name": "IOSSReader",
+        "description": "Reader for IOSS supported data. This is a distributed reader.",
+        "code_snippet": "from paraview.simple import *;points = IOSSReader(registrationName='can_points.ex2', FileName=['can_points.ex2'])"
+      },
+      {
+        "name": "Delaunay Triangulation",
+        "description": "Delaunay3D is a filter that constructs a 3D Delaunay triangulation from a list of input points. These points may be represented by any dataset of type vtkPointSet and subclasses. The output of the filter is an unstructured grid dataset.",
+        "code_snippet": "delaunay3D = Delaunay3D(registrationName='Delaunay3D', Input=points)"
+      },
+      {
+        "name": "Clip",
+        "description": "Cuts away a portion of the input data set using an implicit function (an implicit description). This filter operates on all types of data sets, and it returns unstructured grid data on output.",
+        "code_snippet": "clip = Clip(registrationName='Clip', Input=delaunay3D);clip.ClipType = 'Plane';clip.ClipType.Origin = [0.0, 0.0, 0.0];clip.ClipType.Normal = [1.0, 0.0, 0.0]"
+      },
+      {
+        "name": "Compute Data Bounds",
+        "description": "Computes the bounding box dimensions of the dataset.",
+        "code_snippet": "bounds = velocity.GetDataInformation().GetBounds();length = [bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]]"
+      },
+      {
+        "name": "Stream Tracer",
+        "description": "Stream Tracer filter generates streamlines in a vector field from a collection of seed points. Production of streamlines terminates if a streamline crosses the exterior boundary of the input dataset (ReasonForTermination=1). ",
+        "code_snippet": "streamTracer = StreamTracer(registrationName='StreamTracer1', Input=velocity, SeedType='Point Cloud');streamTracer.Vectors = ['POINTS', 'V'];streamTracer.MaximumStreamlineLength = 20.15999984741211;streamTracer.SeedType.Center = [0.0, 0.0, 0.07999992370605469];streamTracer.SeedType.Radius = 2.015999984741211"
+      },
+      {
+        "name": "Tube",
+        "description": "creates tubes around the lines in the input polygonal dataset. The output is also polygonal.",
+        "code_snippet": "tube = Tube(registrationName='Tube1', Input=streamTracer);tube.Scalars = ['POINTS', 'AngularVelocity'];tube.Vectors = ['POINTS', 'Normals'];tube.Radius = 0.0752525282476563"
+      },
+      {
+        "name": "Disables Camera Reset",
+        "description": "Disables the automatic camera reset to prevent unintended view changes.",
+        "code_snippet": "from paraview.simple import *;paraview.simple._DisableFirstRenderCameraReset()"
+      },
+      {
+        "name": "Wavelet",
+        "description": "The Wavelet source can be used to create a uniform rectilinear grid in up to three dimensions with values varying according to the following periodic function. OS = M * G * (XM * sin(XF * x) + YM * sin(YF * y) + ZM * cos(ZF * z)) OS is the output scalar; M represents the maximum value; G represents the Gaussian; XM, YM, and ZM are the X, Y, and Z magnitude values; and XF, YF, and ZF are the X, Y, and Z frequency values. If a two-dimensional extent is specified, the resulting image will be displayed. If a three-dimensional extent is used, then the bounding box of the volume will be displayed.",
+        "code_snippet": "wavelet1 = Wavelet(registrationName='Wavelet1')"
+      },
+      {
+        "name": "Render View",
+        "description": "Gets or creates the active render view and resets the camera to fit the data.",
+        "code_snippet": "renderView1 = GetActiveViewOrCreate('RenderView');renderView1.ResetCamera(False);renderView1.Update()"
+      },
+      {
+        "name": "Display Wavelet Data",
+        "description": "Displays the wavelet data in the render view with an outline representation.",
+        "code_snippet": "wavelet1Display = Show(wavelet1, renderView1, 'UniformGridRepresentation');wavelet1Display.Representation = 'Outline'"
+      },
+      {
+        "name": "Plot Over Line",
+        "description": "input dataset at the points of a given line. The values of the point-centered variables along that line will be displayed in an XY Plot. This filter uses interpolation to determine the values at the selected point, whether or not it lies at an input point. This filter operates on any type of data and produces a polygonal output (a polyline). One can use different sampling patterns with this filter. “Sample At Cell Boundaries” gives the most accurate plots, “Sample At Segment Centers” provides one sample per probed cell, and “Sample Uniformally” samples uniformally along the input line.",
+        "code_snippet": "plotOverLine1 = PlotOverLine(registrationName='PlotOverLine1', Input=wavelet1)"
+      },
+      {
+        "name": "Display Plot Over Line Data",
+        "description": "Displays the Plot Over Line data in the render view with a surface representation.",
+        "code_snippet": "plotOverLine1Display = Show(plotOverLine1, renderView1, 'GeometryRepresentation');plotOverLine1Display.Representation = 'Surface'"
+      },
+      {
+        "name": "Create Line Chart View",
+        "description": "Creates an XYChartView to display the Plot Over Line data as a line chart.",
+        "code_snippet": "lineChartView1 = CreateView('XYChartView')"
+      },
+      {
+        "name": "Show Data in Line Chart View",
+        "description": "Displays the Plot Over Line data in the line chart view.",
+        "code_snippet": "plotOverLine1Display_1 = Show(plotOverLine1, lineChartView1, 'XYChartRepresentation')"
+      },
+      {
+        "name": "Assign View to Layout",
+        "description": "Assigns the line chart view to an existing layout so it is visible in the UI.",
+        "code_snippet": "layout1 = GetLayoutByName('Layout #1');AssignViewToLayout(view=lineChartView1, layout=layout1, hint=0)"
+      },
+      {
+        "name": "Properties on plotOverLine1Display",
+        "description": "Adjusts opacity, line style, thickness, and visibility of various series in the line chart.",
+        "code_snippet": "plotOverLine1Display_1.SeriesOpacity = ['arc_length', '1', 'RTData', '0.3', 'vtkValidPointMask', '0.3', 'Points_X', '0.3', 'Points_Y', '0.3', 'Points_Z', '0.3', 'Points_Magnitude', '0.3'];plotOverLine1Display_1.SeriesPlotCorner = ['Points_Magnitude', '0', 'Points_X', '0', 'Points_Y', '0', 'Points_Z', '0', 'RTData', '0', 'arc_length', '0', 'vtkValidPointMask', '0'];plotOverLine1Display_1.SeriesLineStyle = ['Points_Magnitude', '1', 'Points_X', '1', 'Points_Y', '1', 'Points_Z', '1', 'RTData', '1', 'arc_length', '1', 'vtkValidPointMask', '1'];plotOverLine1Display_1.SeriesLineThickness = ['Points_Magnitude', '2', 'Points_X', '2', 'Points_Y', '2', 'Points_Z', '2', 'RTData', '2', 'arc_length', '2', 'vtkValidPointMask', '2'];plotOverLine1Display_1.SeriesMarkerStyle = ['Points_Magnitude', '0', 'Points_X', '0', 'Points_Y', '0', 'Points_Z', '0', 'RTData', '0', 'arc_length', '0', 'vtkValidPointMask', '0'];plotOverLine1Display_1.SeriesMarkerSize = ['Points_Magnitude', '4', 'Points_X', '4', 'Points_Y', '4', 'Points_Z', '4', 'RTData', '4', 'arc_length', '4', 'vtkValidPointMask', '4'];plotOverLine1Display_1.SeriesVisibility = ['arc_length', 'Points_Z', 'RTData']"
+      },
+      {
+        "name": "Load Background Palette",
+        "description": "Loads the BlueGrayBackground palette for rendering.",
+        "code_snippet": "from paraview.simple import *;LoadPalette('BlueGrayBackground')"
+      },
+      {
+        "name": "Update Animation Scene",
+        "description": "Updates the animation scene to use the data time steps from the dataset.",
+        "code_snippet": "animationScene1 = GetAnimationScene();animationScene1.UpdateAnimationUsingDataTimeSteps()"
+      },
+      {
+        "name": "Setup Render View",
+        "description": "Gets or creates the active render view and resets the camera to fit the data.",
+        "code_snippet": "renderView1 = GetActiveViewOrCreate('RenderView');renderView1.ResetCamera(False, 0.9);renderView1.Update()"
+      },
+      {
+        "name": "Display Dataset",
+        "description": "Displays the dataset in the render view with a surface representation.",
+        "code_snippet": "canex2Display = Show(canex2, renderView1, 'UnstructuredGridRepresentation');canex2Display.Representation = 'Surface'"
+      },
+      {
+        "name": "Apply Scalar Coloring",
+        "description": "Applies scalar coloring using the 'vtkBlockColors' field.",
+        "code_snippet": "ColorBy(canex2Display, ('FIELD', 'vtkBlockColors'))"
+      },
+      {
+        "name": "Scalar Coloring",
+        "description": "Applies scalar coloring to the wavelet data using the 'RTData' variable at point data level.",
+        "code_snippet": "ColorBy(wavelet1Display, ('POINTS', 'RTData'))"
+      },
+      {
+        "name": "Configure Color and Opacity Transfer Functions",
+        "description": "Sets up color and opacity transfer functions for the 'vtkBlockColors' field.",
+        "code_snippet": "vtkBlockColorsLUT = GetColorTransferFunction('vtkBlockColors');vtkBlockColorsPWF = GetOpacityTransferFunction('vtkBlockColors');vtkBlockColorsTF2D = GetTransferFunction2D('vtkBlockColors')"
+      },
+      {
+        "name": "Set Block Scalar Coloring",
+        "description": "Applies scalar coloring to a specific block ('block_2') using the 'ACCL' variable in the X direction.",
+        "code_snippet": "ColorBlocksBy(canex2Display, ['/IOSS/element_blocks/block_2'], ('POINTS', 'ACCL', 'X'))"
+      },
+      {
+        "name": "Rescale Block Transfer Function",
+        "description": "Rescales block color and opacity transfer functions to fit the current data range.",
+        "code_snippet": "canex2Display.RescaleBlocksTransferFunctionToDataRange(['/IOSS/element_blocks/block_2'], False, True)"
+      },
+      {
+        "name": "Configure Block Color Transfer Function",
+        "description": "Retrieves the color transfer function for 'ACCL' in 'block_2' and applies a preset color scheme.",
+        "code_snippet": "blockACCLLUT = GetBlockColorTransferFunction('/IOSS/element_blocks/block_2', 'ACCL');blockACCLLUT.ApplyPreset('Cool to Warm', True)"
+      },
+      {
+        "name": "Show Block Color Legend",
+        "description": "Enables the scalar bar visibility for 'block_2' in the render view.",
+        "code_snippet": "canex2Display.SetBlocksScalarBarVisibility(renderView1, ['/IOSS/element_blocks/block_2'], True)"
+      },
+      {
+        "name": "Reset Camera to Negative Y",
+        "description": "Resets the active camera to align with the negative Y direction.",
+        "code_snippet": "renderView1.ResetActiveCameraToNegativeY()"
+      },
+      {
+        "name": "Modify Display Properties",
+        "description": "Changes the representation to 'Surface' and applies scalar coloring based on the 'Result' field.",
+        "code_snippet": "calculator1Display.SetRepresentationType('Surface');ColorBy(calculator1Display, ('POINTS', 'Result', 'X'))"
+      },
+      {
+        "name": "Rescale Color and Opacity Maps",
+        "description": "Rescales the color and opacity transfer functions to fit the current data range.",
+        "code_snippet": "calculator1Display.RescaleTransferFunctionToDataRange(True)"
+      },
+      {
+        "name": "Enable Scalar Bar Visibility",
+        "description": "Shows the color legend for the calculated field in the render view.",
+        "code_snippet": "calculator1Display.SetScalarBarVisibility(renderView1, True)"
+      },
+      {
+        "name": "Update Scalar Bar Title and Apply Preset",
+        "description": "Updates the scalar bar component title and applies the 'Cool to Warm' preset for coloring.",
+        "code_snippet": "UpdateScalarBarsComponentTitle(ResultLUT, calculator1Display);ResultLUT.ApplyPreset('Cool to Warm', True)"
+      },
+      {
+        "name": "Adjust Camera View",
+        "description": "Configures the camera position and parallel scale for better visualization.",
+        "code_snippet": "renderView1.CameraPosition = [0.0, 0.0, 82.35963323102031];renderView1.CameraParallelScale = 21.57466795392812"
+      },
+      {
+        "name": "Export GLTF Scene",
+        "description": "Exports the rendered wavelet scene as a GLTF file.",
+        "code_snippet": "filename = 'ExportedGLTF.gltf';ExportView(filename, view=renderView1)"
+      },
+      {
+        "name": "Load Exported GLTF Data",
+        "description": "Reads the exported GLTF file into a new render view.",
+        "code_snippet": "exportgltf = glTFReader(registrationName='ExportedGLTF.gltf', FileName=filename);renderView2 = GetActiveViewOrCreate('RenderView');exportgltfDisplay = Show(exportgltf, renderView2, 'GeometryRepresentation');exportgltfDisplay.SetRepresentationType('Surface')"
+      },
+      {
+        "name": "Apply Color Mapping to Exported Data",
+        "description": "Colors the exported GLTF data by 'TEXCOORD_0' and rescales transfer function to match original visualization.",
+        "code_snippet": "ColorBy(exportgltfDisplay, ('POINTS', 'TEXCOORD_0', 'Magnitude'));exportgltfDisplay.RescaleTransferFunctionToDataRange(True, False);exportgltfDisplay.SetScalarBarVisibility(renderView2, False);renderView2.OrientationAxesVisibility = 0;renderView2.ResetCamera(False, 0.9);renderView2.Update()"
+      },
+      {
+        "name": "Import GLTF File",
+        "description": "Imports the 'NestedRings.glb' file and selects specific nodes from the assembly structure.",
+        "code_snippet": "ImportView('NestedRings.glb', view=renderView1, NodeSelectors=['/assembly/Axle', '/assembly/OuterRing/Torus002', '/assembly/OuterRing/MiddleRing/InnerRing'])"
+      },
+      {
+        "name": "Get Active Source and Display Properties",
+        "description": "Retrieves the active source and its display properties for further modifications.",
+        "code_snippet": "innerRing_Torus001 = GetActiveSource();innerRing_Torus001Display = GetDisplayProperties(innerRing_Torus001, view=renderView1)"
+      },
+      {
+        "name": "Create First Text Annotation",
+        "description": "Creates the first text annotation with font size 10 and specified position.",
+        "code_snippet": "text1 = Text();text1.Text = 'Interstellar clouds of gas and dust collapse to form stars';text1Display = Show(text1, renderView1, 'TextSourceRepresentation');text1Display.FontFamily = 'Times';text1Display.FontSize = 10;text1Display.WindowLocation = 'Any Location';text1Display.Position = [0.1, 0.0]"
+      },
+      {
+        "name": "Create Second Text Annotation",
+        "description": "Creates the second text annotation with font size 11 and specified position.",
+        "code_snippet": "text2 = Text();text2.Text = text1.Text;text2Display = Show(text2, renderView1, 'TextSourceRepresentation');text2Display.FontFamily = 'Times';text2Display.FontSize = 11;text2Display.WindowLocation = 'Any Location';text2Display.Position = [0.1, 0.1]"
+      },
+      {
+        "name": "Create Third Text Annotation",
+        "description": "Creates the third text annotation with font size 12 and specified position.",
+        "code_snippet": "text3 = Text();text3.Text = text1.Text;text3Display = Show(text3, renderView1, 'TextSourceRepresentation');text3Display.FontFamily = 'Times';text3Display.FontSize = 12;text3Display.WindowLocation = 'Any Location';text3Display.Position = [0.1, 0.2]"
+      },
+      {
+        "name": "Create Fourth Text Annotation",
+        "description": "Creates the fourth text annotation with font size 13 and specified position.",
+        "code_snippet": "text4 = Text();text4.Text = text1.Text;text4Display = Show(text4, renderView1, 'TextSourceRepresentation');text4Display.FontFamily = 'Times';text4Display.FontSize = 13;text4Display.WindowLocation = 'Any Location';text4Display.Position = [0.1, 0.3]"
+      },
+      {
+        "name": "Create Fifth Text Annotation",
+        "description": "Creates the fifth text annotation with font size 14, specified position, and viewport scaling mode.",
+        "code_snippet": "text5 = Text();text5.Text = text1.Text;text5Display = Show(text5, renderView1, 'TextSourceRepresentation');text5Display.FontFamily = 'Times';text5Display.FontSize = 14;text5Display.WindowLocation = 'Any Location';text5Display.Position = [0.1, 0.4];text5Display.TextScaleMode = 'Viewport'"
+      },
+      {
+        "name": "Screenshot fontsize",
+        "description": "Saves a screenshot of the rendered text annotations in the layout.",
+        "code_snippet": "SaveScreenshot('font-size-screenshot.png', layout1, ImageResolution=[1280,800])"
+      },
+      {
+        "name": "Configure Layout Size",
+        "description": "Sets the layout size to 300x300 pixels.",
+        "code_snippet": "layout1 = GetLayout();layout1.SetSize(300, 300)"
+      },
+      {
+        "name": "Import GLTF File",
+        "description": "Imports the 'NestedRings.glb' file and selects specific nodes from the assembly structure.",
+        "code_snippet": "ImportView('NestedRings.glb', view=renderView1, NodeSelectors=['/assembly/Axle', '/assembly/OuterRing/Torus002', '/assembly/OuterRing/MiddleRing/InnerRing'])"
+      },
+      {
+        "name": "Configure Layout Size",
+        "description": "Sets the layout size to 300x300 pixels.",
+        "code_snippet": "layout1 = GetLayout();layout1.SetSize(300, 300)"
+      },
+      {
+        "name": "Reset Camera View",
+        "description": "Resets the active camera to align with the positive Y direction and adjusts to fit data.",
+        "code_snippet": "renderView1.ResetActiveCameraToPositiveY();renderView1.ResetCamera(False, 0.9)"
+      },
+      {
+        "name": "Enable Scalar Bar and Configure Color Mapping",
+        "description": "Shows the color legend for 'RTData' and sets up the color transfer function.",
+        "code_snippet": "wavelet1Display.SetScalarBarVisibility(renderView1, True);rTDataLUT = GetColorTransferFunction('RTData')"
+      },
+      {
+        "name": "Modify Layout and Split View",
+        "description": "Splits the view layout horizontally to accommodate multiple visualizations.",
+        "code_snippet": "viewLayout1 = GetLayout();viewLayout1.SplitHorizontal(0, 0.5)"
+      },
+      {
+        "name": "Create Histogram View",
+        "description": "Creates an XY Histogram Chart View to display data distribution.",
+        "code_snippet": "histogramView1 = CreateView('XYHistogramChartView');histogramView1.ViewSize = [500, 780]"
+      },
+      {
+        "name": "Assign Histogram View to Layout",
+        "description": "Places the histogram view in the layout next to the render view.",
+        "code_snippet": "viewLayout1.AssignView(2, histogramView1)"
+      },
+      {
+        "name": "Show Histogram Data",
+        "description": "Displays the histogram representation of 'RTData' in the histogram view.",
+        "code_snippet": "SetActiveSource(wavelet1);histogram = Show(wavelet1, histogramView1);histogram.SelectInputArray = ['POINTS', 'RTData'];histogram.UseColorMapping = True;histogram.LookupTable = rTDataLUT"
+      },
+      {
+        "name": "Reset Camera to Custom Direction",
+        "description": "Resets the camera to a specified direction [0.5, 1, 0.5] relative to the focal point.",
+        "code_snippet": "direction = [0.5, 1, 0.5];ResetCameraToDirection(view.CameraFocalPoint, direction)"
+      },
+      {
+        "name": "Configure Display Properties",
+        "description": "Sets the representation to 'Surface With Edges' for better visualization of mesh structure.",
+        "code_snippet": "disp = GetDisplayProperties(wavelet, view);disp.Representation = 'Surface With Edges'"
+      },
+      {
+        "name": "Modify Representation and Hide Color Bar",
+        "description": "Changes the representation to 'Surface' and hides the color legend.",
+        "code_snippet": "wavelet1Display.SetRepresentationType('Surface');wavelet1Display.SetScalarBarVisibility(renderView1, False)"
+      },
+      {
+        "name": "Adjust Camera View",
+        "description": "Configures the camera position and orientation for optimal visualization.",
+        "code_snippet": "renderView1.CameraPosition = [30.273897726939246, 40.8733980301544, 43.48927935675712];renderView1.CameraViewUp = [-0.3634544237682163, 0.7916848767068606, -0.49105594165731975];renderView1.CameraParallelScale = 17.320508075688775"
+      },
+      {
+        "name": "SaveData Time-Series Subseries",
+        "description": "Saves a subset of timesteps from the sliced dataset as a VTM file series.",
+        "code_snippet": "from os.path import join;SaveData('canslices.vtm', proxy=slice1, Writetimestepsasfileseries=1,Firsttimestep=10,Lasttimestep=20,Timestepstride=3,Filenamesuffix='_%d',DataMode='Appended',HeaderType='UInt64',EncodeAppendedData=0,CompressorType='None')"
+      },
+      {
+        "name": "Load Saved Time-Series Subseries",
+        "description": "Reads the saved VTM files as a multi-block dataset.",
+        "code_snippet": "canslices = XMLMultiBlockDataReader(FileName=['canslices_10.vtm','canslices_13.vtm','canslices_16.vtm','canslices_19.vtm'])"
+      },
+      {
+        "name": "Save Contour Data to PLY Format",
+        "description": "Exports the contour data as a PLY file with color encoding enabled.",
+        "code_snippet": "plyfilename = 'PLYWriterData.ply';SaveData(plyfilename, proxy=contour1, EnableColoring=1)"
+      },
+      {
+        "name": "Volume Rendering of VTK Data",
+        "description": "Volume rendering using the default transfer function.",
+        "code_snippet": "volume1 = Show(ml100vtk, renderView);volume1Display = GetDisplayProperties(ml100vtk, view=renderView);volume1Display.SetRepresentationType('Volume')"
+      },
+      {
+        "name": "Apply Isometric View",
+        "description": "Applies an isometric view to enhance visualization and resets the camera.",
+        "code_snippet": "renderView.ApplyIsometricView();renderView.ResetCamera()"
+      },
+      {
+        "name": "Streamlines",
+        "description": "Creates a StreamTracer to trace streamlines of the 'V' data array using a point cloud seed.",
+        "code_snippet": "streamTracer = StreamTracer(registrationName='StreamTracer1', Input=reader, SeedType='Point Cloud')"
+      },
+      {
+        "name": "Render Streamlines with Tubes",
+        "description": "Enhances streamline visibility by rendering them as tubes with a specified radius.",
+        "code_snippet": "tube = Tube(registrationName='Tube1', Input=streamTracer);tube.Radius = 0.075"
+      },
+      {
+        "name": "Add Glyphs to Indicate Flow Direction",
+        "description": "Adds cone glyphs along streamlines to indicate flow direction based on 'V' vector data.",
+        "code_snippet": "glyph = Glyph(registrationName='Glyph1', Input=streamTracer, GlyphType='Cone');glyph.OrientationArray = ['POINTS', 'V'];glyph.ScaleArray = ['POINTS', 'V'];glyph.ScaleFactor = 0.05"
+      },
+      {
+        "name": "Display and Color Streamlines and Glyphs",
+        "description": "Displays streamlines and glyphs while applying color mapping based on 'Temp' data.",
+        "code_snippet": "tubeDisplay = Show(tube, renderView);glyphDisplay = Show(glyph, renderView);ColorBy(tubeDisplay, ('POINTS', 'Temp'));ColorBy(glyphDisplay, ('POINTS', 'Temp'));tubeDisplay.RescaleTransferFunctionToDataRange(True);glyphDisplay.RescaleTransferFunctionToDataRange(True)"
+      },
+      {
+        "name": "Orient Camera View",
+        "description": "Orients the view to look from the positive X direction and resets the camera.",
+        "code_snippet": "renderView.ResetActiveCameraToPositiveX();renderView.ResetCamera()"
+      },
+      {
+        "name": "Read ExodusII Data",
+        "description": "Loads the ExodusII dataset file 'disk.ex2' using the ExodusIIReader and updates the pipeline.",
+        "code_snippet": "reader = ExodusIIReader(FileName='/Users/tanwimallick/Documents/Paraview/generated_code/disk.ex2');reader.UpdatePipeline()"
+      },
+      {
+        "name": "Read XML PolyData File",
+        "description": "Loads the VTP dataset file 'mpas.vtp' using the XMLPolyDataReader.",
+        "code_snippet": "mpasvtp = XMLPolyDataReader(registrationName='mpas.vtp', FileName=['mpas.vtp'])"
+      },
+      {
+        "name": "Apply Calculator Filter",
+        "description": "Creates a Calculator filter to compute transformed velocity components.",
+        "code_snippet": "calculator1 = Calculator(registrationName='Calculator1', Input=mpasvtp);calculator1.Function = '(-velocity_X*sin(coordsX*0.0174533) + velocity_Y*cos(coordsX*0.0174533)) * iHat + (-velocity_X * sin(coordsY*0.0174533) * cos(coordsX*0.0174533) - velocity_Y * sin(coordsY*0.0174533) * sin(coordsX*0.0174533) + velocity_Z * cos(coordsY*0.0174533)) * jHat + 0*kHat'"
+      },
+      {
+        "name": "Create Tube Representation",
+        "description": "Applies a Tube filter to enhance visualization of velocity field lines.",
+        "code_snippet": "tube1 = Tube(registrationName='Tube1', Input=mpasvtp);tube1.Scalars = ['POINTS', 'Result'];tube1.Vectors = ['POINTS', 'Result'];tube1.Radius = 0.05"
+      },
+      {
+        "name": "Add Glyph Representation",
+        "description": "Adds cone glyphs to represent velocity field direction and magnitude.",
+        "code_snippet": "glyph1 = Glyph(registrationName='Glyph1', Input=calculator1, GlyphType='Cone');glyph1.OrientationArray = ['POINTS', 'Result'];glyph1.ScaleFactor = 0.5;glyph1.GlyphType.Resolution = 10;glyph1.GlyphType.Radius = 0.15;glyph1.GlyphType.Height = 0.5"
+      },
+      {
+        "name": "Create Render View",
+        "description": "Creates a new render view with a specified resolution.",
+        "code_snippet": "renderView1 = CreateView('RenderView');renderView1.ViewSize = [2294, 1440]"
+      },
+      {
+        "name": "Create Layout and Assign View",
+        "description": "Creates a layout and assigns the render view to it.",
+        "code_snippet": "layout1 = CreateLayout(name='Layout');layout1.AssignView(0, renderView1)"
+      },
+      {
+        "name": "Configure Velocity Color Mapping",
+        "description": "Applies the 'Cool to Warm' preset to the velocity color transfer function.",
+        "code_snippet": "velocityLUT = GetColorTransferFunction('velocity');velocityLUT.ApplyPreset('Cool to Warm', True)"
+      },
+      {
+        "name": "Display Glyph Representation",
+        "description": "Displays glyph representation of the velocity field with applied color mapping.",
+        "code_snippet": "glyph1Display = Show(glyph1, renderView1, 'GeometryRepresentation');glyph1Display.Representation = 'Surface';glyph1Display.ColorArrayName = ['POINTS', 'velocity'];glyph1Display.LookupTable = velocityLUT;glyph1Display.RescaleTransferFunctionToDataRange()"
+      },
+      {
+        "name": "Display Tube Representation",
+        "description": "Displays tube representation of the velocity field with applied color mapping.",
+        "code_snippet": "tube1Display = Show(tube1, renderView1, 'GeometryRepresentation');tube1Display.Representation = 'Surface';tube1Display.ColorArrayName = ['POINTS', 'velocity'];tube1Display.LookupTable = velocityLUT;tube1Display.Diffuse = 0.73;tube1Display.Specular = 1.0;tube1Display.RescaleTransferFunctionToDataRange()"
+      },
+      {
+        "name": "Configure Color Legend for Velocity",
+        "description": "Displays a color legend for the velocity field.",
+        "code_snippet": "velocityLUTColorBar = GetScalarBar(velocityLUT, renderView1);velocityLUTColorBar.Title = 'velocity';velocityLUTColorBar.ComponentTitle = 'Magnitude';velocityLUTColorBar.Visibility = 1"
+      },
+      {
+        "name": "Set Camera Direction",
+        "description": "Orients the camera view in the negative Z direction and resets it for proper visualization.",
+        "code_snippet": "renderView1.ResetActiveCameraToNegativeZ();renderView1.ResetCamera(True, 0.9)"
+      },
+      {
+        "name": "Rescale Transfer Function",
+        "description": "Rescales the transfer function to fit the data range for the clipped prediction dataset.",
+        "code_snippet": "clip1Display.RescaleTransferFunctionToDataRange(True)"
+      }
+    
+]

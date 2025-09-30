@@ -1,7 +1,7 @@
 {
   "provider": "openai",
   "model": "gpt-4o",
-  "base_url": "https://api.openai.com",
+  "base_url": "https://api.openai.com/v1",
   "price": {
     "input_per_1m_tokens": "$2.50",
     "output_per_1m_tokens": "$10.00"

@@ -141,28 +141,63 @@ class ChatVisYAMLTestRunner:
     """Runs test cases loaded from YAML configuration using ChatVis approach."""
     
     def __init__(self, yaml_path: str, cases_dir: str, output_dir: Optional[str] = None, 
-                 openai_api_key: Optional[str] = None, model: str = "gpt-4o", 
+                 config_path: Optional[str] = None, model: str = "gpt-4o", 
                  eval_model: str = "gpt-4o"):
         self.yaml_path = Path(yaml_path)
         self.cases_dir = Path(cases_dir)
         self.output_dir = Path(output_dir) if output_dir else self.cases_dir.parent / "test_results" / "chatvis_yaml"
-        self.openai_api_key = openai_api_key or os.getenv('OPENAI_API_KEY')
+        self.config_path = config_path
         self.model = model
         self.eval_model = eval_model
         self.test_cases: List[YAMLTestCase] = []
         self.token_counter = TokenCounter()
         
-        # Initialize OpenAI client
-        if self.openai_api_key:
-            self.openai_client = OpenAI(api_key=self.openai_api_key)
-        else:
-            self.openai_client = None
+        # Initialize multi-provider client
+        sys.path.insert(0, str(current_dir / "chatvis"))
+        from multi_provider_client import MultiProviderClient
+        
+        if config_path and os.path.exists(config_path):
+            # Load config first to check provider
+            import json
+            with open(config_path, 'r') as f:
+                config = json.load(f)
             
-        # Default pricing for GPT-4o
-        self.pricing_info = {
-            "input_per_1m_tokens": "$2.50",
-            "output_per_1m_tokens": "$10.00"
-        }
+            # Create client with explicit API key from environment
+            if config.get('provider') == 'openai':
+                self.client = MultiProviderClient(
+                    provider="openai",
+                    model=config.get('model', model),
+                    api_key=os.getenv('OPENAI_API_KEY')
+                )
+            elif config.get('provider') == 'anthropic':
+                self.client = MultiProviderClient(
+                    provider="anthropic", 
+                    model=config.get('model', model),
+                    api_key=os.getenv('ANTHROPIC_API_KEY')
+                )
+            else:
+                # Use config file method for other providers
+                self.client = MultiProviderClient.from_config_file(config_path)
+                
+            self.pricing_info = config.get('price', {
+                "input_per_1m_tokens": "$2.50",
+                "output_per_1m_tokens": "$10.00"
+            })
+        else:
+            # Fallback to OpenAI
+            self.client = MultiProviderClient(
+                provider="openai",
+                model=model,
+                api_key=os.getenv('OPENAI_API_KEY')
+            )
+            # Default pricing for GPT-4o
+            self.pricing_info = {
+                "input_per_1m_tokens": "$2.50",
+                "output_per_1m_tokens": "$10.00"
+            }
+        
+        # Initialize evaluation client (always OpenAI for now)
+        self.eval_client = OpenAI(api_key=os.getenv('OPENAI_API_KEY')) if os.getenv('OPENAI_API_KEY') else None
     
     def _calculate_cost(self, input_tokens: int, output_tokens: int) -> Optional[Dict]:
         """Calculate cost based on token usage and pricing info."""
@@ -315,11 +350,11 @@ class ChatVisYAMLTestRunner:
         # Ensure directories exist
         test_case.ensure_directories()
         
-        if not self.openai_client:
+        if not self.client:
             return {
                 "case_name": test_case.case_name,
                 "status": "failed",
-                "error": "No OpenAI API key provided",
+                "error": "No client configured",
                 "task_description": "",
                 "response": "",
                 "token_usage": {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0}
@@ -365,9 +400,8 @@ class ChatVisYAMLTestRunner:
             print(f"Generating ParaView script for case: {test_case.case_name}")
             print(f"Task preview: {task_description[:200]}...")
             
-            # Generate script using OpenAI
-            sr = self.openai_client.chat.completions.create(
-                model=self.model,
+            # Generate script using multi-provider client
+            sr = self.client.create_completion(
                 messages=[
                     {"role": "system", "content": (
                         "You are a code assistant. Output only a self-contained Python script for ParaView:\n"
@@ -383,9 +417,9 @@ class ChatVisYAMLTestRunner:
             )
             
             # Count output tokens and update token usage
-            response_content = sr.choices[0].message.content
-            output_tokens = self.token_counter.count_tokens(response_content)
-            result["token_usage"]["output_tokens"] += output_tokens
+            response_content = self.client.get_response_content(sr)
+            token_usage = self.client.get_token_usage(sr)
+            result["token_usage"]["output_tokens"] += token_usage["output_tokens"]
             result["token_usage"]["total_tokens"] = result["token_usage"]["input_tokens"] + result["token_usage"]["output_tokens"]
             
             # Calculate cost
@@ -422,8 +456,7 @@ class ChatVisYAMLTestRunner:
                 print(f"    ⚠ attempt {attempt}: fixing {len(errors)} errors...")
                 error_msg = "\\n".join(errors[:3])  # Limit to first 3 errors
                 
-                fix_sr = self.openai_client.chat.completions.create(
-                    model=self.model,
+                fix_sr = self.client.create_completion(
                     messages=[
                         {"role": "system", "content": "Fix the ParaView Python script based on the error message. Return only the corrected complete script."},
                         {"role": "user", "content": f"Original script:\n```python\n{code}\n```\n\nError:\n{error_msg}\n\nProvide the fixed script:"}
@@ -431,10 +464,10 @@ class ChatVisYAMLTestRunner:
                 )
                 
                 # Count additional tokens
-                fix_response = fix_sr.choices[0].message.content
-                additional_output_tokens = self.token_counter.count_tokens(fix_response)
-                result["token_usage"]["output_tokens"] += additional_output_tokens
-                result["token_usage"]["total_tokens"] += additional_output_tokens
+                fix_response = self.client.get_response_content(fix_sr)
+                fix_token_usage = self.client.get_token_usage(fix_sr)
+                result["token_usage"]["output_tokens"] += fix_token_usage["output_tokens"]
+                result["token_usage"]["total_tokens"] += fix_token_usage["output_tokens"]
                 
                 code = self.extract_python(fix_response)
                 code = "from paraview.simple import ResetSession\nResetSession()\n" + code
@@ -526,9 +559,9 @@ class ChatVisYAMLTestRunner:
     
     async def run_evaluation(self, test_case: YAMLTestCase) -> Dict:
         """Run comprehensive evaluation for a test case with support for multiple subtypes."""
-        if not self.openai_api_key:
-            print("⚠️  No OpenAI API key provided, skipping evaluation")
-            return {"status": "skipped", "reason": "No OpenAI API key"}
+        if not self.eval_client:
+            print("⚠️  No evaluation client available, skipping evaluation")
+            return {"status": "skipped", "reason": "No evaluation client available"}
         
         print(f"🔍 Evaluating test case: {test_case.case_name}")
         print(f"Available evaluation subtypes: {test_case.get_all_evaluation_subtypes()}")
@@ -592,7 +625,7 @@ class ChatVisYAMLTestRunner:
         try:
             # Create evaluator instance
             case_dir = str(test_case.case_path)
-            evaluator = PVPythonAutoEvaluator(case_dir, test_case.case_name, self.openai_api_key, self.eval_model)
+            evaluator = PVPythonAutoEvaluator(case_dir, test_case.case_name, os.getenv('OPENAI_API_KEY'), self.eval_model)
             
             # Check if required files exist for evaluation
             gs_state_path = test_case.case_path / "GS" / f"{test_case.case_name}_gs.pvsm"
@@ -722,9 +755,8 @@ Respond with a JSON object in the following format:
 
 Be specific about what aspects of the answers meet or don't meet the criteria."""
             
-            # Use OpenAI to evaluate
-            from openai import OpenAI
-            client = OpenAI(api_key=self.openai_api_key)
+            # Use evaluation client
+            client = self.eval_client
             
             response = client.chat.completions.create(
                 model=self.eval_model,
@@ -868,12 +900,12 @@ async def main():
                        help="List available test cases and exit")
     parser.add_argument("--no-eval", action="store_true",
                        help="Skip LLM-based evaluation")
-    parser.add_argument("--model", default="gpt-4o",
-                       help="OpenAI model for script generation (default: gpt-4o)")
+    parser.add_argument("--config", "-c",
+                       help="Path to the configuration JSON file (specifies model and provider)")
     parser.add_argument("--eval-model", default="gpt-4o",
-                       help="OpenAI model for evaluation (default: gpt-4o)")
+                       help="Model for evaluation (default: gpt-4o)")
     parser.add_argument("--api-key",
-                       help="OpenAI API key (can also use OPENAI_API_KEY env var)")
+                       help="API key (can also use environment variables)")
     
     args = parser.parse_args()
     
@@ -886,19 +918,36 @@ async def main():
         print(f"Error: Cases directory not found: {args.cases}")
         sys.exit(1)
     
-    # Get API key
-    api_key = args.api_key or os.getenv('OPENAI_API_KEY')
-    if not api_key:
-        print("Error: No OpenAI API key provided.")
-        print("Set OPENAI_API_KEY environment variable or use --api-key")
+    # Config file is now required
+    if not args.config:
+        print("Error: Configuration file is required. Use --config to specify a config file.")
+        print("Available config files:")
+        config_dir = Path(__file__).parent / "configs" / "chatvis"
+        if config_dir.exists():
+            for config_file in config_dir.glob("*.json"):
+                print(f"  {config_file}")
+        sys.exit(1)
+    
+    if not os.path.exists(args.config):
+        print(f"Error: Configuration file not found: {args.config}")
+        sys.exit(1)
+    
+    # Get model from config file
+    try:
+        with open(args.config, 'r') as f:
+            config = json.load(f)
+        model_from_config = config.get('model', '')
+        print(f"Using model from config: {model_from_config}")
+    except Exception as e:
+        print(f"Error: Could not read config file: {e}")
         sys.exit(1)
     
     runner = ChatVisYAMLTestRunner(
         yaml_path=args.yaml,
         cases_dir=args.cases,
         output_dir=args.output,
-        openai_api_key=api_key,
-        model=args.model,
+        config_path=args.config,
+        model=model_from_config,
         eval_model=args.eval_model
     )
     

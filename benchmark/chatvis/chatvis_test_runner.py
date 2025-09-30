@@ -5,14 +5,107 @@ import subprocess
 import tempfile
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 from openai import OpenAI
 import tiktoken
+import pickle
+import faiss
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
+# Multi-provider client will be imported when needed
 
 HERE      = Path(__file__).resolve().parent
 REPO_ROOT = HERE.parent
 print(f"REPO_ROOT: {REPO_ROOT}")
 BATCH_DIR = REPO_ROOT / "cases"
+
+# ————————————————
+# 1) VECTOR DATABASE SETUP
+# ————————————————
+class ParaViewRAG:
+    """Retrieval-Augmented Generation system for ParaView operations."""
+    
+    def __init__(self):
+        try:
+            self.model = SentenceTransformer('all-MiniLM-L6-v2')
+        except Exception as e:
+            print(f"  ! Failed to load SentenceTransformer: {e}")
+            self.model = None
+        self.index = None
+        self.metadata_lookup = []
+        self.setup_operations_db()
+    
+    def setup_operations_db(self):
+        """Setup the operations database from operations.json."""
+        if self.model is None:
+            print("  ! RAG disabled - SentenceTransformer not available")
+            return
+            
+        operations_file = HERE / "operations.json"
+        faiss_index_file = HERE / "paraview_operations_faiss.index"
+        metadata_file = HERE / "metadata_lookup.pkl"
+        
+        # Try to load existing index
+        try:
+            if faiss_index_file.exists() and metadata_file.exists():
+                import faiss
+                self.index = faiss.read_index(str(faiss_index_file))
+                with open(metadata_file, "rb") as f:
+                    self.metadata_lookup = pickle.load(f)
+                print("  ✓ Loaded existing FAISS index")
+                return
+        except Exception as e:
+            print(f"  ! Failed to load existing index: {e}")
+        
+        # Create new index if operations.json exists
+        if operations_file.exists():
+            try:
+                import faiss
+                with open(operations_file, "r") as f:
+                    operations_json = json.load(f)
+                
+                # Create embeddings
+                d = self.model.get_sentence_embedding_dimension()
+                self.index = faiss.IndexFlatL2(d)
+                
+                for op in operations_json:
+                    text = op["name"] + " " + op["description"] + " " + op["code_snippet"]
+                    embedding = self.model.encode(text, convert_to_numpy=True).astype(np.float32)
+                    self.index.add(embedding.reshape(1, -1))
+                    self.metadata_lookup.append(op)
+                
+                # Save index
+                faiss.write_index(self.index, str(faiss_index_file))
+                with open(metadata_file, "wb") as f:
+                    pickle.dump(self.metadata_lookup, f)
+                
+                print(f"  ✓ Created FAISS index with {len(operations_json)} operations")
+            except Exception as e:
+                print(f"  ! Failed to create operations index: {e}")
+                self.index = None
+        else:
+            print("  ! No operations.json found, RAG disabled")
+    
+    def search_similar_operations(self, query_text: str, top_k: int = 5) -> List[Dict]:
+        """Search for similar operations based on query text."""
+        if self.index is None or self.index.ntotal == 0 or self.model is None:
+            return []
+        
+        try:
+            import faiss
+            query_embedding = self.model.encode(query_text, convert_to_numpy=True).astype(np.float32)
+            top_k = min(top_k, self.index.ntotal)
+            distances, indices = self.index.search(query_embedding.reshape(1, -1), top_k)
+            
+            matches = []
+            for idx in indices[0]:
+                if idx < len(self.metadata_lookup):
+                    matches.append(self.metadata_lookup[idx])
+            return matches
+        except Exception as e:
+            print(f"  ! RAG search failed: {e}")
+            return []
 
 # ————————————————
 # 2) TOKEN COUNTER
@@ -80,14 +173,65 @@ def calculate_cost(input_tokens: int, output_tokens: int, pricing_info: Optional
         return None
 
 # ————————————————
-# 4) OPENAI CLIENT
+# 4) MULTI-PROVIDER CLIENT
 # ————————————————
-openai_client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY")
-)
+# Global client - will be initialized in main() based on config
+multi_provider_client = None
 
 # ————————————————
-# 5) PARAVIEW EXECUTION HELPERS
+# 5) ENHANCED SYSTEM PROMPT WITH RAG
+# ————————————————
+def create_enhanced_system_prompt(rag_system: ParaViewRAG, task_description: str) -> str:
+    """Create enhanced system prompt matching notebook implementation."""
+    
+    # Load operations.json directly like the notebook
+    operations_file = HERE / "operations.json"
+    operations_json = []
+    
+    if operations_file.exists():
+        try:
+            with open(operations_file, "r") as f:
+                operations_json = json.load(f)
+        except Exception as e:
+            print(f"Failed to load operations.json: {e}")
+    
+    # Create exact system prompt from notebook
+    system_prompt = f'''You are a highly accurate code assistant specializing in 3D visualization scripting (e.g., ParaView, VTK). Your task is to read and execute the user's prompt line by line, ensuring that all operations, camera angles, views, rendering, and screenshots are handled correctly.
+
+Execution Rules:
+Process the Prompt Line-by-Line
+
+Read and execute each instruction in order without skipping or merging steps.
+If an operation depends on a previous step, ensure proper sequencing.
+Camera and Viewing Directions
+
+Object Creation and Rendering
+Unless the user specifically instructs you to not show a data source, please show any data source after it has been loaded or created.
+
+Apply background settings before rendering.
+If a white background is needed for screenshots, ensure it is set before rendering.
+Save screenshots immediately after rendering, before moving to the next step.
+Ensure filenames or saving locations match the user's intent.
+
+Camera and Viewing Directions
+If a specific camera direction or position is given by the user adjust the camera accordingly.
+If the user does not specify how to zoom the camera, zoom the camera to fit the active rendered objects as the last operation in the script. Also, zoom the camera to fit the active rendered objects immediately before saving a screenshot. Call ResetCamera() on the render view object so that the camera will be zoomed to fit.
+If the user manually specifies a camera zoom level, follow their instructions and do not insert extra calls to 'renderView.ResetCamera();layout = CreateLayout(name='Layout')layout.AssignView(0, renderView)'.
+
+Use provided operation templates as references.
+Maintain correct syntax, function calls, and parameters.
+Code Quality & Best Practices
+
+Ensure modular, readable, and structured code.
+Add comments to explain significant steps.
+Avoid redundant operations and ensure compatibility with visualization libraries.
+Primary Goal:
+Generate a precise, structured, and error-free script that accurately follows the user's instructions, handling camera angles, views, rendering, and screenshots correctly. If any ambiguity exists, infer the most logical approach based on best practices. Follow Example Operations \\n{operations_json}'''
+    
+    return system_prompt
+
+# ————————————————
+# 6) PARAVIEW EXECUTION HELPERS
 # ————————————————
 def execute_paraview_code(code: str) -> str:
     """Execute ParaView Python code directly using pvpython"""
@@ -133,12 +277,88 @@ def execute_paraview_code(code: str) -> str:
 # ————————————————
 # 6) LLM & UTILS
 # ————————————————
+def extract_python_code(script_content: str, filename: str) -> str:
+    """Extract Python code from script content and save to file - matches notebook implementation."""
+    # Extract code between ```python and ```
+    python_pattern = r'```python\s*(.*?)\s*```'
+    matches = re.findall(python_pattern, script_content, re.DOTALL)
+    
+    if matches:
+        # Take the first (or largest) code block
+        code = matches[0] if len(matches) == 1 else max(matches, key=len)
+        
+        # Clean up the code
+        code = code.strip()
+        
+        # Save to file
+        file_path = f"{filename}.py"
+        with open(file_path, 'w') as f:
+            f.write(code)
+        
+        return file_path
+    else:
+        # If no code blocks found, treat entire content as code
+        with open(f"{filename}.py", 'w') as f:
+            f.write(script_content)
+        return f"{filename}.py"
+
+def extract_error_messages(stderr_output: str) -> str:
+    """Extract error messages from stderr output - matches notebook implementation."""
+    if not stderr_output:
+        return ""
+    
+    # Filter out common non-error messages
+    lines = stderr_output.split('\n')
+    error_lines = []
+    
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        
+        # Skip common ParaView info messages
+        skip_patterns = [
+            "Warning: In",
+            "vtkOpenGL",
+            "QStandardPaths:",
+            "qt.qpa.fonts:",
+            "Created ThermoData"
+        ]
+        
+        should_skip = False
+        for pattern in skip_patterns:
+            if pattern in line:
+                should_skip = True
+                break
+        
+        if not should_skip and any(error_word in line for error_word in ["Error", "Traceback", "Exception", "ERROR"]):
+            error_lines.append(line)
+    
+    return '\n'.join(error_lines) if error_lines else ""
+
 def extract_python(text: str) -> str:
     m = re.search(r"```python(.*?)```", text, re.DOTALL)
     return m.group(1).strip() if m else text.strip()
 
 def extract_errors(output: str) -> list:
-    return [ln for ln in output.splitlines() if "Error" in ln or "Traceback" in ln]
+    """Extract error messages from ParaView output, similar to notebook approach."""
+    error_lines = []
+    lines = output.splitlines()
+    
+    for i, line in enumerate(lines):
+        # Look for various error patterns
+        if any(pattern in line for pattern in ["Error", "Traceback", "Exception", "ERROR", "AttributeError", "NameError", "ValueError", "TypeError"]):
+            error_lines.append(line.strip())
+            
+            # Also include following lines that are part of the traceback
+            j = i + 1
+            while j < len(lines) and (lines[j].startswith('  ') or lines[j].startswith('    ') or 'File "' in lines[j]):
+                error_lines.append(lines[j].strip())
+                j += 1
+                if j >= i + 10:  # Limit to avoid too much output
+                    break
+    
+    return error_lines
 
 def save_script(code: str, case: str, case_dir: Path):
     generated_dir = Path(os.path.join(case_dir, "results", "pvpython"))
@@ -176,12 +396,13 @@ def save_test_result(case_path: Path, result: Dict):
 # ————————————————
 # 7) RUN ONE CASE (with iterative fixes)
 # ————————————————
-def run_case(case_path: Path) -> Dict:
+def run_case(case_path: Path, client) -> Dict:
     case = case_path.name
     print(f"\n=== {case} ===")
 
-    # Initialize token counter
+    # Initialize token counter and RAG system
     token_counter = TokenCounter()
+    rag_system = ParaViewRAG()
     
     # Initialize result structure
     start_time = datetime.now()
@@ -262,31 +483,24 @@ def run_case(case_path: Path) -> Dict:
         save_test_result(case_path, result)
         return result
 
-    # 2) generate script
-    sr = openai_client.chat.completions.create(
-        model="gpt-4o",
+    # 2) generate script with enhanced system prompt
+    enhanced_system_prompt = create_enhanced_system_prompt(rag_system, prompt)
+    
+    sr = client.create_completion(
         messages=[
-            {"role":"system","content":(
-                "You are a code assistant. Output only a self-contained Python script for ParaView:\n"
-                "- Call ResetSession() once\n"
-                "- Import from paraview.simple only needed symbols\n"
-                "- Read raw via ImageReader(...) and configure DataScalarType, DataByteOrder, DataExtent, DataSpacing\n"
-                "- UpdatePipeline(), Show(...), Representation='Volume'\n"
-                "- Configure GetColorTransferFunction and GetOpacityTransferFunction\n"
-                "- SaveState(state_path) at end"
-            )},
+            {"role":"system","content": enhanced_system_prompt},
             {"role":"user","content":prompt}
         ]
     )
     
     # Count output tokens and update token usage
-    response_content = sr.choices[0].message.content
-    output_tokens = token_counter.count_tokens(response_content)
-    result["token_usage"]["output_tokens"] += output_tokens
+    response_content = client.get_response_content(sr)
+    token_usage = client.get_token_usage(sr)
+    result["token_usage"]["output_tokens"] += token_usage["output_tokens"]
     result["token_usage"]["total_tokens"] = result["token_usage"]["input_tokens"] + result["token_usage"]["output_tokens"]
     
     # Calculate cost
-    cost_info = calculate_cost(result["token_usage"]["input_tokens"], result["token_usage"]["output_tokens"])
+    cost_info = calculate_cost(result["token_usage"]["input_tokens"], result["token_usage"]["output_tokens"], client.get_pricing_info())
     if cost_info:
         result["cost_info"] = cost_info
     
@@ -313,28 +527,47 @@ def run_case(case_path: Path) -> Dict:
     # 4) save initial script
     save_script(code, case, case_path)
 
-    # 5) execution + iterative fix
+    # 5) execution + iterative fix with enhanced feedback
     max_attempts = 5
     out = execute_paraview_code(code)
     errors = extract_errors(out)
     attempt = 1
+    
+    # Build conversation history for better context
+    conversation_history = [
+        {"role": "system", "content": enhanced_system_prompt},
+        {"role": "user", "content": prompt},
+        {"role": "assistant", "content": f"```python\n{code}\n```"}
+    ]
+    
     while errors and attempt < max_attempts:
         attempt += 1
         print(f"  → fix attempt {attempt} errors: {errors}")
-        fix = openai_client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role":"system","content":"You are a code fixer. Return only corrected Python code."},
-                {"role":"user","content":(
-                    f"Script:\n```python\n{code}\n```\nErrors:\n" + "\n".join(errors)
-                )}
-            ]
-        )
+        
+        # Create detailed error feedback
+        error_feedback = f"""
+I tried running the following Python script and encountered errors:
+
+**Error Messages:**
+{chr(10).join(errors)}
+
+**Original Script:**
+```python
+{code}
+```
+
+Can you help me fix the issues and provide a corrected version of the script? 
+Please make sure the new script runs correctly without errors.
+"""
+        
+        # Add error feedback to conversation
+        conversation_history.append({"role": "user", "content": error_feedback})
+        
+        fix = client.create_completion(messages=conversation_history)
         
         # Count tokens for fix attempts
-        fix_input = f"Script:\n```python\n{code}\n```\nErrors:\n" + "\n".join(errors)
-        fix_response = fix.choices[0].message.content
-        fix_input_tokens = token_counter.count_tokens(fix_input)
+        fix_response = client.get_response_content(fix)
+        fix_input_tokens = token_counter.count_tokens(error_feedback)
         fix_output_tokens = token_counter.count_tokens(fix_response)
         
         # Update token usage
@@ -343,12 +576,13 @@ def run_case(case_path: Path) -> Dict:
         result["token_usage"]["total_tokens"] = result["token_usage"]["input_tokens"] + result["token_usage"]["output_tokens"]
         
         # Update cost
-        cost_info = calculate_cost(result["token_usage"]["input_tokens"], result["token_usage"]["output_tokens"])
+        cost_info = calculate_cost(result["token_usage"]["input_tokens"], result["token_usage"]["output_tokens"], client.get_pricing_info())
         if cost_info:
             result["cost_info"] = cost_info
         
-        # Append to response
+        # Append to response and conversation history
         result["response"] += f"\n\nFix attempt {attempt}:\n{fix_response}"
+        conversation_history.append({"role": "assistant", "content": fix_response})
         
         code = extract_python(fix_response)
         if not code.startswith("from paraview.simple import ResetSession"):
@@ -402,14 +636,31 @@ def run_case(case_path: Path) -> Dict:
 # ————————————————
 # 8) MAIN
 # ————————————————
-def main():
+def main(config_path: str = None):
+    """Main function with optional config path."""
+    # Import MultiProviderClient
+    from multi_provider_client import MultiProviderClient
+    
+    # Initialize client based on config
+    if config_path and os.path.exists(config_path):
+        print(f"Using configuration from: {config_path}")
+        client = MultiProviderClient.from_config_file(config_path)
+    else:
+        # Fallback to OpenAI with environment variable
+        print("Using default OpenAI configuration")
+        client = MultiProviderClient(
+            provider="openai",
+            model="gpt-4o",
+            api_key=os.getenv("OPENAI_API_KEY")
+        )
+    
     results = {}
     all_results = []
     start_time = datetime.now()
     
     for case_dir in sorted(BATCH_DIR.iterdir()):
         if case_dir.is_dir():
-            result = run_case(case_dir)
+            result = run_case(case_dir, client)
             results[case_dir.name] = result["status"] == "completed"
             all_results.append(result)
 
@@ -483,4 +734,11 @@ def main():
         print(f"Failed to save summary: {e}")
 
 if __name__ == '__main__':
-    main()
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Run ChatVis test cases")
+    parser.add_argument("--config", "-c", 
+                       help="Path to the configuration JSON file")
+    
+    args = parser.parse_args()
+    main(args.config)
