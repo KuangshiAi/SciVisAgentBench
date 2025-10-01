@@ -165,7 +165,7 @@ We provide a tool to help anonymize volume datasets so that we can test whether 
 ```shell
 conda activate paraview_mcp
 cd benchmark
-python anonymize_dataset.py eval_cases/paraview/sci_volume_test_cases.yaml
+python anonymize_dataset.py eval_cases/paraview/what_obj_cases.yaml
 
 # Then you can run the "what is the object" test
 bash run_paraview_mcp_what_obj.sh

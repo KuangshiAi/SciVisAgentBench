@@ -1,0 +1,218 @@
+# Medical/Anatomical Data Visualization Test Cases for SciVisAgentBench
+# Tests scalar volume visualization capabilities for medical imaging data
+
+# Test 1: Basic Volume Rendering and Tissue Identification
+- vars:
+    question: |
+      Clear the ParaView pipeline and load the data file "foot/data/foot_256x256x256_uint8.raw".
+      1. Enable volume rendering to visualize the internal structures
+      2. Adjust the opacity transfer function to reveal both bone and soft tissue (bone should be more opaque, soft tissue semi-transparent)
+      3. Set an appropriate color map to differentiate tissue types (e.g., white/beige for bone, reddish for soft tissue)
+      Finally, save the paraview state as "foot/results/{agent_mode}/foot.pvsm"
+  assert:
+    - type: llm-rubric
+      value: |
+        - Successfully load the foot dataset
+        - Enable volume rendering
+        - Adjust opacity to show both bone and soft tissue structures
+        - Apply appropriate color mapping for tissue differentiation
+        - Use screenshot to verify foot bones (metatarsals, phalanges) and soft tissue are visible
+        - Verify the colors match the instruction (white/beige for bone, reddish for soft tissue)
+
+# # Test 2: Multi-Isosurface Segmentation
+# - vars:
+#     question: |
+#       Clear the ParaView pipeline and load the data file "mri_ventricles/data/mri_ventricles_256x256x124_uint8.raw".
+#       1. Create at least 3 different isosurfaces at different threshold values to segment different tissue types
+#       2. Color each isosurface differently to distinguish structures
+#       3. Make appropriate surfaces semi-transparent if needed to show internal structures
+#       Finally, save the paraview state as "mri_ventricles/results/{agent_mode}/mri_ventricles.pvsm"
+#   assert:
+#     - type: llm-rubric
+#       value: |
+#         - Create multiple isosurfaces (at least 3) at different threshold values
+#         - Apply different colors to each isosurface for clear distinction
+#         - Use screenshot to verify brain ventricles are successfully segmented and visible
+#         - Verify transparency is applied where needed to show nested structures
+#         - Report identification of brain structures (ventricles, grey/white matter boundaries)
+
+# # Test 3: Cross-Sectional Analysis
+# - vars:
+#     question: |
+#       Clear the ParaView pipeline and load the data file "skull/data/skull_256x256x256_uint8.raw".
+#       1. Create three orthogonal slices (axial, sagittal, and coronal planes)
+#       2. Position the slices to show key anatomical features of the skull
+#       3. Apply an appropriate color map to the slices
+#       Finally, save the paraview state as "skull/results/{agent_mode}/skull.pvsm"
+#   assert:
+#     - type: llm-rubric
+#       value: |
+
+#         - Create exactly three orthogonal slices (axial, sagittal, coronal)
+#         - Use screenshot to verify all three slice planes are visible simultaneously
+#         - Verify slices show key features: cranial cavity, eye sockets, nasal cavity
+#         - Report which anatomical features are visible in each specific plane
+
+# # Test 4: Vascular Structure Visualization
+# - vars:
+#     question: |
+#       Clear the ParaView pipeline and load the data file "aneurism/data/aneurism_256x256x256_uint8.raw".
+#       1. Use appropriate visualization technique to isolate and display the vascular structure
+#       2. Create an isosurface that clearly shows the aneurysm and blood vessels
+#       3. Apply a red or red-gradient color map appropriate for vascular visualization
+#       4. Compute and report the surface area of the vascular structure
+#       Finally, save the paraview state as "aneurism/results/{agent_mode}/aneurism.pvsm"
+#   assert:
+#     - type: llm-rubric
+#       value: |
+
+#         - Successfully isolate vascular structure using isosurface
+#         - Use screenshot to verify aneurysm bulge is clearly visible
+#         - Verify red/red-gradient coloring is applied to vessels
+#         - Successfully compute and report numerical surface area value
+
+# # Test 5: Histogram Analysis and Tissue Classification
+# - vars:
+#     question: |
+#       Clear the ParaView pipeline and load the data file "pancreas/data/pancreas_240x512x512_int16.raw".
+#       1. Generate a histogram of the intensity values with 256 bins
+#       2. Based on the histogram, identify distinct peaks corresponding to different tissue types
+#       3. Create threshold filters to isolate pancreatic tissue based on the histogram analysis
+#       4. Apply volume rendering with opacity settings based on your histogram findings
+#       Finally, save the paraview state as "pancreas/results/{agent_mode}/pancreas.pvsm"
+#   assert:
+#     - type: llm-rubric
+#       value: |
+
+#         - Successfully generate histogram with 256 bins
+#         - Report specific intensity values for identified peaks
+#         - Create threshold filters using values derived from histogram peaks
+#         - Apply volume rendering with opacity based on histogram analysis
+#         - Use screenshot to verify pancreatic tissue is properly isolated
+
+# # Test 6: Complex Organ System Visualization
+# - vars:
+#     question: |
+#       Clear the ParaView pipeline and load the data file "mri_woman/data/mri_woman_256x256x109_uint16.raw".
+#       1. Enable volume rendering to show internal anatomy
+#       2. Adjust the transfer functions to visualize multiple organ systems simultaneously
+#       3. Create a clip plane to show a sagittal cross-section while maintaining volume rendering
+#       4. Use appropriate color and opacity settings to distinguish between organs
+#       Finally, save the paraview state as "mri_woman/results/{agent_mode}/mri_woman.pvsm"
+#   assert:
+#     - type: llm-rubric
+#       value: |
+
+#         - Enable volume rendering successfully
+#         - Adjust transfer functions to reveal multiple organ systems
+#         - Create clip plane in sagittal orientation
+#         - Use screenshots from anterior and lateral views to verify organ visibility
+#         - List identified organs (e.g., heart, lungs, liver, spine)
+#         - Verify clip plane and volume rendering work together
+
+# # Test 7: Small Animal Specimen Analysis
+# - vars:
+#     question: |
+#       Clear the ParaView pipeline and load the data file "frog/data/frog_256x256x44_uint8.raw".
+#       1. Create visualization showing both skeletal and soft tissue structures
+#       2. Use either multiple isosurfaces or volume rendering with careful transfer functions
+#       3. Generate a plot-over-line measurement through the specimen (dorsal to ventral)
+#       Finally, save the paraview state as "frog/results/{agent_mode}/frog.pvsm"
+#   assert:
+#     - type: llm-rubric
+#       value: |
+
+#         - Choose appropriate technique (isosurfaces or volume rendering)
+#         - Use screenshot to verify both skeleton and soft tissue are visible
+#         - Successfully create plot-over-line from dorsal to ventral
+#         - Report numerical values from plot-over-line measurement
+#         - Verify measurement traverses through the specimen correctly
+
+# # Test 8: Dental Structure Analysis
+# - vars:
+#     question: |
+#       Clear the ParaView pipeline and load the data file "tooth/data/tooth_103x94x161_uint8.raw".
+#       1. Create isosurface to show the tooth enamel (outer layer)
+#       2. Use volume rendering or additional isosurface to show internal structures (dentin, pulp cavity)
+#       3. Apply appropriate colors (white for enamel, yellow for dentin)
+#       Finally, save the paraview state as "tooth/results/{agent_mode}/tooth.pvsm"
+#   assert:
+#     - type: llm-rubric
+#       value: |
+
+#         - Create isosurface at appropriate threshold for enamel
+#         - Use screenshot to verify white color on enamel and yellow/amber color on dentin
+#         - Identify enamel, dentin, and pulp cavity structures
+
+# # Test 9: Abdominal CT with Vascular Stent Visualization
+# - vars:
+#     question: |
+#       Clear the ParaView pipeline and load the data file "stent/data/stent_512x512x174_uint16.raw".
+#       This is an abdominal/pelvic CT scan containing a stent in the abdominal aorta (no contrast agent used).
+#       1. Create a volume rendering to show the overall abdominal anatomy
+#       2. Adjust the opacity transfer function to visualize bones (spine, pelvis) and soft tissue
+#       3. Create an isosurface at a high threshold value to isolate and highlight the metallic stent
+#       4. Apply appropriate colors - bone white/beige, soft tissue reddish, metallic grey for the stent
+#       Finally, save the paraview state as "stent/results/{agent_mode}/stent.pvsm"
+
+#   assert:
+#     - type: llm-rubric
+#       value: |
+
+#         - Create volume rendering of full abdomen/pelvis
+#         - Use screenshot to verify spine and pelvis are visible
+#         - Create high-threshold isosurface to isolate metallic stent
+#         - Verify stent appears with metallic/grey coloring
+        
+# # # Test 10: Comparative Analysis with State Saving
+# # - vars:
+# #     question: |
+# #       Clear the ParaView pipeline and load the data file "vis_male/data/vis_male_128x256x256_uint8.raw".
+# #       1. Create two different visualization approaches:
+# #          a) Volume rendering optimized for soft tissue
+# #          b) Isosurface extraction for skeletal system
+# #       2. Save the ParaView state file to preserve your visualization setup
+# #       3. Create a text report comparing the effectiveness of both techniques
+# #   assert:
+# #     - type: llm-rubric
+# #       value: |
+# # 
+# #         - Create volume rendering with soft tissue emphasis
+# #         - Create separate isosurface for skeletal system
+# #         - Use screenshots to document both approaches
+# #         - Successfully save .pvsm state file
+# #         - Write and save comparative analysis as text file
+# #         - Report specific advantages/disadvantages of each technique
+# #         - Verify both visualizations show distinct anatomical features
+
+# # Test 11: Marine Biology Specimen
+# - vars:
+#     question: |
+#       Clear the ParaView pipeline and load the data file "lobster/data/lobster_301x324x56_uint8.raw".
+#       1. Create visualization showing the exoskeleton and internal anatomy
+#       2. Adjust the visualization to show the prominent structure
+#       Finally, save the paraview state as "lobster/results/{agent_mode}/lobster.pvsm"
+#   assert:
+#     - type: llm-rubric
+#       value: |
+
+#         - Choose appropriate visualization for exoskeleton (isosurface or volume)
+#         - Use screenshot to verify whether specific features can be identified: claws, abdomen, tail fan
+
+# # Test 12: Fish Anatomy Visualization  
+# - vars:
+#     question: |
+#       Clear the ParaView pipeline and load the data file "carp/data/carp_256x256x512_uint16.raw".
+#       1. Enable volume rendering to show internal fish anatomy
+#       2. Adjust transfer functions to reveal skeletal structure and organs
+#       3. Create a sagittal slice through the fish body
+#       4. Use color mapping that differentiates tissue types
+#       5. Reset camera with appropriate padding to frame the entire fish
+#       Finally, save the paraview state as "carp/results/{agent_mode}/carp.pvsm"
+#   assert:
+#     - type: llm-rubric
+#       value: |
+
+#         - The volume rendering show both skeleton and organs
+#         - Create sagittal slice along fish body length
+#         - Verify sagittal slice shows internal structure along body axis

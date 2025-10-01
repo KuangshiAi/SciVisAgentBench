@@ -7,12 +7,12 @@ set -e  # Exit on any error
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BENCHMARK_DIR="$SCRIPT_DIR"
-YAML_FILE="$BENCHMARK_DIR/eval_cases/paraview/main_test_cases.yaml"
+YAML_FILE="$BENCHMARK_DIR/eval_cases/paraview/main_cases.yaml"
 CASES_DIR="$BENCHMARK_DIR/../SciVisAgentBench-tasks/main"
 
 # Default values
 EVAL_MODEL="gpt-5"
-MODEL="gpt-4.1"
+CONFIG_FILE="$BENCHMARK_DIR/configs/chatvis/config_anthropic.json"
 SPECIFIC_CASE=""
 LIST_CASES=false
 NO_EVAL=false
@@ -33,12 +33,12 @@ while [[ $# -gt 0 ]]; do
             OUTPUT_DIR="$2"
             shift 2
             ;;
-        --case)
-            SPECIFIC_CASE="$2"
+        --config|-c)
+            CONFIG_FILE="$2"
             shift 2
             ;;
-        --model)
-            MODEL="$2"
+        --case)
+            SPECIFIC_CASE="$2"
             shift 2
             ;;
         --eval-model)
@@ -67,27 +67,37 @@ while [[ $# -gt 0 ]]; do
             echo "  --yaml, -y FILE       YAML test cases file (default: main_test_cases.yaml)"
             echo "  --cases DIR           Cases directory (default: ../SciVisAgentBench-tasks/main)"
             echo "  --output, -o DIR      Output directory (default: test_results/chatvis_yaml)"
+            echo "  --config, -c FILE     Configuration JSON file (supports OpenAI, Anthropic, HuggingFace)"
             echo "  --case NAME           Run specific test case by name"
-            echo "  --model MODEL         OpenAI model for script generation (default: gpt-4o)"
-            echo "  --eval-model MODEL    OpenAI model for evaluation (default: gpt-4o)"
+            echo "  --model MODEL         Model for script generation (default: gpt-4o, overridden by config)"
+            echo "  --eval-model MODEL    Model for evaluation (default: gpt-4o)"
             echo "  --no-eval             Skip LLM-based evaluation"
             echo "  --list                List available test cases and exit"
-            echo "  --api-key KEY         OpenAI API key (can also use OPENAI_API_KEY env var)"
+            echo "  --api-key KEY         API key (can also use environment variables)"
             echo "  --help, -h            Show this help message"
             echo ""
             echo "Environment Variables:"
-            echo "  OPENAI_API_KEY        Required for both script generation and evaluation"
+            echo "  OPENAI_API_KEY        For OpenAI models"
+            echo "  ANTHROPIC_API_KEY     For Anthropic Claude models"
+            echo "  HF_TOKEN              For Hugging Face models"
+            echo ""
+            echo "Configuration Files:"
+            echo "  configs/chatvis/config_openai.json     - OpenAI GPT models"
+            echo "  configs/chatvis/config_anthropic.json  - Anthropic Claude models"
+            echo "  configs/chatvis/config_hf.json         - Hugging Face models"
             echo ""
             echo "Requirements:"
             echo "  - ParaView with pvpython in PATH or standard locations"
-            echo "  - OpenAI API key for script generation"
+            echo "  - API key for the chosen provider"
             echo ""
             echo "Examples:"
-            echo "  $0                                    # Run all test cases with default settings"
-            echo "  $0 --case bonsai                     # Run only the bonsai test case"
-            echo "  $0 --no-eval                         # Run all cases but skip evaluation"
-            echo "  $0 --list                            # List available test cases"
-            echo "  $0 --model gpt-4 --eval-model gpt-4o # Use different models for generation and evaluation"
+            echo "  $0                                       # Run all test cases with default OpenAI settings"
+            echo "  $0 --config configs/chatvis/config_anthropic.json  # Use Anthropic Claude"
+            echo "  $0 --config configs/chatvis/config_hf.json         # Use Hugging Face models"
+            echo "  $0 --case bonsai                        # Run only the bonsai test case"
+            echo "  $0 --no-eval                            # Run all cases but skip evaluation"
+            echo "  $0 --list                               # List available test cases"
+            echo "  $0 --model gpt-4 --eval-model gpt-4o    # Use different models (without config file)"
             echo ""
             exit 0
             ;;
@@ -112,12 +122,28 @@ if [ ! -d "$CASES_DIR" ]; then
     exit 1
 fi
 
-# Check if OpenAI API key is set
-if [ -z "$OPENAI_API_KEY" ] && [ "$LIST_CASES" = false ]; then
-    echo "Error: OPENAI_API_KEY environment variable is not set."
-    echo "ChatVis requires OpenAI API key for script generation."
-    echo "Set it with: export OPENAI_API_KEY='your-api-key-here'"
-    echo "Or use: $0 --api-key 'your-api-key-here'"
+# Check config file if provided
+if [ -n "$CONFIG_FILE" ] && [ ! -f "$CONFIG_FILE" ]; then
+    echo "Error: Configuration file not found: $CONFIG_FILE"
+    echo "Available config files:"
+    if [ -d "$BENCHMARK_DIR/configs/chatvis" ]; then
+        ls -1 "$BENCHMARK_DIR/configs/chatvis/"
+    fi
+    exit 1
+fi
+
+# Check API keys (if no config file is provided, default to OpenAI requirements)
+if [ -z "$CONFIG_FILE" ] && [ -z "$OPENAI_API_KEY" ] && [ "$LIST_CASES" = false ]; then
+    echo "Error: No configuration file provided and OPENAI_API_KEY environment variable is not set."
+    echo "Either:"
+    echo "  1. Use a config file: $0 --config configs/chatvis/config_openai.json"
+    echo "  2. Set environment variable: export OPENAI_API_KEY='your-api-key-here'"
+    echo "  3. Use command line: $0 --api-key 'your-api-key-here'"
+    echo ""
+    echo "Available config files:"
+    if [ -d "$BENCHMARK_DIR/configs/chatvis" ]; then
+        ls -1 "$BENCHMARK_DIR/configs/chatvis/"
+    fi
     exit 1
 fi
 
@@ -152,14 +178,25 @@ echo "Starting ChatVis YAML test runner..."
 echo "YAML file: $YAML_FILE"
 echo "Cases directory: $CASES_DIR"
 echo "Output directory: $OUTPUT_DIR"
+if [ -n "$CONFIG_FILE" ]; then
+    echo "Configuration file: $CONFIG_FILE"
+fi
 if [ -n "$SPECIFIC_CASE" ]; then
     echo "Specific case: $SPECIFIC_CASE"
 fi
 if [ "$NO_EVAL" = false ]; then
-    echo "Generation model: $MODEL"
+    if [ -n "$CONFIG_FILE" ]; then
+        echo "Generation: Using config file settings"
+    else
+        echo "Generation model: $MODEL"
+    fi
     echo "Evaluation model: $EVAL_MODEL"
 else
-    echo "Generation model: $MODEL"
+    if [ -n "$CONFIG_FILE" ]; then
+        echo "Generation: Using config file settings"
+    else
+        echo "Generation model: $MODEL"
+    fi
     echo "Evaluation: DISABLED"
 fi
 echo ""
@@ -169,7 +206,16 @@ CMD="python3 yaml_runner_chatvis.py"
 CMD="$CMD --yaml \"$YAML_FILE\""
 CMD="$CMD --cases \"$CASES_DIR\""
 CMD="$CMD --output \"$OUTPUT_DIR\""
-CMD="$CMD --model \"$MODEL\""
+
+# Add config file if provided (this will override model settings)
+if [ -n "$CONFIG_FILE" ]; then
+    CMD="$CMD --config \"$CONFIG_FILE\""
+fi
+
+# Add model only if no config file is provided (config file takes precedence)
+if [ -z "$CONFIG_FILE" ]; then
+    CMD="$CMD --model \"$MODEL\""
+fi
 
 if [ -n "$SPECIFIC_CASE" ]; then
     CMD="$CMD --case \"$SPECIFIC_CASE\""
@@ -185,6 +231,7 @@ if [ "$LIST_CASES" = true ]; then
     CMD="$CMD --list"
 fi
 
+# Add API key only if provided (mainly for backward compatibility)
 if [ -n "$OPENAI_API_KEY" ]; then
     CMD="$CMD --api-key \"$OPENAI_API_KEY\""
 fi

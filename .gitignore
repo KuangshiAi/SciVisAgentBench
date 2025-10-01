@@ -61,3 +61,6 @@ SciVisAgentBench-tasks/
 communication_logs/
 *.log
 test_results/
+
+*.pkl
+*.index
