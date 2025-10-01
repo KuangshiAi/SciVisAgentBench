@@ -5,20 +5,113 @@ import collections.abc
 import json
 import tifffile
 
+def _detect_channel_axis(data_shape, axes_string=None):
+    """Detect which axis corresponds to channels in multi-dimensional data.
+    
+    Args:
+        data_shape: Shape of the data array
+        axes_string: Optional string like 'TCZYX' indicating axis order
+        
+    Returns:
+        int: Index of the channel axis, or None if not detected
+    """
+    if axes_string:
+        # Look for 'C' in the axes string
+        if 'C' in axes_string:
+            return axes_string.index('C')
+    
+    # Heuristic: look for the smallest dimension that's not 1
+    # Channels are often the smallest non-spatial dimension
+    non_one_dims = [(i, size) for i, size in enumerate(data_shape) if size > 1]
+    
+    if len(non_one_dims) >= 3:  # At least 3D data
+        # Sort by size and take the smallest as potential channel dimension
+        non_one_dims.sort(key=lambda x: x[1])
+        # Check if the smallest dimension is reasonably small (likely channels)
+        smallest_dim_idx, smallest_size = non_one_dims[0]
+        if smallest_size <= 10:  # Reasonable number of channels
+            return smallest_dim_idx
+    
+    return None
+
+def _open_tiff_with_channels(path, viewer, plugin=None, layer_type=None):
+    """Open a TIFF file and create separate layers for each channel.
+    
+    Args:
+        path: Path to the TIFF file
+        viewer: Napari viewer instance
+        plugin: Plugin to use for reading
+        layer_type: Layer type to create
+        
+    Returns:
+        List of created layers or None if failed
+    """
+    try:
+        with tifffile.TiffFile(path) as tif:
+            # Get the first series (most TIFF files have one series)
+            series = tif.series[0]
+            data = series.asarray()
+            axes = getattr(series, 'axes', None)
+            
+            # Detect channel axis
+            channel_axis = _detect_channel_axis(data.shape, axes)
+            
+            if channel_axis is None:
+                # No channel axis detected, use standard opening
+                layers = viewer.open(path, plugin=plugin or "napari", layer_type=layer_type)
+                return layers[0] if layers else None
+            
+            # Create separate layers for each channel
+            created_layers = []
+            n_channels = data.shape[channel_axis]
+            
+            for channel_idx in range(n_channels):
+                # Extract channel data
+                channel_data = np.take(data, channel_idx, axis=channel_axis)
+                
+                # Create layer name
+                layer_name = f"{path.stem}_ch{channel_idx}"
+                
+                # Add layer to viewer
+                layer = viewer.add_image(
+                    channel_data,
+                    name=layer_name,
+                    colormap='gray' if n_channels == 1 else None
+                )
+                created_layers.append(layer)
+            
+            return created_layers[0] if created_layers else None
+            
+    except Exception as e:
+        # Fall back to standard opening if channel detection fails
+        layers = viewer.open(path, plugin=plugin or "napari", layer_type=layer_type)
+        return layers[0] if layers else None
+
 def open_file(
     path: str | Path,                 # ① first (supplied by you)
     viewer: Viewer,                   # ② injected by napari
     *,                                # keyword-only from here on
     plugin: str | None = None,
     layer_type: str | None = None,
+    detect_channels: bool = True,      # ③ new parameter for channel detection
 ):
-    """Open *any* image file (TIFF, PNG, ND2…) with napari's readers."""
-    layers = viewer.open(
-        Path(path),
-        plugin=plugin or "napari",     # built-in reader first
-        layer_type=layer_type,
-    )
-    return layers[0] if layers else None
+    """Open *any* image file (TIFF, PNG, ND2…) with napari's readers.
+    
+    For TIFF files, can automatically detect channels and create separate layers.
+    """
+    path = Path(path)
+    
+    # Check if it's a TIFF file and channel detection is enabled
+    if path.suffix.lower() in ['.tif', '.tiff'] and detect_channels:
+        return _open_tiff_with_channels(path, viewer, plugin, layer_type)
+    else:
+        # Use standard napari opening for non-TIFF files or when channel detection is disabled
+        layers = viewer.open(
+            path,
+            plugin=plugin or "napari",
+            layer_type=layer_type,
+        )
+        return layers[0] if layers else None
 
 def remove_layer(name_or_index: str | int, viewer: Viewer):
     """Remove a layer by its name or positional index."""
@@ -82,14 +175,16 @@ def iso_contour(
 # ----------------------------------------------------------------------
 
 def screenshot(
-    viewer: Viewer | None = None,          # injected by napari
     canvas_only: bool = True,
+    filename: str | None = None,           # optional filename parameter
+    viewer: Viewer | None = None,          # injected by napari
 ) -> str:
     """
     Take a screenshot of the current napari viewer.
     
-    Saves a JPG file to the temp folder and returns the file path.
+    Saves a JPG file and returns the file path.
     Set canvas_only=False to capture the full UI instead of just the canvas.
+    If filename is provided, saves to that location; otherwise saves to temp folder.
     """
     import os
     import tempfile
@@ -97,11 +192,21 @@ def screenshot(
 
     screenshot_array = viewer.screenshot(canvas_only=canvas_only)
     img = Image.fromarray(screenshot_array)
-    fd, tmp = tempfile.mkstemp(prefix="napari_scr_", suffix=".jpg")
-    os.close(fd)
-    img = img.convert("RGB")  # Ensure no alpha channel for JPG
-    img.save(tmp, format="JPEG")
-    return os.path.abspath(tmp)
+    
+    if filename is not None:
+        # Use provided filename
+        if not filename.endswith(('.jpg', '.jpeg')):
+            filename += '.jpg'  # Add .jpg extension if not present
+        img = img.convert("RGB")  # Ensure no alpha channel for JPG
+        img.save(filename, format="JPEG")
+        return os.path.abspath(filename)
+    else:
+        # Use temporary file as before
+        fd, tmp = tempfile.mkstemp(prefix="napari_scr_", suffix=".jpg")
+        os.close(fd)
+        img = img.convert("RGB")  # Ensure no alpha channel for JPG
+        img.save(tmp, format="JPEG")
+        return os.path.abspath(tmp)
 
 # ----------------------------------------------------------------------
 # layer introspection
@@ -248,17 +353,6 @@ def set_gamma(
         return f"Gamma for layer '{layer.name}' set to {gamma}."
     return f"Layer '{layer.name}' does not have a gamma attribute."
 
-def set_interpolation(
-        layer_name: str | int,
-        interpolation: str, 
-        viewer: Viewer, 
-        ):
-    """Set the interpolation method for zooming."""
-    layer = _get_layer(viewer, layer_name)
-    if hasattr(layer, 'interpolation'):
-        layer.interpolation = interpolation
-        return f"Interpolation for layer '{layer.name}' set to '{interpolation}'."
-    return f"Layer '{layer.name}' does not have an interpolation attribute."
 
 def set_timestep(
     timestep: int,
@@ -440,21 +534,6 @@ def save_layers(
         return "No layers were saved"
     
     return f"Saved {saved_count} layer(s) to {path}"
-
-def export_screenshot(
-    file_path: str | Path,
-    canvas_only: bool = True,
-    viewer: Viewer = None,
-):
-    """Export screenshot to specific file path."""
-    path = Path(file_path)
-    screenshot_array = viewer.screenshot(canvas_only=canvas_only)
-    
-    from PIL import Image
-    img = Image.fromarray(screenshot_array)
-    img.save(path)
-    
-    return f"Screenshot saved to {path.absolute()}"
 
 def get_layer_data(
     layer_name: str | int,
@@ -666,3 +745,149 @@ def play_animation(
     viewer.dims.animation = False
     
     return f"Animation range set from frame {start_frame} to {end_frame} at {fps} FPS (animation started and stopped)"
+
+# ----------------------------------------------------------------------
+# Enhanced Channel Management Functions
+# ----------------------------------------------------------------------
+
+def get_channel_info(layer_name: str | int, viewer: Viewer = None):
+    """Get information about channels in a layer.
+    
+    Args:
+        layer_name: Name or index of the layer to analyze
+        viewer: Napari viewer instance
+        
+    Returns:
+        dict: Information about the layer's channel structure
+    """
+    try:
+        layer = _get_layer(viewer, layer_name)
+        
+        if not hasattr(layer, 'data'):
+            return f"Layer '{layer.name}' does not have data attribute."
+        
+        data = layer.data
+        if hasattr(data, 'compute'):  # Handle dask arrays
+            data = data.compute()
+        
+        # Analyze the data shape and try to detect channel information
+        shape = data.shape
+        ndim = len(shape)
+        
+        # Try to detect channel axis using our detection function
+        channel_axis = _detect_channel_axis(shape)
+        
+        info = {
+            'layer_name': layer.name,
+            'data_shape': shape,
+            'ndim': ndim,
+            'channel_axis': channel_axis,
+            'n_channels': shape[channel_axis] if channel_axis is not None else 1,
+            'axis_labels': list(viewer.dims.axis_labels) if hasattr(viewer.dims, 'axis_labels') else None
+        }
+        
+        return info
+        
+    except (KeyError, IndexError) as e:
+        available_layers = [layer.name for layer in viewer.layers]
+        return f"Layer '{layer_name}' not found. Available layers: {available_layers}"
+
+def split_channels(layer_name: str | int, viewer: Viewer = None):
+    """Split a multi-channel layer into separate single-channel layers.
+    
+    Args:
+        layer_name: Name or index of the layer to split
+        viewer: Napari viewer instance
+        
+    Returns:
+        str: Success message with list of created layers
+    """
+    try:
+        layer = _get_layer(viewer, layer_name)
+        
+        if not hasattr(layer, 'data'):
+            return f"Layer '{layer.name}' does not have data attribute."
+        
+        data = layer.data
+        if hasattr(data, 'compute'):  # Handle dask arrays
+            data = data.compute()
+        
+        # Detect channel axis
+        channel_axis = _detect_channel_axis(data.shape)
+        
+        if channel_axis is None:
+            return f"No channel axis detected in layer '{layer.name}'. Data shape: {data.shape}"
+        
+        n_channels = data.shape[channel_axis]
+        created_layers = []
+        
+        for channel_idx in range(n_channels):
+            # Extract channel data
+            channel_data = np.take(data, channel_idx, axis=channel_axis)
+            
+            # Create layer name
+            new_layer_name = f"{layer.name}_ch{channel_idx}"
+            
+            # Add layer to viewer
+            new_layer = viewer.add_image(
+                channel_data,
+                name=new_layer_name,
+                colormap='gray'
+            )
+            created_layers.append(new_layer_name)
+        
+        return f"Split layer '{layer.name}' into {n_channels} channels: {created_layers}"
+        
+    except (KeyError, IndexError) as e:
+        available_layers = [layer.name for layer in viewer.layers]
+        return f"Layer '{layer_name}' not found. Available layers: {available_layers}"
+
+def merge_channels(layer_names: list, viewer: Viewer = None, output_name: str = None):
+    """Merge multiple single-channel layers into one multi-channel layer.
+    
+    Args:
+        layer_names: List of layer names to merge
+        viewer: Napari viewer instance
+        output_name: Name for the merged layer (default: auto-generated)
+        
+    Returns:
+        str: Success message with merged layer name
+    """
+    try:
+        if len(layer_names) < 2:
+            return "Need at least 2 layers to merge channels."
+        
+        # Get all layers
+        layers = []
+        for name in layer_names:
+            layer = _get_layer(viewer, name)
+            if not hasattr(layer, 'data'):
+                return f"Layer '{name}' does not have data attribute."
+            layers.append(layer)
+        
+        # Check that all layers have the same spatial dimensions
+        first_shape = layers[0].data.shape
+        for layer in layers[1:]:
+            if layer.data.shape != first_shape:
+                return f"All layers must have the same shape. Found: {first_shape} vs {layer.data.shape}"
+        
+        # Stack the data along a new channel dimension
+        channel_data = [layer.data for layer in layers]
+        merged_data = np.stack(channel_data, axis=0)  # Channels first
+        
+        # Create output name
+        if output_name is None:
+            output_name = f"merged_{len(layer_names)}ch"
+        
+        # Add merged layer
+        merged_layer = viewer.add_image(
+            merged_data,
+            name=output_name,
+            channel_axis=0  # Specify that first axis is channels
+        )
+        
+        return f"Merged {len(layer_names)} layers into '{output_name}' with shape {merged_data.shape}"
+        
+    except (KeyError, IndexError) as e:
+        available_layers = [layer.name for layer in viewer.layers]
+        return f"One or more layers not found. Available layers: {available_layers}"

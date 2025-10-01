@@ -44,7 +44,7 @@ def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Napari MCP server (socket backend)")
     parser.add_argument("--host", default="127.0.0.1", help="Napari‑socket host [default: %(default)s]")
     parser.add_argument("--port", type=int, default=64908, help="Napari‑socket port [default: %(default)s]")
-    parser.add_argument("--timeout", type=float, default=5.0, help="TCP timeout seconds [default: %(default)s]")
+    parser.add_argument("--timeout", type=float, default=20.0, help="TCP timeout seconds [default: %(default)s]")
     parser.add_argument(
         "--loglevel",
         default="INFO",
@@ -107,7 +107,6 @@ def build_mcp(manager: NapariManager) -> FastMCP:
         "• set_contrast_limits(layer_name, min, max) - adjust contrast\n"
         "• auto_contrast(layer_name) - auto-adjust contrast\n"
         "• set_gamma(layer_name, gamma) - adjust gamma correction\n"
-        "• set_interpolation(layer_name, mode) - set interpolation\n"
         "• set_timestep(timestep) - set current time point\n"
         "• get_dims_info() - get dimension info\n"
         "• set_camera(center, zoom, angle) - adjust camera\n"
@@ -119,7 +118,6 @@ def build_mcp(manager: NapariManager) -> FastMCP:
         "• add_surface(vertices, faces, name) - add 3D meshes\n"
         "• add_vectors(vectors, name) - add vector fields\n"
         "• save_layers(file_path, layer_names) - save layers to file\n"
-        "• export_screenshot(file_path, canvas_only) - save screenshot\n"
         "• get_layer_data(layer_name) - extract layer data\n"
         "• set_scale_bar(visible, unit) - show/hide scale bar\n"
         "• set_axis_labels(labels) - set axis labels\n"
@@ -131,6 +129,9 @@ def build_mcp(manager: NapariManager) -> FastMCP:
         "• set_channel(index) - set current channel\n"
         "• set_z_slice(index) - set current z-slice\n"
         "• play_animation(start, end, fps) - play time series\n"
+        "• get_channel_info(layer_name) - get channel information for a layer\n"
+        "• split_channels(layer_name) - split multi-channel layer into separate layers\n"
+        "• merge_channels(layer_names, output_name) - merge layers into multi-channel layer\n"
     )
 
     mcp = FastMCP("Napari‑Socket", system_prompt=prompt)
@@ -209,7 +210,7 @@ def build_mcp(manager: NapariManager) -> FastMCP:
         return message if success else f"❌ {message}"
 
     @mcp.tool(name="screenshot")
-    def screenshot() -> str:  
+    def screenshot(filename: str | None = None) -> str:  
         """Take a screenshot of the current view.
         
         Returns:
@@ -220,7 +221,7 @@ def build_mcp(manager: NapariManager) -> FastMCP:
             Captures only the canvas area by default.
             The temporary file is automatically cleaned up by the system.
         """
-        success, message = manager.screenshot()
+        success, message = manager.screenshot(filename)
         if success:
             return Image(path=message)  # message is the absolute path to the screenshot
         return f"\u274c {message}"
@@ -347,25 +348,6 @@ def build_mcp(manager: NapariManager) -> FastMCP:
         success, message = manager.set_gamma(layer_name, gamma)
         return message if success else f"❌ {message}"
 
-    @mcp.tool()
-    def set_interpolation(layer_name: str, interpolation: str) -> str:
-        """Set the interpolation method for zooming.
-        
-        Args:
-            layer_name: Layer name (str) or index (int) to modify
-            interpolation: Interpolation mode ('nearest', 'linear', 'cubic')
-                          
-        Returns:
-            str: Success message or error message prefixed with ❌
-            
-        Note:
-            Common interpolation modes:
-            - nearest: No interpolation (pixelated)
-            - linear: Linear interpolation (smooth)
-            - cubic: Cubic interpolation (very smooth)
-        """
-        success, message = manager.set_interpolation(layer_name, interpolation)
-        return message if success else f"❌ {message}"
 
     @mcp.tool()
     def set_timestep(timestep: int) -> str:
@@ -567,20 +549,6 @@ def build_mcp(manager: NapariManager) -> FastMCP:
         return message if success else f"❌ {message}"
 
     @mcp.tool()
-    def export_screenshot(file_path: str, canvas_only: bool = True) -> str:
-        """Save a screenshot to a specific location.
-        
-        Args:
-            file_path: Path where to save the screenshot
-            canvas_only: If True, capture only the canvas area. If False, capture full UI.
-                        
-        Returns:
-            str: Success message with file path or error message prefixed with ❌
-        """
-        success, message = manager.export_screenshot(file_path, canvas_only)
-        return message if success else f"❌ {message}"
-
-    @mcp.tool()
     def get_layer_data(layer_name: str | int) -> str:
         """Extract the raw data from a layer.
         
@@ -774,6 +742,63 @@ def build_mcp(manager: NapariManager) -> FastMCP:
             Currently limited functionality - sets animation range but doesn't play continuously.
         """
         success, message = manager.play_animation(start_frame, end_frame, fps)
+        return message if success else f"❌ {message}"
+
+    # ------------------------------------------------------------------
+    # Enhanced Channel Management Functions
+    # ------------------------------------------------------------------
+    @mcp.tool()
+    def get_channel_info(layer_name: str | int) -> str:
+        """Get information about channels in a layer.
+        
+        Args:
+            layer_name: Layer name (str) or index (int) to analyze
+            
+        Returns:
+            str: JSON-formatted channel information including shape, channel axis, and number of channels
+                 or error message prefixed with ❌
+                 
+        Note:
+            Returns detailed information about the layer's channel structure.
+            Useful for understanding how multi-dimensional data is organized.
+        """
+        success, message = manager.get_channel_info(layer_name)
+        return json.dumps(message, indent=2) if success else f"❌ {message}"
+
+    @mcp.tool()
+    def split_channels(layer_name: str | int) -> str:
+        """Split a multi-channel layer into separate single-channel layers.
+        
+        Args:
+            layer_name: Layer name (str) or index (int) to split
+                        
+        Returns:
+            str: Success message with list of created layers or error message prefixed with ❌
+                
+        Note:
+            Automatically detects the channel axis and creates separate layers for each channel.
+            Each new layer will be named with '_ch0', '_ch1', etc. suffix.
+        """
+        success, message = manager.split_channels(layer_name)
+        return message if success else f"❌ {message}"
+
+    @mcp.tool()
+    def merge_channels(layer_names: list, output_name: str | None = None) -> str:
+        """Merge multiple single-channel layers into one multi-channel layer.
+        
+        Args:
+            layer_names: List of layer names to merge
+            output_name: Optional name for the merged layer (default: auto-generated)
+                        
+        Returns:
+            str: Success message with merged layer name or error message prefixed with ❌
+                
+        Note:
+            All input layers must have the same spatial dimensions.
+            The merged layer will have channels as the first dimension.
+            Useful for combining separate channel files into one multi-channel dataset.
+        """
+        success, message = manager.merge_channels(layer_names, output_name)
         return message if success else f"❌ {message}"
 
     return mcp

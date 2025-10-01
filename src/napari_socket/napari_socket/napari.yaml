@@ -62,9 +62,6 @@ contributions:
       title: Set Gamma
       python_name: napari_socket._commands:set_gamma
 
-    - id: napari-socket.set_interpolation
-      title: Set Interpolation
-      python_name: napari_socket._commands:set_interpolation
 
     - id: napari-socket.set_timestep
       title: Set Timestep
@@ -112,10 +109,6 @@ contributions:
       title: Save Layers
       python_name: napari_socket._commands:save_layers
 
-    - id: napari-socket.export_screenshot
-      title: Export Screenshot
-      python_name: napari_socket._commands:export_screenshot
-
     - id: napari-socket.get_layer_data
       title: Get Layer Data
       python_name: napari_socket._commands:get_layer_data
@@ -162,6 +155,19 @@ contributions:
     - id: napari-socket.play_animation
       title: Play Animation
       python_name: napari_socket._commands:play_animation
+
+    # Enhanced Channel Management Functions
+    - id: napari-socket.get_channel_info
+      title: Get Channel Info
+      python_name: napari_socket._commands:get_channel_info
+
+    - id: napari-socket.split_channels
+      title: Split Channels
+      python_name: napari_socket._commands:split_channels
+
+    - id: napari-socket.merge_channels
+      title: Merge Channels
+      python_name: napari_socket._commands:merge_channels
 
   # link the widget to the first command
   widgets:
