@@ -447,7 +447,7 @@ def main():
         dataset_folder, metadata_file = downloader.download_dataset(
             test_url, 
             image_id="IM76",  # Specify which image to download
-            download_files=False  
+            download_files=True  
         )
         print(f"\nSuccess! Dataset processed: {dataset_folder}")
         print(f"Metadata saved to: {metadata_file}")
