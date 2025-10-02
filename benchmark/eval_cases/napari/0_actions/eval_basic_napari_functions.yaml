@@ -5,7 +5,7 @@
 # Test: open_file - Load a multi-dimensional image file (T, Z, Y, X, C)
 - vars:
     question: |
-      Load the file "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1.tif" into the viewer.
+      Load the file "/data/dataset_001/dataset_001.tif" into the viewer.
       Respond with <1> if the file was successfully loaded, or <0> if it failed. Only respond with <1> or <0>.
   assert:
     - type: contains-all
@@ -19,7 +19,7 @@
 # Test: delete layers - Delete all loaded layers from the viewer
 - vars:
     question: |
-      Delete the two currently loaded layers (SNAP_IgM_BCR_Cell_1_ch0 and SNAP_IgM_BCR_Cell_1_ch1).
+      Delete the two currently loaded layers (dataset_001_ch0 and dataset_001_ch1).
       Respond with <1> if all layers were successfully deleted, or <0> if the operation failed. Only respond with <1> or <0>.
   assert:
     - type: contains-all
@@ -33,7 +33,7 @@
 # Test: open_file - Load a single image file
 - vars:
     question: |
-      Load the file "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1_ch0_t14.tif" into the viewer.
+      Load the file "/data/dataset_002/dataset_002.tif" into the viewer.
       Respond with <1> if the file was successfully loaded, or <0> if it failed. Only respond with <1> or <0>.
   assert:
     - type: contains-all
