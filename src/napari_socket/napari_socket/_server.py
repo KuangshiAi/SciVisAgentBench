@@ -37,7 +37,7 @@ class _TCPHandler(socketserver.BaseRequestHandler):
             # If result is a Future, get its result
             if hasattr(result, "result") and callable(result.result):
                 try:
-                    result = result.result(timeout=5)
+                    result = result.result(timeout=20)
                 except Exception as e:
                     self.request.sendall(f"ERR {e}\n".encode())
                     return
