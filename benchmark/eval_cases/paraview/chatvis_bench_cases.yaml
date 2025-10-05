@@ -1,0 +1,430 @@
+# 1. line-plot
+- vars:
+    question: |
+          Read the dataset in the file "line-plot/data/line-plot.ex2", and print the number of components and the range of all the variables.
+          Show a default view of the dataset, colored by the variable Pres.
+          Create a line plot over all the variables in the dataset, from (0,0,0) to (0,0,10).
+          Write the values of the line plot in the file "line-plot/results/{agent_mode}/line-plot.csv", and save a screenshot of the line plot in "line-plot/results/{agent_mode}/line-plot.png".
+          Finally, save the ParaView state as "line-plot/results/{agent_mode}/line-plot.pvsm"
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Line Visualization Quality: Are multiple distinct lines clearly visible and properly rendered showing the evolution of different variables along the specified path?
+
+          2. Variable Differentiation: Are all dataset variables visually distinguishable through distinct colors or line styles with clear separation between curves?
+
+          3. Axis and Scale Appropriateness: Do the plot axes display appropriate ranges and scaling that effectively show the data trends and variations?
+
+          4. Legend and Readability: Is there a clear legend identifying each variable line with readable labels and proper visual organization?
+
+# 2. ml-dvr
+- vars:
+    question: |
+          Read in the file named "ml-dvr/data/ml-dvr.vtk", and generate a volume rendering using the default transfer function.
+          Save a screenshot, size 1920 x 1080 pixels, of an isometric view of the visualization in "ml-dvr/results/{agent_mode}/ml-dvr.png".
+          Finally, save the ParaView state as "ml-dvr/results/{agent_mode}/ml-dvr.pvsm"
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Volume Rendering Quality: Is the volume rendering properly generated with appropriate opacity and color mapping that reveals internal structures?
+
+          2. Transfer Function Application: Does the default transfer function effectively highlight meaningful data features and provide good visual contrast?
+
+          3. Isometric View Setup: Is the visualization displayed from an isometric viewpoint that provides a clear three-dimensional perspective of the volume?
+
+          4. Visual Clarity and Detail: Are the volume details clearly visible with proper lighting and shading that enhances depth perception?
+
+# 3. ml-iso
+- vars:
+    question: |
+          Read in the file named "ml-iso/data/ml-iso.vtk", and generate an isosurface of the variable var0 at value 0.5.
+          Save a screenshot of the result, size 1920 x 1080 pixels, in "ml-iso/results/{agent_mode}/ml-iso.png".
+          Finally, save the ParaView state as "ml-iso/results/{agent_mode}/ml-iso.pvsm"
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Isosurface Generation: Is the isosurface properly generated at the specified value (0.5) with correct topology and continuity?
+
+          2. Surface Rendering Quality: Does the isosurface display smooth surfaces with appropriate shading and lighting that reveals the 3D structure?
+
+          3. Geometric Accuracy: Are the surface features geometrically correct and free from artifacts or discontinuities?
+
+          4. Visual Presentation: Is the isosurface clearly visible with good contrast and coloring that enhances the understanding of the data structure?
+
+# 4. ml-slice-iso
+- vars:
+    question: |
+          Read in the file named "ml-slice-iso/data/ml-slice-iso.vtk", slice the volume with a y-z plane at x=0, and take a contour, colored red, through the slice at the value 0.5.
+          Save a screenshot of a +x direction view, size 1920 x 1080 pixels, of the result in "ml-slice-iso/results/{agent_mode}/ml-slice-iso.png".
+          Finally, save the ParaView state as "ml-slice-iso/results/{agent_mode}/ml-slice-iso.pvsm"
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Slice Generation: Is the y-z plane slice properly generated at x=0 position showing the correct cross-section of the volume?
+
+          2. Contour on Slice: Are the contour lines at value 0.5 correctly extracted from the slice and properly displayed?
+
+          3. Red Color Application: Is the contour visualization properly colored red as specified in the requirements?
+
+          4. View Direction: Is the visualization displayed from the correct +x direction view that provides clear visibility of the slice and contours?
+
+# 5. points-surf-clip
+- vars:
+    question: |
+          Read in the file named "points-surf-clip/data/points-surf-clip.ex2", generate a 3D Delaunay triangulation of the dataset, and clip with a y-z plane at x=0, keeping the -x half of the data.
+          Save a screenshot of the result as a wireframe, image size 1920 x 1080 pixels, in "points-surf-clip/results/{agent_mode}/points-surf-clip.png".
+          Finally, save the ParaView state as "points-surf-clip/results/{agent_mode}/points-surf-clip.pvsm"
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Delaunay Triangulation Quality: Is the 3D Delaunay triangulation properly generated creating a valid mesh structure from the point data?
+
+          2. Clipping Accuracy: Is the mesh correctly clipped by the y-z plane at x=0, with only the -x half of the data remaining visible?
+
+          3. Wireframe Representation: Is the result displayed as a clear wireframe showing the triangulated mesh structure with visible edges?
+
+          4. Geometric Integrity: Does the clipped wireframe maintain proper connectivity and show the expected geometric features without artifacts?
+
+# 6. shrink-sphere
+- vars:
+    question: |
+          Create a default sphere, hide it, and create a shrink filter from the sphere.
+          Double the sphere's theta resolution while halving the shrink filter's shrink factor.
+          Group the shrink filter and a wireframe of the sphere together, and save a screenshot of the result in "shrink-sphere/results/{agent_mode}/shrink-sphere.png", size 1920 x 1080 pixels with a white background.
+          Finally, save the ParaView state as "shrink-sphere/results/{agent_mode}/shrink-sphere.pvsm"
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Sphere Creation and Resolution: Is the sphere created with doubled theta resolution providing higher geometric detail and smoother curvature?
+
+          2. Shrink Filter Application: Is the shrink filter properly applied with halved shrink factor creating visible separation between mesh elements?
+
+          3. Dual Representation: Are both the wireframe sphere and shrink filter results simultaneously visible and properly grouped together?
+
+          4. Visual Quality: Does the visualization clearly show the contrast between the wireframe structure and the shrunken elements with appropriate white background?
+
+# 7. stream-glyph
+- vars:
+    question: |
+          Read in the file named "stream-glyph/data/stream-glyph.ex2", and trace streamlines of the V variable seeded from a default point cloud.
+          Render the streamlines with tubes, adding cone glyphs to the streamlines, and coloring the streamlines and glyphs by the Temp variable.
+          Save a screenshot of a +x view of the result, size 1920 x 1080 pixels, in "stream-glyph/results/{agent_mode}/stream-glyph.png".
+          Finally, save the ParaView state as "stream-glyph/results/{agent_mode}/stream-glyph.pvsm"
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Streamline Generation: Are streamlines properly traced following the V variable flow field with appropriate seeding from the point cloud?
+
+          2. Tube and Glyph Rendering: Are streamlines rendered as tubes with cone glyphs properly attached showing flow direction and magnitude?
+
+          3. Temperature Color Mapping: Are both streamlines and glyphs correctly colored by the Temp variable with appropriate color scaling?
+
+          4. View Configuration: Is the visualization displayed from the correct +x view direction providing clear visibility of the flow patterns and structures?
+
+# 8. time-varying
+- vars:
+    question: |
+          Read the dataset in the file "time-varying/data/time-varying.ex2", and color the data by the EQPS variable.
+          Viewing in the +y direction, play an animation through the time steps, with visible color bar legend.
+          Rescale the data range to last time step, and play the animation again.
+          Create a second linked render view to the right of the first, applying a temporal interpolator to the second view.
+          Play the animation simultaneously in both views, and save the animation of both views in "time-varying/results/{agent_mode}/time-varying.avi".
+          Print the following statistics: average value of EQPS over all locations and all time steps, average value of EQPS over all locations in the first half of the time steps, average value of EQPS over all locations in the even numbered time steps, and variance of EQPS over all locations and all the time steps.
+          Finally, save the ParaView state as "time-varying/results/{agent_mode}/time-varying.pvsm"
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Temporal Animation Quality: Does the animation smoothly progress through all time steps showing the evolution of the EQPS variable over time?
+
+          2. Dual View Configuration: Are both render views properly configured with the second view showing temporal interpolation effects compared to the first?
+
+          3. Color Mapping and Legend: Is the EQPS variable properly color-mapped with an appropriate color bar legend visible throughout the animation?
+
+          4. View Direction and Layout: Is the +y direction view properly set and are both views arranged side-by-side in the correct layout configuration?
+
+# 9. chart-opacity
+- vars:
+    question: |
+          Create a wavelet object.
+          Create a plot over line chart from the wavelet with three paths: arc_length, Points_Z, and RTData variables with opacity for arc_length 1 and opacity for Points_Z and RTData 0.3.
+          Save a screenshot in "chart-opacity/results/{agent_mode}/chart-opacity.png".
+          Finally, save the ParaView state as "chart-opacity/results/{agent_mode}/chart-opacity.pvsm"
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Chart Generation: Is the plot over line chart properly created from the wavelet data showing all three specified variables?
+
+          2. Variable Display: Are arc_length, Points_Z, and RTData variables all correctly plotted and distinguishable in the chart?
+
+          3. Opacity Settings: Is the arc_length variable displayed with full opacity (1.0) while Points_Z and RTData show reduced opacity (0.3)?
+
+          4. Chart Clarity: Does the chart provide clear visualization of the data trends with appropriate axis scaling and readable formatting?
+
+# 10. color-blocks
+- vars:
+    question: |
+          Read the file "color-blocks/data/color-blocks.ex2".
+          Color the dataset by the vtkBlockColors field.
+          Retrieve the color map, opacity transfer function, and 2D transfer function for vtkBlockColors.
+          Set block coloring for the block at /IOSS/element_blocks/block_2 using the x component of the ACCL variable.
+          Rescale the block's color and opacity maps to match the current data range of block_2.
+          For the ACCL variable of block_2, retrieve the color transfer function, enable the color bar, and apply cool to warm coloring.
+          View the entire dataset in the -y direction, and save a screenshot with blue-gray background in "color-blocks/results/{agent_mode}/color-blocks.png".
+          Finally, save the ParaView state as "color-blocks/results/{agent_mode}/color-blocks.pvsm"
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Block Color Mapping: Is the dataset properly colored by vtkBlockColors field with distinct block visualization?
+
+          2. Individual Block Coloring: Is block_2 correctly colored using the x component of the ACCL variable with appropriate scaling?
+
+          3. Color Transfer Functions: Are the color transfer functions properly applied with cool to warm coloring for the ACCL variable?
+
+          4. View Configuration: Is the dataset displayed from the -y direction with blue-gray background and visible color bar legend?
+
+# 11. color-data
+- vars:
+    question: |
+          Create a wavelet object.
+          Create a new calculator with the function 'RTData*iHat + ln(RTData)*jHat + coordsZ*kHat'.
+          Get a color transfer function/color map and opacity transfer function/opacity map for the result of the calculation, scaling the color and/or opacity maps to the data range.
+          For a surface representation, color by the x coordinate of the result using a cool to warm color map, show the color bar/color legend, and save a screenshot of size 1158 x 833 pixels in "color-data/results/{agent_mode}/color-data.png".
+          Finally, save the ParaView state as "color-data/results/{agent_mode}/color-data.pvsm"
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Calculator Function: Is the calculator properly implemented with the specified vector function combining RTData and coordinate components?
+
+          2. Color Transfer Function: Is the color transfer function correctly applied with cool to warm color mapping scaled to the data range?
+
+          3. Surface Coloring: Is the surface representation properly colored by the x coordinate of the calculated result?
+
+          4. Color Bar Display: Is the color bar/legend visible and properly displaying the color mapping scale and values?
+
+# 12. export-gltf
+- vars:
+    question: |
+          Create a wavelet object.
+          Create a surface rendering of the wavelet object and color by RTData.
+          Scale the color map to the data, and don't display the color bar or the orientation axes.
+          Export the view to "export-gltf/results/{agent_mode}/ExportedGLTF.gltf".
+
+          Next load the file "export-gltf/results/{agent_mode}/ExportedGLTF.gltf" and display it as a surface.
+          Color this object by TEXCOORD_0.
+          Scale the color map to the data, and don't display the color bar or the orientation axes.
+          Use the 'Cool to Warm' colormap.
+
+          Save a screenshot to the file "export-gltf/results/{agent_mode}/export-gltf.png".
+          Finally, save the ParaView state as "export-gltf/results/{agent_mode}/export-gltf.pvsm"
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. GLTF Export Quality: Is the wavelet object properly exported to GLTF format with correct surface representation and RTData coloring?
+
+          2. GLTF Import and Display: Is the exported GLTF file successfully loaded and displayed as a surface with proper geometry?
+
+          3. Texture Coordinate Coloring: Is the imported GLTF object correctly colored by TEXCOORD_0 with Cool to Warm colormap?
+
+          4. Clean Presentation: Are the color bar and orientation axes properly hidden for a clean visualization appearance?
+
+# 13. import-gltf
+- vars:
+    question: |
+          Load the "BlueGrayBackground" palette.
+          Read the file "import-gltf/data/import-gltf.glb" and import the nodes "/assembly/Axle", "assembly/OuterRing/Torus002", and "assembly/OuterRing/MiddleRing/InnerRing".
+          Set the layout size to 300x300 pixels.
+          Point the camera in the positive Y direction and zoom to fit.
+          Make sure all views are rendered, then save a screenshot to "import-gltf/results/{agent_mode}/import-gltf.png".
+          Finally, save the ParaView state as "import-gltf/results/{agent_mode}/import-gltf.pvsm"
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. GLTF Import Success: Are the specified GLTF nodes properly imported and displayed as separate geometric components?
+
+          2. Node Selection: Are all three specified nodes (Axle, Torus002, InnerRing) correctly imported and visible?
+
+          3. Camera Positioning: Is the camera positioned in the positive Y direction with appropriate zoom to fit all imported geometry?
+
+          4. Layout Configuration: Is the view properly sized to 300x300 pixels with correct rendering and background palette?
+
+# 14. render-histogram
+- vars:
+    question: |
+          Create a wavelet object.
+          Render the RTDATA data in the wavelet and show the color bar.
+          [optional: Make sure the colors are rescaled to the data range]
+          [optional: Use the color map called 'Cool to Warm']
+
+          Next, split the view to the right and create a histogram from RTDATA.
+          Use the same color map as before.
+          Save a screenshot of the line chart in the file "render-histogram/results/{agent_mode}/render-histogram.png".
+          Finally, save the ParaView state as "render-histogram/results/{agent_mode}/render-histogram.pvsm"
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Wavelet Visualization: Is the wavelet object properly rendered with RTDATA coloring and visible color bar?
+
+          2. Split View Layout: Is the view correctly split with the wavelet visualization on the left and histogram on the right?
+
+          3. Histogram Generation: Is the histogram properly generated from RTDATA showing the data distribution?
+
+          4. Color Map Consistency: Are both the wavelet visualization and histogram using the same Cool to Warm color map?
+
+# 15. reset-camera-direction
+- vars:
+    question: |
+          Create a Wavelet object, set its representation to "Surface with Edges", and set the camera direction to [0.5, 1, 0.5].
+          Save a screenshot to the file "reset-camera-direction/results/{agent_mode}/reset-camera-direction.png".
+          Finally, save the ParaView state as "reset-camera-direction/results/{agent_mode}/reset-camera-direction.pvsm"
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Wavelet Creation: Is the Wavelet object properly created and displayed in the scene?
+
+          2. Surface with Edges Representation: Is the wavelet correctly displayed with "Surface with Edges" representation showing both surface and wireframe?
+
+          3. Camera Direction: Is the camera positioned according to the specified direction vector [0.5, 1, 0.5]?
+
+          4. View Quality: Does the visualization provide a clear view of the wavelet structure from the specified camera angle?
+
+# 16. save-transparent
+- vars:
+    question: |
+          Create a cone object.
+          Set the transparency of the cone to be 50%.
+          Save a screenshot with a transparent background in "save-transparent/results/{agent_mode}/save-transparent.png".
+          Finally, save the ParaView state as "save-transparent/results/{agent_mode}/save-transparent.pvsm"
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Cone Object Creation: Is the cone object properly created and displayed in the scene?
+
+          2. Transparency Setting: Is the cone transparency correctly set to 50% showing partial see-through effect?
+
+          3. Transparent Background: Is the screenshot saved with a properly transparent background instead of solid color?
+
+          4. Visual Quality: Does the transparent cone maintain good visual quality and edge definition?
+
+# 17. subseries-of-time-series
+- vars:
+    question: |
+          Read the file "subseries-of-time-series/data/subseries-of-time-series.ex2". Load two element blocks: the first is called 'Unnamed block ID: 1 Type: HEX', the second is called 'Unnamed block ID: 2 Type: HEX'.
+          Next, slice this object with a plane with origin at [0.21706008911132812, 4.0, -5.110947132110596] and normal direction [1.0, 0.0, 0.0]. The plane should have no offset.
+          Next, save this time series to a collection of .vtm files. The base file name for the time series is "subseries-of-time-series/results/{agent_mode}/canslices.vtm" and the suffix is '_%d'. Only save time steps with index between 10 and 20 inclusive, counting by 3.
+          Next, load the files "subseries-of-time-series/results/{agent_mode}/canslices_10.vtm", "subseries-of-time-series/results/{agent_mode}/canslices_13.vtm", "subseries-of-time-series/results/{agent_mode}/canslices_16.vtm", and "subseries-of-time-series/results/{agent_mode}/canslices_19.vtm" in multi-block format.
+          Finally, show the multi-block data set you just loaded.
+          Save a screenshot to the file "subseries-of-time-series/results/{agent_mode}/subseries-of-time-series.png".
+          Finally, save the ParaView state as "subseries-of-time-series/results/{agent_mode}/subseries-of-time-series.pvsm"
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Data Loading and Block Selection: Are the specified element blocks properly loaded and the slice plane correctly applied?
+
+          2. Time Series Export: Is the time series correctly saved as VTM files with the specified time step range and interval?
+
+          3. Multi-block Loading: Are the exported VTM files successfully loaded back as a multi-block dataset?
+
+          4. Final Visualization: Is the multi-block dataset properly displayed showing the sliced geometry from the time series?
+
+# 18. write-ply
+- vars:
+    question: |
+          Create a cube object.
+          Export the cube to a PLY file named "write-ply/results/{agent_mode}/cube.ply".
+          Load the PLY file back into ParaView.
+          Save a screenshot to "write-ply/results/{agent_mode}/write-ply.png".
+          Finally, save the ParaView state as "write-ply/results/{agent_mode}/write-ply.pvsm"
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Cube Creation: Is the cube object properly created and displayed with correct geometry?
+
+          2. PLY Export: Is the cube successfully exported to PLY format with proper mesh data preservation?
+
+          3. PLY Import: Is the exported PLY file correctly loaded back into ParaView maintaining geometric fidelity?
+
+          4. Visualization Quality: Does the imported cube display properly with correct surface representation and rendering?
+
+# 19. climate
+- vars:
+    question: |
+          Read in the file named "climate/data/climate.vtp".
+          Apply a calculator filter to convert velocity from geospatial to lat-long coordinates.
+          Render the computed values using a tube filter with 0.05 radius, colored by velocity magnitude, and lit with maximum shininess and include normals for lighting.
+          Add cone glyphs to show the direction of the velocity, using 10 polygons, radius 0.15, height 0.5, and scaling factor 0.5.
+          View the result in the -z direction scaled so that the tubes occupy most of the image.
+          Save a screenshot of the result, 2294 x 1440 pixels, white background, in the filename "climate/results/{agent_mode}/climate.png".
+          Finally, save the ParaView state as "climate/results/{agent_mode}/climate.pvsm"
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Velocity Conversion: Is the calculator filter properly applied to convert velocity from geospatial to lat-long coordinates?
+
+          2. Tube Visualization: Are the tubes rendered with correct radius (0.05), colored by velocity magnitude, and proper lighting with maximum shininess?
+
+          3. Cone Glyph Direction: Are the cone glyphs properly configured with specified parameters and showing velocity direction accurately?
+
+          4. View Configuration: Is the visualization displayed from -z direction with appropriate scaling and white background as specified?
+
+# 20. materials
+- vars:
+    question: |
+          Compare two datasets in two views side by side each 900 pixels wide x 1400 pixels high.
+          Read the dataset "materials/data/materials_prediction.vtr" in the left view and "materials/data/materials_ground_truth.vtr" in the right view.
+          In both views, convert the "Intensity" and "Phase" variables from cell to point data.
+          In both views, take an isovolume of the "Intensity" variable in the range of [0.2, 1.0], clipped with a plane at (32.0, 32.0, 32.0) and +x normal direction.
+          Color both views with the Viridis (matplotlib) color map for the "Phase" variable, scaled to the data range, including a colormap legend in both views.
+          Label the left view "NN Prediction" and the right view "Ground Truth".
+          Orient the camera to look in the (-1, 0, -1) direction, with the datasets fitting in the views.
+          Save a screenshot of both views in "materials/results/{agent_mode}/materials.png".
+          Finally, save the ParaView state as "materials/results/{agent_mode}/materials.pvsm"
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Side-by-Side Comparison: Are both datasets properly displayed in side-by-side views with correct dimensions and labeling?
+
+          2. Data Conversion and Filtering: Are the Intensity and Phase variables correctly converted to point data and isovolume filtering applied?
+
+          3. Clipping and Color Mapping: Is the plane clipping correctly applied and Viridis colormap properly used for Phase variable?
+
+          4. Camera and Layout: Is the camera positioned correctly in (-1, 0, -1) direction with appropriate fitting and legends visible?

@@ -141,7 +141,7 @@ class YAMLTestRunner:
     
     def __init__(self, config_path: str, yaml_path: str, cases_dir: str, 
                  output_dir: Optional[str] = None, openai_api_key: Optional[str] = None,
-                 eval_model: str = "gpt-4o"):
+                 eval_model: str = "gpt-4o", static_screenshot: bool = False):
         # Convert config_path to absolute path
         if not os.path.isabs(config_path):
             self.config_path = os.path.abspath(config_path)
@@ -153,6 +153,7 @@ class YAMLTestRunner:
         self.output_dir = Path(output_dir) if output_dir else self.cases_dir.parent / "test_results" / "yaml_mcp"
         self.openai_api_key = openai_api_key or os.getenv('OPENAI_API_KEY')
         self.eval_model = eval_model
+        self.static_screenshot = static_screenshot
         self.test_cases: List[YAMLTestCase] = []
         self.token_counter = TokenCounter()
         
@@ -244,22 +245,30 @@ class YAMLTestRunner:
     
     def _extract_case_name(self, case_data: Dict, index: int) -> Optional[str]:
         """Extract case name from YAML test case data."""
-        # Look for dataset name in the task description
         task_description = case_data.get('vars', {}).get('question', '')
         
-        # For anonymized datasets, look for dataset_XXX pattern
         import re
+        # Case 1: anonymized dataset_X
         dataset_match = re.search(r'dataset_(\d+)', task_description)
         if dataset_match:
             return f"dataset_{dataset_match.group(1)}"
         
-        # Alternative pattern for cases where the file has additional info after dataset name
-        # Like "aneurism/data/aneurism_256x256x256_uint8.raw"
+        # Case 2: path like aneurism/data/aneurism_256x256x256_uint8.raw
         path_pattern_extended = re.search(r'([a-zA-Z_][a-zA-Z0-9_]*)/data/\1_[^"]*', task_description)
         if path_pattern_extended:
             return path_pattern_extended.group(1)
         
-        # Fallback to case index
+        # Case 3: path like line-plot/data/line-plot.ex2 (allow dash in name)
+        path_with_dash = re.search(r'([a-zA-Z0-9_-]+)/data/\1[^"]*', task_description)
+        if path_with_dash:
+            return path_with_dash.group(1)
+        
+        # Case 4: path like points-surf-clip/results (allow dash in name)
+        results_path = re.search(r'([a-zA-Z0-9_-]+)/results', task_description)
+        if results_path:
+            return results_path.group(1)
+        
+        # Fallback
         return f"case_{index + 1}"
     
     def _create_test_case_config(self, test_case: YAMLTestCase) -> str:
@@ -535,7 +544,8 @@ class YAMLTestRunner:
                 case_dir=str(test_case.case_path),
                 case_name=test_case.case_name,
                 openai_api_key=self.openai_api_key,
-                model=self.eval_model
+                model=self.eval_model,
+                static_screenshot=self.static_screenshot
             )
             
             # Run the complete evaluation
@@ -808,6 +818,8 @@ async def main():
                        help="OpenAI model for evaluation (default: gpt-4o)")
     parser.add_argument("--api-key",
                        help="OpenAI API key for evaluation (can also use OPENAI_API_KEY env var)")
+    parser.add_argument("--static-screenshot", action="store_true",
+                       help="Use pre-generated screenshots/videos for evaluation instead of generating from state files")
     
     args = parser.parse_args()
     
@@ -836,7 +848,8 @@ async def main():
         cases_dir=args.cases,
         output_dir=args.output,
         openai_api_key=api_key,
-        eval_model=args.eval_model
+        eval_model=args.eval_model,
+        static_screenshot=args.static_screenshot
     )
     
     # Load test cases

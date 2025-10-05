@@ -142,7 +142,28 @@ class ChatVisYAMLTestRunner:
     
     def __init__(self, yaml_path: str, cases_dir: str, output_dir: Optional[str] = None, 
                  config_path: Optional[str] = None, model: str = "gpt-4o", 
-                 eval_model: str = "gpt-4o"):
+                 eval_model: str = "gpt-4o", static_screenshot: bool = False):
+        """
+        Initialize the ChatVis YAML test runner
+        
+        Args:
+            yaml_path: Path to the YAML configuration file
+            cases_dir: Directory containing test cases
+            output_dir: Optional output directory for results
+            config_path: Path to the configuration JSON file
+            model: Model name for running tests
+            eval_model: Model name for evaluation
+            static_screenshot: If True, use pre-generated screenshots/videos for evaluation
+        """
+        self.yaml_path = Path(yaml_path)
+        self.cases_dir = Path(cases_dir)
+        self.output_dir = Path(output_dir) if output_dir else self.cases_dir.parent / "test_results" / "chatvis_yaml"
+        self.config_path = config_path
+        self.model = model
+        self.eval_model = eval_model
+        self.static_screenshot = static_screenshot
+        self.test_cases: List[YAMLTestCase] = []
+        self.token_counter = TokenCounter()
         self.yaml_path = Path(yaml_path)
         self.cases_dir = Path(cases_dir)
         self.output_dir = Path(output_dir) if output_dir else self.cases_dir.parent / "test_results" / "chatvis_yaml"
@@ -154,7 +175,7 @@ class ChatVisYAMLTestRunner:
         
         # Initialize multi-provider client
         sys.path.insert(0, str(current_dir / "chatvis"))
-        from multi_provider_client import MultiProviderClient
+        from chatvis.multi_provider_client import MultiProviderClient
         
         if config_path and os.path.exists(config_path):
             # Load config first to check provider
@@ -259,22 +280,30 @@ class ChatVisYAMLTestRunner:
     
     def _extract_case_name(self, case_data: Dict, index: int) -> Optional[str]:
         """Extract case name from YAML test case data."""
-        # Look for dataset name in the task description
         task_description = case_data.get('vars', {}).get('question', '')
         
-        # For anonymized datasets, look for dataset_XXX pattern
         import re
+        # Case 1: anonymized dataset_X
         dataset_match = re.search(r'dataset_(\d+)', task_description)
         if dataset_match:
             return f"dataset_{dataset_match.group(1)}"
         
-        # Alternative pattern for cases where the file has additional info after dataset name
-        # Like "aneurism/data/aneurism_256x256x256_uint8.raw"
+        # Case 2: path like aneurism/data/aneurism_256x256x256_uint8.raw
         path_pattern_extended = re.search(r'([a-zA-Z_][a-zA-Z0-9_]*)/data/\1_[^"]*', task_description)
         if path_pattern_extended:
             return path_pattern_extended.group(1)
         
-        # Fallback to case index
+        # Case 3: path like line-plot/data/line-plot.ex2 (allow dash in name)
+        path_with_dash = re.search(r'([a-zA-Z0-9_-]+)/data/\1[^"]*', task_description)
+        if path_with_dash:
+            return path_with_dash.group(1)
+        
+        # Case 4: path like points-surf-clip/results (allow dash in name)
+        results_path = re.search(r'([a-zA-Z0-9_-]+)/results', task_description)
+        if results_path:
+            return results_path.group(1)
+        
+        # Fallback
         return f"case_{index + 1}"
     
     def execute_paraview_code(self, code: str) -> str:
@@ -619,28 +648,88 @@ class ChatVisYAMLTestRunner:
             return {"status": "failed", "reason": f"Import error: {e}"}
         
         try:
-            # Create evaluator instance
-            case_dir = str(test_case.case_path)
-            evaluator = PVPythonAutoEvaluator(case_dir, test_case.case_name, os.getenv('OPENAI_API_KEY'), self.eval_model)
+            # Check if required files exist for evaluation based on mode
+            if self.static_screenshot:
+                # In static screenshot mode, look for image files instead of state files
+                print("Using static screenshot mode - checking for image files...")
+                
+                # Check for ground truth screenshot
+                gs_image_path = test_case.case_path / "GS" / f"{test_case.case_name}_gs.png"
+                if not gs_image_path.exists():
+                    # Try alternative naming without _gs suffix
+                    gs_image_path = test_case.case_path / "GS" / f"{test_case.case_name}.png"
+                
+                # Check for result screenshot
+                result_image_path = test_case.case_path / "results" / "pvpython" / f"{test_case.case_name}.png"
+                
+                if not gs_image_path.exists():
+                    print(f"⚠️  Ground truth image not found at either:")
+                    print(f"    {test_case.case_path / 'GS' / f'{test_case.case_name}_gs.png'}")
+                    print(f"    {test_case.case_path / 'GS' / f'{test_case.case_name}.png'}")
+                    return {"status": "failed", "reason": f"Ground truth image not found"}
+                
+                if not result_image_path.exists():
+                    print(f"⚠️  Result image not found: {result_image_path}")
+                    return {"status": "failed", "reason": f"Result image not found: {result_image_path}"}
+                
+                print(f"✓ Found ground truth image: {gs_image_path.name}")
+                print(f"✓ Found result image: {result_image_path.name}")
+            else:
+                # In normal mode, look for state files
+                print("Using state file mode - checking for .pvsm files...")
+                
+                # Try both naming conventions for ground truth state file
+                gs_state_path = test_case.case_path / "GS" / f"{test_case.case_name}.pvsm"
+                if not gs_state_path.exists():
+                    # Try alternative naming with _gs suffix
+                    gs_state_path = test_case.case_path / "GS" / f"{test_case.case_name}_gs.pvsm"
+                
+                result_state_path = test_case.case_path / "results" / "pvpython" / f"{test_case.case_name}.pvsm"
+                
+                if not gs_state_path.exists():
+                    print(f"⚠️  Ground truth state not found at either:")
+                    print(f"    {test_case.case_path / 'GS' / f'{test_case.case_name}.pvsm'}")
+                    print(f"    {test_case.case_path / 'GS' / f'{test_case.case_name}_gs.pvsm'}")
+                    return {"status": "failed", "reason": f"Ground truth state not found"}
+                
+                if not result_state_path.exists():
+                    print(f"⚠️  Result state not found: {result_state_path}")
+                    return {"status": "failed", "reason": f"Result state not found: {result_state_path}"}
+                
+                print(f"✓ Found ground truth state: {gs_state_path.name}")
+                print(f"✓ Found result state: {result_state_path.name}")
             
-            # Check if required files exist for evaluation
-            gs_state_path = test_case.case_path / "GS" / f"{test_case.case_name}_gs.pvsm"
-            result_state_path = test_case.case_path / "results" / "pvpython" / f"{test_case.case_name}.pvsm"
-            
-            if not gs_state_path.exists():
-                return {"status": "failed", "reason": f"Ground truth state not found: {gs_state_path}"}
-            
-            if not result_state_path.exists():
-                return {"status": "failed", "reason": f"Result state not found: {result_state_path}"}
-            
-            # Write YAML rubric to visualization_goals.txt for the evaluator
+            # Write YAML rubric to visualization_goals.txt BEFORE creating evaluator
+            # so it can properly count the goals during initialization
             vision_rubric = test_case.get_rubric_for_subtype('vision')
             goals_file = test_case.case_path / "visualization_goals.txt"
+            
+            # Debug: print rubric content and goals count
+            print(f"DEBUG: Writing vision rubric to {goals_file}")
+            print(f"DEBUG: Rubric content ({len(vision_rubric)} chars):")
+            print(f"DEBUG: {vision_rubric[:200]}..." if len(vision_rubric) > 200 else f"DEBUG: {vision_rubric}")
+            
             with open(goals_file, 'w', encoding='utf-8') as f:
                 f.write(vision_rubric)
             
+            # Verify file was written
+            if goals_file.exists():
+                with open(goals_file, 'r', encoding='utf-8') as f:
+                    written_content = f.read()
+                print(f"DEBUG: File exists, {len(written_content)} chars written")
+                # Count goals manually
+                manual_count = len([line for line in written_content.split('\n') if line.strip() and line.strip()[0].isdigit() and '. ' in line])
+                print(f"DEBUG: Manual goal count: {manual_count}")
+            else:
+                print(f"DEBUG: WARNING - File does not exist after writing!")
+            
+            # Create evaluator instance AFTER writing the goals file
+            case_dir = str(test_case.case_path)
+            evaluator = PVPythonAutoEvaluator(case_dir, test_case.case_name, os.getenv('OPENAI_API_KEY'), self.eval_model, self.static_screenshot)
+            
             # Get goals count for dynamic max score calculation
             goals_count = evaluator.get_goals_count()
+            print(f"DEBUG: Evaluator goals_count: {goals_count}")
             
             # Run all evaluation components
             viz_score = evaluator.evaluate_visualization_quality()
@@ -902,6 +991,8 @@ async def main():
                        help="Model for evaluation (default: gpt-4o)")
     parser.add_argument("--api-key",
                        help="API key (can also use environment variables)")
+    parser.add_argument("--static-screenshot", action="store_true",
+                       help="Use pre-generated screenshots/videos for evaluation instead of generating from state files")
     
     args = parser.parse_args()
     
@@ -944,7 +1035,8 @@ async def main():
         output_dir=args.output,
         config_path=args.config,
         model=model_from_config,
-        eval_model=args.eval_model
+        eval_model=args.eval_model,
+        static_screenshot=args.static_screenshot
     )
     
     # Load test cases

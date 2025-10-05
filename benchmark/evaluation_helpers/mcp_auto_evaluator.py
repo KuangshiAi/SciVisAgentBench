@@ -27,7 +27,7 @@ class MCPAutoEvaluator(SciVisEvaluator):
     Automatic evaluator for MCP test cases using LLM judge
     """
     
-    def __init__(self, case_dir: str, case_name: str, openai_api_key: str = None, model: str = "gpt-4o"):
+    def __init__(self, case_dir: str, case_name: str, openai_api_key: str = None, model: str = "gpt-4o", static_screenshot: bool = False):
         """
         Initialize the MCP evaluator
         
@@ -36,8 +36,10 @@ class MCPAutoEvaluator(SciVisEvaluator):
             case_name (str): Name of the test case
             openai_api_key (str): OpenAI API key for LLM evaluation
             model (str): OpenAI model to use for evaluation
+            static_screenshot (bool): If True, use pre-generated screenshots/videos instead of generating from state files
         """
         super().__init__(case_dir, case_name, eval_mode="mcp")
+        self.static_screenshot = static_screenshot
         
         # Initialize LLM evaluator
         self.llm_evaluator = LLMEvaluator(api_key=openai_api_key, model=model)
@@ -115,69 +117,140 @@ class MCPAutoEvaluator(SciVisEvaluator):
         goals_count = self.get_goals_count()
         max_score = goals_count * 10  # 10 points per goal
         
-        # Check if result state file exists (required)
-        if not os.path.exists(self.result_state_path):
-            explanation = f"Result state file not found: {self.result_state_path}"
-            self.evaluation_results["scores"]["visualization_quality"] = {
-                "score": 0,
-                "max_score": max_score,
-                "explanation": explanation
-            }
-            return 0
-        
-        # Check if ground truth state file exists
-        has_ground_truth = os.path.exists(self.gs_state_path)
-        
         try:
             # Load visualization goals
             visualization_goals = self.load_visualization_goals()
             
-            if has_ground_truth:
-                # Take screenshots from both states (original behavior)
-                print("Taking screenshots from both ground truth and result states...")
-                screenshots = compare_states_screenshots(
-                    self.gs_state_path,
-                    self.result_state_path,
+            if self.static_screenshot:
+                # Use static screenshots/videos instead of generating from state files
+                print("Using static screenshot mode...")
+                try:
+                    from video_helper import load_static_screenshots_or_video
+                except ImportError:
+                    # Try relative import if absolute fails
+                    from .video_helper import load_static_screenshots_or_video
+                
+                # Load GS screenshots/video
+                gs_base_path = os.path.join(self.case_dir, "GS")
+                gs_screenshots = load_static_screenshots_or_video(
+                    gs_base_path, 
+                    self.case_name, 
                     self.screenshot_dir,
-                    data_directory=self.data_dir
+                    prefix="gs_",
+                    num_video_frames=10
                 )
                 
-                # Create evaluation prompt for comparison
-                evaluation_prompt = self._create_evaluation_prompt(visualization_goals, goals_count)
-                
-                # Perform LLM evaluation with both ground truth and result
-                llm_result = self.llm_evaluator.evaluate_visualization(
-                    screenshots['ground_truth'],
-                    screenshots['result'],
-                    evaluation_prompt
-                )
-            else:
-                # Take screenshots from result state only
-                print("Ground truth state not found. Taking screenshots from result state only...")
-                from screenshot_helper import take_screenshots_from_state
-                
-                result_screenshots = take_screenshots_from_state(
-                    self.result_state_path,
+                # Load result screenshots/video
+                result_base_path = os.path.join(self.case_dir, "results", "mcp")
+                result_screenshots = load_static_screenshots_or_video(
+                    result_base_path,
+                    self.case_name,
                     self.screenshot_dir,
                     prefix="result_",
-                    data_directory=self.data_dir
+                    num_video_frames=10
                 )
                 
-                # Create evaluation prompt for result-only evaluation
-                evaluation_prompt = self._create_result_only_evaluation_prompt(visualization_goals, goals_count)
+                if not result_screenshots:
+                    explanation = f"Result screenshot/video not found in: {result_base_path}"
+                    self.evaluation_results["scores"]["visualization_quality"] = {
+                        "score": 0,
+                        "max_score": max_score,
+                        "explanation": explanation
+                    }
+                    return 0
                 
-                # Perform LLM evaluation with result screenshots only
-                llm_result = self.llm_evaluator.evaluate_visualization_result_only(
-                    result_screenshots,
-                    evaluation_prompt
-                )
-            
-            # Parse the LLM result
-            score, explanation = self._parse_llm_result(llm_result, goals_count)
-            
-            # Add note about missing ground truth if applicable
-            if not has_ground_truth:
-                explanation = f"Note: Ground truth state file not found ({self.gs_state_path}). Evaluation based on result screenshots only. " + explanation
+                has_ground_truth = gs_screenshots is not None
+                
+                if has_ground_truth:
+                    # Evaluate with both GS and result
+                    print(f"Loaded {len(gs_screenshots)} GS images and {len(result_screenshots)} result images...")
+                    evaluation_prompt = self._create_evaluation_prompt(visualization_goals, goals_count)
+                    
+                    # Perform LLM evaluation with both ground truth and result
+                    llm_result = self.llm_evaluator.evaluate_visualization(
+                        gs_screenshots,
+                        result_screenshots,
+                        evaluation_prompt
+                    )
+                else:
+                    # Evaluate with result only
+                    print(f"GS screenshots/video not found. Evaluating with {len(result_screenshots)} result images only...")
+                    evaluation_prompt = self._create_result_only_evaluation_prompt(visualization_goals, goals_count)
+                    
+                    # Perform LLM evaluation with result screenshots only
+                    llm_result = self.llm_evaluator.evaluate_visualization_result_only(
+                        result_screenshots,
+                        evaluation_prompt
+                    )
+                
+                # Parse the LLM result
+                score, explanation = self._parse_llm_result(llm_result, goals_count)
+                
+                # Add note about missing ground truth if applicable
+                if not has_ground_truth:
+                    explanation = f"Note: Ground truth screenshots/video not found. Evaluation based on result images only. " + explanation
+                
+            else:
+                # Original behavior: generate screenshots from state files
+                # Check if result state file exists (required)
+                if not os.path.exists(self.result_state_path):
+                    explanation = f"Result state file not found: {self.result_state_path}"
+                    self.evaluation_results["scores"]["visualization_quality"] = {
+                        "score": 0,
+                        "max_score": max_score,
+                        "explanation": explanation
+                    }
+                    return 0
+                
+                # Check if ground truth state file exists
+                has_ground_truth = os.path.exists(self.gs_state_path)
+                
+                if has_ground_truth:
+                    # Take screenshots from both states (original behavior)
+                    print("Taking screenshots from both ground truth and result states...")
+                    screenshots = compare_states_screenshots(
+                        self.gs_state_path,
+                        self.result_state_path,
+                        self.screenshot_dir,
+                        data_directory=self.data_dir
+                    )
+                    
+                    # Create evaluation prompt for comparison
+                    evaluation_prompt = self._create_evaluation_prompt(visualization_goals, goals_count)
+                    
+                    # Perform LLM evaluation with both ground truth and result
+                    llm_result = self.llm_evaluator.evaluate_visualization(
+                        screenshots['ground_truth'],
+                        screenshots['result'],
+                        evaluation_prompt
+                    )
+                else:
+                    # Take screenshots from result state only
+                    print("Ground truth state not found. Taking screenshots from result state only...")
+                    from screenshot_helper import take_screenshots_from_state
+                    
+                    result_screenshots = take_screenshots_from_state(
+                        self.result_state_path,
+                        self.screenshot_dir,
+                        prefix="result_",
+                        data_directory=self.data_dir
+                    )
+                    
+                    # Create evaluation prompt for result-only evaluation
+                    evaluation_prompt = self._create_result_only_evaluation_prompt(visualization_goals, goals_count)
+                    
+                    # Perform LLM evaluation with result screenshots only
+                    llm_result = self.llm_evaluator.evaluate_visualization_result_only(
+                        result_screenshots,
+                        evaluation_prompt
+                    )
+                
+                # Parse the LLM result
+                score, explanation = self._parse_llm_result(llm_result, goals_count)
+                
+                # Add note about missing ground truth if applicable
+                if not has_ground_truth:
+                    explanation = f"Note: Ground truth state file not found ({self.gs_state_path}). Evaluation based on result screenshots only. " + explanation
             
             self.evaluation_results["scores"]["visualization_quality"] = {
                 "score": score,
@@ -453,7 +526,7 @@ class MCPBatchEvaluator:
     Batch evaluator for all MCP test cases
     """
     
-    def __init__(self, cases_dir: str, openai_api_key: str = None, output_dir: str = None, model: str = "gpt-4o"):
+    def __init__(self, cases_dir: str, openai_api_key: str = None, output_dir: str = None, model: str = "gpt-4o", static_screenshot: bool = False):
         """
         Initialize the batch evaluator
         
@@ -462,10 +535,12 @@ class MCPBatchEvaluator:
             openai_api_key (str): OpenAI API key for LLM evaluation
             output_dir (str): Output directory for batch results
             model (str): OpenAI model to use for evaluation
+            static_screenshot (bool): If True, use pre-generated screenshots/videos instead of generating from state files
         """
         self.cases_dir = Path(cases_dir)
         self.openai_api_key = openai_api_key
         self.model = model
+        self.static_screenshot = static_screenshot
         self.output_dir = Path(output_dir) if output_dir else self.cases_dir.parent / "evaluation_results" / "mcp_auto"
         self.output_dir.mkdir(parents=True, exist_ok=True)
     
@@ -526,7 +601,7 @@ class MCPBatchEvaluator:
             
             try:
                 case_dir = str(self.cases_dir / case_name)
-                evaluator = MCPAutoEvaluator(case_dir, case_name, self.openai_api_key, self.model)
+                evaluator = MCPAutoEvaluator(case_dir, case_name, self.openai_api_key, self.model, self.static_screenshot)
                 result = evaluator.run_evaluation()
                 
                 batch_results["results"][case_name] = result
@@ -587,6 +662,8 @@ def main():
                        help="OpenAI model to use for evaluation (default: gpt-4o)")
     parser.add_argument("--list", action="store_true",
                        help="List available test cases and exit")
+    parser.add_argument("--static-screenshot", action="store_true",
+                       help="Use pre-generated screenshots/videos instead of generating from state files")
     
     args = parser.parse_args()
     
@@ -601,7 +678,7 @@ def main():
         print("Error: OpenAI API key not provided. Use --api-key or set OPENAI_API_KEY environment variable.")
         sys.exit(1)
     
-    batch_evaluator = MCPBatchEvaluator(args.cases, api_key, args.output, args.model)
+    batch_evaluator = MCPBatchEvaluator(args.cases, api_key, args.output, args.model, args.static_screenshot)
     
     # List cases if requested
     if args.list:
@@ -618,7 +695,7 @@ def main():
             print(f"Error: Test case not found: {args.case}")
             sys.exit(1)
         
-        evaluator = MCPAutoEvaluator(case_dir, args.case, api_key, args.model)
+        evaluator = MCPAutoEvaluator(case_dir, args.case, api_key, args.model, args.static_screenshot)
         evaluator.run_evaluation()
     else:
         batch_evaluator.run_all_evaluations()

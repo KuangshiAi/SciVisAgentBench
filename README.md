@@ -49,7 +49,7 @@ To set up integration with claude desktop, add the following to claude_desktop_c
 
 Download the benchmark tasks from our secondary GitHub repo [SciVisAgentBench-tasks](https://github.com/KuangshiAi/SciVisAgentBench-tasks) and place them in your workspace.
 
-Make sure the `SciVisAgentBench-tasks` directory is placed at the same level as the `benchmark` directory, including the `main`, the `napari_mcp_evals`, and the `sci_volume_data` folders, as shown in the project structure:
+Make sure the `SciVisAgentBench-tasks` directory is placed at the same level as the `benchmark` directory, including the `main`, the `napari_mcp_evals`, the `sci_volume_data`, and the `chatvis_bench` folders, as shown in the project structure:
 
 ```
 SciVisAgentBench/
@@ -68,6 +68,8 @@ Follow the instructions and make sure you download the datasets locally:
 cd SciVisAgentBench-tasks
 python download_and_organize.py
 ```
+
+If evaluating on the `chatvis_bench`, please turn on the ```--static_screenshot``` mode for maximum compatability.
 
 ## MCP Logger and Tiny Agent
 
@@ -234,6 +236,7 @@ SciVisAgentBench was mainly created by Kuangshi Ai (kai@nd.edu), Shusen Liu (liu
 
 - [ParaView-MCP](https://github.com/LLNL/paraview_mcp)
 - [Napari-MCP](https://github.com/LLNL/napari-mcp)
+- [ChatVis](https://github.com/tpeterka/ChatVis)
 
 ## License
 
