@@ -1,15 +1,14 @@
-# Basic Visualization Workflow Tests for napari-mcp
-# These tests evaluate basic visualization techniques and layer management
-# Focus: Colormaps, blending modes, opacity, contrast, and basic layer operations
+# Basic Visualization Workflow Tests
+# Use https://www.ebi.ac.uk/bioimage-archive/galleries/S-BIAD7.html IM1 to test the workflows.
 
-# Test 1: Multi-channel Overlay with Colormaps
+# Test: Multi-channel Overlay with Colormaps with channels
 - vars:
     question: |
-      Load the first image "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1_ch0_t14.tif" and then load the second image "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1_ch1_t14.tif".
-      Set the first channel to green colormap and the second channel to magenta colormap.
-      Use additive blending for both channels to create an overlay visualization.
+      Load the "D:\Development\napari-mcp\eval\data\dataset_001\dataset_001.tiff" dataset into napari. 
+      Depnding on the number of channels, set the colormap for each channel to the corresponding color.
+      Use additive blending for all channels to create an overlay visualization.
       Take a screenshot of the result.
-      Respond with <1> if both channels are visible with their respective colors in the overlay, or <0> if it failed. Only respond with <1> or <0>.
+      Respond with <1> if all channels are visible with their respective colors in the overlay, or <0> if it failed. Only respond with <1> or <0>.
   assert:
     - type: contains-all
       value: "<1>"
@@ -19,13 +18,12 @@
     cache: false
     runSerially: true
 
-# Test 2: Colormap Variety and Selection
+# Test: Hide All Channels Except for the Channel with the Cells
 - vars:
     question: |
-      Apply different colormaps to each channel: set channel 0 to 'viridis' and channel 1 to 'plasma'.
-      Then change channel 0 to 'hot' and channel 1 to 'cool'.
-      Take screenshots showing both colormap combinations.
-      Respond with <1> if you successfully applied different colormaps to each channel, or <0> if it failed. Only respond with <1> or <0>.
+      Set all layers invisible except for the layer that contains the individual cells. 
+      Take a screenshots to check if only individual cell bodies are shown.
+      Respond with <1> if only individual cell bodies are shown, or <0> if it failed. Only respond with <1> or <0>.
   assert:
     - type: contains-all
       value: "<1>"
@@ -35,13 +33,11 @@
     cache: false
     runSerially: true
 
-# Test 3: Contrast and Gamma Adjustment
+# Test: Contrast and Gamma Adjustment to Display Nucleus
 - vars:
     question: |
-      Auto-adjust contrast for both channels using auto_contrast.
-      Then manually fine-tune the contrast limits: set channel 0 to [0.1, 0.9] and channel 1 to [0.2, 0.8].
-      Adjust gamma correction to 1.2 for channel 0 and 0.8 for channel 1.
-      Take a screenshot showing the enhanced visualization.
+      Adjust the gamma value in channel 0 so that the bright cell organelles are only visible but the cell membrane is suppressed.  
+      Take screenshots to check if the contrast and gamma adjustments were successful.
       Respond with <1> if the contrast and gamma adjustments were successful, or <0> if it failed. Only respond with <1> or <0>.
   assert:
     - type: contains-all
@@ -52,14 +48,20 @@
     cache: false
     runSerially: true
 
-# Test 4: Blending Mode Variations
+
+# Test: Advanced 3D Camera Control and Navigation
 - vars:
     question: |
-      Test different blending modes: set channel 0 to 'opaque', channel 1 to 'translucent'.
-      Take a screenshot to show this combination.
-      Change to: channel 0 to 'additive', channel 1 to 'minimum'.
-      Take a screenshot to show this combination.
-      Respond with <1> if you successfully tested different blending modes, or <0> if it failed. Only respond with <1> or <0>.
+      Start with the default 3D view and take an initial screenshot.
+      Rotate the camera to show the 3D data from a different perspective (side view).
+      Take a screenshot to verify the 3D camera rotation.
+      Zoom in on the 3D structures so they appear larger in the viewport.
+      Take a screenshot to verify the 3D zoom.
+      Pan the camera to move the 3D view to show a different region.
+      Take a screenshot to verify the 3D pan.
+      Reset the camera to the default 3D view.
+      Take a final screenshot to verify the 3D reset.
+      Respond with <1> if all 3D camera operations were successful, or <0> if any failed. Only respond with <1> or <0>.
   assert:
     - type: contains-all
       value: "<1>"
@@ -69,14 +71,14 @@
     cache: false
     runSerially: true
 
-# Test 5: Layer Opacity and Visibility Management
+# Test: Iso-surface Threshold Adjustment
 - vars:
     question: |
-      Set the opacity of channel 0 to 0.3 and channel 1 to 0.7.
-      Take a screenshot showing the different opacities.
-      Toggle the visibility of channel 0 to hide it, then show it again.
-      Take screenshots showing the visibility changes.
-      Respond with <1> if the opacity and visibility management was successful, or <0> if it failed. Only respond with <1> or <0>.
+      Adjust the iso-surface threshold to different values to explore different surface levels.
+      Start with a low threshold (e.g., 0.1) and take a screenshot.
+      Increase the threshold to a medium value (e.g., 0.5) and take a screenshot.
+      Increase the threshold to a high value (e.g., 0.9) and take a screenshot.
+      Respond with <1> if you successfully adjusted iso-surface thresholds and could see different surface levels, or <0> if it failed. Only respond with <1> or <0>.
   assert:
     - type: contains-all
       value: "<1>"
@@ -86,41 +88,7 @@
     cache: false
     runSerially: true
 
-# Test 6: Interpolation and Rendering Quality
-- vars:
-    question: |
-      Set interpolation to 'nearest' for channel 0 and 'linear' for channel 1.
-      Take a screenshot showing the different interpolation modes.
-      Change channel 0 to 'cubic' interpolation.
-      Take a screenshot showing the cubic interpolation.
-      Respond with <1> if you successfully tested different interpolation modes, or <0> if it failed. Only respond with <1> or <0>.
-  assert:
-    - type: contains-all
-      value: "<1>"
-    - type: not-contains
-      value: "<0>"
-  options:
-    cache: false
-    runSerially: true
-
-# Test 7: Scale Bar and Display Elements
-- vars:
-    question: |
-      Show the scale bar with unit 'um' for the visualization.
-      Take a screenshot showing the scale bar.
-      Hide the scale bar, then show it again with unit 'nm'.
-      Take a screenshot showing the scale bar with different units.
-      Respond with <1> if the scale bar management was successful, or <0> if it failed. Only respond with <1> or <0>.
-  assert:
-    - type: contains-all
-      value: "<1>"
-    - type: not-contains
-      value: "<0>"
-  options:
-    cache: false
-    runSerially: true
-
-# Test 8: Cleanup - Reset for next test run
+# Test: Cleanup - Reset for next test run
 - vars:
     question: |
       Delete all loaded layers and reset the view to 2D mode to prepare for the next test run.

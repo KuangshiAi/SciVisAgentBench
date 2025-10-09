@@ -5,7 +5,7 @@
 # Test: open_file - Load a multi-dimensional image file (T, Z, Y, X, C)
 - vars:
     question: |
-      Load the file "/data/dataset_001/dataset_001.tif" into the viewer.
+      Load the file "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1.tif" into the viewer.
       Respond with <1> if the file was successfully loaded, or <0> if it failed. Only respond with <1> or <0>.
   assert:
     - type: contains-all
@@ -19,7 +19,7 @@
 # Test: delete layers - Delete all loaded layers from the viewer
 - vars:
     question: |
-      Delete the two currently loaded layers (dataset_001_ch0 and dataset_001_ch1).
+      Delete the two currently loaded layers (SNAP_IgM_BCR_Cell_1_ch0 and SNAP_IgM_BCR_Cell_1_ch1).
       Respond with <1> if all layers were successfully deleted, or <0> if the operation failed. Only respond with <1> or <0>.
   assert:
     - type: contains-all
@@ -33,7 +33,7 @@
 # Test: open_file - Load a single image file
 - vars:
     question: |
-      Load the file "/data/dataset_002/dataset_002.tif" into the viewer.
+      Load the file "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1_ch0_t14.tif" into the viewer.
       Respond with <1> if the file was successfully loaded, or <0> if it failed. Only respond with <1> or <0>.
   assert:
     - type: contains-all
@@ -58,6 +58,38 @@
     cache: false
     runSerially: true
 
+# Test: Z-stack Navigation - Scroll through different depths
+- vars:
+    question: |
+      Navigate through the z-stack of the loaded image. Use set_z_slice to jump to at least 3 different z-slices to examine structures at different depths. 
+      Take a screenshot at each z-slice to verify navigation. 
+      Respond with <1> if you successfully navigated through different z-slices and could see structural changes, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+
+# Test: Time Series Navigation - Navigate through time points
+- vars:
+    question: |
+      If the data has time dimensions, use set_timestep to navigate through different time points.
+      Take screenshots at different time points to show temporal changes.
+      If no time dimension exists, simulate time navigation by adjusting the current view and taking multiple screenshots.
+      Respond with <1> if you successfully navigated through time points or simulated time navigation, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+    
 # Test: set_colormap - Change layer colormap
 - vars:
     question: |
@@ -133,6 +165,20 @@
     question: |
       Set the gamma correction of the active layer to 1.5.
       Respond with <1> if the gamma was successfully adjusted, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test: set_interpolation - Change interpolation mode - doesn't work
+- vars:
+    question: |
+      Change the interpolation mode of the active layer to 'linear'.
+      Respond with <1> if the interpolation mode was successfully changed, or <0> if it failed. Only respond with <1> or <0>.
   assert:
     - type: contains-all
       value: "<1>"
@@ -257,7 +303,7 @@
 # # Test: get_layer_statistics - Get layer statistics
 # - vars:
 #     question: |
-#       Retrieve basic statistics for the active layer.
+#       Retrieve basic statistics (min, max, mean, std) for the active layer.
 #       Respond with <1> if you successfully retrieved layer statistics, or <0> if it failed. Only respond with <1> or <0>.
 #   assert:
 #     - type: contains-all
@@ -338,6 +384,20 @@
 #     cache: false
 #     runSerially: true
 
+# Test: screenshot - Save screenshot to file
+- vars:
+    question: |
+      Save a screenshot.
+      Respond with <1> if the screenshot was successfully exported, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
 # Test: save_layers - Save layer to file
 - vars:
     question: |
@@ -385,6 +445,21 @@
     question: |
       Try to remove a layer that doesn't exist named "nonexistent_layer" and handle the error gracefully.
       Respond with <1> if the error was handled gracefully (no crash), or <0> if it crashed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test: 3D View and Iso-surface Rendering
+- vars:
+    question: |
+      Enable iso-surface rendering for the loaded layer.
+      Take a screenshot to verify the 3D iso-surface rendering.
+      Respond with <1> if the 3D iso-surface rendering was successfully set up, or <0> if it failed. Only respond with <1> or <0>.
   assert:
     - type: contains-all
       value: "<1>"

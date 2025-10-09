@@ -1,0 +1,24 @@
+# Figure Recreation Tests for napari-mcp
+# These tests evaluate the agent's ability to recreate scientific figures from papers
+# Focus: Loading data, applying appropriate visualization settings, and matching target figures
+
+#Test: Recreate a figure from a dataset. 
+- vars:
+    question: |
+      Load the dataset into napari: D:\Development\napari-mcp\eval\data\dataset_001\dataset_001.tiff
+      Read the target figure: D:\Development\napari-mcp\eval\data\dataset_001\dataset_001.png but don't load it into napari.
+      Read the dataset description: D:\Development\napari-mcp\eval\data\dataset_001\dataset_001.yaml. 
+      Set appropriate colormaps and blending modes to match the target figure.
+      Adjust contrast and gamma as needed to match the target figure.
+      Take a screenshot of your recreation.
+      If the recreation does not match the target figure, adjust the visualization settings and take a screenshot again.
+      Stop when the recreation matches the target figure or you have tried five different visualization settings.
+      Respond with <1> if you successfully recreated the figure and it closely matches the target, or <0> if it failed or doesn't match well. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true

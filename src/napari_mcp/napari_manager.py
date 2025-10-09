@@ -22,6 +22,7 @@ import numpy as np
 _LOGGER = logging.getLogger(__name__)
 
 
+
 def _convert_numpy_for_json(obj):
     """Convert numpy arrays to lists for JSON serialization."""
     if isinstance(obj, np.ndarray):
@@ -187,6 +188,10 @@ class NapariManager:  # pylint: disable=too-few-public-methods
         args = [layer_name, gamma]
         return self.send_command("napari-socket.set_gamma", args)
 
+    def set_interpolation(self, layer_name: str | int, interpolation: str) -> Tuple[bool, Any]:
+        """Set the interpolation method for zooming."""
+        args = [layer_name, interpolation]
+        return self.send_command("napari-socket.set_interpolation", args)
 
     def set_timestep(self, timestep: int) -> Tuple[bool, Any]:
         """Jump to a specific time point."""

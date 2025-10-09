@@ -58,6 +58,14 @@ class BioImageArchiveDownloader:
             'download_timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
         }
         
+        # Find the larger representative preview image
+        large_preview_url = self._find_large_preview_image(soup, url)
+        if large_preview_url:
+            metadata['large_preview_url'] = large_preview_url
+            print(f"Found large preview image: {large_preview_url}")
+        else:
+            print("No large preview image found on the page")
+        
         # Extract study title
         title_elem = soup.find('h1')
         if title_elem:
@@ -230,6 +238,146 @@ class BioImageArchiveDownloader:
         
         return image_info if image_info else None
     
+    def _find_large_preview_image(self, soup, base_url):
+        """Find the larger representative preview image on the page."""
+        img_tags = soup.find_all('img')
+        print(f"Found {len(img_tags)} images on the page")
+        
+        # Strategy 1: Look for explicit representative images
+        for img in img_tags:
+            src = img.get('src', '')
+            if not src:
+                continue
+                
+            # Convert relative URL to absolute
+            if src.startswith('/'):
+                full_url = 'https://www.ebi.ac.uk' + src
+            else:
+                full_url = urljoin(base_url, src)
+            
+            # Look for representative images with larger dimensions
+            # Common patterns: IM*-representative-*-*.png, *-representative-*.png, etc.
+            if any(pattern in src.lower() for pattern in [
+                'representative', 'overview', 'sample'
+            ]):
+                # Check if it's a larger image (not a small thumbnail)
+                if any(size in src for size in ['512', '1024', '2048', 'large', 'big']):
+                    print(f"Found representative image: {src}")
+                    return full_url
+        
+        # Strategy 2: Look for images that are larger than typical thumbnails
+        # but not necessarily labeled as "representative"
+        large_images = []
+        for img in img_tags:
+            src = img.get('src', '')
+            if not src:
+                continue
+                
+            # Convert relative URL to absolute
+            if src.startswith('/'):
+                full_url = 'https://www.ebi.ac.uk' + src
+            else:
+                full_url = urljoin(base_url, src)
+            
+            # Look for images that are likely larger (not thumbnails)
+            if any(size in src for size in ['512', '1024', '2048']) and 'thumb' not in src.lower():
+                print(f"Found potential large image: {src}")
+                large_images.append(full_url)
+        
+        # Strategy 3: If we found large images, pick the first one
+        if large_images:
+            return large_images[0]
+        
+        # Strategy 4: Look for any image that's not a thumbnail
+        # This is a fallback for pages that might have different naming conventions
+        for img in img_tags:
+            src = img.get('src', '')
+            if not src:
+                continue
+                
+            # Convert relative URL to absolute
+            if src.startswith('/'):
+                full_url = 'https://www.ebi.ac.uk' + src
+            else:
+                full_url = urljoin(base_url, src)
+            
+            # Skip obvious thumbnails
+            if 'thumb' in src.lower() or '128' in src:
+                continue
+                
+            # Look for images that might be larger based on filename patterns
+            if any(pattern in src.lower() for pattern in [
+                'preview', 'view', 'display', 'show'
+            ]):
+                print(f"Found potential preview image: {src}")
+                return full_url
+        
+        # Strategy 5: As a last resort, try to find the largest available image
+        # by looking for images with dimension indicators in the filename
+        dimension_images = []
+        for img in img_tags:
+            src = img.get('src', '')
+            if not src:
+                continue
+                
+            # Convert relative URL to absolute
+            if src.startswith('/'):
+                full_url = 'https://www.ebi.ac.uk' + src
+            else:
+                full_url = urljoin(base_url, src)
+            
+            # Look for images with dimension patterns like 512x512, 1024x1024, etc.
+            import re
+            dim_match = re.search(r'(\d+)[x\-](\d+)', src)
+            if dim_match:
+                width, height = int(dim_match.group(1)), int(dim_match.group(2))
+                if width >= 256 and height >= 256:  # At least 256x256
+                    dimension_images.append((full_url, width * height))
+                    print(f"Found dimensioned image: {src} ({width}x{height})")
+        
+        # Return the largest image by area
+        if dimension_images:
+            largest = max(dimension_images, key=lambda x: x[1])
+            print(f"Selected largest image: {largest[0]} (area: {largest[1]})")
+            return largest[0]
+        
+        print("No suitable large preview image found")
+        return None
+    
+    def _find_best_individual_preview(self, images_to_download):
+        """Find the best individual preview image from the available images."""
+        if not images_to_download:
+            return None
+        
+        # Look for images with preview URLs
+        preview_candidates = []
+        for image_info in images_to_download:
+            if 'preview_url' in image_info and image_info['preview_url']:
+                preview_url = image_info['preview_url']
+                
+                # Try to determine the size/quality of the preview
+                # Look for dimension indicators in the URL
+                import re
+                dim_match = re.search(r'(\d+)[x\-](\d+)', preview_url)
+                if dim_match:
+                    width, height = int(dim_match.group(1)), int(dim_match.group(2))
+                    area = width * height
+                    preview_candidates.append((preview_url, area, image_info.get('image_id', 'Unknown')))
+                    print(f"Found preview candidate: {image_info.get('image_id', 'Unknown')} - {width}x{height} (area: {area})")
+                else:
+                    # If no dimensions in URL, assume it's a standard thumbnail
+                    preview_candidates.append((preview_url, 128*128, image_info.get('image_id', 'Unknown')))
+                    print(f"Found preview candidate: {image_info.get('image_id', 'Unknown')} - standard thumbnail")
+        
+        if not preview_candidates:
+            return None
+        
+        # Sort by area (largest first) and return the best one
+        preview_candidates.sort(key=lambda x: x[1], reverse=True)
+        best_url, best_area, best_id = preview_candidates[0]
+        print(f"Selected best individual preview: {best_id} (area: {best_area})")
+        return best_url
+    
     def download_image(self, image_url, local_path):
         """Download a single image."""
         print(f"Downloading: {image_url}")
@@ -282,26 +430,54 @@ class BioImageArchiveDownloader:
             images_to_download = images_to_download[:1]
             print("No Image ID specified, downloading first image")
         
-        # Download preview images as part of metadata (only if they exist)
+        # Download preview images - prioritize large representative, fall back to best individual preview
         preview_files = []
-        for i, image_info in enumerate(images_to_download):
-            if 'preview_url' in image_info and image_info['preview_url']:
-                preview_filename = f"preview_{image_info['image_id']}.jpg"
+        preview_downloaded = False
+        
+        if 'large_preview_url' in metadata and metadata['large_preview_url']:
+            # Use the large preview image for all images in the dataset
+            large_preview_filename = "dataset_preview.png"
+            large_preview_path = dataset_folder / large_preview_filename
+            
+            try:
+                print(f"Downloading large representative preview image...")
+                self.download_image(metadata['large_preview_url'], large_preview_path)
+                preview_files.append({
+                    'filename': large_preview_filename,
+                    'local_path': str(large_preview_path),
+                    'image_id': 'representative',
+                    'preview_url': metadata['large_preview_url'],
+                    'type': 'large_representative'
+                })
+                print(f"Successfully downloaded large preview: {large_preview_filename}")
+                preview_downloaded = True
+            except Exception as e:
+                print(f"Failed to download large preview image: {e}")
+        
+        # If no large representative image was found or downloaded, try to find the best individual preview
+        if not preview_downloaded:
+            best_preview_url = self._find_best_individual_preview(images_to_download)
+            if best_preview_url:
+                preview_filename = "dataset_preview.png"
                 preview_path = dataset_folder / preview_filename
                 
                 try:
-                    print(f"Downloading preview: {image_info['image_id']}")
-                    self.download_image(image_info['preview_url'], preview_path)
+                    print(f"Downloading best available individual preview image...")
+                    self.download_image(best_preview_url, preview_path)
                     preview_files.append({
                         'filename': preview_filename,
                         'local_path': str(preview_path),
-                        'image_id': image_info['image_id'],
-                        'preview_url': image_info['preview_url']
+                        'image_id': 'best_available',
+                        'preview_url': best_preview_url,
+                        'type': 'best_individual'
                     })
+                    print(f"Successfully downloaded best preview: {preview_filename}")
+                    preview_downloaded = True
                 except Exception as e:
-                    print(f"Failed to download preview for {image_info['image_id']}: {e}")
-            else:
-                print(f"No preview available for {image_info.get('image_id', 'Unknown')}")
+                    print(f"Failed to download best individual preview: {e}")
+        
+        if not preview_downloaded:
+            print("No suitable preview image found, skipping preview download")
         
         if download_files:
             print("Downloading image files...")
@@ -439,14 +615,14 @@ def main():
     """Main function to test the downloader."""
     downloader = BioImageArchiveDownloader()
     
-    # Test with S-BIAD7 dataset
+    # Test with S-BIAD7 dataset (has large representative image)
     test_url = "https://www.ebi.ac.uk/bioimage-archive/galleries/S-BIAD7.html"
     
     try:
         # Example: Download specific image by ID
         dataset_folder, metadata_file = downloader.download_dataset(
             test_url, 
-            image_id="IM76",  # Specify which image to download
+            image_id="IM1",  # Specify which image to download
             download_files=True  
         )
         print(f"\nSuccess! Dataset processed: {dataset_folder}")

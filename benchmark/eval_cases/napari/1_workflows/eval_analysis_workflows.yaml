@@ -2,7 +2,7 @@
 # These tests evaluate complex analysis workflows that combine multiple napari functions
 # Each test focuses on performing specific analysis tasks
 
-# Test 1: Cell Counting and Measurement Analysis
+# Test: Cell Counting and Measurement Analysis
 - vars:
     question: |
       Load the image "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1_ch1_t14.tif" and set it to magenta colormap.
@@ -18,7 +18,7 @@
     cache: false
     runSerially: true
 
-# Test 2: Multi-dimensional Data Exploration
+# Test: Multi-dimensional Data Exploration
 - vars:
     question: |
       Load the multi-dimensional image "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1_ch0_t14.tif".
@@ -35,7 +35,7 @@
     cache: false
     runSerially: true
 
-# Test 3: Statistical Analysis and Data Export
+# Test: Statistical Analysis and Data Export
 - vars:
     question: |
       Get basic statistics (min, max, mean, std) for the loaded layer.
@@ -52,7 +52,7 @@
     cache: false
     runSerially: true
 
-# Test 4: Annotation and Measurement Workflow
+# Test: Annotation and Measurement Workflow
 - vars:
     question: |
       Add point annotations to mark specific features of interest in the image.
@@ -69,7 +69,7 @@
     cache: false
     runSerially: true
 
-# Test 5: Time Series Analysis (if applicable)
+# Test: Time Series Analysis (if applicable)
 - vars:
     question: |
       If the data has time dimensions, navigate through different time points.
@@ -86,7 +86,7 @@
     cache: false
     runSerially: true
 
-# Test 6: Data Cropping and Region of Interest Analysis
+# Test: Data Cropping and Region of Interest Analysis
 - vars:
     question: |
       Define a region of interest by cropping the layer to a specific area.
@@ -103,7 +103,7 @@
     cache: false
     runSerially: true
 
-# Test 7: Cleanup - Reset for next test run
+# Test: Cleanup - Reset for next test run
 - vars:
     question: |
       Delete all loaded layers and remove any annotations to prepare for the next test run.

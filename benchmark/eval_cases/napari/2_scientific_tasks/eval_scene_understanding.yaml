@@ -2,7 +2,7 @@
 # These tests evaluate the agent's ability to analyze and interpret visual content from screenshots
 # Focus: Visual analysis, object counting, color identification, and scene interpretation
 
-# Test 1: Setup - Load multi-channel cell data
+# Test: Setup - Load multi-channel cell data
 - vars:
     question: |
       Load the first image "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1_ch0_t14.tif" and then load the second image "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1_ch1_t14.tif".
@@ -19,7 +19,7 @@
     cache: false
     runSerially: true
 
-# Test 2: Count Green Cells
+# Test: Count Green Cells
 - vars:
     question: |
       Take a screenshot of the current view and analyze it.
@@ -36,7 +36,7 @@
     cache: false
     runSerially: true
 
-# Test 3: Count Magenta Cells
+# Test: Count Magenta Cells
 - vars:
     question: |
       Take a screenshot of the current view and analyze it.
@@ -53,7 +53,7 @@
     cache: false
     runSerially: true
 
-# Test 4: Count Yellow/Overlapping Cells
+# Test: Count Yellow/Overlapping Cells
 - vars:
     question: |
       Take a screenshot of the current view and analyze it.
@@ -70,7 +70,7 @@
     cache: false
     runSerially: true
 
-# Test 5: Total Cell Count
+# Test: Total Cell Count
 - vars:
     question: |
       Take a screenshot of the current view and analyze it.
@@ -88,7 +88,7 @@
     cache: false
     runSerially: true
 
-# Test 6: Cell Size Analysis
+# Test: Cell Size Analysis
 - vars:
     question: |
       Take a screenshot of the current view and analyze it.
@@ -105,7 +105,7 @@
     cache: false
     runSerially: true
 
-# Test 7: Cell Distribution Analysis
+# Test: Cell Distribution Analysis
 - vars:
     question: |
       Take a screenshot of the current view and analyze it.
@@ -122,7 +122,7 @@
     cache: false
     runSerially: true
 
-# Test 8: Color Intensity Analysis
+# Test: Color Intensity Analysis
 - vars:
     question: |
       Take a screenshot of the current view and analyze it.
@@ -139,7 +139,7 @@
     cache: false
     runSerially: true
 
-# Test 9: Cell Shape Analysis
+# Test: Cell Shape Analysis
 - vars:
     question: |
       Take a screenshot of the current view and analyze it.
@@ -156,7 +156,7 @@
     cache: false
     runSerially: true
 
-# Test 10: Scene Summary
+# Test: Scene Summary
 - vars:
     question: |
       Take a screenshot of the current view and analyze it.
@@ -174,7 +174,7 @@
     cache: false
     runSerially: true
 
-# Test 11: Change View and Re-analyze
+# Test: Change View and Re-analyze
 - vars:
     question: |
       Zoom in on the cells so they appear larger in the viewport.
@@ -192,7 +192,7 @@
     cache: false
     runSerially: true
 
-# Test 12: Switch to 3D and Analyze
+# Test: Switch to 3D and Analyze
 - vars:
     question: |
       Switch to 3D view mode.
@@ -211,7 +211,7 @@
     cache: false
     runSerially: true
 
-# Test 13: Cleanup - Reset for next test run
+# Test: Cleanup - Reset for next test run
 - vars:
     question: |
       Delete all loaded layers and reset the view to 2D mode.
