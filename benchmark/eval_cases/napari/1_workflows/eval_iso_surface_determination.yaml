@@ -4,8 +4,8 @@
 # Test: Iso surface determination for a target
 - vars:
     question: |
-      Read the file "D:\Development\napari-mcp\eval\data\tooth\eval_iso_surface_determination_target_2.txt" to get the target iso-surface values for different tooth structures.
-      Load D:\Development\napari-mcp\eval\data\tooth\tooth_103x94x161_uint8.tif into napari. 
+      Read the file "dataset_003/eval_iso_surface_determination_target_1.txt" to get the target iso-surface values for different tooth structures.
+      Load dataset_003/dataset_003.tif into napari. 
       Switch to 3D view mode and set the rendering to iso. 
       Find the iso surface value that shows the target clearly.
       Rotate the camera to several angles and take a screenshot of the result each time to check if the target structure is clearly visible from different angles.

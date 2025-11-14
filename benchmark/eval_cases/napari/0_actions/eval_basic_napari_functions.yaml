@@ -1,11 +1,13 @@
 # Basic Napari Function Tests - Action Level
-# These tests evaluate individual napari MCP server functions with simple, single-function calls
+# These tests evaluate individual server functions with simple, single-function calls
 # Each test focuses on testing one specific function with appropriate parameters
+# We suggest using https://www.ebi.ac.uk/bioimage-archive/galleries/S-BIAD7.html IM1 as dataset_001
+# We suggest using https://uk1s3.embassy.ebi.ac.uk/bia-integrator-data/pages/S-BIAD573.html IM1 as dataset_002
 
 # Test: open_file - Load a multi-dimensional image file (T, Z, Y, X, C)
 - vars:
     question: |
-      Load the file "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1.tif" into the viewer.
+      Load the file "dataset_001/dataset_001.tiff" into the viewer.
       Respond with <1> if the file was successfully loaded, or <0> if it failed. Only respond with <1> or <0>.
   assert:
     - type: contains-all
@@ -19,7 +21,7 @@
 # Test: delete layers - Delete all loaded layers from the viewer
 - vars:
     question: |
-      Delete the two currently loaded layers (SNAP_IgM_BCR_Cell_1_ch0 and SNAP_IgM_BCR_Cell_1_ch1).
+      Delete the all currently loaded layers.
       Respond with <1> if all layers were successfully deleted, or <0> if the operation failed. Only respond with <1> or <0>.
   assert:
     - type: contains-all
@@ -33,7 +35,7 @@
 # Test: open_file - Load a single image file
 - vars:
     question: |
-      Load the file "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1_ch0_t14.tif" into the viewer.
+      Load the file "dataset_002/dataset_002.tif" into the viewer.
       Respond with <1> if the file was successfully loaded, or <0> if it failed. Only respond with <1> or <0>.
   assert:
     - type: contains-all
@@ -61,7 +63,7 @@
 # Test: Z-stack Navigation - Scroll through different depths
 - vars:
     question: |
-      Navigate through the z-stack of the loaded image. Use set_z_slice to jump to at least 3 different z-slices to examine structures at different depths. 
+      Navigate through the z-stack of the loaded image. Use set_z_slice to jump to at least z-slice 0 to examine structures at different depths. 
       Take a screenshot at each z-slice to verify navigation. 
       Respond with <1> if you successfully navigated through different z-slices and could see structural changes, or <0> if it failed. Only respond with <1> or <0>.
   assert:
@@ -93,7 +95,7 @@
 # Test: set_colormap - Change layer colormap
 - vars:
     question: |
-      Change the colormap of the active image layer to 'viridis'.
+      Change the colormap of the active image layer (dataset_002_ch1) to 'viridis'.
       Respond with <1> if the colormap was successfully changed, or <0> if it failed. Only respond with <1> or <0>.
   assert:
     - type: contains-all
@@ -107,7 +109,7 @@
 # Test: set_opacity - Adjust layer transparency
 - vars:
     question: |
-      Set the opacity of the active layer to 0.5 (50% transparent).
+      Set the opacity of the active layer (dataset_002_ch1) to 0.5 (50% transparent).
       Respond with <1> if the opacity was successfully changed, or <0> if it failed. Only respond with <1> or <0>.
   assert:
     - type: contains-all

@@ -4,8 +4,8 @@
 # Test: Multi-channel Overlay with Colormaps with channels
 - vars:
     question: |
-      Load the "D:\Development\napari-mcp\eval\data\dataset_001\dataset_001.tiff" dataset into napari. 
-      Depnding on the number of channels, set the colormap for each channel to the corresponding color.
+      Load the "dataset_001/dataset_001.tiff" dataset into napari. 
+      Depending on the number of channels, set the colormap for each channel to the corresponding color.
       Use additive blending for all channels to create an overlay visualization.
       Take a screenshot of the result.
       Respond with <1> if all channels are visible with their respective colors in the overlay, or <0> if it failed. Only respond with <1> or <0>.

@@ -49,7 +49,7 @@ To set up integration with claude desktop, add the following to claude_desktop_c
 
 Download the benchmark tasks from our secondary huggingface dataset repo [KuangshiAi/SciVisAgentBench-tasks](https://huggingface.co/datasets/KuangshiAi/SciVisAgentBench-tasks) and place them in your workspace.
 
-Make sure the `SciVisAgentBench-tasks` directory is placed at the same level as the `benchmark` directory, including the `main`, the `napari_mcp_evals`, the `sci_volume_data`, and the `chatvis_bench` folders, as shown in the project structure:
+Make sure the `SciVisAgentBench-tasks` directory is placed at the same level as the `benchmark` directory, including the `main`, the `bioimage_data`, the `sci_volume_data`, and the `chatvis_bench` folders, as shown in the project structure:
 
 ```
 SciVisAgentBench/
@@ -59,7 +59,7 @@ SciVisAgentBench/
 └── SciVisAgentBench-tasks/
     ├── main/
     ├── sci_volume_data/
-    ├── napari_mcp_evals/
+    ├── bioimage_data/
     └── download_and_organize.py
 ```
 

@@ -5,7 +5,7 @@
 # Test: Cell Counting and Measurement Analysis
 - vars:
     question: |
-      Load the image "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1_ch1_t14.tif" and set it to magenta colormap.
+      Load the image "dataset_001/dataset_001.tiff" and set it to magenta colormap.
       Take a screenshot and analyze it to count how many complete cells are visible (not cut off by edges).
       Add point annotations to mark the center of each counted cell.
       Measure the distance between the two most distant cells.
@@ -14,23 +14,6 @@
     - type: llm-rubric
       value: 
         - It counted 2 complete cells
-  options:
-    cache: false
-    runSerially: true
-
-# Test: Multi-dimensional Data Exploration
-- vars:
-    question: |
-      Load the multi-dimensional image "D:/Development/napari-mcp/eval/data/SNAP_IgM_BCR_Cell_1/input/SNAP_IgM_BCR_Cell_1_ch0_t14.tif".
-      Get dimension information to understand the data structure.
-      Navigate through different z-slices to examine structures at different depths.
-      Take screenshots at 3 different z-slices to show structural changes.
-      Respond with <1> if you successfully explored the multi-dimensional data and observed structural changes, or <0> if it failed. Only respond with <1> or <0>.
-  assert:
-    - type: contains-all
-      value: "<1>"
-    - type: not-contains
-      value: "<0>"
   options:
     cache: false
     runSerially: true

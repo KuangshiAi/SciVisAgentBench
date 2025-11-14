@@ -7,9 +7,9 @@ set -e  # Exit on any error
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BENCHMARK_DIR="$SCRIPT_DIR"
-YAML_FILE="$BENCHMARK_DIR/eval_cases/napari/test_basic_functions.yaml"
+YAML_FILE="$BENCHMARK_DIR/eval_cases/napari/0_actions/eval_basic_napari_functions.yaml"
 CONFIG_FILE="$BENCHMARK_DIR/configs/napari_mcp/config_openai.json"
-CASES_DIR="$BENCHMARK_DIR/../SciVisAgentBench-tasks/napari_mcp_evals/data"
+CASES_DIR="$BENCHMARK_DIR/../SciVisAgentBench-tasks/bioimage_data"
 OUTPUT_DIR="$BENCHMARK_DIR/test_results/napari_mcp"
 
 # Default values

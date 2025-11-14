@@ -5,10 +5,10 @@
 #Test: Recreate a figure from a dataset. 
 - vars:
     question: |
-      Load the dataset into napari: D:\Development\napari-mcp\eval\data\dataset_001\dataset_001.tiff
-      Read the target figure: D:\Development\napari-mcp\eval\data\dataset_001\dataset_001.png but don't load it into napari.
-      Read the dataset description: D:\Development\napari-mcp\eval\data\dataset_001\dataset_001.yaml. 
-      Set appropriate colormaps and blending modes to match the target figure.
+      Load the dataset into napari: dataset_001/dataset_001.tiff
+      Read the target figure: dataset_001/dataset_001.png but don't load it into napari.
+      Read the dataset description: dataset_001/dataset_001.yaml. 
+      Set the same colormaps and blending modes as the target figure.
       Adjust contrast and gamma as needed to match the target figure.
       Take a screenshot of your recreation.
       If the recreation does not match the target figure, adjust the visualization settings and take a screenshot again.
