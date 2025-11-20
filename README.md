@@ -31,13 +31,13 @@ To set up integration with claude desktop, add the following to claude_desktop_c
 ```json
     "mcpServers": {
       "ParaView": {
-        "command": "/path/to/paraview_mcp/conda/env/python.exe",
+        "command": "/path/to/paraview_mcp/conda/env/python",
         "args": [
         ".../src/paraview_mcp/paraview_mcp_server.py"
         ]
       },
       "Napari": {
-        "command": "/path/to/bioimage_agent/conda/env/python.exe",
+        "command": "/path/to/bioimage_agent/conda/env/python",
         "args": [                        
           ".../src/napari_mcp/napari_mcp_server.py"
         ]
@@ -108,13 +108,13 @@ Make sure the ParaView GUI be of the same version as the ParaView server.
 
 ### 3. Setup configs and the bash script
 
-Check `benchmark/configs/paraview_mcp` and `benchmark/run_paraview_mcp_main.sh`.
+Check `benchmark/configs/paraview_mcp` and `benchmark/eval_scripts/run_paraview_mcp_main.sh`.
 
 ### 4. Run evaluation with tiny_agent
 
 ```shell
 conda activate paraview_mcp
-cd benchmark
+cd benchmark/eval_scripts
 bash run_paraview_mcp_main.sh
 ```
 
@@ -122,13 +122,13 @@ bash run_paraview_mcp_main.sh
 
 ### 1. Setup the bash script
 
-Check `benchmark/run_chatvis_main.sh`.
+Check `benchmark/eval_scripts/run_chatvis_main.sh`.
 
 ### 2. Run evaluation with ChatVis
 
 ```shell
 conda activate paraview_mcp
-cd benchmark
+cd benchmark/eval_scripts
 bash run_chatvis_main.sh
 ```
 
@@ -150,14 +150,15 @@ Listening on 127.0.0.1:64908
 
 ### 3. Setup configs and the bash script
 
-Check `benchmark/configs/napari_mcp` and `benchmark/run_napari_mcp.sh`.
+Check `benchmark/configs/napari_mcp` and `benchmark/eval_scripts/run_bioimage_agent.sh`.
+The bash script runs evaluation on both level-0 action tasks and level-1 workflow tasks.
 
 ### 4. Run evaluation with tiny_agent
 
 ```shell
 conda activate bioimage_agent
-cd benchmark
-bash run_napari_mcp.sh
+cd benchmark/eval_scripts
+bash run_bioimage_agent.sh
 ```
 
 ## Anonymize Datasets
@@ -170,6 +171,7 @@ cd benchmark
 python anonymize_dataset.py eval_cases/paraview/what_obj_cases.yaml
 
 # Then you can run the "what is the object" test
+cd eval_scripts
 bash run_paraview_mcp_what_obj.sh
 bash run_chatvis_what_obj.sh
 ```

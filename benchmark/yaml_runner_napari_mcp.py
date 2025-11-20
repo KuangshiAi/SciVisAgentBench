@@ -2,9 +2,18 @@
 """
 YAML Test Runner for SciVisAgentBench - Napari MCP
 
-This script loads test cases from a YAML configuration file and runs them through 
+This script loads test cases from a YAML configuration file and runs them through
 the TinyAgent using MCP, then evaluates the results based on assertions in the YAML.
-Supports contains-all, not-contains, and llm-rubric assertion types.
+
+Supported assertion types:
+- contains-all: Check if response contains specified value(s). Value can be a string or list.
+                If list, ALL values must be present in the response.
+- not-contains: Check if response does NOT contain specified value(s). Value can be a string or list.
+                If list, NONE of the values should be present in the response.
+- llm-rubric:   Use LLM (GPT-4) to evaluate response against a rubric.
+
+Each assertion returns a score of 1 (passed) or 0 (failed), making it compatible with
+promptfoo-style evaluation format.
 """
 
 import asyncio
@@ -52,10 +61,11 @@ class TokenCounter:
 class YAMLTestCase:
     """Represents a single test case loaded from YAML."""
     
-    def __init__(self, yaml_data: Dict, case_name: str, cases_dir: str, config_path: Optional[str] = None):
+    def __init__(self, yaml_data: Dict, case_name: str, cases_dir: str, data_dir: str, config_path: Optional[str] = None):
         self.yaml_data = yaml_data
         self.case_name = case_name
         self.cases_dir = Path(cases_dir)
+        self.data_dir = Path(data_dir)
         self.config_path = config_path
         
         # Extract question and rubric from YAML
@@ -92,7 +102,7 @@ class YAMLTestCase:
         if not self.task_description:
             return "No task description provided"
         
-        working_dir = self.cases_dir
+        working_dir = self.data_dir
         
         # Prepend working directory information
         working_dir_info = f'Your agent_mode is "mcp", use it when saving results. Your working directory is "{working_dir}", and you should have access to it. In the following prompts, we will use relative path with respect to your working path. But remember, when you load or save any file, always stick to absolute path.'
@@ -116,7 +126,7 @@ class YAMLTestCase:
 class YAMLTestRunner:
     """Runs test cases loaded from YAML configuration."""
     
-    def __init__(self, config_path: str, yaml_path: str, cases_dir: str, 
+    def __init__(self, config_path: str, yaml_path: str, cases_dir: str, data_dir: str,
                  output_dir: Optional[str] = None, openai_api_key: Optional[str] = None,
                  eval_model: str = "gpt-4o"):
         # Convert config_path to absolute path
@@ -127,6 +137,10 @@ class YAMLTestRunner:
             
         self.yaml_path = Path(yaml_path)
         self.cases_dir = Path(cases_dir)
+        if not os.path.exists(self.cases_dir):
+            # create cases_dir if it does not exist
+            self.cases_dir.mkdir(exist_ok=True, parents=True)
+        self.data_dir = Path(data_dir)
         self.output_dir = Path(output_dir) if output_dir else self.cases_dir.parent / "test_results" / "yaml_mcp"
         self.openai_api_key = openai_api_key or os.getenv('OPENAI_API_KEY')
         self.eval_model = eval_model
@@ -144,10 +158,10 @@ class YAMLTestRunner:
         try:
             with open(self.config_path, 'r', encoding='utf-8') as f:
                 config = json.load(f)
-            return config.get('agent_model', 'gpt-4o')
+            return config.get('model', 'unknown')
         except Exception as e:
             print(f"Warning: Could not load agent model from config: {e}")
-            return 'gpt-4o'
+            return 'unknown'
     
     def _load_pricing_info(self) -> Optional[Dict]:
         """Load pricing information from the config file."""
@@ -205,6 +219,7 @@ class YAMLTestRunner:
                             yaml_data=case_data,
                             case_name=case_name,
                             cases_dir=str(self.cases_dir),
+                            data_dir=str(self.data_dir),
                             config_path=self.config_path
                         )
                         
@@ -221,20 +236,20 @@ class YAMLTestRunner:
     
     def _extract_case_name(self, case_data: Dict, index: int) -> Optional[str]:
         """Extract case name from YAML test case data."""
-        # Look for dataset name in the task description
-        task_description = case_data.get('vars', {}).get('question', '')
+        # # Look for dataset name in the task description
+        # task_description = case_data.get('vars', {}).get('question', '')
         
-        # For anonymized datasets, look for dataset_XXX pattern
-        import re
-        dataset_match = re.search(r'dataset_(\d+)', task_description)
-        if dataset_match:
-            return f"dataset_{dataset_match.group(1)}"
+        # # For anonymized datasets, look for dataset_XXX pattern
+        # import re
+        # dataset_match = re.search(r'dataset_(\d+)', task_description)
+        # if dataset_match:
+        #     return f"dataset_{dataset_match.group(1)}"
         
-        # Alternative pattern for cases where the file has additional info after dataset name
-        # Like "aneurism/data/aneurism_256x256x256_uint8.raw"
-        path_pattern_extended = re.search(r'([a-zA-Z_][a-zA-Z0-9_]*)/data/\1_[^"]*', task_description)
-        if path_pattern_extended:
-            return path_pattern_extended.group(1)
+        # # Alternative pattern for cases where the file has additional info after dataset name
+        # # Like "aneurism/data/aneurism_256x256x256_uint8.raw"
+        # path_pattern_extended = re.search(r'([a-zA-Z_][a-zA-Z0-9_]*)/data/\1_[^"]*', task_description)
+        # if path_pattern_extended:
+        #     return path_pattern_extended.group(1)
         
         # Fallback to case index
         return f"case_{index + 1}"
@@ -245,7 +260,7 @@ class YAMLTestRunner:
         with open(self.config_path, 'r', encoding='utf-8') as f:
             config = json.load(f)
         
-        working_dir = self.cases_dir
+        working_dir = self.data_dir
         
         # Create a temporary config file for this test case
         temp_config_dir = Path(tempfile.gettempdir()) / "scivisagent_bench_configs"
@@ -330,29 +345,36 @@ class YAMLTestRunner:
                     # Run the task
                     print(f"Starting execution for case: {test_case.case_name}")
                     print(f"Task preview: {task_description[:200]}...")
-                    
-                    response_parts = []
-                    
+
+                    # Separate assistant responses from tool calls
+                    assistant_response_parts = []  # Only assistant's text for evaluation
+                    full_response_parts = []       # Complete log including tool calls
+
                     async for chunk in agent.run(task_description):
                         if hasattr(chunk, 'choices') and chunk.choices:
                             delta = chunk.choices[0].delta
                             if delta and delta.content:
                                 content = delta.content
-                                response_parts.append(content)
+                                assistant_response_parts.append(content)
+                                full_response_parts.append(content)
                                 print(content, end="", flush=True)
                         elif hasattr(chunk, 'role') and chunk.role == "tool":
                             tool_message = f"\n[Tool: {chunk.name}] {chunk.content}"
-                            response_parts.append(tool_message)
+                            full_response_parts.append(tool_message)
                             print(tool_message)
-                    
-                    full_response = "".join(response_parts)
+
+                    # For evaluation, use only the assistant's text (without tool logs)
+                    assistant_response = "".join(assistant_response_parts)
+                    # For logging/debugging, keep the full response with tool calls
+                    full_response = "".join(full_response_parts)
                     
                     # Count output tokens
                     output_tokens = self.token_counter.count_tokens(full_response)
                     
                     result.update({
                         "status": "completed",
-                        "response": full_response,
+                        "response": full_response,  # Full response with tool logs
+                        "assistant_response": assistant_response,  # Only assistant's text for evaluation
                         "token_usage": {
                             "input_tokens": input_tokens,
                             "output_tokens": output_tokens,
@@ -444,10 +466,19 @@ class YAMLTestRunner:
         try:
             with open(latest_result_file, 'r', encoding='utf-8') as f:
                 test_result = json.load(f)
-            agent_response = test_result.get('response', '')
+
+            # Use assistant_response (without tool logs) for evaluation if available
+            # Fall back to full response for backward compatibility
+            full_result_data = test_result.get('full_result', {})
+            agent_response = full_result_data.get('assistant_response') or full_result_data.get('response', '')
+
+            # If not found in full_result, try top level (for backward compatibility)
+            if not agent_response:
+                agent_response = test_result.get('assistant_response') or test_result.get('response', '')
+
         except Exception as e:
             return {"status": "failed", "reason": f"Failed to load test result: {e}"}
-        
+
         if not agent_response:
             return {"status": "failed", "reason": "No agent response found"}
         
@@ -455,26 +486,78 @@ class YAMLTestRunner:
         assertions = test_case.get_assertions()
         evaluation_results = []
         total_passed = 0
-        
-        for i, assertion in enumerate(assertions):
-            assert_type = assertion.get('type', '')
-            assert_value = assertion.get('value', '')
-            
-            print(f"  Evaluating assertion {i+1}: {assert_type}")
-            
-            result = await self._evaluate_assertion(agent_response, assert_type, assert_value, test_case)
+        total_score = 0
+
+        # Check if this is a <1>/<0> pattern (contains-all: <1> and not-contains: <0>)
+        is_binary_response = False
+        if len(assertions) == 2:
+            types = [a.get('type', '') for a in assertions]
+            values = [a.get('value', '') for a in assertions]
+            if ('contains-all' in types and 'not-contains' in types and
+                '<1>' in values and '<0>' in values):
+                is_binary_response = True
+
+        if is_binary_response:
+            # Handle <1>/<0> pattern: only check if response is exactly <1>
+            print(f"  Detected binary <1>/<0> pattern - evaluating as single check")
+
+            agent_response_stripped = agent_response.strip()
+
+            if '<1>' in agent_response_stripped:
+                passed = True
+                status = "passed"
+                details = "Response contains <1> (success)"
+                score = 1
+            elif '<0>' in agent_response_stripped:
+                passed = False
+                status = "failed"
+                details = "Response contains <0> (failure)"
+                score = 0
+            else:
+                passed = False
+                status = "invalid"
+                details = f"Response is neither <1> nor <0> (invalid response)"
+                score = 0
+
             evaluation_results.append({
-                "assertion_index": i,
-                "type": assert_type,
-                "value": assert_value,
-                "passed": result["passed"],
-                "details": result.get("details", "")
+                "assertion_index": 0,
+                "type": "binary_response",
+                "value": "<1> for pass, <0> for fail",
+                "passed": passed,
+                "score": score,
+                "details": details,
+                "status": status
             })
-            
-            if result["passed"]:
+
+            if passed:
                 total_passed += 1
-        
+            total_score += score
+        else:
+            # Original logic for other assertion types
+            for i, assertion in enumerate(assertions):
+                assert_type = assertion.get('type', '')
+                assert_value = assertion.get('value', '')
+
+                print(f"  Evaluating assertion {i+1}: {assert_type}")
+
+                result = await self._evaluate_assertion(agent_response, assert_type, assert_value, test_case)
+                evaluation_results.append({
+                    "assertion_index": i,
+                    "type": assert_type,
+                    "value": assert_value,
+                    "passed": result["passed"],
+                    "score": result.get("score", 1 if result["passed"] else 0),
+                    "details": result.get("details", "")
+                })
+
+                if result["passed"]:
+                    total_passed += 1
+                total_score += result.get("score", 1 if result["passed"] else 0)
+
         # Create evaluation result
+        # For binary responses, we treat it as 1 assertion (not 2)
+        effective_assertions = 1 if is_binary_response else len(assertions)
+
         final_result = {
             "status": "completed",
             "case_name": test_case.case_name,
@@ -482,47 +565,75 @@ class YAMLTestRunner:
             "agent_response": agent_response,
             "assertion_results": evaluation_results,
             "scores": {
+                "total_score": total_score,
                 "total_passed": total_passed,
-                "total_assertions": len(assertions),
-                "pass_rate": total_passed / len(assertions) if assertions else 0
+                "total_assertions": effective_assertions,
+                "pass_rate": total_passed / effective_assertions if effective_assertions else 0,
+                "average_score": total_score / effective_assertions if effective_assertions else 0
             },
+            # Top-level score field for easy access (binary: 1 if all passed, 0 otherwise)
+            "score": 1 if total_passed == effective_assertions else 0,
             "timestamp": datetime.now().isoformat()
         }
-        
+
         # Save evaluation result
         eval_file = test_case.evaluation_dir / f"evaluation_result_{int(time.time())}.json"
         with open(eval_file, 'w', encoding='utf-8') as f:
             json.dump(final_result, f, indent=2, ensure_ascii=False)
-        
+
         print(f"✅ Evaluation completed for {test_case.case_name}")
-        print(f"Passed: {total_passed}/{len(assertions)} ({final_result['scores']['pass_rate']:.1%})")
-        
+        print(f"Passed: {total_passed}/{effective_assertions} ({final_result['scores']['pass_rate']:.1%})")
+        print(f"Score: {final_result['score']} (Total: {total_score}/{effective_assertions})")
+
         return final_result
 
-    async def _evaluate_assertion(self, agent_response: str, assert_type: str, assert_value: str, test_case: YAMLTestCase) -> Dict:
-        """Evaluate a single assertion against the agent response."""
-        
+    async def _evaluate_assertion(self, agent_response: str, assert_type: str, assert_value: Any, test_case: YAMLTestCase) -> Dict:
+        """Evaluate a single assertion against the agent response.
+
+        Special handling for <1>/<0> responses:
+        - If assert contains both 'contains-all: <1>' and 'not-contains: <0>',
+          we merge them into a single check:
+          * Response is '<1>' → passed
+          * Response is '<0>' → failed
+          * Response is anything else → invalid (failed)
+        """
+
         if assert_type == "contains-all":
-            # Check if response contains the specified value
-            passed = assert_value in agent_response
-            details = f"Checking if response contains '{assert_value}': {'✓' if passed else '✗'}"
-            
+            # Check if response contains the specified value(s)
+            # assert_value can be a single string or a list of strings
+            if isinstance(assert_value, list):
+                # Check if ALL values are present in the response
+                passed = all(str(val) in agent_response for val in assert_value)
+                details = f"Checking if response contains all of {assert_value}: {'✓' if passed else '✗'}"
+            else:
+                # Single value check
+                passed = str(assert_value) in agent_response
+                details = f"Checking if response contains '{assert_value}': {'✓' if passed else '✗'}"
+
         elif assert_type == "not-contains":
-            # Check if response does NOT contain the specified value
-            passed = assert_value not in agent_response
-            details = f"Checking if response does NOT contain '{assert_value}': {'✓' if passed else '✗'}"
-            
+            # Check if response does NOT contain the specified value(s)
+            # assert_value can be a single string or a list of strings
+            if isinstance(assert_value, list):
+                # Check if NONE of the values are present in the response
+                passed = all(str(val) not in agent_response for val in assert_value)
+                details = f"Checking if response contains none of {assert_value}: {'✓' if passed else '✗'}"
+            else:
+                # Single value check
+                passed = str(assert_value) not in agent_response
+                details = f"Checking if response does NOT contain '{assert_value}': {'✓' if passed else '✗'}"
+
         elif assert_type == "llm-rubric":
             # Use LLM to evaluate based on rubric
             if not self.openai_api_key:
-                return {"passed": False, "details": "No OpenAI API key for LLM evaluation"}
-                
+                return {"passed": False, "details": "No OpenAI API key for LLM evaluation", "score": 0}
+
             passed, details = await self._llm_evaluation(agent_response, assert_value)
-            
+
         else:
-            return {"passed": False, "details": f"Unknown assertion type: {assert_type}"}
-        
-        return {"passed": passed, "details": details}
+            return {"passed": False, "details": f"Unknown assertion type: {assert_type}", "score": 0}
+
+        # Add score field (1 for passed, 0 for failed) for compatibility with promptfoo format
+        return {"passed": passed, "details": details, "score": 1 if passed else 0}
 
     async def _llm_evaluation(self, agent_response: str, rubric: str) -> tuple[bool, str]:
         """Use LLM to evaluate the agent response against a rubric."""
@@ -593,12 +704,29 @@ Please evaluate whether the agent's response meets the criteria. Respond with ex
                 result["evaluation"] = eval_result
         
         end_time = datetime.now()
-        
+
         # Calculate summary statistics
         total_cases = len(results)
-        successful_cases = len([r for r in results if r.get("status") == "completed"])
+
+        # A case is successful only if:
+        # 1. It completed without errors (status == "completed")
+        # 2. It has an evaluation result with score == 1 (all assertions passed)
+        successful_cases = 0
+        completed_cases = 0
+        evaluation_passed_cases = 0
+
+        for r in results:
+            if r.get("status") == "completed":
+                completed_cases += 1
+
+                # Check if evaluation passed (score == 1)
+                eval_result = r.get("evaluation", {})
+                if eval_result.get("score") == 1:
+                    successful_cases += 1
+                    evaluation_passed_cases += 1
+
         failed_cases = total_cases - successful_cases
-        
+
         total_tokens = sum(r.get("token_usage", {}).get("total_tokens", 0) for r in results)
         total_cost = sum(r.get("cost", {}).get("total_cost", 0) for r in results)
         
@@ -607,9 +735,11 @@ Please evaluate whether the agent's response meets the criteria. Respond with ex
             "end_time": end_time.isoformat(),
             "duration_seconds": (end_time - start_time).total_seconds(),
             "total_cases": total_cases,
-            "successful_cases": successful_cases,
-            "failed_cases": failed_cases,
+            "completed_cases": completed_cases,  # Cases that ran without errors
+            "successful_cases": successful_cases,  # Cases that passed all assertions (score=1)
+            "failed_cases": failed_cases,  # Cases that failed assertions or had errors
             "success_rate": successful_cases / total_cases if total_cases > 0 else 0,
+            "completion_rate": completed_cases / total_cases if total_cases > 0 else 0,
             "total_tokens": total_tokens,
             "total_cost": total_cost,
             "currency": "USD",
@@ -630,15 +760,17 @@ Please evaluate whether the agent's response meets the criteria. Respond with ex
         print(f"🎯 YAML TEST SUMMARY")
         print(f"{'='*60}")
         print(f"Total cases: {total_cases}")
-        print(f"Successful: {successful_cases}")
-        print(f"Failed: {failed_cases}")
-        print(f"Success rate: {summary['success_rate']:.1%}")
+        print(f"Completed: {completed_cases} (ran without errors)")
+        print(f"Successful: {successful_cases} (passed all assertions)")
+        print(f"Failed: {failed_cases} (failed assertions or had errors)")
+        print(f"Success rate: {summary['success_rate']:.1%} (based on passing all assertions)")
+        print(f"Completion rate: {summary['completion_rate']:.1%}")
         print(f"Total tokens: {total_tokens:,}")
         if total_cost > 0:
             print(f"Total cost: ${total_cost:.4f}")
         print(f"Duration: {summary['duration_seconds']:.1f} seconds")
         print(f"Results saved: {summary_file}")
-        
+
         return summary
 
 
@@ -650,6 +782,8 @@ async def main():
                        help="Path to the YAML test cases file")
     parser.add_argument("--cases", required=True,
                        help="Path to the cases directory")
+    parser.add_argument("--data_dir", required=True,
+                       help="Path to the dataset directory")
     parser.add_argument("--output", "-o", 
                        help="Output directory for results (default: cases_parent/test_results/yaml_mcp)")
     parser.add_argument("--case", 
@@ -674,8 +808,8 @@ async def main():
         print(f"Error: YAML file not found: {args.yaml}")
         sys.exit(1)
     
-    if not os.path.exists(args.cases):
-        print(f"Error: Cases directory not found: {args.cases}")
+    if not os.path.exists(args.data_dir):
+        print(f"Error: Data directory not found: {args.data_dir}")
         sys.exit(1)
     
     # Get API key for evaluation
@@ -688,6 +822,7 @@ async def main():
         config_path=args.config,
         yaml_path=args.yaml,
         cases_dir=args.cases,
+        data_dir=args.data_dir,
         output_dir=args.output,
         openai_api_key=api_key,
         eval_model=args.eval_model

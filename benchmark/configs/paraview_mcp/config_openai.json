@@ -12,8 +12,6 @@
       "config": {
         "command": "/Users/kuangshiai/miniconda3/envs/paraview_mcp/bin/python",
         "args": [
-          "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench/src/mcp_logger.py",
-          "/Users/kuangshiai/miniconda3/envs/paraview_mcp/bin/python",
           "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench/src/paraview_mcp/paraview_mcp_server.py"
         ]
       }

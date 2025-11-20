@@ -39,11 +39,27 @@ try:
 except ImportError:
     # Fallback format_result function
     def format_result(result):
-        """Fallback format_result function."""
+        """Fallback format_result function with support for FastMCP Image objects."""
+        # Handle FastMCP Image objects
+        if hasattr(result, '__class__') and result.__class__.__name__ == 'Image':
+            # Try to get the image path
+            if hasattr(result, 'path'):
+                return json.dumps({"type": "image", "path": str(result.path)})
+            # Try to get base64 encoded image data
+            elif hasattr(result, 'data'):
+                return json.dumps({"type": "image", "data": str(result.data)})
+            # Fallback: return string representation
+            return json.dumps({"type": "image", "info": str(result)})
+
+        # Handle MCP result objects with content attribute
         if hasattr(result, 'content'):
             return str(result.content)
+
+        # Handle dict objects
         elif isinstance(result, dict):
             return json.dumps(result, indent=2)
+
+        # Fallback for any other type
         else:
             return str(result)
 
