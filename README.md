@@ -2,10 +2,10 @@
 
 SciVisAgentBench is a comprehensive benchmark for evaluating scientific visualization agents. The benchmark supports evaluation of three autonomous agents, ParaView-MCP, bioimage-agent, and ChatVis, enabling users to create and manipulate scientific visualizations using natural language instead of complex commands or GUI operations. The benchmark uses YAML files compatible with [promptfoo](https://www.promptfoo.dev/) to store test cases and evaluation metrics. This initial version focuses on outcome-based evaluation, using both LLM-as-a-judge and quantitative metrics.
 
-## ParaView-MCP and bioimage-agent Installation
+## ParaView-MCP, bioimage-agent, and GMX-VMD-MCP Installation
 We suggest installing ParaView-MCP and bioimage-agent in two seperated conda virtual environments.
 
-To install ParaView, ParaView-MCP and other requirements:
+### To install ParaView, ParaView-MCP, and SciVisAgentBench requirements:
 ```shell
 conda create -n paraview_mcp python=3.10
 conda activate paraview_mcp
@@ -13,7 +13,7 @@ conda install conda-forge::paraview
 pip install -r requirements.txt
 ```
 
-To install napari, bioimage-agent and other requirements:
+### To install napari, bioimage-agent, and SciVisAgentBench requirements:
 ```shell
 conda create -y -n bioimage_agent -c conda-forge python=3.11
 conda activate bioimage_agent
@@ -24,24 +24,78 @@ cd src/napari_socket
 pip install -e .
 ```
 
+### To install GMX-VMD-MCP and SciVisAgentBench requirements:
+
+Prerequisites:
+
+- GROMACS (installed and accessible in PATH)
+- VMD (Visual Molecular Dynamics, installed and accessible in PATH)
+- (Optional) Python VMD module for enhanced visualization capabilities
+
+```shell
+conda create -n gmx_vmd_mcp python=3.10
+conda activate gmx_vmd_mcp
+
+# First install SciVisAgentBench requirements
+pip install -r requirements.txt
+
+cd src/gmx_vmd_mcp
+# Then install GMX-VMD-MCP requirements
+pip install -r requirements.txt
+pip install -e .
+```
+
+Config GROMACS and VMD paths:
+
+The MCP server uses a configuration file (`src/gmx_vmd_mcp/config.json`) for VMD path, search paths, and other settings. If this file doesn't exist, create one with the following structure (check `src/gmx_vmd_mcp/config.json.example`):
+
+```json
+{
+  "vmd": {
+    "vmd_path": "/path/to/vmd/executable",
+    "search_paths": ["/path/to/search"]
+  },
+  "gmx": {
+    "gmx_path": "/path/to/gromacs/executable"
+  }
+}
+```
+
+For macOS users, the VMD path is typically:
+
+```bash
+/Applications/VMD.app/Contents/MacOS/startup.command
+```
+
 ## Setup for External MCP Clients
 
 To set up integration with claude desktop, add the following to claude_desktop_config.json
 
 ```json
     "mcpServers": {
-      "ParaView": {
+      "paraview": {
         "command": "/path/to/paraview_mcp/conda/env/python",
         "args": [
         ".../src/paraview_mcp/paraview_mcp_server.py"
         ]
       },
-      "Napari": {
+      "napari": {
         "command": "/path/to/bioimage_agent/conda/env/python",
         "args": [                        
           ".../src/napari_mcp/napari_mcp_server.py"
-        ]
-    }
+          ]
+      },
+      "gmx_vmd": {
+      "command": "/path/to/gmx_vmd_mcp/conda/env/python",
+      "args": [
+        ".../src/gmx-vmd-mcp/mcp_server.py"
+        ],
+      "env": {
+        "PYTHONPATH": ".../src/gmx-vmd-mcp",
+        "MCP_DEBUG": "1",
+        "PYTHONUNBUFFERED": "1"
+      }
+      }
     }
 ```
 
@@ -239,6 +293,7 @@ SciVisAgentBench was mainly created by Kuangshi Ai (kai@nd.edu), Shusen Liu (liu
 - [ParaView-MCP](https://github.com/LLNL/paraview_mcp)
 - [Bioimage-agent](https://github.com/LLNL/bioimage-agent)
 - [ChatVis](https://github.com/tpeterka/ChatVis)
+- [GMX-VMD-MCP](https://github.com/egtai/gmx-vmd-mcp)
 
 ## License
 

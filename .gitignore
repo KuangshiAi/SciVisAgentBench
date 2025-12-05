@@ -1,3 +1,8 @@
+# Python virtual environment
+venv/
+env/
+ENV/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -64,3 +69,5 @@ test_results/
 
 *.pkl
 *.index
+
+src/gmx_vmd_mcp/config.json
