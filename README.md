@@ -47,7 +47,7 @@ pip install -e .
 
 Config GROMACS and VMD paths:
 
-The MCP server uses a configuration file (`src/gmx_vmd_mcp/config.json`) for VMD path, search paths, and other settings. If this file doesn't exist, create one with the following structure (check `src/gmx_vmd_mcp/config.json.example`):
+The MCP server uses a configuration file (`src/gmx_vmd_mcp/config.json`) for visualization engine path, search paths, and other settings. If this file doesn't exist, create one with the following structure (check `src/gmx_vmd_mcp/config.json.example`):
 
 ```json
 {
@@ -213,6 +213,23 @@ The bash script runs evaluation on both level-0 action tasks and level-1 workflo
 conda activate bioimage_agent
 cd benchmark/eval_scripts
 bash run_bioimage_agent.sh
+```
+
+## Run GMX-VMD-MCP Evaluation for Molecular Visualization
+
+### 1. Environment setup
+
+Make sure both GROMACS and VMD (Visual Molecular Dynamics) are installed and accessible in PATH, and explicitly create and set `src/gmx_vmd_mcp/config.json` file.
+
+### 2. Promptfoo setup
+
+Config `benchmark/eval_promptfoo/eval_claude.yaml` for promptfoo evaluation. You may also setup other LLM models as the agent.
+
+### 3. Run evaluation with general_mcp_client
+
+```shell
+cd benchmark/eval_scripts
+bash run_molecular_vis.sh
 ```
 
 ## Anonymize Datasets

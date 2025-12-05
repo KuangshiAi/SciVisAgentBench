@@ -1,0 +1,1 @@
+promptfoo eval -c ../eval_promptfoo/eval_claude.yaml -t ../eval_cases/molecular_vis/actions/basic_actions.yaml

@@ -1,0 +1,32 @@
+providers:
+  - id: python:general_mcp_client.py
+    config:
+      provider: claude
+      model: claude-sonnet-4-5-20250929
+      mcp:
+        enabled: true
+        server:
+          command: "/Users/kuangshiai/miniconda3/envs/gmx-vmd-mcp/bin/python"
+          args: ["/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench/src/gmx_vmd_mcp/mcp_server.py"]
+          cwd: "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench/benchmark/eval_cases/molecular_vis/actions"
+          name: gmx_vmd_mcp
+          env:
+            PORT: "3000"
+            WORKFLOW_BASE_DIR: "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench/benchmark/eval_cases/molecular_vis/actions/workspace"
+        temperature: 0
+        max_tokens: 4096
+        executeTools: true
+
+prompts:
+  - |
+    {{question}}
+
+# Configure default test settings for model-graded assertions
+defaultTest:
+  options:
+    runSerially: true
+    provider: anthropic:messages:claude-sonnet-4-5-20250929
+
+evaluateOptions:
+  cache: false
+  maxConcurrency: 1    

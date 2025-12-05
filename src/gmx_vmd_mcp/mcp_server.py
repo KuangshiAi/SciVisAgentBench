@@ -37,12 +37,23 @@ SCRIPT_DIR = Path(__file__).parent.resolve()
 print(f"[DEBUG] Script directory: {SCRIPT_DIR}", file=sys.stderr, flush=True)
 print(f"[DEBUG] Current working directory: {os.getcwd()}", file=sys.stderr, flush=True)
 
+# Change working directory if WORKFLOW_BASE_DIR is set
+if 'WORKFLOW_BASE_DIR' in os.environ:
+    workflow_base_dir = os.environ['WORKFLOW_BASE_DIR']
+    try:
+        os.chdir(workflow_base_dir)
+        print(f"[DEBUG] Changed working directory to: {os.getcwd()}", file=sys.stderr, flush=True)
+    except Exception as e:
+        print(f"[DEBUG] Failed to change working directory: {e}", file=sys.stderr, flush=True)
+
 # Create service instance
 service = MCPService(SCRIPT_DIR)
 
 # Load workflow directory mapping
 try:
-    mapping_file = SCRIPT_DIR / ".mcp" / "workflow_dir_mapping.json"
+    # Use environment variable if set, otherwise use script directory
+    workflow_base_dir = os.environ.get('WORKFLOW_BASE_DIR', str(SCRIPT_DIR))
+    mapping_file = Path(workflow_base_dir) / ".mcp" / "workflow_dir_mapping.json"
     if mapping_file.exists():
         with open(mapping_file, "r") as f:
             workflow_dir_mapping.update(json.load(f))
@@ -618,7 +629,9 @@ async def create_workflow_tool(name: str, description: str = "", params: Optiona
         
         # 保存工作流目录映射到File，确保服务重启后仍能找到
         try:
-            mapping_file = Path(os.getcwd()) / ".mcp" / "workflow_dir_mapping.json"
+            # Use environment variable if set, otherwise fall back to current directory
+            workflow_base_dir = os.environ.get('WORKFLOW_BASE_DIR', os.getcwd())
+            mapping_file = Path(workflow_base_dir) / ".mcp" / "workflow_dir_mapping.json"
             mapping_file.parent.mkdir(parents=True, exist_ok=True)
             
             # 读取现有映射（如果存在）
@@ -1238,29 +1251,44 @@ async def launch_vmd_gui_tool(structure_file: Optional[str] = None, trajectory_f
 
 @mcp.tool("execute_vmd_script")
 async def execute_vmd_script_tool(
-    script: str, 
-    process_id: Optional[int] = None, 
+    script: str,
+    process_id: Optional[int] = None,
     structure_file: Optional[str] = None,
     generate_image: bool = False,
-    image_file: Optional[str] = None
+    image_file: Optional[str] = None,
+    workflow_id: Optional[str] = None
 ) -> Dict:
     """向VMD实例执行TCL脚本
-    
+
     向已运行或新启动的VMD实例发送TCL脚本进行执行。可以选择性地加载分子结构并生成渲染图像。
-    
+
     Args:
         script: TCL脚本内容
         process_id: 可选的VMD进程ID（若不提供则启动新实例）
         structure_file: 可选的分子结构File路径
         generate_image: 是否生成渲染图像
         image_file: 输出图像File路径（可选）
-    
+        workflow_id: 可选的Workflow ID（用于确定输出目录）
+
     Returns:
         Dict: 包含脚本执行结果和生成图像路径的字典
     """
+    # If workflow_id is provided, resolve image_file relative to workflow directory
+    if workflow_id and generate_image:
+        workflow_dir = get_custom_workflow_directory(workflow_id)
+        if workflow_dir:
+            if image_file:
+                # Make image_file absolute relative to workflow directory
+                if not Path(image_file).is_absolute():
+                    image_file = str(workflow_dir / image_file)
+            else:
+                # Generate default image file name in workflow directory
+                from datetime import datetime
+                image_file = str(workflow_dir / f"vmd_render_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png")
+
     return await service.vmd_manager.execute_script(
-        script, 
-        process_id, 
+        script,
+        process_id,
         structure_file,
         generate_image,
         image_file
