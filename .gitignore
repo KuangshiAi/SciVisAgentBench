@@ -71,3 +71,5 @@ test_results/
 *.index
 
 src/gmx_vmd_mcp/config.json
+
+benchmark/eval_cases/molecular_vis/actions/workspace/*

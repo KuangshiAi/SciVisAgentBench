@@ -5,7 +5,7 @@
 # Loading a CIF file
 - vars:
     question: |
-        Remove all molecules from and load the data "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench/benchmark/eval_cases/molecular_vis/data/1CRN.cif".
+        Remove all molecules from and load the data "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench/SciVisAgentBench-tasks/molecular_vis/data/1CRN.cif".
         Take a screenshot to confirm if the dataset has been loaded.
   assert:
     - type: llm-rubric
