@@ -127,13 +127,14 @@ from benchmark.evaluation_framework.agents import (
 
 ## Benchmarks
 
-### Main (ParaView Volume Visualization)
+### Main (ParaView Visualization)
 ```bash
 python -m benchmark.evaluation_framework.run_evaluation \
     --agent paraview_mcp \
     --config benchmark/configs/paraview_mcp/config_openai.json \
-    --yaml SciVisAgentBench-tasks/main/main_cases.yaml \
-    --cases SciVisAgentBench-tasks/main
+    --yaml benchmark/eval_cases/paraview/main_cases.yaml \
+    --cases SciVisAgentBench-tasks/main \
+    --eval-model gpt-5.2
 ```
 
 ### Bioimage Data (Napari)
@@ -142,8 +143,8 @@ python -m benchmark.evaluation_framework.run_evaluation \
     --agent napari_mcp \
     --config benchmark/configs/napari_mcp/config_openai.json \
     --yaml benchmark/eval_cases/napari/0_actions/eval_basic_napari_functions.yaml \
-    --cases SciVisAgentBench-tasks/bioimage_data/0_actions \
-    --data-dir SciVisAgentBench-tasks/bioimage_data/data
+    --cases SciVisAgentBench-tasks/bioimage_data/data \
+    --eval-model gpt-5.2
 ```
 
 ### Molecular Visualization (GMX-VMD)
@@ -152,8 +153,8 @@ python -m benchmark.evaluation_framework.run_evaluation \
     --agent gmx_vmd_mcp \
     --config benchmark/configs/gmx_vmd_mcp/config_anthropic.json \
     --yaml benchmark/eval_cases/molecular_vis/actions/basic_actions.yaml \
-    --cases SciVisAgentBench-tasks/molecular_vis/actions \
-    --data-dir SciVisAgentBench-tasks/molecular_vis/data
+    --cases SciVisAgentBench-tasks/molecular_vis/data \
+    --eval-model gpt-5.2
 ```
 
 ## Evaluation Types
@@ -163,9 +164,9 @@ python -m benchmark.evaluation_framework.run_evaluation \
 Used by: main, chatvis_bench, sci_volume_data
 
 **Scoring:**
-- Visualization quality: 10 points per goal
+- Visualization quality: 10 points per goal, evaluated by a multi-modal LLM judge
 - Output generation: 5 points
-- Efficiency: 10 points
+- Efficiency: 10 points (5 for token usage, 5 for execution time)
 
 **Example:**
 ```yaml
@@ -184,7 +185,6 @@ Used by: bioimage_data, molecular_vis
 **Assertion Types:**
 - `contains-all`: Check if response contains value(s)
 - `not-contains`: Check if response does NOT contain value(s)
-- `llm-rubric`: LLM evaluates against criteria
 
 **Binary Pattern:**
 ```yaml
@@ -254,46 +254,12 @@ asyncio.run(main())
 
 ## Migrating Existing Agents
 
-Before (500+ lines):
-```python
-class MyRunner:
-    def __init__(self, config, yaml_path, cases_dir):
-        # Load YAML, setup directories, initialize agent...
-    def run_test_case(self, case):
-        # Run agent, save results, call evaluator...
-    def run_all_cases(self):
-        # For each case...
-```
-
-After (~20 lines):
 ```python
 @register_agent("my_agent")
 class MyAgent(BaseAgent):
     async def run_task(self, task_description, task_config):
         result = self.my_agent.process(task_description)
         return AgentResult(success=True, response=result.text)
-```
-
-## Troubleshooting
-
-**Agent Not Found**
-```python
-@register_agent("my_agent")  # Add decorator
-from my_module import MyAgent  # Import registers it
-```
-
-**Missing Output Files**
-```python
-dirs = self.get_result_directories(task_config["case_dir"], task_config["case_name"])
-output_file = dirs["results_dir"] / f"{task_config['case_name']}.pvsm"
-dirs["results_dir"].mkdir(parents=True, exist_ok=True)
-```
-
-**Evaluation Skipped**
-```bash
-export OPENAI_API_KEY="your-key"
-# Or pass via CLI
---openai-api-key your-key
 ```
 
 ## Examples
@@ -320,7 +286,6 @@ Existing Evaluators (LLMEvaluator, ImageMetricsHelper, etc.)
 
 ## Additional Documentation
 
-- **[ASSERTION_EVALUATION.md](ASSERTION_EVALUATION.md)** - Assertion-based evaluation details
 - **[MIGRATION_GUIDE.md](MIGRATION_GUIDE.md)** - Migrating existing agents
 - **Config examples**: `benchmark/configs/{agent_name}/`
 

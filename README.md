@@ -7,6 +7,7 @@ SciVisAgentBench is a comprehensive benchmark for evaluating scientific visualiz
 We now provide a **high-level evaluation framework** that makes it dramatically easier to evaluate new agents!
 
 **Before:** Write 500+ lines of test runner code
+
 **After:** Implement one method and run a single command
 
 ### Quick Example
@@ -27,16 +28,36 @@ Run evaluation:
 python -m benchmark.evaluation_framework.run_evaluation \
     --agent my_agent \
     --config my_config.json \
-    --yaml SciVisAgentBench-tasks/main/main_cases.yaml \
+    --yaml benchmark/eval_cases/paraview/main_cases.yaml \
     --cases SciVisAgentBench-tasks/main
+    --eval-model gpt-5.2
 ```
 
 **See [benchmark/evaluation_framework/README.md](benchmark/evaluation_framework/README.md) for details.**
 
-## ParaView-MCP, bioimage-agent, and GMX-VMD-MCP Installation
-We suggest installing ParaView-MCP and bioimage-agent in two seperated conda virtual environments.
+## Download Benchmark Tasks
 
-### To install ParaView, ParaView-MCP, and SciVisAgentBench requirements:
+Download the benchmark tasks from our secondary huggingface dataset repo [KuangshiAi/SciVisAgentBench-tasks](https://huggingface.co/datasets/KuangshiAi/SciVisAgentBench-tasks) and place them in your workspace.
+
+Make sure the `SciVisAgentBench-tasks` directory is placed at the same level as the `benchmark` directory, including the `main`, the `bioimage_data`, the `sci_volume_data`, the `molecular_vis`, and the `chatvis_bench` folders, as shown in the project structure:
+
+```
+SciVisAgentBench/
+├── benchmark/
+│   ├── yaml_runner_paraview_mcp.py
+│   └── ...
+└── SciVisAgentBench-tasks/
+    ├── main/
+    ├── sci_volume_data/
+    ├── bioimage_data/
+    ├── chatvis_bench/
+    └── molecular_vis/
+```
+
+## ParaView-MCP, ChatVis, bioimage-agent, and GMX-VMD-MCP Installation
+We provide out-of-box evaluation for ParaView-MCP, ChatVis, bioimage-agent, and GMX-VMD-MCP in SciVisAgentBench. We suggest installing them in seperated conda virtual environments (ParaView-MCP and ChatVis can share the same environment).
+
+### To install ParaView, ParaView-MCP, and SciVisAgentBench requirements (it also works for ChatVis):
 ```shell
 conda create -n paraview_mcp python=3.10
 conda activate paraview_mcp
@@ -98,64 +119,6 @@ For macOS users, the VMD path is typically:
 /Applications/VMD.app/Contents/MacOS/startup.command
 ```
 
-## Setup for External MCP Clients
-
-To set up integration with claude desktop, add the following to claude_desktop_config.json
-
-```json
-    "mcpServers": {
-      "paraview": {
-        "command": "/path/to/paraview_mcp/conda/env/python",
-        "args": [
-        ".../src/paraview_mcp/paraview_mcp_server.py"
-        ]
-      },
-      "napari": {
-        "command": "/path/to/bioimage_agent/conda/env/python",
-        "args": [                        
-          ".../src/napari_mcp/napari_mcp_server.py"
-          ]
-      },
-      "gmx_vmd": {
-      "command": "/path/to/gmx_vmd_mcp/conda/env/python",
-      "args": [
-        ".../src/gmx-vmd-mcp/mcp_server.py"
-        ],
-      "env": {
-        "PYTHONPATH": ".../src/gmx-vmd-mcp",
-        "MCP_DEBUG": "1",
-        "PYTHONUNBUFFERED": "1"
-      }
-      }
-    }
-```
-
-## Download Benchmark Tasks
-
-Download the benchmark tasks from our secondary huggingface dataset repo [KuangshiAi/SciVisAgentBench-tasks](https://huggingface.co/datasets/KuangshiAi/SciVisAgentBench-tasks) and place them in your workspace.
-
-Make sure the `SciVisAgentBench-tasks` directory is placed at the same level as the `benchmark` directory, including the `main`, the `bioimage_data`, the `sci_volume_data`, the `molecular_vis`, and the `chatvis_bench` folders, as shown in the project structure:
-
-```
-SciVisAgentBench/
-├── benchmark/
-│   ├── yaml_runner_paraview_mcp.py
-│   └── ...
-└── SciVisAgentBench-tasks/
-    ├── main/
-    ├── sci_volume_data/
-    ├── bioimage_data/
-    └── download_and_organize.py
-```
-
-Follow the instructions and make sure you download the datasets locally:
-```shell
-cd SciVisAgentBench-tasks
-python download_and_organize.py
-```
-
-If evaluating on the `chatvis_bench`, please turn on the ```--static_screenshot``` mode for maximum compatability.
-
 ## MCP Logger and Tiny Agent
 
 - `mcp_logger.py` - Enhanced MCP communication logger with structured JSON logging and automatic screenshot capture
@@ -174,8 +137,8 @@ If evaluating on the `chatvis_bench`, please turn on the ```--static_screenshot`
 }
 ```
 
-## Configs for MCP Agents
-Set the config files for MCP agents at `benchmark/configs/napari_mcp` and `benchmark/configs/paraview_mcp`. As an optional choice, use `src/mcp_logger.py` to record the communication logs (MCP function calls and arguments) between MCP agents and MCP servers, together with screenshots after each MCP function call.
+## Configs for Agents
+Set the config files for the agents at `benchmark/configs`. As an optional choice, use `src/mcp_logger.py` to record the communication logs (MCP function calls and arguments) between MCP agents and MCP servers, together with screenshots after each MCP function call.
 
 ## Run ParaView-MCP Evaluation
 
@@ -191,30 +154,38 @@ python pvserver --multi-clients
 
 Make sure the ParaView GUI be of the same version as the ParaView server.
 
-### 3. Setup configs and the bash script
+### 3. Setup agent configs
 
-Check `benchmark/configs/paraview_mcp` and `benchmark/eval_scripts/run_paraview_mcp_main.sh`.
+Check `benchmark/configs/paraview_mcp` and setup both MCP server and API provider info.
 
-### 4. Run evaluation with tiny_agent
+### 4. Run evaluation of ParaView-MCP on the `main` benchmark
 
 ```shell
 conda activate paraview_mcp
-cd benchmark/eval_scripts
-bash run_paraview_mcp_main.sh
+python -m benchmark.evaluation_framework.run_evaluation \
+    --agent paraview_mcp \
+    --config benchmark/configs/paraview_mcp/config_openai.json \
+    --yaml benchmark/eval_cases/paraview/main_cases.yaml \
+    --cases SciVisAgentBench-tasks/main \
+    --eval-model gpt-5.2
 ```
 
-## Run ChatVis Evaluation for ParaView
+## Run ChatVis Evaluation
 
-### 1. Setup the bash script
+### 1. Setup agent configs
 
-Check `benchmark/eval_scripts/run_chatvis_main.sh`.
+Check `benchmark/configs/chatvis` and setup API provider info.
 
-### 2. Run evaluation with ChatVis
+### 2. Run evaluation of ChatVis on the `chatvis-bench` benchmark
 
 ```shell
 conda activate paraview_mcp
-cd benchmark/eval_scripts
-bash run_chatvis_main.sh
+python -m benchmark.evaluation_framework.run_evaluation \
+    --agent chatvis \
+    --config benchmark/configs/chatvis/config_openai.json \
+    --yaml benchmark/eval_cases/paraview/chatvis_bench_cases.yaml\
+    --cases SciVisAgentBench-tasks/chatvis_bench \
+    --eval-model gpt-5.2
 ```
 
 ## Run bioimage-agent Evaluation
@@ -233,34 +204,44 @@ napari
 Listening on 127.0.0.1:64908
 ```
 
-### 3. Setup configs and the bash script
+### 3. Setup agent configs
 
-Check `benchmark/configs/napari_mcp` and `benchmark/eval_scripts/run_bioimage_agent.sh`.
-The bash script runs evaluation on both level-0 action tasks and level-1 workflow tasks.
+Check `benchmark/configs/napari_mcp` and setup both MCP server and API provider info.
 
-### 4. Run evaluation with tiny_agent
+### 4. Run evaluation of bioimage-agent on the `bioimage_data` benchmark with level-0 action tasks
 
 ```shell
 conda activate bioimage_agent
-cd benchmark/eval_scripts
-bash run_bioimage_agent.sh
+python -m benchmark.evaluation_framework.run_evaluation \
+    --agent napari_mcp \
+    --config benchmark/configs/napari_mcp/config_openai.json \
+    --yaml benchmark/eval_cases/napari/0_actions/eval_basic_napari_functions.yaml \
+    --cases SciVisAgentBench-tasks/bioimage_data/data \
+    --eval-model gpt-5.2
 ```
 
-## Run GMX-VMD-MCP Evaluation for Molecular Visualization
+You may also run evaluation with level-1 workflow tasks (`benchmark/eval_cases/napari/1_workflows`).
+
+## Run GMX-VMD-MCP Evaluation
 
 ### 1. Environment setup
 
 Make sure both GROMACS and VMD (Visual Molecular Dynamics) are installed and accessible in PATH, and explicitly create and set `src/gmx_vmd_mcp/config.json` file.
 
-### 2. Promptfoo setup
+### 2. Setup agent configs
 
-Config `benchmark/eval_promptfoo/eval_claude.yaml` for promptfoo evaluation. You may also setup other LLM models as the agent.
+Check `benchmark/configs/gmx_vmd_mcp` and setup both MCP server and API provider info.
 
-### 3. Run evaluation with general_mcp_client
+### 3. Run evaluation of GMX-VMD-MCP on the `molecular_vis` benchmark
 
 ```shell
-cd benchmark/eval_scripts
-bash run_molecular_vis.sh
+conda activate gmx_vmd_mcp
+python -m benchmark.evaluation_framework.run_evaluation \
+    --agent gmx_vmd_mcp \
+    --config benchmark/configs/gmx_vmd_mcp/config_anthropic.json \
+    --yaml benchmark/eval_cases/molecular_vis/actions/basic_actions.yaml \
+    --cases SciVisAgentBench-tasks/molecular_vis/data \
+    --eval-model gpt-5.2
 ```
 
 ## Anonymize Datasets
@@ -273,10 +254,18 @@ cd benchmark
 python anonymize_dataset.py eval_cases/paraview/what_obj_cases.yaml
 
 # Then you can run the "what is the object" test
-cd eval_scripts
-bash run_paraview_mcp_what_obj.sh
-bash run_chatvis_what_obj.sh
+cd ..
+python -m benchmark.evaluation_framework.run_evaluation \
+    --agent paraview_mcp \
+    --config benchmark/configs/paraview_mcp/config_openai.json \
+    --yamlbenchmark/eval_cases/paraview/what_obj_cases_anonymized.yaml \
+    --cases SciVisAgentBench-tasks/anonymized_datasets \
+    --eval-model gpt-5.2
 ```
+
+## Evaluate Your Own Agents
+
+We provide a **high-level evaluation framework** that makes it dramatically easier to evaluate your own agents. See [benchmark/evaluation_framework/README.md](benchmark/evaluation_framework/README.md) for details.
 
 ## Quantitative Metrics
 
@@ -333,6 +322,38 @@ This compatibility allows researchers to:
 - Define test cases in a standardized, version-controllable format
 - Integrate SciVisAgentBench into automated evaluation pipelines
 - Compare results across different visualization agent implementations
+
+## Additional: Setup MCP Servers for External MCP Clients
+
+To set up integration with claude desktop, add the following to claude_desktop_config.json
+
+```json
+    "mcpServers": {
+      "paraview": {
+        "command": "/path/to/paraview_mcp/conda/env/python",
+        "args": [
+        ".../src/paraview_mcp/paraview_mcp_server.py"
+        ]
+      },
+      "napari": {
+        "command": "/path/to/bioimage_agent/conda/env/python",
+        "args": [                        
+          ".../src/napari_mcp/napari_mcp_server.py"
+          ]
+      },
+      "gmx_vmd": {
+      "command": "/path/to/gmx_vmd_mcp/conda/env/python",
+      "args": [
+        ".../src/gmx-vmd-mcp/mcp_server.py"
+        ],
+      "env": {
+        "PYTHONPATH": ".../src/gmx-vmd-mcp",
+        "MCP_DEBUG": "1",
+        "PYTHONUNBUFFERED": "1"
+      }
+      }
+    }
+```
 
 ## Acknowledgement
 

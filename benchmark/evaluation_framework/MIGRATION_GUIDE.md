@@ -467,10 +467,9 @@ python -m benchmark.evaluation_framework.run_evaluation \
 
 If you run into issues:
 
-1. Check [USER_GUIDE.md](USER_GUIDE.md) for detailed documentation
-2. Look at [examples/](examples/) for working examples
-3. Review existing adapters in [agents/](agents/)
-4. Compare with your old test runner to see what's missing
+1. Look at [examples/](examples/) for working examples
+2. Review existing adapters in [agents/](agents/)
+3. Compare with your old test runner to see what's missing
 
 ## Summary
 
