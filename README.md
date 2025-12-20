@@ -2,6 +2,37 @@
 
 SciVisAgentBench is a comprehensive benchmark for evaluating scientific visualization agents. The benchmark supports evaluation of three autonomous agents, ParaView-MCP, bioimage-agent, and ChatVis, enabling users to create and manipulate scientific visualizations using natural language instead of complex commands or GUI operations. The benchmark uses YAML files compatible with [promptfoo](https://www.promptfoo.dev/) to store test cases and evaluation metrics. This initial version focuses on outcome-based evaluation, using both LLM-as-a-judge and quantitative metrics.
 
+## 🚀 NEW: Easy Evaluation Framework
+
+We now provide a **high-level evaluation framework** that makes it dramatically easier to evaluate new agents!
+
+**Before:** Write 500+ lines of test runner code
+**After:** Implement one method and run a single command
+
+### Quick Example
+
+```python
+from benchmark.evaluation_framework import BaseAgent, AgentResult, register_agent
+
+@register_agent("my_agent")
+class MyAgent(BaseAgent):
+    async def run_task(self, task_description, task_config):
+        # Your agent logic here
+        return AgentResult(success=True, response="Done", output_files={...})
+```
+
+Run evaluation:
+
+```bash
+python -m benchmark.evaluation_framework.run_evaluation \
+    --agent my_agent \
+    --config my_config.json \
+    --yaml SciVisAgentBench-tasks/main/main_cases.yaml \
+    --cases SciVisAgentBench-tasks/main
+```
+
+**See [benchmark/evaluation_framework/README.md](benchmark/evaluation_framework/README.md) for details.**
+
 ## ParaView-MCP, bioimage-agent, and GMX-VMD-MCP Installation
 We suggest installing ParaView-MCP and bioimage-agent in two seperated conda virtual environments.
 

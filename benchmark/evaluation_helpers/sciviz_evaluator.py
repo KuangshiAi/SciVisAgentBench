@@ -133,7 +133,7 @@ class SciVisEvaluator(ABC):
             "execution_time": {"score": 0, "max_score": 5, "explanation": "No test result found"},
             "token_usage": {"score": 0, "max_score": 5, "explanation": "Token usage data not available"}
         }
-        
+
         if test_data:
             # Evaluate execution time
             if "duration" in test_data:
@@ -156,14 +156,14 @@ class SciVisEvaluator(ABC):
                 else:
                     efficiency_scores["execution_time"]["score"] = 0
                     efficiency_scores["execution_time"]["explanation"] = f"Completed in {duration:.2f} seconds (very slow)"
-            
+
             # Evaluate token usage (use real token data if available)
             if "token_usage" in test_data:
                 token_usage = test_data["token_usage"]
                 total_tokens = token_usage.get("total_tokens", 0)
                 input_tokens = token_usage.get("input_tokens", 0)
                 output_tokens = token_usage.get("output_tokens", 0)
-                
+
                 # Score based on total token usage
                 if total_tokens < 500:
                     efficiency_scores["token_usage"]["score"] = 5
@@ -184,7 +184,7 @@ class SciVisEvaluator(ABC):
                 # Fallback to old estimation method if token_usage not available
                 response_length = len(test_data["response"])
                 estimated_tokens = response_length // 4  # Rough estimation
-                
+
                 if estimated_tokens < 1000:
                     efficiency_scores["token_usage"]["score"] = 5
                     efficiency_scores["token_usage"]["explanation"] = f"Estimated ~{estimated_tokens} tokens (efficient)"

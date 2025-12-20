@@ -279,7 +279,7 @@ class CaseImageMetrics:
     def __init__(self, case_dir: str, case_name: str, eval_mode: str = "mcp"):
         """
         Initialize case metrics calculator
-        
+
         Args:
             case_dir (str): Path to the test case directory
             case_name (str): Name of the test case
@@ -288,35 +288,59 @@ class CaseImageMetrics:
         self.case_dir = case_dir
         self.case_name = case_name
         self.eval_mode = eval_mode
-        
+
         # Set up paths
         self.gs_dir = os.path.join(case_dir, "GS")
         self.screenshot_dir = os.path.join(case_dir, "evaluation_results", eval_mode, "screenshots")
-        
+        self.results_dir = os.path.join(case_dir, "results", eval_mode)
+
         # Initialize metrics calculator
         self.calculator = ImageMetricsCalculator()
-        
+
         # Define viewpoints
         self.viewpoints = ["diagonal", "front", "side"]
     
     def get_image_paths(self) -> Dict[str, Dict[str, str]]:
         """
         Get paths to ground truth and result images for all viewpoints
-        
+
         Returns:
             Dict: Nested dictionary with viewpoint -> {"gt": path, "result": path}
         """
         image_paths = {}
-        
-        for viewpoint in self.viewpoints:
-            gt_path = os.path.join(self.gs_dir, f"gs_{viewpoint}_view.png")
-            result_path = os.path.join(self.screenshot_dir, f"result_{viewpoint}_view.png")
-            
-            image_paths[viewpoint] = {
-                "gt": gt_path,
-                "result": result_path
-            }
-        
+
+        # First check if there's a single-image result (chatvis_bench style)
+        # Format: {data_name}/GS/{data_name}_gs.png and {data_name}/results/{eval_mode}/{data_name}.png
+        single_gt_path = os.path.join(self.gs_dir, f"{self.case_name}_gs.png")
+        single_result_path = os.path.join(self.results_dir, f"{self.case_name}.png")
+
+        if os.path.exists(single_gt_path) and os.path.exists(single_result_path):
+            # Single image mode - use the same image for all viewpoints
+            print(f"Using single-image mode for {self.case_name}")
+            for viewpoint in self.viewpoints:
+                image_paths[viewpoint] = {
+                    "gt": single_gt_path,
+                    "result": single_result_path
+                }
+        else:
+            # Multi-viewpoint mode (main benchmark style)
+            for viewpoint in self.viewpoints:
+                # Check for pre-existing result image in results directory first
+                preexisting_result = os.path.join(self.results_dir, f"{self.case_name}_{viewpoint}_view.png")
+
+                gt_path = os.path.join(self.gs_dir, f"gs_{viewpoint}_view.png")
+
+                # Use pre-existing result image if it exists, otherwise use screenshot path
+                if os.path.exists(preexisting_result):
+                    result_path = preexisting_result
+                else:
+                    result_path = os.path.join(self.screenshot_dir, f"result_{viewpoint}_view.png")
+
+                image_paths[viewpoint] = {
+                    "gt": gt_path,
+                    "result": result_path
+                }
+
         return image_paths
     
     def check_images_exist(self) -> Dict[str, bool]:
@@ -364,28 +388,48 @@ class CaseImageMetrics:
     def calculate_case_metrics(self) -> Dict[str, Any]:
         """
         Calculate metrics for all viewpoints and compute averages
-        
+
         Returns:
             Dict[str, Any]: Complete metrics for this case
         """
         print(f"Calculating image metrics for {self.case_name} ({self.eval_mode} mode)...")
-        
-        # Check which images exist
-        existence = self.check_images_exist()
-        
+
+        # Check if we're in single-image mode
+        single_gt_path = os.path.join(self.gs_dir, f"{self.case_name}_gs.png")
+        single_result_path = os.path.join(self.results_dir, f"{self.case_name}.png")
+        is_single_image_mode = os.path.exists(single_gt_path) and os.path.exists(single_result_path)
+
         # Calculate metrics for each viewpoint
         viewpoint_metrics = {}
         valid_viewpoints = []
-        
-        for viewpoint in self.viewpoints:
-            if existence[viewpoint]:
-                try:
-                    metrics = self.calculate_viewpoint_metrics(viewpoint)
+
+        if is_single_image_mode:
+            # Single-image mode: calculate once and use for all viewpoints
+            print(f"Single-image mode: using {single_result_path}")
+            try:
+                metrics = self.calculator.calculate_all_metrics(single_gt_path, single_result_path)
+                # Use the same metrics for all viewpoints
+                for viewpoint in self.viewpoints:
                     viewpoint_metrics[viewpoint] = metrics
                     valid_viewpoints.append(viewpoint)
-                    print(f"  {viewpoint} view - PSNR: {metrics.get('psnr', 'N/A')}, SSIM: {metrics.get('ssim', 'N/A')}, LPIPS: {metrics.get('lpips', 'N/A')}")
-                except Exception as e:
-                    print(f"  Error calculating {viewpoint} view metrics: {e}")
+                print(f"  PSNR: {metrics.get('psnr', 'N/A')}, SSIM: {metrics.get('ssim', 'N/A')}, LPIPS: {metrics.get('lpips', 'N/A')}")
+            except Exception as e:
+                print(f"  Error calculating single-image metrics: {e}")
+                for viewpoint in self.viewpoints:
+                    viewpoint_metrics[viewpoint] = {'psnr': None, 'ssim': None, 'lpips': None}
+        else:
+            # Multi-viewpoint mode: calculate for each viewpoint
+            existence = self.check_images_exist()
+
+            for viewpoint in self.viewpoints:
+                if existence[viewpoint]:
+                    try:
+                        metrics = self.calculate_viewpoint_metrics(viewpoint)
+                        viewpoint_metrics[viewpoint] = metrics
+                        valid_viewpoints.append(viewpoint)
+                        print(f"  {viewpoint} view - PSNR: {metrics.get('psnr', 'N/A')}, SSIM: {metrics.get('ssim', 'N/A')}, LPIPS: {metrics.get('lpips', 'N/A')}")
+                    except Exception as e:
+                        print(f"  Error calculating {viewpoint} view metrics: {e}")
                     viewpoint_metrics[viewpoint] = {'psnr': None, 'ssim': None, 'lpips': None}
             else:
                 viewpoint_metrics[viewpoint] = {'psnr': None, 'ssim': None, 'lpips': None}

@@ -7,463 +7,627 @@
     question: |
         Remove all molecules from and load the data "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench/SciVisAgentBench-tasks/molecular_vis/data/1CRN.cif".
         Take a screenshot to confirm if the dataset has been loaded.
+        Respond with <1> if the cif file has been loaded and the molecule is visible in the viewport, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: text
-      value: |
-          The cif file has been loaded.
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          The molecule is visible in the viewport.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Basic visualization - Van der Waals representation
 - vars:
     question: |
         Change the visualization type to Van-der-Waals.
         Take a screenshot to validate whether the representation has been changed.
+        Respond with <1> if the molecule in the viewport is in the Van-der-Waals representation, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          The molecule in the viewport is in the Van-der-Waals representation.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Licorice representation
 - vars:
     question: |
         Change the visualization type to Licorice (stick representation).
         Take a screenshot to validate whether the representation has been changed.
+        Respond with <1> if the molecule in the viewport is in the Licorice representation showing bonds as sticks, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          The molecule in the viewport is in the Licorice representation showing bonds as sticks.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Coloring by element
 - vars:
     question: |
         Color the molecule by element (atoms colored according to their chemical element).
         Take a screenshot to validate whether the coloring has been applied.
+        Respond with <1> if the molecule is colored by element with different colors for different atom types, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          The molecule is colored by element with different colors for different atom types (e.g., carbon gray, oxygen red, nitrogen blue).
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Coloring by chain
 - vars:
     question: |
         Select chain A and color it red. Color all other chains blue.
         Take a screenshot to validate whether the selection and coloring has been applied.
+        Respond with <1> if Chain A is colored red and other chains are colored blue, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          Chain A is colored red and other chains are colored blue.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Coloring by residue type
 - vars:
     question: |
         Color the molecule by residue type (amino acids colored according to their type).
         Take a screenshot to validate whether the coloring has been applied.
+        Respond with <1> if the molecule is colored by residue type with different amino acids having distinct colors, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          The molecule is colored by residue type with different amino acids having distinct colors.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting and coloring specific residues
 - vars:
     question: |
         Select residues 1 to 10 and color them green. Keep the rest of the molecule in its current color.
         Take a screenshot to validate whether the selection and coloring has been applied.
+        Respond with <1> if residues 1 to 10 are colored green while the rest of the molecule remains in a different color, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          Residues 1 to 10 are colored green while the rest of the molecule remains in a different color.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting specific atoms
 - vars:
     question: |
         Select all carbon atoms and color them cyan.
         Take a screenshot to validate whether the selection and coloring has been applied.
+        Respond with <1> if all carbon atoms are colored cyan while other atoms have different colors, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          All carbon atoms are colored cyan while other atoms have different colors.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Multiple representations
 - vars:
     question: |
         Create two representations: show the backbone as Cartoon and all side chains as Licorice.
         Take a screenshot to validate whether both representations are visible.
+        Respond with <1> if both representations are visible (Cartoon backbone + Licorice side chains), or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          The molecule shows both Cartoon representation for backbone and Licorice representation for side chains simultaneously.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Material properties - Opaque
 - vars:
     question: |
         Change the material to Opaque (fully opaque, no transparency).
         Take a screenshot to validate whether the material has been changed.
+        Respond with <1> if the molecule appears fully opaque with no transparency, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          The molecule appears fully opaque with no transparency.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Changing representation radius
 - vars:
     question: |
         Change the representation to Licorice and set the radius to 0.3.
         Take a screenshot to validate whether the radius has been changed.
+        Respond with <1> if the Licorice representation shows bonds with a radius of 0.3, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          The Licorice representation shows bonds with a radius of 0.3.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Coloring by B-factor (temperature factor)
 - vars:
     question: |
         Color the molecule by B-factor (temperature factor, showing flexibility/uncertainty).
         Take a screenshot to validate whether the coloring has been applied.
+        Respond with <1> if the molecule is colored by B-factor showing a gradient of colors indicating different temperature factors, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          The molecule is colored by B-factor showing a gradient of colors indicating different temperature factors.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting water molecules
 - vars:
     question: |
         Select all water molecules (residue name "HOH" or "WAT") and color them cyan.
         Take a screenshot to validate whether the water molecules have been selected and colored.
+        Respond with <1> if all water molecules are colored cyan and visible in the viewport, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          All water molecules are colored cyan and visible in the viewport.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Coloring by charge
 - vars:
     question: |
         Color the molecule by charge (positive charges one color, negative charges another, neutral a third color).
         Take a screenshot to validate whether the coloring has been applied.
+        Respond with <1> if the molecule is colored by charge with distinct colors for positive, negative, and neutral regions, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          The molecule is colored by charge with distinct colors for positive, negative, and neutral regions.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Coloring by hydrophobicity
 - vars:
     question: |
         Color the molecule by hydrophobicity (hydrophobic residues one color, hydrophilic another).
         Take a screenshot to validate whether the coloring has been applied.
+        Respond with <1> if the molecule is colored by hydrophobicity with distinct colors for hydrophobic and hydrophilic regions, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          The molecule is colored by hydrophobicity with distinct colors for hydrophobic and hydrophilic regions.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting and highlighting active site
 - vars:
     question: |
         Select residues within 5 Angstroms of residue 25 and color them yellow. Color the rest of the molecule gray.
         Take a screenshot to validate whether the selection and coloring has been applied.
+        Respond with <1> if residues within 5 Angstroms of residue 25 are colored yellow and the rest of the molecule is colored gray, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          Residues within 5 Angstroms of residue 25 are colored yellow, and the rest of the molecule is colored gray.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting protein vs non-protein
 - vars:
     question: |
         Color all protein atoms green and all non-protein atoms (water, ions, ligands) red.
         Take a screenshot to validate whether the coloring has been applied.
+        Respond with <1> if protein atoms are colored green and non-protein atoms (water, ions, ligands) are colored red, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          Protein atoms are colored green and non-protein atoms (water, ions, ligands) are colored red.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Changing background color
 - vars:
     question: |
         Change the background color to white.
         Take a screenshot to validate whether the background color has been changed.
+        Respond with <1> if the background of the viewport is white, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          The background of the viewport is white.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting specific atom types in a range
 - vars:
     question: |
         Select all oxygen atoms in residues 1 to 20 and color them red.
         Take a screenshot to validate whether the selection and coloring has been applied.
+        Respond with <1> if all oxygen atoms in residues 1 to 20 are colored red, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          All oxygen atoms in residues 1 to 20 are colored red.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting atoms within distance
 - vars:
     question: |
         Select all atoms within 3 Angstroms of any atom in residue 15 and color them magenta.
         Take a screenshot to validate whether the selection and coloring has been applied.
+        Respond with <1> if all atoms within 3 Angstroms of residue 15 are colored magenta, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          All atoms within 3 Angstroms of residue 15 are colored magenta.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting and hiding specific residues
 - vars:
     question: |
         Select residues 20 to 30 and hide them (make them invisible).
         Take a screenshot to validate whether the residues have been hidden.
+        Respond with <1> if residues 20 to 30 are not visible in the viewport while the rest of the molecule remains visible, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          Residues 20 to 30 are not visible in the viewport while the rest of the molecule remains visible.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting and showing only specific atoms
 - vars:
     question: |
         Show only atoms with element type "N" (nitrogen) and hide all other atoms.
         Take a screenshot to validate whether only nitrogen atoms are visible.
+        Respond with <1> if only nitrogen atoms are visible in the viewport and all other atoms are hidden, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          Only nitrogen atoms are visible in the viewport, all other atoms are hidden.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting and showing only backbone
 - vars:
     question: |
         Show only the backbone atoms (N, CA, C, O) as Licorice representation.
         Take a screenshot to validate whether only backbone atoms are visible.
+        Respond with <1> if only backbone atoms (N, CA, C, O) are visible in Licorice representation and side chains are hidden, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          Only backbone atoms (N, CA, C, O) are visible in Licorice representation, side chains are hidden.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting and showing only side chains
 - vars:
     question: |
         Show only side chain atoms (excluding backbone atoms N, CA, C, O) as Van-der-Waals representation.
         Take a screenshot to validate whether only side chain atoms are visible.
+        Respond with <1> if only side chain atoms are visible in Van-der-Waals representation and backbone atoms are hidden, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          Only side chain atoms are visible in Van-der-Waals representation, backbone atoms are hidden.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting aromatic residues
 - vars:
     question: |
         Select all aromatic residues (PHE, TYR, TRP) and color them purple.
         Take a screenshot to validate whether the aromatic residues have been selected and colored.
+        Respond with <1> if all aromatic residues (PHE, TYR, TRP) are colored purple, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          All aromatic residues (PHE, TYR, TRP) are colored purple.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting charged residues
 - vars:
     question: |
         Select all charged residues (ARG, LYS, ASP, GLU) and color them red for positive charges and blue for negative charges.
         Take a screenshot to validate whether the charged residues have been selected and colored correctly.
+        Respond with <1> if charged residues are colored correctly (ARG/LYS red, ASP/GLU blue), or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          Charged residues are colored: positive charges (ARG, LYS) in red and negative charges (ASP, GLU) in blue.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Multiple selections with different representations
 - vars:
     question: |
         Show the backbone as Cartoon colored by chain, and show all side chain atoms as Van-der-Waals colored by element.
         Take a screenshot to validate whether both representations are visible with their respective colorings.
+        Respond with <1> if the backbone is shown as Cartoon colored by chain and side chain atoms are shown as Van-der-Waals colored by element, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          The backbone is shown as Cartoon colored by chain, and side chain atoms are shown as Van-der-Waals colored by element.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting and coloring by atom selection - backbone with sidechain by element
 - vars:
     question: |
         Show backbone atoms (N, CA, C, O) as Licorice colored blue, and show side chain atoms as Van-der-Waals colored by element.
         Take a screenshot to validate whether both representations are visible with their respective colorings.
+        Respond with <1> if backbone atoms are shown as Licorice colored blue and side chain atoms are shown as Van-der-Waals colored by element, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          Backbone atoms are shown as Licorice colored blue, and side chain atoms are shown as Van-der-Waals colored by element.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting and coloring by distance from specific atom
 - vars:
     question: |
         Select all atoms within 4 Angstroms of the CA atom of residue 10 and color them green. Color all other atoms gray.
         Take a screenshot to validate whether the selection and coloring has been applied.
+        Respond with <1> if all atoms within 4 Angstroms of the CA atom of residue 10 are colored green and all other atoms are colored gray, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          All atoms within 4 Angstroms of the CA atom of residue 10 are colored green, and all other atoms are colored gray.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Coloring by atom selection with multiple criteria
 - vars:
     question: |
         Select all atoms that are either oxygen or nitrogen atoms in residues 1 to 20, and color them red. Color all other atoms gray.
         Take a screenshot to validate whether the selection and coloring has been applied.
+        Respond with <1> if all oxygen and nitrogen atoms in residues 1 to 20 are colored red and all other atoms are colored gray, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          All oxygen and nitrogen atoms in residues 1 to 20 are colored red, and all other atoms are colored gray.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting and coloring by atom property
 - vars:
     question: |
         Select all atoms with element type "S" (sulfur) and color them yellow. Keep all other atoms in their default color.
         Take a screenshot to validate whether the selection and coloring has been applied.
+        Respond with <1> if all sulfur atoms are colored yellow while other atoms remain in their default color, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          All sulfur atoms are colored yellow while other atoms remain in their default color.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Coloring by residue number
 - vars:
     question: |
         Color the molecule by residue number (gradient from N-terminus to C-terminus).
         Take a screenshot to validate whether the coloring has been applied.
+        Respond with <1> if the molecule is colored by residue number showing a gradient from the beginning to the end of the sequence, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          The molecule is colored by residue number showing a gradient from the beginning to the end of the sequence.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting and coloring by atom type in specific region
 - vars:
     question: |
         Select all nitrogen atoms in residues 5 to 15 and color them blue. Color all other atoms gray.
         Take a screenshot to validate whether the selection and coloring has been applied.
+        Respond with <1> if all nitrogen atoms in residues 5 to 15 are colored blue and all other atoms are colored gray, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          All nitrogen atoms in residues 5 to 15 are colored blue, and all other atoms are colored gray.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting and coloring by atom selection - element and residue combination
 - vars:
     question: |
         Select all oxygen atoms in polar residues (SER, THR, ASN, GLN, TYR, CYS) and color them cyan. Color all other atoms gray.
         Take a screenshot to validate whether the selection and coloring has been applied.
+        Respond with <1> if all oxygen atoms in polar residues are colored cyan and all other atoms are colored gray, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          All oxygen atoms in polar residues are colored cyan, and all other atoms are colored gray.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting and coloring by atom selection - distance-based with element filter
 - vars:
     question: |
         Select all oxygen atoms within 5 Angstroms of residue 15 and color them red. Color all other atoms gray.
         Take a screenshot to validate whether the selection and coloring has been applied.
+        Respond with <1> if all oxygen atoms within 5 Angstroms of residue 15 are colored red and all other atoms are colored gray, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          All oxygen atoms within 5 Angstroms of residue 15 are colored red, and all other atoms are colored gray.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting and coloring by atom selection - backbone with sidechain by element
 - vars:
     question: |
         Show the backbone as NewCartoon colored by chain. Show all side chain carbon atoms as Licorice colored gray, all side chain nitrogen atoms as Licorice colored blue, and all side chain oxygen atoms as Licorice colored red.
         Take a screenshot to validate whether the representations and colorings have been applied.
+        Respond with <1> if the backbone is shown as NewCartoon colored by chain, side chain carbon atoms are Licorice gray, side chain nitrogen atoms are Licorice blue, and side chain oxygen atoms are Licorice red, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          The backbone is shown as NewCartoon colored by chain, side chain carbon atoms are shown as Licorice colored gray, side chain nitrogen atoms as Licorice colored blue, and side chain oxygen atoms as Licorice colored red.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting and coloring by atom selection - complex distance and element
 - vars:
     question: |
         Select all carbon atoms within 4 Angstroms of any nitrogen atom in residues 1 to 15, and color them green. Color all other atoms gray.
         Take a screenshot to validate whether the selection and coloring has been applied.
+        Respond with <1> if all carbon atoms within 4 Angstroms of any nitrogen atom in residues 1 to 15 are colored green and all other atoms are colored gray, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          All carbon atoms within 4 Angstroms of any nitrogen atom in residues 1 to 15 are colored green, and all other atoms are colored gray.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting and coloring by atom selection - multiple criteria
 - vars:
     question: |
         Select all atoms that are either (carbon atoms in residues 1 to 10) or (nitrogen atoms in residues 11 to 20), and color them yellow. Color all other atoms gray.
         Take a screenshot to validate whether the selection and coloring has been applied.
+        Respond with <1> if all atoms matching the criteria are colored yellow and all other atoms are colored gray, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          All atoms matching the criteria are colored yellow, and all other atoms are colored gray.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting and coloring by atom selection - complex multi-criteria
 - vars:
     question: |
         Select all atoms that are either (oxygen atoms in residues 1 to 10) or (nitrogen atoms within 3 Angstroms of residue 15), and color them magenta. Color all other atoms gray.
         Take a screenshot to validate whether the selection and coloring has been applied.
+        Respond with <1> if all atoms matching the complex criteria are colored magenta and all other atoms are colored gray, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          All atoms matching the complex criteria are colored magenta, and all other atoms are colored gray.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting and showing only CA atoms
 - vars:
     question: |
         Show only CA (alpha carbon) atoms as Van-der-Waals spheres colored by chain.
         Take a screenshot to validate whether only alpha carbons are visible.
+        Respond with <1> if only alpha carbon atoms are visible as spheres colored by chain, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          Only alpha carbon atoms are visible as spheres, colored by chain.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting and showing only heteroatoms
 - vars:
     question: |
         Show only heteroatoms (non-standard atoms like water, ions, ligands) as Van-der-Waals spheres colored by element.
         Take a screenshot to validate whether only heteroatoms are visible.
+        Respond with <1> if only heteroatoms (non-standard atoms) are visible as spheres colored by element, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          Only heteroatoms (non-standard atoms) are visible as spheres, colored by element.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
 
 # Selecting and coloring by atom selection - multiple element types
 - vars:
     question: |
         Select all carbon, nitrogen, and oxygen atoms and color them by element (carbon gray, nitrogen blue, oxygen red). Hide all other atoms.
         Take a screenshot to validate whether the selection and coloring has been applied.
+        Respond with <1> if only carbon (gray), nitrogen (blue), and oxygen (red) atoms are visible and all other atoms are hidden, or <0> if it failed. Only respond with <1> or <0>.
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          Only carbon (gray), nitrogen (blue), and oxygen (red) atoms are visible, colored by element. All other atoms are hidden.
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true

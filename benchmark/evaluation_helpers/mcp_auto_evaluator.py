@@ -72,27 +72,35 @@ class MCPAutoEvaluator(SciVisEvaluator):
     def parse_visualization_goals(self) -> List[str]:
         """
         Parse visualization goals and return a list of individual goals
-        
+
         Returns:
             List[str]: List of individual goals
         """
         goals_text = self.load_visualization_goals()
         if "No visualization goals found" in goals_text:
             return []
-        
-        # Split by lines and filter for numbered goals
+
+        # Split by lines and filter for goals
         lines = goals_text.split('\n')
         goals = []
-        
+
         for line in lines:
             line = line.strip()
             # Check if line starts with a number followed by a period or dot
-            if line and (line[0].isdigit() or (len(line) > 1 and line[0].isdigit())):
-                # Find the first occurrence of '. ' to separate number from goal text
-                if '. ' in line:
-                    goal_text = line.split('. ', 1)[1]
-                    goals.append(goal_text)
-        
+            if line and line[0].isdigit() and '. ' in line:
+                # Numbered goal: extract text after "N. "
+                goal_text = line.split('. ', 1)[1]
+                goals.append(goal_text)
+            elif line and not line[0].isdigit():
+                # Non-numbered goal: treat entire line as a goal if it's substantive
+                # Skip empty lines and common headers
+                if len(line) > 10 and not line.lower().startswith(('note:', 'important:', 'goals:')):
+                    goals.append(line)
+
+        # If no numbered goals were found but we have text, treat entire text as one goal
+        if len(goals) == 0 and goals_text.strip():
+            goals.append(goals_text.strip())
+
         return goals
     
     def get_goals_count(self) -> int:
@@ -192,8 +200,82 @@ class MCPAutoEvaluator(SciVisEvaluator):
                 
             else:
                 # Original behavior: generate screenshots from state files
-                # Check if result state file exists (required)
-                if not os.path.exists(self.result_state_path):
+                # But first check if single-image GT and result exist
+                results_dir = os.path.join(self.case_dir, "results", "mcp")
+                single_gt_image = os.path.join(self.case_dir, "GS", f"{self.case_name}_gs.png")
+                single_result_image = os.path.join(results_dir, f"{self.case_name}.png")
+                multi_result_images = [
+                    os.path.join(results_dir, f"{self.case_name}_diagonal_view.png"),
+                    os.path.join(results_dir, f"{self.case_name}_front_view.png"),
+                    os.path.join(results_dir, f"{self.case_name}_side_view.png")
+                ]
+
+                # Check for single-image mode
+                has_single_gt = os.path.exists(single_gt_image)
+                has_single_result = os.path.exists(single_result_image)
+                has_multi_results = all(os.path.exists(img) for img in multi_result_images)
+
+                # Initialize has_ground_truth early (used later)
+                has_ground_truth = False
+
+                if has_single_gt and (has_single_result or has_multi_results):
+                    # Single-image GT mode detected
+                    print(f"Found single-image GT: {single_gt_image}")
+
+                    if has_single_result:
+                        # Both GT and result are single images
+                        print(f"Using single-image mode: {single_result_image}")
+                        result_screenshots = [single_result_image]
+                    elif has_multi_results:
+                        # GT is single, but result has multi-viewpoints (use them)
+                        result_screenshots = multi_result_images
+                    else:
+                        # No result images found
+                        explanation = f"Result image not found: {single_result_image}"
+                        self.evaluation_results["scores"]["visualization_quality"] = {
+                            "score": 0,
+                            "max_score": max_score,
+                            "explanation": explanation
+                        }
+                        return 0
+
+                    has_ground_truth = True
+                    gt_screenshots = [single_gt_image]
+
+                    evaluation_prompt = self._create_evaluation_prompt(visualization_goals, goals_count)
+                    llm_result = self.llm_evaluator.evaluate_visualization(
+                        gt_screenshots,
+                        result_screenshots,
+                        evaluation_prompt
+                    )
+
+                elif has_single_result or has_multi_results:
+                    # No single GT, but have result images (multi-viewpoint or single without GT)
+                    print(f"Found pre-existing result images for {self.case_name}, skipping screenshot generation from state file")
+
+                    os.makedirs(self.screenshot_dir, exist_ok=True)
+
+                    if has_single_result:
+                        result_screenshots = [single_result_image]
+                    else:
+                        result_screenshots = []
+                        for i, viewpoint in enumerate(["diagonal", "front", "side"]):
+                            dest_path = os.path.join(self.screenshot_dir, f"result_{viewpoint}_view.png")
+                            if not os.path.exists(dest_path):
+                                import shutil
+                                shutil.copy(multi_result_images[i], dest_path)
+                            result_screenshots.append(dest_path)
+
+                    # No single GT, so result-only evaluation
+                    has_ground_truth = False
+                    evaluation_prompt = self._create_result_only_evaluation_prompt(visualization_goals, goals_count)
+                    llm_result = self.llm_evaluator.evaluate_visualization_result_only(
+                        result_screenshots,
+                        evaluation_prompt
+                    )
+
+                elif not os.path.exists(self.result_state_path):
+                    # No pre-existing images and no state file
                     explanation = f"Result state file not found: {self.result_state_path}"
                     self.evaluation_results["scores"]["visualization_quality"] = {
                         "score": 0,
@@ -201,49 +283,51 @@ class MCPAutoEvaluator(SciVisEvaluator):
                         "explanation": explanation
                     }
                     return 0
-                
-                # Check if ground truth state file exists
-                has_ground_truth = os.path.exists(self.gs_state_path)
-                
-                if has_ground_truth:
-                    # Take screenshots from both states (original behavior)
-                    print("Taking screenshots from both ground truth and result states...")
-                    screenshots = compare_states_screenshots(
-                        self.gs_state_path,
-                        self.result_state_path,
-                        self.screenshot_dir,
-                        data_directory=self.data_dir
-                    )
-                    
-                    # Create evaluation prompt for comparison
-                    evaluation_prompt = self._create_evaluation_prompt(visualization_goals, goals_count)
-                    
-                    # Perform LLM evaluation with both ground truth and result
-                    llm_result = self.llm_evaluator.evaluate_visualization(
-                        screenshots['ground_truth'],
-                        screenshots['result'],
-                        evaluation_prompt
-                    )
+
                 else:
-                    # Take screenshots from result state only
-                    print("Ground truth state not found. Taking screenshots from result state only...")
-                    from screenshot_helper import take_screenshots_from_state
-                    
-                    result_screenshots = take_screenshots_from_state(
-                        self.result_state_path,
-                        self.screenshot_dir,
-                        prefix="result_",
-                        data_directory=self.data_dir
-                    )
-                    
-                    # Create evaluation prompt for result-only evaluation
-                    evaluation_prompt = self._create_result_only_evaluation_prompt(visualization_goals, goals_count)
-                    
-                    # Perform LLM evaluation with result screenshots only
-                    llm_result = self.llm_evaluator.evaluate_visualization_result_only(
-                        result_screenshots,
-                        evaluation_prompt
-                    )
+                    # Generate screenshots from state files (original behavior)
+                    # Check if ground truth state file exists
+                    has_ground_truth = os.path.exists(self.gs_state_path)
+
+                    if has_ground_truth:
+                        # Take screenshots from both states (original behavior)
+                        print("Taking screenshots from both ground truth and result states...")
+                        screenshots = compare_states_screenshots(
+                            self.gs_state_path,
+                            self.result_state_path,
+                            self.screenshot_dir,
+                            data_directory=self.data_dir
+                        )
+
+                        # Create evaluation prompt for comparison
+                        evaluation_prompt = self._create_evaluation_prompt(visualization_goals, goals_count)
+
+                        # Perform LLM evaluation with both ground truth and result
+                        llm_result = self.llm_evaluator.evaluate_visualization(
+                            screenshots['ground_truth'],
+                            screenshots['result'],
+                            evaluation_prompt
+                        )
+                    else:
+                        # Take screenshots from result state only
+                        print("Ground truth state not found. Taking screenshots from result state only...")
+                        from screenshot_helper import take_screenshots_from_state
+
+                        result_screenshots = take_screenshots_from_state(
+                            self.result_state_path,
+                            self.screenshot_dir,
+                            prefix="result_",
+                            data_directory=self.data_dir
+                        )
+
+                        # Create evaluation prompt for result-only evaluation
+                        evaluation_prompt = self._create_result_only_evaluation_prompt(visualization_goals, goals_count)
+
+                        # Perform LLM evaluation with result screenshots only
+                        llm_result = self.llm_evaluator.evaluate_visualization_result_only(
+                            result_screenshots,
+                            evaluation_prompt
+                        )
                 
                 # Parse the LLM result
                 score, explanation = self._parse_llm_result(llm_result, goals_count)
@@ -391,25 +475,25 @@ Be specific about what you observe in the images and how well the results meet t
     def evaluate_output_generation(self) -> int:
         """
         Evaluate if the required output files were generated
-        
+
         Returns:
-            int: Score for output generation
+            int: Score for output generation (5 points max)
         """
         print("Evaluating output generation...")
-        
+
         score = 0
         explanations = []
-        
+
         # Check if state file exists
         if os.path.exists(self.result_state_path):
-            score += 10
+            score += 5
             explanations.append("ParaView state file generated successfully")
         else:
             explanations.append(f"ParaView state file not found: {self.result_state_path}")
-        
+
         self.evaluation_results["scores"]["output_generation"] = {
             "score": score,
-            "max_score": 10,
+            "max_score": 5,
             "explanation": "; ".join(explanations)
         }
         

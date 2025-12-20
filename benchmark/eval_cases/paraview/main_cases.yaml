@@ -23,13 +23,11 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: How well does the result achieve the overall goal of showing a potted tree with the specified colors?
+          1. Brown Pot Visualization: Does the result show the pot portion in brown color?
 
-          2. Brown Pot Visualization: Does the result show the pot portion in brown color?
+          2. Silver Branch Visualization: Does the result show the branch/trunk portion in silver color?
 
-          3. Silver Branch Visualization: Does the result show the branch/trunk portion in silver color?
-
-          4. Golden Leaves Visualization: Does the result show the leaves portion in golden color?
+          3. Golden Leaves Visualization: Does the result show the leaves portion in golden color?
 
 # 2. Carp Dataset
 - vars:
@@ -54,8 +52,18 @@
         4. Optimize the viewpoint to display the full skeleton, ensuring the head, spine, and fins are all clearly visible in a single frame.
 
         5. Analyze the visualization and answer the following questions:
-        Q1: How many distinct fins are visible in the carp skeleton? List their anatomical names and corresponding counts.
-        Q2: Estimate the ratio of skull length to overall body length, based on the visualization.
+
+        Q1: Which of the following options correctly describes the fins visible in the carp skeleton visualization?
+        A. 5 fins: 1 dorsal, 2 pectoral, 2 pelvic
+        B. 6 fins: 1 dorsal, 2 pectoral, 2 pelvic, 1 caudal
+        C. 7 fins: 1 dorsal, 2 pectoral, 2 pelvic, 1 anal, 1 caudal
+        D. 8 fins: 2 dorsal, 2 pectoral, 2 pelvic, 1 anal, 1 caudal
+
+        Q2: Based on the visualization, what is the approximate ratio of skull length to total body length?
+        A. ~15%
+        B. ~22%
+        C. ~30%
+        D. ~40%
 
         6. Save your work:
         Save the ParaView state as "carp/results/{agent_mode}/carp.pvsm".
@@ -74,9 +82,9 @@
     - type: llm-rubric
       subtype: text
       value: |
-          1. 7 fins are visible: 1 dorsal fin, 2 pectoral fins, 2 pelvic fins, 1 anal fin, and 1 caudal fin.
+          1. Q1 correct answer: C. 7 fins: 1 dorsal, 2 pectoral, 2 pelvic, 1 anal, 1 caudal
 
-          2. The skull length is approximately 22% of the overall body length.
+          2. Q2 correct answer: B. ~22%
 
 # 3. Chameleon Dataset
 - vars:
@@ -327,7 +335,12 @@
         1. Apply volume rendering with an X-ray transfer function that distinguishes soft tissues and bones. Bones with darker color, and soft tissue with lighter color.
 
         2. Analyze the visualization and answer the following questions:
-        Q1: In the visualization, which structures are fully visible: the phalanges, the metatarsals, or both?
+
+        Q1: Based on the X-ray style volume rendering of the foot dataset, which of the following best describes the visibility of bony structures?
+        A. Both the phalanges and metatarsals are fully visible
+        B. The phalanges are fully visible, but the metatarsals are only partially visible
+        C. The metatarsals are fully visible, but the phalanges are only partially visible
+        D. Neither the phalanges nor the metatarsals are clearly visible
 
         3. Save your work:
         Save the ParaView state as "foot/results/{agent_mode}/foot.pvsm".
@@ -343,7 +356,7 @@
     - type: llm-rubric
       subtype: text
       value: |
-          1. The phalanges (toe bones) are clearly visible in full, but the metatarsals are only partially visible.
+          1. Q1 correct answer: B. The phalanges are fully visible, but the metatarsals are only partially visible
 
 # 11. Lobster Dataset
 - vars:
@@ -365,7 +378,12 @@
         2. Use natural colors appropriate for the specimen (red-orange for lobster)
 
         3. Analyze the visualization and answer the following questions:
-        Q1: How many walking legs does the lobster in the visualization have?
+
+        Q1: Based on the isosurface visualization of the lobster specimen, how many walking legs are visible?
+        A. 6 walking legs
+        B. 7 walking legs
+        C. 8 walking legs
+        D. 10 walking legs
 
         4. Save your work:
         Save the ParaView state as "lobster/results/{agent_mode}/lobster.pvsm".
@@ -383,4 +401,4 @@
     - type: llm-rubric
       subtype: text
       value: |
-          1. The lobster only has 7 walking legs, one of them on the right side of its body is missing.
+          1. Q1 correct answer: B. 7 walking legs
