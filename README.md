@@ -1,5 +1,7 @@
 # SciVisAgentBench
 
+**📝 Learn more or contribute to our benchmark [here](https://kuangshiai.github.io/SciVisAgentBench-data-collection/).**
+
 SciVisAgentBench is a comprehensive benchmark for evaluating scientific visualization agents. The benchmark supports evaluation of three autonomous agents, ParaView-MCP, bioimage-agent, and ChatVis, enabling users to create and manipulate scientific visualizations using natural language instead of complex commands or GUI operations. The benchmark uses YAML files compatible with [promptfoo](https://www.promptfoo.dev/) to store test cases and evaluation metrics. This initial version focuses on outcome-based evaluation, using both LLM-as-a-judge and quantitative metrics.
 
 ## 🚀 NEW: Easy Evaluation Framework
