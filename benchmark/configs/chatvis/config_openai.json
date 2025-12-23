@@ -1,9 +1,9 @@
 {
   "provider": "openai",
-  "model": "gpt-5.2",
+  "model": "gpt-5-mini",
   "base_url": "https://api.openai.com/v1",
   "price": {
-    "input_per_1m_tokens": "$2.50",
-    "output_per_1m_tokens": "$10.00"
+    "input_per_1m_tokens": "$0.25",
+    "output_per_1m_tokens": "$2.00"
   }
 }

@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Human Evaluation - SciVisAgentBench</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .metadata {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .metadata-item {
+            display: flex;
+            gap: 5px;
+        }
+
+        .metadata-item strong {
+            color: #333;
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: #4CAF50;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .case-navigation {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .case-info-header {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .evaluation-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-evaluated {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-not-evaluated {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .panel h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .task-description {
+            grid-column: 1 / -1;
+        }
+
+        .task-description pre {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 13px;
+            line-height: 1.5;
+            text-align: left;
+        }
+
+        .images-panel {
+            grid-column: 1 / -1;
+        }
+
+        .image-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .image-set {
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 15px;
+            background: #fafafa;
+        }
+
+        .image-set h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .image-container {
+            margin-bottom: 10px;
+        }
+
+        .image-container:last-child {
+            margin-bottom: 0;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: block;
+        }
+
+        .image-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .evaluation-panel {
+            grid-column: 1 / -1;
+        }
+
+        .metric-item {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .metric-criterion {
+            font-size: 14px;
+            margin-bottom: 15px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .rating-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .rating-label {
+            font-size: 13px;
+            color: #666;
+            min-width: 80px;
+        }
+
+        .rating-slider {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .rating-slider input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .rating-slider input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #2196F3;
+            cursor: pointer;
+        }
+
+        .rating-slider input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #2196F3;
+            cursor: pointer;
+            border: none;
+        }
+
+        .rating-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2196F3;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .notes-section {
+            margin-top: 20px;
+        }
+
+        .notes-section label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .notes-section textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #1976D2;
+        }
+
+        .btn-secondary {
+            background: #757575;
+            color: white;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #616161;
+        }
+
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #45a049;
+        }
+
+        .case-info {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border-left: 4px solid #c62828;
+        }
+
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2e7d32;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ff9800;
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-style: italic;
+        }
+
+        @media (max-width: 1200px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Human Evaluation - SciVisAgentBench</h1>
+            <div class="metadata" id="metadata">
+                <div class="metadata-item">
+                    <strong>Agent:</strong>
+                    <span id="agent-name">Loading...</span>
+                </div>
+                <div class="metadata-item">
+                    <strong>Benchmark:</strong>
+                    <span id="benchmark-type">Loading...</span>
+                </div>
+                <div class="metadata-item">
+                    <strong>Total Cases:</strong>
+                    <span id="total-cases">Loading...</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-text" id="progress-text">Loading...</div>
+        </div>
+
+        <div id="message-area"></div>
+
+        <div id="evaluation-content" class="loading">
+            Loading evaluation cases...
+        </div>
+    </div>
+
+    <script>
+        let currentCaseIndex = 0;
+        let totalCases = 0;
+        let casesData = [];
+        let metadata = {};
+        let evaluatedCases = new Set();  // Track which cases have been evaluated
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMetadata();
+            loadCases();
+        });
+
+        async function loadMetadata() {
+            try {
+                const response = await fetch('/api/metadata');
+                metadata = await response.json();
+
+                document.getElementById('agent-name').textContent = metadata.agent_name || 'N/A';
+                document.getElementById('benchmark-type').textContent = metadata.benchmark_type || 'N/A';
+                document.getElementById('total-cases').textContent = metadata.total_cases || '0';
+
+                updateProgress();
+            } catch (error) {
+                console.error('Error loading metadata:', error);
+            }
+        }
+
+        async function loadCases() {
+            try {
+                const response = await fetch('/api/cases');
+                const data = await response.json();
+
+                casesData = data.cases;
+                totalCases = data.total;
+
+                if (totalCases === 0) {
+                    document.getElementById('evaluation-content').innerHTML =
+                        '<div class="no-results">No vision-based evaluation cases found.</div>';
+                    return;
+                }
+
+                loadCase(0);
+            } catch (error) {
+                console.error('Error loading cases:', error);
+                showError('Failed to load evaluation cases');
+            }
+        }
+
+        async function loadCase(index) {
+            if (index < 0 || index >= totalCases) return;
+
+            currentCaseIndex = index;
+
+            try {
+                const response = await fetch(`/api/case/${index}`);
+                const caseData = await response.json();
+
+                if (caseData.error) {
+                    showError(caseData.error);
+                    return;
+                }
+
+                // Track if this case has existing evaluation
+                if (caseData.existing_evaluation) {
+                    evaluatedCases.add(index);
+                }
+
+                renderCase(caseData);
+                updateProgress();
+            } catch (error) {
+                console.error('Error loading case:', error);
+                showError('Failed to load case data');
+            }
+        }
+
+        function renderCase(caseData) {
+            const hasResults = caseData.has_results;
+            const existingEval = caseData.existing_evaluation;
+            const isEvaluated = evaluatedCases.has(currentCaseIndex) || existingEval;
+
+            let html = `
+                <div class="case-navigation">
+                    <div class="nav-buttons">
+                        <button class="btn-secondary" onclick="previousCase()" ${currentCaseIndex === 0 ? 'disabled' : ''}>
+                            ← Previous
+                        </button>
+                        <button class="btn-secondary" onclick="nextCase()" ${currentCaseIndex >= totalCases - 1 ? 'disabled' : ''}>
+                            Next →
+                        </button>
+                    </div>
+                    <div class="case-info-header">
+                        Case ${currentCaseIndex + 1} of ${totalCases}: ${caseData.case_name}
+                        <span class="evaluation-status ${isEvaluated ? 'status-evaluated' : 'status-not-evaluated'}">
+                            ${isEvaluated ? '✓ Evaluated' : '○ Not Evaluated'}
+                        </span>
+                    </div>
+                    <button class="btn-success" onclick="saveEvaluation()">
+                        Save Evaluation
+                    </button>
+                </div>
+
+                <div class="content">
+                    <div class="panel task-description">
+                        <h2>Task Description</h2>
+                        <pre>${escapeHtml(caseData.task_description)}</pre>
+                    </div>
+
+                    <div class="panel images-panel">
+                        <h2>Visual Comparison</h2>
+                        ${!hasResults ? '<div class="alert">⚠️ No result images found for this case. Results may not have been generated yet.</div>' : ''}
+                        <div class="image-comparison">
+                            <div class="image-set">
+                                <h3>Ground Truth</h3>
+                                ${renderImages(caseData.ground_truth_images, 'Ground Truth')}
+                            </div>
+                            <div class="image-set">
+                                <h3>Agent Result</h3>
+                                ${hasResults ? renderImages(caseData.result_images, 'Result') : '<div class="no-results">No results available</div>'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel evaluation-panel">
+                        <h2>Evaluation Metrics (Rate 0-10)</h2>
+                        ${renderMetrics(caseData.metrics, existingEval)}
+
+                        <div class="notes-section">
+                            <label for="eval-notes">Additional Notes (Optional):</label>
+                            <textarea id="eval-notes" placeholder="Enter any additional observations or comments...">${existingEval ? existingEval.notes || '' : ''}</textarea>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('evaluation-content').innerHTML = html;
+        }
+
+        function renderImages(imagePaths, label) {
+            if (!imagePaths || imagePaths.length === 0) {
+                return '<div class="no-results">No images available</div>';
+            }
+
+            return imagePaths.map((path, index) => {
+                const viewName = getViewName(path, index);
+                return `
+                    <div class="image-container">
+                        <div class="image-label">${viewName}</div>
+                        <img src="/images/${path}" alt="${label} - ${viewName}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 fill=%22%23999%22%3EImage not found%3C/text%3E%3C/svg%3E'">
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getViewName(path, index) {
+            if (path.includes('front')) return 'Front View';
+            if (path.includes('side')) return 'Side View';
+            if (path.includes('diagonal')) return 'Diagonal View';
+            return `View ${index + 1}`;
+        }
+
+        function renderMetrics(metrics, existingEval) {
+            return metrics.map((metric, index) => {
+                const existingRating = existingEval && existingEval.ratings ? existingEval.ratings[index] : 5;
+                return `
+                    <div class="metric-item">
+                        <div class="metric-criterion">
+                            <strong>Metric ${index + 1}:</strong> ${escapeHtml(metric.criterion)}
+                        </div>
+                        <div class="rating-controls">
+                            <span class="rating-label">Rating:</span>
+                            <div class="rating-slider">
+                                <input type="range" min="0" max="10" value="${existingRating}"
+                                       id="metric-${index}"
+                                       oninput="updateRatingDisplay(${index})">
+                            </div>
+                            <span class="rating-value" id="rating-value-${index}">${existingRating}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateRatingDisplay(index) {
+            const slider = document.getElementById(`metric-${index}`);
+            const display = document.getElementById(`rating-value-${index}`);
+            display.textContent = slider.value;
+        }
+
+        async function saveEvaluation() {
+            const caseData = casesData[currentCaseIndex];
+            const ratings = [];
+
+            // Collect all ratings
+            for (let i = 0; i < caseData.metrics.length; i++) {
+                const slider = document.getElementById(`metric-${i}`);
+                ratings.push(parseInt(slider.value));
+            }
+
+            const notes = document.getElementById('eval-notes').value;
+
+            const evaluation = {
+                case_index: currentCaseIndex,
+                ratings: ratings,
+                notes: notes
+            };
+
+            try {
+                const response = await fetch('/api/evaluate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(evaluation)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showSuccess('Evaluation saved successfully!');
+                    evaluatedCases.add(currentCaseIndex);  // Mark this case as evaluated
+                    updateProgress();
+                    // Re-render to update the status badge
+                    loadCase(currentCaseIndex);
+                } else {
+                    showError(result.error || 'Failed to save evaluation');
+                }
+            } catch (error) {
+                console.error('Error saving evaluation:', error);
+                showError('Failed to save evaluation');
+            }
+        }
+
+        function previousCase() {
+            if (currentCaseIndex > 0) {
+                loadCase(currentCaseIndex - 1);
+            }
+        }
+
+        function nextCase() {
+            if (currentCaseIndex < totalCases - 1) {
+                loadCase(currentCaseIndex + 1);
+            }
+        }
+
+        async function updateProgress() {
+            try {
+                const response = await fetch('/api/progress');
+                const progress = await response.json();
+
+                const percentage = progress.progress_percentage || 0;
+                document.getElementById('progress-fill').style.width = percentage + '%';
+                document.getElementById('progress-text').textContent =
+                    `${progress.evaluated_cases} of ${progress.total_cases} cases evaluated (${percentage.toFixed(1)}%)`;
+            } catch (error) {
+                console.error('Error updating progress:', error);
+            }
+        }
+
+        function showMessage(message, type) {
+            const messageArea = document.getElementById('message-area');
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = message;
+            messageArea.innerHTML = '';
+            messageArea.appendChild(div);
+
+            setTimeout(() => {
+                div.remove();
+            }, 5000);
+        }
+
+        function showError(message) {
+            showMessage(message, 'error');
+        }
+
+        function showSuccess(message) {
+            showMessage(message, 'success');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
