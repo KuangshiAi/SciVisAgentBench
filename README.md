@@ -66,11 +66,11 @@ SciVisAgentBench/
 ## ParaView-MCP, ChatVis, bioimage-agent, and GMX-VMD-MCP Installation
 We provide out-of-box evaluation for ParaView-MCP, ChatVis, bioimage-agent, and GMX-VMD-MCP in SciVisAgentBench. We suggest installing them in seperated conda virtual environments (ParaView-MCP and ChatVis can share the same environment).
 
-### To install ParaView, ParaView-MCP, and SciVisAgentBench requirements (it also works for ChatVis):
+### To install ParaView, ParaView-MCP, and SciVisAgentBench requirements (it also works for ChatVis, make sure the ParaView environment here is the same as your ParaView GUI):
 ```shell
 conda create -n paraview_mcp python=3.10
 conda activate paraview_mcp
-conda install conda-forge::paraview
+conda install -c conda-forge "paraview==5.13.3"
 pip install -r requirements.txt
 ```
 
