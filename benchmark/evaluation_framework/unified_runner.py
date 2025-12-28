@@ -283,7 +283,7 @@ class UnifiedTestRunner:
         # Fallback
         return f"case_{index + 1}"
 
-    async def run_single_test_case(self, test_case: YAMLTestCase) -> Dict:
+    async def run_single_test_case(self, test_case: YAMLTestCase, save_result: bool = True) -> Dict:
         """Run a single test case and return results."""
         print(f"\n{'='*60}")
         print(f"Running test case: {test_case.case_name}")
@@ -365,8 +365,9 @@ class UnifiedTestRunner:
         result["end_time"] = end_time.isoformat()
         result["duration_seconds"] = (end_time - start_time).total_seconds()
 
-        # Save centralized result
-        await self.save_centralized_result(test_case, result)
+        # Save centralized result if requested
+        if save_result:
+            await self.save_centralized_result(test_case, result)
 
         return result
 
@@ -374,6 +375,19 @@ class UnifiedTestRunner:
         """Save test result to centralized output directory."""
         self.output_dir.mkdir(parents=True, exist_ok=True)
         centralized_file = self.output_dir / f"{test_case.case_name}_result_{int(time.time())}.json"
+
+        # Add model metadata from agent config
+        if hasattr(self.agent, 'config') and self.agent.config:
+            model_metadata = {
+                "provider": self.agent.config.get("provider"),
+                "model": self.agent.config.get("model"),
+                "base_url": self.agent.config.get("base_url"),
+                "price": self.agent.config.get("price")
+            }
+            # Remove None values
+            model_metadata = {k: v for k, v in model_metadata.items() if v is not None}
+            if model_metadata:
+                result["model_metadata"] = model_metadata
 
         with open(centralized_file, 'w', encoding='utf-8') as f:
             json.dump(result, f, indent=2, ensure_ascii=False)
@@ -428,14 +442,17 @@ class UnifiedTestRunner:
 
         try:
             for test_case in self.test_cases:
-                # Run test case
-                result = await self.run_single_test_case(test_case)
+                # Run test case without saving (we'll save after evaluation)
+                result = await self.run_single_test_case(test_case, save_result=False)
                 results.append(result)
 
                 # Run evaluation if requested and test completed successfully
                 if run_evaluation and result.get("status") == "completed":
                     eval_result = await self.run_evaluation(test_case)
                     result["evaluation"] = eval_result
+
+                # Save centralized result with evaluation data
+                await self.save_centralized_result(test_case, result)
 
         finally:
             # Teardown agent
@@ -499,6 +516,19 @@ class UnifiedTestRunner:
             },
             "results": results
         }
+
+        # Add model metadata from agent config
+        if hasattr(self.agent, 'config') and self.agent.config:
+            model_metadata = {
+                "provider": self.agent.config.get("provider"),
+                "model": self.agent.config.get("model"),
+                "base_url": self.agent.config.get("base_url"),
+                "price": self.agent.config.get("price")
+            }
+            # Remove None values
+            model_metadata = {k: v for k, v in model_metadata.items() if v is not None}
+            if model_metadata:
+                summary["model_metadata"] = model_metadata
 
         # Save summary
         summary_file = self.output_dir / f"test_summary_{int(time.time())}.json"

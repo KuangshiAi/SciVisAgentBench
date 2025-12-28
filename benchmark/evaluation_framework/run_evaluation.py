@@ -266,14 +266,17 @@ async def main():
             await agent.setup()
 
             try:
-                # Run single case
+                # Run single case without saving (we'll save after evaluation)
                 print(f"\nRunning single test case: {args.case}")
-                result = await runner.run_single_test_case(target_case)
+                result = await runner.run_single_test_case(target_case, save_result=False)
 
                 # Run evaluation if requested
                 if not args.no_eval and result.get("status") == "completed" and openai_api_key:
                     eval_result = await runner.run_evaluation(target_case)
                     result["evaluation"] = eval_result
+
+                # Save result with evaluation data
+                await runner.save_centralized_result(target_case, result)
 
                 print(f"\nCase result: {result.get('status')}")
                 return 0 if result.get('status') == 'completed' else 1
