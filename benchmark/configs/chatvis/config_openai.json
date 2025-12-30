@@ -5,5 +5,10 @@
   "price": {
     "input_per_1m_tokens": "$0.25",
     "output_per_1m_tokens": "$2.00"
+  },
+  "rate_limits": {
+    "requests_per_minute": 500,
+    "input_tokens_per_minute": 450000,
+    "output_tokens_per_minute": 90000
   }
 }

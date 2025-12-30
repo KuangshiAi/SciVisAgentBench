@@ -72,6 +72,8 @@ conda create -n paraview_mcp python=3.10
 conda activate paraview_mcp
 conda install -c conda-forge "paraview==5.13.3"
 pip install -r requirements.txt
+# Install Node.js to access the filesystem server
+conda install -c conda-forge nodejs -y
 ```
 
 ### To install napari, bioimage-agent, and SciVisAgentBench requirements:
@@ -149,6 +151,28 @@ For macOS users, the VMD path is typically:
 ## Configs for Agents
 Set the config files for the agents at `benchmark/configs`. As an optional choice, use `src/mcp_logger.py` to record the communication logs (MCP function calls and arguments) between MCP agents and MCP servers, together with screenshots after each MCP function call.
 
+The rate limiting feature helps prevent hitting API provider limits. Add a `rate_limits` section to your config JSON file if necessary:
+
+```json
+{
+  "provider": "anthropic",
+  "model": "claude-sonnet-4-5",
+  "base_url": "https://api.anthropic.com",
+  "price": {
+    "input_per_1m_tokens": "$3.00",
+    "output_per_1m_tokens": "$15.00"
+  },
+  "rate_limits": {
+    "requests_per_minute": 1000,
+    "input_tokens_per_minute": 450000,
+    "output_tokens_per_minute": 90000
+  },
+  "servers": [...]
+}
+```
+
+Disable rate limiting by simply removing the `rate_limits` section.
+
 ## Run ParaView-MCP Evaluation
 
 ### 1. Start paraview server
@@ -156,7 +180,7 @@ Set the config files for the agents at `benchmark/configs`. As an optional choic
 In a new terminal:
 ```shell
 conda activate paraview_mcp
-python pvserver --multi-clients
+pvserver --multi-clients
 ```
 
 ### 2. Connect to paraview server from paraview GUI (file -> connect)

@@ -6,13 +6,18 @@
     "input_per_1m_tokens": "$2.50",
     "output_per_1m_tokens": "$10.00"
   },
+  "rate_limits": {
+    "requests_per_minute": 500,
+    "input_tokens_per_minute": 450000,
+    "output_tokens_per_minute": 90000
+  },
   "servers": [
     {
       "type": "stdio",
       "config": {
-        "command": "/Users/kuangshiai/miniconda3/envs/paraview_mcp/bin/python",
+        "command": "C:/miniconda/envs/paraview_mcp/python.exe",
         "args": [
-          "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench/src/paraview_mcp/paraview_mcp_server.py"
+          "D:/Code/SciVisAgentBench/src/paraview_mcp/paraview_mcp_server.py"
         ]
       }
     },
@@ -23,7 +28,7 @@
         "args": [
           "-y",
           "@modelcontextprotocol/server-filesystem",
-          "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench"
+          "D:/Code/SciVisAgentBench"
         ]
       }
     }

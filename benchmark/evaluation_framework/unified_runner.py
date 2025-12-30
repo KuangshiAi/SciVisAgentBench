@@ -21,6 +21,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from .base_agent import BaseAgent, AgentResult
 from .evaluation_manager import EvaluationManager
+from .rate_limiter import create_rate_limiter_from_config, RateLimiter
 
 
 class YAMLTestCase:
@@ -140,7 +141,8 @@ class UnifiedTestRunner:
         output_dir: Optional[str] = None,
         openai_api_key: Optional[str] = None,
         eval_model: str = "gpt-4o",
-        static_screenshot: bool = False
+        static_screenshot: bool = False,
+        config: Optional[Dict[str, Any]] = None
     ):
         """
         Initialize the unified test runner.
@@ -154,6 +156,7 @@ class UnifiedTestRunner:
             openai_api_key: OpenAI API key for evaluation
             eval_model: Model to use for LLM evaluation
             static_screenshot: If True, use pre-generated screenshots for evaluation
+            config: Optional config dictionary for rate limiting (passed from agent)
         """
         self.agent = agent
         self.yaml_path = Path(yaml_path)
@@ -187,6 +190,13 @@ class UnifiedTestRunner:
 
         self.openai_api_key = openai_api_key or os.getenv('OPENAI_API_KEY')
         self.eval_model = eval_model
+
+        # Initialize rate limiter from config if available
+        self.rate_limiter: Optional[RateLimiter] = None
+        if config:
+            self.rate_limiter = create_rate_limiter_from_config(config)
+            if self.rate_limiter:
+                print("✓ Rate limiting enabled based on config")
         self.static_screenshot = static_screenshot
         self.test_cases: List[YAMLTestCase] = []
 
@@ -442,9 +452,24 @@ class UnifiedTestRunner:
 
         try:
             for test_case in self.test_cases:
+                # Wait if needed to comply with rate limits (before starting the case)
+                if self.rate_limiter:
+                    await self.rate_limiter.wait_if_needed(
+                        estimated_input_tokens=2000,  # Conservative estimate
+                        estimated_output_tokens=20000
+                    )
+
                 # Run test case without saving (we'll save after evaluation)
                 result = await self.run_single_test_case(test_case, save_result=False)
                 results.append(result)
+
+                # Record the actual token usage after the request completes
+                if self.rate_limiter and result.get("token_usage"):
+                    token_usage = result["token_usage"]
+                    await self.rate_limiter.record_request(
+                        input_tokens=token_usage.get("input_tokens", 0),
+                        output_tokens=token_usage.get("output_tokens", 0)
+                    )
 
                 # Run evaluation if requested and test completed successfully
                 if run_evaluation and result.get("status") == "completed":

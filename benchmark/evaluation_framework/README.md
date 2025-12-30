@@ -72,10 +72,16 @@ python -m benchmark.evaluation_framework.run_evaluation \
 --static-screenshot
 
 # Change evaluation model
---eval-model gpt-4-turbo
+--eval-model gpt-5.2
 
 # Custom output directory
 --output /path/to/results
+
+# Clear previous agent execution results before running
+--clear-result
+
+# Skip agent execution and only evaluate existing results
+--eval-only
 ```
 
 ## Agent Interface
