@@ -91,7 +91,7 @@
     question: |
         Task:
 
-        Load the chameleon dataset from "chameleon_volvis/data/chameleon_256x256x270_float32.raw", the information about this dataset:
+        Load the chameleon dataset from "chameleon_volvis/data/chameleon_volvis_256x256x270_float32.raw", the information about this dataset:
         chameleon (Scalar)
         Data Scalar Type: float
         Data Byte Order: little Endian
@@ -407,7 +407,7 @@
 - vars:
     question: |
         Task:
-        Load the chameleon dataset from "chameleon_isosurface/data/chameleon_256x256x256_float32.vtk".
+        Load the chameleon dataset from "chameleon_isosurface/data/chameleon_isosurface_256x256x256_float32.vtk".
         Generate a visualization image of 2 isosurfaces of the Chameleon scalar field dataset with the following visualization settings:
         1) Create isosurfaces of Iso_1 with a value of 0.12 and Iso_2 with a value of 0.45
         2) Assign RGB color of [0.0, 1.0, 0.0] to Iso_1, and color of [1.0, 1.0, 1.0] to Iso_2
