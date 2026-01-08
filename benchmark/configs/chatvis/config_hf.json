@@ -1,4 +1,9 @@
 {
     "model": "meta-llama/Llama-3.3-70B-Instruct",
-    "provider": "nebius"
+    "provider": "nebius",
+    "rate_limits": {
+        "requests_per_minute": 100,
+        "input_tokens_per_minute": 100000,
+        "output_tokens_per_minute": 20000
+    }
 }

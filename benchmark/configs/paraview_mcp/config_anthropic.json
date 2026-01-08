@@ -1,18 +1,23 @@
 {
   "provider": "anthropic",
-  "model": "claude-3-5-haiku-latest",
+  "model": "claude-sonnet-4-5",
   "base_url": "https://api.anthropic.com",
   "price": {
-    "input_per_1m_tokens": "$0.80",
-    "output_per_1m_tokens": "$4.00"
+    "input_per_1m_tokens": "$3.00",
+    "output_per_1m_tokens": "$15.00"
+  },
+  "rate_limits": {
+    "requests_per_minute": 900,
+    "input_tokens_per_minute": 400000,
+    "output_tokens_per_minute": 75000
   },
   "servers": [
     {
       "type": "stdio",
       "config": {
-        "command": "/Users/kuangshiai/miniconda3/envs/paraview_mcp/bin/python",
+        "command": "C:/miniconda/envs/paraview_mcp/python.exe",
         "args": [
-          "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench/src/paraview_mcp/paraview_mcp_server.py"
+          "D:/Code/SciVisAgentBench/src/paraview_mcp/paraview_mcp_server.py"
         ]
       }
     },
@@ -23,7 +28,7 @@
         "args": [
           "-y",
           "@modelcontextprotocol/server-filesystem",
-          "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench"
+          "D:/Code/SciVisAgentBench"
         ]
       }
     }

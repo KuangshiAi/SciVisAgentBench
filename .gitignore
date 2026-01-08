@@ -75,3 +75,5 @@ src/gmx_vmd_mcp/config.json
 benchmark/eval_cases/molecular_vis/actions/workspace/*
 
 benchmark/human_judge/evaluations/*
+
+exp_win.sh

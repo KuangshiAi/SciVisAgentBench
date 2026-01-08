@@ -13,14 +13,23 @@ Usage examples:
        --yaml SciVisAgentBench-tasks/main/main_cases.yaml \\
        --cases SciVisAgentBench-tasks/main
 
-2. Evaluate custom agent:
+2. Clear previous results before running:
    python -m benchmark.evaluation_framework.run_evaluation \\
-       --agent my_custom_agent \\
-       --config my_config.json \\
-       --yaml path/to/cases.yaml \\
-       --cases path/to/cases
+       --agent paraview_mcp \\
+       --config benchmark/configs/paraview_mcp/config_openai.json \\
+       --yaml SciVisAgentBench-tasks/main/main_cases.yaml \\
+       --cases SciVisAgentBench-tasks/main \\
+       --clear-results
 
-3. List available agents:
+3. Evaluate existing results without re-running agent:
+   python -m benchmark.evaluation_framework.run_evaluation \\
+       --agent paraview_mcp \\
+       --config benchmark/configs/paraview_mcp/config_openai.json \\
+       --yaml SciVisAgentBench-tasks/main/main_cases.yaml \\
+       --cases SciVisAgentBench-tasks/main \\
+       --eval-only
+
+4. List available agents:
    python -m benchmark.evaluation_framework.run_evaluation --list-agents
 """
 
@@ -28,6 +37,7 @@ import argparse
 import asyncio
 import os
 import sys
+import shutil
 from pathlib import Path
 
 # Add benchmark directory to path
@@ -111,6 +121,18 @@ def parse_args():
         help="Use pre-generated screenshots instead of generating from state files"
     )
 
+    parser.add_argument(
+        "--clear-results",
+        action="store_true",
+        help="Clear all previous agent execution results before running (removes results/, evaluation_results/, test_results/ from each case)"
+    )
+
+    parser.add_argument(
+        "--eval-only",
+        action="store_true",
+        help="Skip agent execution and only run evaluation on existing results"
+    )
+
     # API keys
     parser.add_argument(
         "--openai-api-key",
@@ -130,6 +152,53 @@ def parse_args():
     )
 
     return parser.parse_args()
+
+
+def clear_case_results(cases_dir: str, case_name: str = None):
+    """
+    Clear agent execution results from test case directories.
+
+    Args:
+        cases_dir: Path to the cases directory
+        case_name: Optional specific case name. If None, clears all cases.
+    """
+    cases_path = Path(cases_dir)
+
+    if not cases_path.exists():
+        print(f"Warning: Cases directory not found: {cases_dir}")
+        return
+
+    # Directories to remove from each case
+    dirs_to_remove = ["results", "evaluation_results", "test_results"]
+
+    # Get list of cases to clear
+    if case_name:
+        cases_to_clear = [case_name]
+    else:
+        # Get all subdirectories (test cases)
+        cases_to_clear = [d.name for d in cases_path.iterdir() if d.is_dir() and not d.name.startswith('.')]
+
+    cleared_count = 0
+    for case in cases_to_clear:
+        case_dir = cases_path / case
+        if not case_dir.exists():
+            print(f"Warning: Case directory not found: {case_dir}")
+            continue
+
+        for dir_name in dirs_to_remove:
+            dir_path = case_dir / dir_name
+            if dir_path.exists():
+                try:
+                    shutil.rmtree(dir_path)
+                    print(f"  ✓ Cleared {case}/{dir_name}/")
+                    cleared_count += 1
+                except Exception as e:
+                    print(f"  ✗ Error clearing {case}/{dir_name}/: {e}")
+
+    if cleared_count > 0:
+        print(f"\n✓ Cleared {cleared_count} result directories")
+    else:
+        print("\nℹ No result directories found to clear")
 
 
 def list_registered_agents():
@@ -223,7 +292,7 @@ async def main():
         print(f"\nCreating agent: {args.agent}")
         agent = agent_class(config)
 
-        # Create test runner
+        # Create test runner (pass config for rate limiting)
         runner = UnifiedTestRunner(
             agent=agent,
             yaml_path=args.yaml,
@@ -232,7 +301,8 @@ async def main():
             output_dir=args.output,
             openai_api_key=openai_api_key,
             eval_model=args.eval_model,
-            static_screenshot=args.static_screenshot
+            static_screenshot=args.static_screenshot,
+            config=config
         )
 
         # Load test cases
@@ -247,6 +317,72 @@ async def main():
         if not test_cases:
             print("Error: No valid test cases found in YAML file")
             return 1
+
+        # Handle --clear-results flag
+        if args.clear_results:
+            print("\n🗑️  Clearing previous results...")
+            clear_case_results(args.cases, args.case)
+            print()
+
+        # Handle --eval-only flag
+        if args.eval_only:
+            print("\n📊 Evaluation-only mode: Skipping agent execution\n")
+            if not openai_api_key:
+                print("Error: --eval-only requires an OpenAI API key for evaluation")
+                print("Set OPENAI_API_KEY environment variable or use --openai-api-key")
+                return 1
+
+            # Run evaluation on all cases
+            if args.case:
+                # Find specific case
+                target_case = None
+                for case in test_cases:
+                    if case.case_name == args.case:
+                        target_case = case
+                        break
+
+                if not target_case:
+                    print(f"Error: Test case '{args.case}' not found")
+                    return 1
+
+                print(f"Evaluating existing results for: {args.case}")
+                eval_result = await runner.run_evaluation(target_case)
+
+                # Create a dummy result with evaluation
+                result = {
+                    "status": "eval_only",
+                    "case_name": args.case,
+                    "evaluation": eval_result
+                }
+                await runner.save_centralized_result(target_case, result)
+
+                print(f"\n✓ Evaluation complete for {args.case}")
+                return 0
+            else:
+                # Evaluate all cases
+                print(f"Evaluating existing results for {len(test_cases)} test cases...")
+                for test_case in test_cases:
+                    print(f"\n{'='*60}")
+                    print(f"Evaluating: {test_case.case_name}")
+                    print(f"{'='*60}")
+
+                    try:
+                        eval_result = await runner.run_evaluation(test_case)
+
+                        # Create a dummy result with evaluation
+                        result = {
+                            "status": "eval_only",
+                            "case_name": test_case.case_name,
+                            "evaluation": eval_result
+                        }
+                        await runner.save_centralized_result(test_case, result)
+
+                        print(f"✓ Evaluation complete")
+                    except Exception as e:
+                        print(f"✗ Evaluation failed: {e}")
+
+                print(f"\n✓ All evaluations complete")
+                return 0
 
         # Run specific case or all cases
         if args.case:
@@ -266,14 +402,17 @@ async def main():
             await agent.setup()
 
             try:
-                # Run single case
+                # Run single case without saving (we'll save after evaluation)
                 print(f"\nRunning single test case: {args.case}")
-                result = await runner.run_single_test_case(target_case)
+                result = await runner.run_single_test_case(target_case, save_result=False)
 
                 # Run evaluation if requested
                 if not args.no_eval and result.get("status") == "completed" and openai_api_key:
                     eval_result = await runner.run_evaluation(target_case)
                     result["evaluation"] = eval_result
+
+                # Save result with evaluation data
+                await runner.save_centralized_result(target_case, result)
 
                 print(f"\nCase result: {result.get('status')}")
                 return 0 if result.get('status') == 'completed' else 1

@@ -1,13 +1,18 @@
 {
     "model": "meta-llama/Llama-3.3-70B-Instruct",
     "provider": "nebius",
+    "rate_limits": {
+        "requests_per_minute": 100,
+        "input_tokens_per_minute": 100000,
+        "output_tokens_per_minute": 20000
+    },
     "servers": [
         {
         "type": "stdio",
         "config": {
-            "command": "/Users/kuangshiai/miniconda3/envs/paraview_mcp/bin/python",
+            "command": "C:/miniconda/envs/paraview_mcp/python.exe",
             "args": [
-            "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench/src/paraview_mcp/paraview_mcp_server.py"
+            "D:/Code/SciVisAgentBench/src/paraview_mcp/paraview_mcp_server.py"
             ]
         }
         },
@@ -18,7 +23,7 @@
                 "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench"
+        "D:/Code/SciVisAgentBench"
       ]
             }
         }

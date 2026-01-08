@@ -1,9 +1,14 @@
 {
   "provider": "anthropic",
-  "model": "claude-3-5-haiku-latest",
+  "model": "claude-sonnet-4-5",
   "base_url": "https://api.anthropic.com",
   "price": {
-    "input_per_1m_tokens": "$0.80",
-    "output_per_1m_tokens": "$4.00"
+    "input_per_1m_tokens": "$3.00",
+    "output_per_1m_tokens": "$15.00"
+  },
+  "rate_limits": {
+    "requests_per_minute": 1000,
+    "input_tokens_per_minute": 450000,
+    "output_tokens_per_minute": 90000
   }
 }

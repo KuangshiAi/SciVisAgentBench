@@ -430,9 +430,9 @@ class CaseImageMetrics:
                         print(f"  {viewpoint} view - PSNR: {metrics.get('psnr', 'N/A')}, SSIM: {metrics.get('ssim', 'N/A')}, LPIPS: {metrics.get('lpips', 'N/A')}")
                     except Exception as e:
                         print(f"  Error calculating {viewpoint} view metrics: {e}")
+                        viewpoint_metrics[viewpoint] = {'psnr': None, 'ssim': None, 'lpips': None}
+                else:
                     viewpoint_metrics[viewpoint] = {'psnr': None, 'ssim': None, 'lpips': None}
-            else:
-                viewpoint_metrics[viewpoint] = {'psnr': None, 'ssim': None, 'lpips': None}
         
         # Calculate averages across valid viewpoints
         averages = self._calculate_averages(viewpoint_metrics, valid_viewpoints)
