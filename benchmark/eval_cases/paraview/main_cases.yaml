@@ -86,12 +86,12 @@
 
           2. Q2 correct answer: B. ~22%
 
-# 3. Chameleon Dataset
+# 3. Chameleon Dataset (VolVis)
 - vars:
     question: |
         Task:
 
-        Load the chameleon dataset from "chameleon/data/chameleon_256x256x270_float32.raw", the information about this dataset:
+        Load the chameleon dataset from "chameleon_volvis/data/chameleon_256x256x270_float32.raw", the information about this dataset:
         chameleon (Scalar)
         Data Scalar Type: float
         Data Byte Order: little Endian
@@ -107,7 +107,7 @@
 
         Please think step by step and make sure to fulfill all the visualization goals mentioned above.
 
-        Finally, save the paraview state as "chameleon/results/{agent_mode}/chameleon.pvsm"
+        Finally, save the paraview state as "chameleon_volvis/results/{agent_mode}/chameleon_volvis.pvsm"
   assert:
     - type: llm-rubric
       subtype: vision
@@ -402,3 +402,141 @@
       subtype: text
       value: |
           1. Q1 correct answer: B. 7 walking legs
+
+# 12. Chameleon Dataset (IsoSurface)
+- vars:
+    question: |
+        Task:
+        Load the chameleon dataset from "chameleon_isosurface/data/chameleon_256x256x256_float32.vtk".
+        Generate a visualization image of 2 isosurfaces of the Chameleon scalar field dataset with the following visualization settings:
+        1) Create isosurfaces of Iso_1 with a value of 0.12 and Iso_2 with a value of 0.45
+        2) Assign RGB color of [0.0, 1.0, 0.0] to Iso_1, and color of [1.0, 1.0, 1.0] to Iso_2
+        3) Assign opacity of 0.1 to Iso_1, and opacity of 0.99 to Iso_2
+        4) Set the lighting parameter as: 0.1 to Ambient; 0.7 to Diffuse; 0.6 to Specular
+        5) Set the viewpoint parameters as: [600, 0, 0] to position; [0, 0, 0] to focal point; [0, -1, 0] to camera up direction
+        6) White background
+        7) Visualization image resolution is 1024x1024
+        8) Save the visualization image as a png file "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.png"
+        9) (Option 1) Save the paraview state as "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.pvsm" if you are using ParaView as the visualization tool
+        10) (Option 2) Save the cxx code script as "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.cxx" if you are using VTK as the visualization tool
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Overall Visualization Goal: Does the result present a good isosurface rendering compared to groundtruth?
+          
+          2. Is the skin of the Chameleon object of green color?
+          
+          3. Is the bone of the Chameleon object of white color?
+
+
+# 13. Argon Bubble
+# A CFD simulation of a bubble of argon gas immersed in air and being hit by a shockwave. 
+# This dataset is a time-varying volume dataset created by the Center for Computational Sciences and Engineering (CCSE) at Lawrence Berkeley National Laboratory.
+# The volumetric used for the SciVis benchmark is one frame of the time sequence.
+- vars:
+    question: |
+        Task:
+        Load the Argon Bubble dataset from "argon-bubble/data/argon-bubble_128x128x256_float32.vtk".
+        Generate a visualization image of the Argon Bubble scalar field dataset with the following visualization settings:
+        1) Create volume rendering
+        2) Set the opacity transfer function as a ramp function across values of the volumetric data, assigning opacity 0 to value 0 and assigning opacity 1 to value 1.
+        3) Set the color transfer function to assign a warm red color [0.71, 0.02, 0.15] to the highest value, a cool color [0.23, 0.29, 0.75] to the lowest value, and a grey color[0.87, 0.87, 0.87] to the midrange value
+        4) Set the viewpoint parameters as: [0, 450, 0] to position; [0, 0, -15] to focal point; [0, 0, -1] to camera up direction
+        5) Visualization image resolution is 1024x1024. White background. Shade turned off. Volume rendering ray casting sample distance is 0.1
+        6) Save the visualization image as a png file "argon-bubble/results/{agent_mode}/argon-bubble.png"
+        7) (Option 1) Save the paraview state as "argon-bubble/results/{agent_mode}/argon-bubble.pvsm" if you are using ParaView as the visualization tool
+        8) (Option 2) Save the cxx code script as "argon-bubble/results/{agent_mode}/argon-bubble.cxx" if you are using VTK as the visualization tool
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Does the visualization image clearly show the regions of cool, warm, and mild regions?
+
+          2. Does the blueish region show areas with low opacity?
+
+          3. Does the reddish region show areas with high opacity?
+
+
+# 14. Richtmyer-Meshkov Instability Simulation
+# Entropy field (timestep 160) of Richtmyer-Meshkov instability simulation
+- vars:
+    question: |
+        Task:
+        Load the Richtmyer dataset from "richtmyer/data/richtmyer_256x256x240_float32.vtk".
+        Generate a visualization image of the Richtmyer dataset, Entropy field (timestep 160) of Richtmyer-Meshkov instability simulation, with the following visualization settings: 
+        1) Create volume rendering
+        2) Set the opacity transfer function as a ramp function from value 0.05 to 1 of the volumetric data, assigning opacity 0 to value less than 0.05 and assigning opacity 1 to value 1.
+        3) Set the color transfer function following the 7 rainbow colors and assign a red color [1.0, 0.0, 0.0] to the highest value, a purple color [0.5, 0.0, 1.0] to the lowest value.
+        4) Visualization image resolution is 1024x1024
+        5) Set the viewpoint parameters as: [420, 420, -550] to position; [128, 128, 150] to focal point; [-1, -1, 1] to camera up direction
+        6) Turn on the shade and set the ambient, diffuse and specular as 1.0
+        7) White background. Volume rendering ray casting sample distance is 0.1
+        8) Save the visualization image as a png file "richtmyer/results/{agent_mode}/richtmyer.png"
+        9) (Option 1) Save the paraview state as "richtmyer/results/{agent_mode}/richtmyer.pvsm" if you are using ParaView as the visualization tool
+        10) (Option 2) Save the cxx code script as "richtmyer/results/{agent_mode}/richtmyer.cxx" if you are using VTK as the visualization tool
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Does the visualization show a clear surface with peaks and valleys?
+
+          2. Are the peaks highlighted with the color yellow?
+
+          3. Are the valleys highlighted with the color blue?
+
+
+# 15. Rayleigh-Taylor Instability (Miranda)
+# A time step of a density field in a simulation of the mixing transition in Rayleigh-Taylor instability
+- vars:
+    question: |
+        Task:
+        Load the Rayleigh-Taylor Instability dataset from "miranda/data/miranda_256x256x256_float32.vtk".
+        Generate a visualization image of the Rayleigh-Taylor Instability dataset, a time step of a density field in a simulation of the mixing transition in Rayleigh-Taylor instability, with the following visualization settings:
+        1) Create volume rendering
+        2) Set the opacity transfer function as a ramp function from value 0 to 1 of the volumetric data, assigning opacity 0 to value 0 and assigning opacity 1 to value 1.
+        3) Set the color transfer function following the 7 rainbow colors and assign a red color [1.0, 0.0, 0.0] to the highest value, a purple color [0.5, 0.0, 1.0] to the lowest value.
+        4) Set the viewpoint parameters as: [650, 650, 650] to position; [128, 128, 128] to focal point; [1, 0, 0] to camera up direction
+        5) Volume rendering ray casting sample distance is 0.1
+        6) White background
+        7) Visualization image resolution is 1024x1024
+        8) Save the visualization image as a png file "miranda/results/{agent_mode}/miranda.png"
+        9) (Option 1) Save the paraview state as "miranda/results/{agent_mode}/miranda.pvsm" if you are using ParaView as the visualization tool
+        10) (Option 2) Save the cxx code script as "miranda/results/{agent_mode}/miranda.cxx" if you are using VTK as the visualization tool
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Does the visualization image clearly show the regions from low to high intensity?
+
+          2. Does the purple region show areas with low opacity?
+
+          3. Does the red region show areas with high opacity?
+
+
+# 16. Rotstrat
+# Temperature field of a direct numerical simulation of rotating stratified turbulence
+- vars:
+    question: |
+        Task:
+        Load the rotstrat dataset from "rotstrat/data/rotstrat_256x256x256_float32.vtk".
+        Generate a visualization image of the Rotstrat dataset, temperature field of a direct numerical simulation of rotating stratified turbulence, with the following visualization settings: 
+        1) Create volume rendering
+        2) Set the opacity transfer function as a step function jumping from 0 to 1 at value 0.12
+        3) Set the color transfer function to assign a warm red color [0.71, 0.02, 0.15] to the highest value, a cool color [0.23, 0.29, 0.75] to the lowest value, and a grey color[0.87, 0.87, 0.87] to the midrange value
+        4) Set the viewpoint parameters as: [800, 128, 128] to position; [0, 128, 128] to focal point; [0, 1, 0] to camera up direction
+        5) Volume rendering ray casting sample distance is 0.1
+        6) White background
+        7) Visualization image resolution is 1024x1024
+        8) Save the visualization image as a png file "rotstrat/results/{agent_mode}/rotstrat.png"
+        9) (Option 1) Save the paraview state as "rotstrat/results/{agent_mode}/rotstrat.pvsm" if you are using ParaView as the visualization tool
+        10) (Option 2) Save the cxx code script as "rotstrat/results/{agent_mode}/rotstrat.cxx" if you are using VTK as the visualization tool
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Does the visualization image clearly show the shape of turbulence compared to ground truth?
+
+          2. Does the blueish region show areas with low opacity?
+
+          3. Does the reddish region show areas with high opacity?
