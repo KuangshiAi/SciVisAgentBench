@@ -181,10 +181,52 @@ class LLMEvaluator:
         # Remove empty categories
         return {k: v for k, v in categories.items() if v}
     
-    def encode_image(self, image_path: str) -> str:
-        """Encode image to base64 string"""
-        with open(image_path, "rb") as image_file:
-            return base64.b64encode(image_file.read()).decode('utf-8')
+    def encode_image(self, image_path: str) -> tuple:
+        """
+        Encode image to base64 string and detect format.
+        Converts unsupported formats to PNG.
+
+        Returns:
+            tuple: (base64_string, mime_type)
+        """
+        import imghdr
+        from PIL import Image
+        import io
+
+        # Detect actual image format (not just extension)
+        img_type = imghdr.what(image_path)
+
+        # Supported formats by OpenAI: png, jpeg, gif, webp
+        supported_formats = {'png', 'jpeg', 'gif', 'webp'}
+
+        if img_type in supported_formats:
+            # Direct encoding for supported formats
+            with open(image_path, "rb") as image_file:
+                encoded = base64.b64encode(image_file.read()).decode('utf-8')
+            mime_type = f"image/{img_type}"
+            return encoded, mime_type
+        else:
+            # Convert to PNG for unsupported formats (e.g., TGA, BMP, etc.)
+            print(f"  Converting {img_type or 'unknown'} format to PNG for: {os.path.basename(image_path)}")
+            img = Image.open(image_path)
+
+            # Convert to RGB if necessary (remove alpha channel)
+            if img.mode in ('RGBA', 'LA', 'P'):
+                # Create white background
+                background = Image.new('RGB', img.size, (255, 255, 255))
+                if img.mode == 'P':
+                    img = img.convert('RGBA')
+                background.paste(img, mask=img.split()[-1] if img.mode in ('RGBA', 'LA') else None)
+                img = background
+            elif img.mode != 'RGB':
+                img = img.convert('RGB')
+
+            # Save to bytes buffer as PNG
+            buffer = io.BytesIO()
+            img.save(buffer, format='PNG')
+            buffer.seek(0)
+            encoded = base64.b64encode(buffer.read()).decode('utf-8')
+            return encoded, "image/png"
     
     def evaluate_visualization(self, ground_truth_images: List[str], result_images: List[str], 
                              evaluation_prompt: str) -> Dict[str, Any]:
@@ -206,23 +248,23 @@ class LLMEvaluator:
         # Add ground truth images
         for i, img_path in enumerate(ground_truth_images):
             if os.path.exists(img_path):
-                encoded_image = self.encode_image(img_path)
+                encoded_image, mime_type = self.encode_image(img_path)
                 image_content.append({
                     "type": "image_url",
                     "image_url": {
-                        "url": f"data:image/png;base64,{encoded_image}",
+                        "url": f"data:{mime_type};base64,{encoded_image}",
                         "detail": "high"
                     }
                 })
-        
+
         # Add result images
         for i, img_path in enumerate(result_images):
             if os.path.exists(img_path):
-                encoded_image = self.encode_image(img_path)
+                encoded_image, mime_type = self.encode_image(img_path)
                 image_content.append({
-                    "type": "image_url", 
+                    "type": "image_url",
                     "image_url": {
-                        "url": f"data:image/png;base64,{encoded_image}",
+                        "url": f"data:{mime_type};base64,{encoded_image}",
                         "detail": "high"
                     }
                 })
@@ -315,11 +357,11 @@ class LLMEvaluator:
         # Add result images
         for i, img_path in enumerate(result_images):
             if os.path.exists(img_path):
-                encoded_image = self.encode_image(img_path)
+                encoded_image, mime_type = self.encode_image(img_path)
                 image_content.append({
-                    "type": "image_url", 
+                    "type": "image_url",
                     "image_url": {
-                        "url": f"data:image/png;base64,{encoded_image}",
+                        "url": f"data:{mime_type};base64,{encoded_image}",
                         "detail": "high"
                     }
                 })

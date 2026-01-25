@@ -1,0 +1,77 @@
+# Test Cases for SciVisAgentBench molecular visualization workflows
+# This test evaluates the ability to complete molecular visualization tasks
+# with detailed requirements and evaluation criteria
+
+# 1. Curved membrane simulation
+# As part of a protocol paper for building membrane using the coarse-grained Martini 3 force field, https://doi.org/10.1016/bs.mie.2024.03.010, a tutorial was developed: https://bbs.llnl.gov/data/building-membranes-data
+# Tutorial 4 is on curved membranes which is used here as an example of bilayer visualization. 
+- vars:
+    question: |
+        1. Please load the Martini coarse-grained simulation file from "curved-membrane/data/curved-membrane." into VMD.
+
+        2. Use VMD to show a zoomed in view of the membrane side coloring the water blue and the lipid phosphate (PO4 beads) red, and take a screenshot.
+
+        3. Analyze the visualization and answer the following questions:
+        Q1: Is there any water that penetrates into the membrane phase? (yes/no)
+        
+        4. Save your work:
+        Save the VMD state as "curved-membrane/results/{agent_mode}/curved-membrane.vmd".
+        Save the screenshot of the visualization as "curved-membrane/results/{agent_mode}/curved-membrane.png".
+        Save the answers to the analysis questions in plain text as "curved-membrane/results/{agent_mode}/answers.txt".
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Does the visualization show a side view of a bilayer rather than a top-down or oblique view?
+          2. Is water present above and below the bilayer, with a mostly empty region in the middle corresponding to the bilayer core?
+    - type: llm-rubric
+      subtype: text
+      value: |
+          1. Q1 correct answer: Yes
+
+# Q1 reason: A few water molecules can be seen a little into the membrane.
+
+
+# 2. RAS-RAF on a plasma membrane
+# The RAS protein is lipid anchored and sits on the inner leaflet of the plasma membrane where it can bind RAF.
+# This is a snapshot of a RAS protein bound to the RBD and CRD domains of RAF on top of an eight-component plasma membrane setup with the coarse-grained Martini 2 force field.
+# This simulation frame is an example from the following study https://doi.org/10.1073/pnas.2113297119 and can be found online at: https://bbs.llnl.gov/data/ras-lipid-dependent-dynamics-data
+- vars:
+    question: |
+        1. Please load the Martini coarse-grained simulation file from "ras-raf-membrane/data/ras-raf-membrane.gro" into VMD. The simulations has a membrane and a RAS-RAF protein complex.
+        
+        2. Use VMD to show a zoomed in side view of the membrane and center on the protein with the protein below the membrane.
+        For the bilayer only show the PO4 lipids beads and ROH cholesterol bead and color them gray. 
+        Also show the protein back bone beads coloring RAS (resid 2 to 187) red and RAF (resid 188 to 329) blue.
+        Take a screenshot of the visualization.
+
+        3. Analyze the visualization and answer the following questions:
+        Q1: Are there any cholesterol head groups in the bilayer center? (yes/no)
+
+        Q2: How many lipids are there within 1.5 nm of the RAF protein?
+          A. 0
+          B. 0-3
+          C. 3-5
+          D. >5
+
+        4. Save your work:
+        Save the VMD state as "ras-raf-membrane/results/{agent_mode}/ras-raf-membrane.vmd".
+        Save the screenshot of the visualization as "ras-raf-membrane/results/{agent_mode}/ras-raf-membrane.png".
+        Save the answers to the analysis questions in plain text as "ras-raf-membrane/results/{agent_mode}/answers.txt".
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Camera Position: Is the image centered on a protein complex composed of clearly distinguishable half red RAS and half blue RAF components?
+          2. Membrane Placement: Is a lipid bilayer clearly visible above the protein?
+          3. Correct Leaflet Ordering: Is the inner leaflet of the bilayer closer to the protein and the outer leaflet positioned farther away?
+    - type: llm-rubric
+      subtype: text
+      value: |
+          1. Q1 correct answer: Yes
+          2. Q2 correct answer: C. 3-5
+
+# Q1 reason: quite some gray dots from cholesterol ROH headgroup bead can be seen in the center of the bilayer, so the answer is YES.
+# Q2 reason: if you run the flowing VMD selection command (name PO4 ROH) and within 15 of (index 3457 to 35009 and resid 188 to 329)
+# You will find 4 lipids head group beads, so the answer is C. 3-5 
+# Note here it’s important to only count each lipid once, e.g. either use a single reference bead per lipid or center of mass, also selecting the protein can be tricky as the lipids and water also if resid’s in the 188 to 329 range so either exclude other molecule or sub select only the protein residues

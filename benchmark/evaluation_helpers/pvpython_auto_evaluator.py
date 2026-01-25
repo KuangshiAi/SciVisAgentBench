@@ -18,8 +18,14 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from sciviz_evaluator import SciVisEvaluator
 from llm_evaluator import LLMEvaluator
-from screenshot_helper import compare_states_screenshots
 from image_metrics_helper import CaseImageMetrics
+
+# Import screenshot_helper only when needed (requires ParaView)
+try:
+    from screenshot_helper import compare_states_screenshots
+    SCREENSHOT_HELPER_AVAILABLE = True
+except ImportError:
+    SCREENSHOT_HELPER_AVAILABLE = False
 
 
 class PVPythonAutoEvaluator(SciVisEvaluator):
@@ -162,6 +168,7 @@ class PVPythonAutoEvaluator(SciVisEvaluator):
                 
                 if not result_screenshots:
                     explanation = f"Result screenshot/video not found in: {result_base_path}"
+                    self.mark_output_generation_failed(explanation)
                     self.evaluation_results["scores"]["visualization_quality"] = {
                         "score": 0,
                         "max_score": max_score,
@@ -201,8 +208,7 @@ class PVPythonAutoEvaluator(SciVisEvaluator):
                     explanation = f"Note: Ground truth screenshots/video not found. Evaluation based on result images only. " + explanation
                 
             else:
-                # Original behavior: generate screenshots from state files
-                # But first check if single-image GT and result exist
+                # Check for pre-existing GT image and result images
                 results_dir = os.path.join(self.case_dir, "results", "pvpython")
                 single_gt_image = os.path.join(self.case_dir, "GS", f"{self.case_name}_gs.png")
                 single_result_image = os.path.join(results_dir, f"{self.case_name}.png")
@@ -220,9 +226,11 @@ class PVPythonAutoEvaluator(SciVisEvaluator):
                 # Initialize has_ground_truth early
                 has_ground_truth = False
 
-                if has_single_gt and (has_single_result or has_multi_results):
-                    # Single-image GT mode detected
-                    print(f"Found single-image GT: {single_gt_image}")
+                if has_single_gt:
+                    # GT image exists - use it regardless of whether result exists
+                    print(f"Found GT image: {single_gt_image}")
+                    has_ground_truth = True
+                    gt_screenshots = [single_gt_image]
 
                     if has_single_result:
                         # Both GT and result are single images
@@ -230,19 +238,19 @@ class PVPythonAutoEvaluator(SciVisEvaluator):
                         result_screenshots = [single_result_image]
                     elif has_multi_results:
                         # GT is single, but result has multi-viewpoints (use them)
+                        print(f"Using multi-image result mode")
                         result_screenshots = multi_result_images
                     else:
-                        # No result images found
-                        explanation = f"Result image not found: {single_result_image}"
+                        # No result images found - report execution failure
+                        explanation = f"Agent failed to generate result image. Expected: {single_result_image}"
+                        print(f"⚠️  {explanation}")
+                        self.mark_output_generation_failed(explanation)
                         self.evaluation_results["scores"]["visualization_quality"] = {
                             "score": 0,
                             "max_score": max_score,
                             "explanation": explanation
                         }
                         return 0
-
-                    has_ground_truth = True
-                    gt_screenshots = [single_gt_image]
 
                     evaluation_prompt = self._create_evaluation_prompt(visualization_goals, goals_count)
                     llm_result = self.llm_evaluator.evaluate_visualization(
@@ -262,7 +270,17 @@ class PVPythonAutoEvaluator(SciVisEvaluator):
                     return 0
 
                 else:
-                    # Generate screenshots from state files (original behavior)
+                    # Generate screenshots from state files (requires ParaView)
+                    if not SCREENSHOT_HELPER_AVAILABLE:
+                        explanation = "ParaView not available. Cannot generate screenshots from state files. Please provide GT image at GS/{case_name}_gs.png"
+                        print(f"⚠️  {explanation}")
+                        self.evaluation_results["scores"]["visualization_quality"] = {
+                            "score": 0,
+                            "max_score": max_score,
+                            "explanation": explanation
+                        }
+                        return 0
+
                     # Check if ground truth state file exists
                     has_ground_truth = os.path.exists(self.gs_state_path)
 
@@ -471,6 +489,7 @@ Be specific about what you observe in the images and how well the results meet t
         
         if not os.path.exists(self.generated_code_path):
             explanation = f"Generated code file not found: {self.generated_code_path}"
+            self.mark_output_generation_failed(explanation)
             self.evaluation_results["scores"]["code_similarity"] = {
                 "score": 0,
                 "max_score": 20,
@@ -510,37 +529,41 @@ Be specific about what you observe in the images and how well the results meet t
     
     def evaluate_output_generation(self) -> int:
         """
-        Evaluate if the required output files were generated
-        
+        Evaluate if the required output files were generated.
+
+        New logic: Start with full score, deduct only if actual evaluations fail
+        to find required files (images, code files, etc.)
+
         Returns:
             int: Score for output generation
         """
         print("Evaluating output generation...")
-        
-        score = 0
-        explanations = []
-        
-        # Check if state file exists (5 points)
-        if os.path.exists(self.result_state_path):
-            score += 5
-            explanations.append("ParaView state file generated successfully")
-        else:
-            explanations.append(f"ParaView state file not found: {self.result_state_path}")
-        
-        # Check if Python code file exists (5 points)
-        if os.path.exists(self.generated_code_path):
-            score += 5
-            explanations.append("Python code file generated successfully")
-        else:
-            explanations.append(f"Python code file not found: {self.generated_code_path}")
-        
+
+        # Start with full score - assume outputs were generated
+        score = 10
+        explanations = ["Output generation assumed successful (will be verified by subsequent evaluations)"]
+
+        # Initialize the score - it will be updated by other evaluation methods if they fail
         self.evaluation_results["scores"]["output_generation"] = {
             "score": score,
             "max_score": 10,
             "explanation": "; ".join(explanations)
         }
-        
+
         return score
+
+    def mark_output_generation_failed(self, reason: str):
+        """
+        Mark output generation as failed when evaluation steps can't find required files.
+
+        Args:
+            reason: Explanation of what file(s) are missing
+        """
+        self.evaluation_results["scores"]["output_generation"] = {
+            "score": 0,
+            "max_score": 10,
+            "explanation": f"Output generation failed: {reason}"
+        }
     
     def evaluate_visualization_setup(self) -> int:
         """

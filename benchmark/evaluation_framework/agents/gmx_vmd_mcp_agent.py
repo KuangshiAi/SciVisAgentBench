@@ -46,21 +46,6 @@ class GmxVmdMcpAgent(BaseAgent):
         self.tiny_agent = None
         self.current_config_path = None
 
-        # Initialize token counter
-        try:
-            import tiktoken
-            self.tokenizer = tiktoken.encoding_for_model("gpt-4o")
-        except Exception:
-            self.tokenizer = None
-
-    def count_tokens(self, text: str) -> int:
-        """Count tokens in text."""
-        if self.tokenizer is None:
-            return len(text.split()) * 2  # Rough approximation
-        try:
-            return len(self.tokenizer.encode(text))
-        except Exception:
-            return len(text.split()) * 2
 
     async def setup(self):
         """Setup the agent."""
@@ -85,24 +70,38 @@ class GmxVmdMcpAgent(BaseAgent):
         working_dir = task_config.get("data_dir", task_config.get("working_dir"))
 
         # Update server configuration with working directory
-        for server in config.get("servers", []):
-            # Check if this is the GMX-VMD MCP server
-            if "gmx_vmd_mcp" in str(server.get("args", [])) or "mcp_server.py" in str(server.get("args", [])):
-                server["cwd"] = str(working_dir)
+        for i, server in enumerate(config.get("servers", [])):
+            # Handle both nested and flat server configurations
+            server_config = server.get("config", server)
 
-                # Update environment variables
-                if "env" not in server:
-                    server["env"] = {}
+            # Check if this is the GMX-VMD MCP server
+            args_str = str(server_config.get("args", []))
+            if "gmx_vmd_mcp" in args_str or "mcp_server.py" in args_str:
+                # For nested config, set cwd in the config section
+                if "config" in server:
+                    server["config"]["cwd"] = str(working_dir)
+                else:
+                    server["cwd"] = str(working_dir)
+
+                # Update environment variables (always in config section)
+                if "config" in server:
+                    if "env" not in server["config"]:
+                        server["config"]["env"] = {}
+                    env = server["config"]["env"]
+                else:
+                    if "env" not in server:
+                        server["env"] = {}
+                    env = server["env"]
 
                 # Set test case name
-                server["env"]["TEST_CASE_NAME"] = case_name
+                env["TEST_CASE_NAME"] = case_name
 
                 # Set workflow base directory if not already set
-                if "WORKFLOW_BASE_DIR" not in server["env"]:
+                if "WORKFLOW_BASE_DIR" not in env:
                     # Create workspace directory for molecular visualization tasks
                     workspace_dir = Path(working_dir) / "workspace"
                     workspace_dir.mkdir(parents=True, exist_ok=True)
-                    server["env"]["WORKFLOW_BASE_DIR"] = str(workspace_dir)
+                    env["WORKFLOW_BASE_DIR"] = str(workspace_dir)
 
         # Save config
         with open(case_config_file, 'w', encoding='utf-8') as f:
@@ -137,6 +136,9 @@ class GmxVmdMcpAgent(BaseAgent):
         """
         start_time = time.time()
 
+        # Timeout in seconds (default: 10 minutes)
+        timeout_seconds = task_config.get("timeout", 600)
+
         try:
             # Create agent from config file
             agent = TinyAgent.from_config_file(self.current_config_path)
@@ -145,29 +147,77 @@ class GmxVmdMcpAgent(BaseAgent):
             assistant_response_parts = []  # Only assistant's text
             full_response_parts = []  # Complete log including tool calls
 
+            # Track actual token usage from API
+            total_input_tokens = 0
+            total_output_tokens = 0
+
             async with agent:
                 await agent.load_tools()
-                print(f"Agent loaded with {len(agent.available_tools)} tools")
 
-                # Run the task
-                print(f"Starting execution...")
+                # Run the task with timeout
+                try:
+                    async def run_with_chunks():
+                        """Wrapper to run agent and collect chunks."""
+                        nonlocal total_input_tokens, total_output_tokens
 
-                async for chunk in agent.run(task_description):
-                    if hasattr(chunk, 'choices') and chunk.choices:
-                        delta = chunk.choices[0].delta
-                        if delta and delta.content:
-                            content = delta.content
-                            assistant_response_parts.append(content)
-                            full_response_parts.append(content)
-                            print(content, end="", flush=True)
-                    elif hasattr(chunk, 'role') and chunk.role == "tool":
-                        # Truncate tool messages if they contain large data
-                        tool_content = chunk.content
-                        if len(tool_content) > 500:
-                            tool_content = tool_content[:500] + "... [truncated]"
-                        tool_message = f"\n[Tool: {chunk.name}] {tool_content}"
-                        full_response_parts.append(tool_message)
-                        print(tool_message)
+                        async for chunk in agent.run(task_description):
+                            # Debug: Check what attributes the chunk has
+                            # print(f"\n[DEBUG] Chunk type: {type(chunk)}, hasattr usage: {hasattr(chunk, 'usage')}")
+                            # if hasattr(chunk, '__dict__'):
+                            #     print(f"[DEBUG] Chunk attrs: {list(chunk.__dict__.keys())}")
+
+                            # Try to extract usage from chunk (if available)
+                            # OpenAI streams include usage in the final chunk when stream_options.include_usage=True
+                            if hasattr(chunk, 'usage') and chunk.usage is not None:
+                                usage = chunk.usage
+                                # Anthropic-style field names
+                                if hasattr(usage, 'input_tokens') and usage.input_tokens:
+                                    total_input_tokens = usage.input_tokens  # Use assignment, not +=, as usage is cumulative
+                                    print(f"\n[TOKEN] Got input_tokens: {total_input_tokens}")
+                                if hasattr(usage, 'output_tokens') and usage.output_tokens:
+                                    total_output_tokens = usage.output_tokens
+                                    print(f"\n[TOKEN] Got output_tokens: {total_output_tokens}")
+                                # OpenAI-style field names
+                                if hasattr(usage, 'prompt_tokens') and usage.prompt_tokens:
+                                    total_input_tokens = usage.prompt_tokens
+                                    print(f"\n[TOKEN] Got prompt_tokens: {total_input_tokens}")
+                                if hasattr(usage, 'completion_tokens') and usage.completion_tokens:
+                                    total_output_tokens = usage.completion_tokens
+                                    print(f"\n[TOKEN] Got completion_tokens: {total_output_tokens}")
+
+                            if hasattr(chunk, 'choices') and chunk.choices:
+                                delta = chunk.choices[0].delta
+                                if delta and delta.content:
+                                    content = delta.content
+                                    assistant_response_parts.append(content)
+                                    full_response_parts.append(content)
+                                    print(content, end="", flush=True)
+                            elif hasattr(chunk, 'role') and chunk.role == "tool":
+                                # Truncate tool messages if they contain large data
+                                tool_content = chunk.content
+                                if len(tool_content) > 500:
+                                    tool_content = tool_content[:500] + "... [truncated]"
+                                tool_message = f"\n[Tool: {chunk.name}] {tool_content}"
+                                full_response_parts.append(tool_message)
+                                print(tool_message)
+
+                    # Execute with timeout
+                    import asyncio
+                    await asyncio.wait_for(run_with_chunks(), timeout=timeout_seconds)
+
+                except asyncio.TimeoutError:
+                    duration = time.time() - start_time
+                    error_msg = f"Task execution timed out after {timeout_seconds} seconds"
+                    print(f"\n❌ {error_msg}")
+                    return AgentResult(
+                        success=False,
+                        error=error_msg,
+                        metadata={
+                            "duration": duration,
+                            "timeout": True,
+                            "partial_response": "".join(full_response_parts) if full_response_parts else None
+                        }
+                    )
 
             # For evaluation, use only the assistant's text (without tool logs)
             assistant_response = "".join(assistant_response_parts)
@@ -175,9 +225,20 @@ class GmxVmdMcpAgent(BaseAgent):
 
             duration = time.time() - start_time
 
-            # Count tokens
-            input_tokens = self.count_tokens(task_description)
-            output_tokens = self.count_tokens(full_response)
+            # Use actual API token usage if available, otherwise estimate
+            if total_input_tokens > 0 or total_output_tokens > 0:
+                # Use actual API-reported usage
+                input_tokens = total_input_tokens
+                output_tokens = total_output_tokens
+                token_source = "api_reported"
+            else:
+                # Fallback to comprehensive estimation
+                input_tokens, output_tokens = self.estimate_comprehensive_tokens(
+                    agent, task_description, full_response
+                )
+                token_source = "estimated"
+                print(f"\n⚠️  Warning: Token usage is estimated (includes system prompt, tools, history). "
+                      f"Actual usage may vary by ±20%.")
 
             # Get output file paths
             dirs = self.get_result_directories(task_config["case_dir"], task_config["case_name"])
@@ -188,10 +249,11 @@ class GmxVmdMcpAgent(BaseAgent):
                 metadata={
                     "duration": duration,
                     "assistant_response": assistant_response,  # For evaluation
-                    "token_usage": {
+                    # Token usage is handled by unified_runner, not stored in metadata
+                    "_token_info": {
                         "input_tokens": input_tokens,
                         "output_tokens": output_tokens,
-                        "total_tokens": input_tokens + output_tokens
+                        "source": token_source  # Track whether tokens are from API or estimated
                     }
                 }
             )

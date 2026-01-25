@@ -47,22 +47,6 @@ class ParaViewMCPAgent(BaseAgent):
         self.tiny_agent = None
         self.current_config_path = None
 
-        # Initialize token counter
-        try:
-            import tiktoken
-            self.tokenizer = tiktoken.encoding_for_model("gpt-4o")
-        except Exception:
-            self.tokenizer = None
-
-    def count_tokens(self, text: str) -> int:
-        """Count tokens in text."""
-        if self.tokenizer is None:
-            return len(text.split())
-        try:
-            return len(self.tokenizer.encode(text))
-        except Exception:
-            return len(text.split())
-
     async def setup(self):
         """Setup the agent (called once before running any tasks)."""
         print(f"Setting up ParaView MCP agent with model: {self.config.get('model', 'unknown')}")
@@ -160,6 +144,10 @@ class ParaViewMCPAgent(BaseAgent):
 
             response_parts = []
 
+            # Track actual token usage from API
+            total_input_tokens = 0
+            total_output_tokens = 0
+
             async with agent:
                 await agent.load_tools()
                 print(f"Agent loaded with {len(agent.available_tools)} tools")
@@ -173,6 +161,21 @@ class ParaViewMCPAgent(BaseAgent):
                 print(f"Task preview: {task_description[:200]}...")
 
                 async for chunk in agent.run(task_description):
+                    # Try to extract usage from chunk (if available)
+                    # OpenAI streams include usage in the final chunk when stream_options.include_usage=True
+                    if hasattr(chunk, 'usage') and chunk.usage is not None:
+                        usage = chunk.usage
+                        # Anthropic-style field names
+                        if hasattr(usage, 'input_tokens') and usage.input_tokens:
+                            total_input_tokens = usage.input_tokens  # Use assignment, not +=, as usage is cumulative
+                        if hasattr(usage, 'output_tokens') and usage.output_tokens:
+                            total_output_tokens = usage.output_tokens
+                        # OpenAI-style field names
+                        if hasattr(usage, 'prompt_tokens') and usage.prompt_tokens:
+                            total_input_tokens = usage.prompt_tokens
+                        if hasattr(usage, 'completion_tokens') and usage.completion_tokens:
+                            total_output_tokens = usage.completion_tokens
+
                     if hasattr(chunk, 'choices') and chunk.choices:
                         delta = chunk.choices[0].delta
                         if delta and delta.content:
@@ -197,9 +200,18 @@ class ParaViewMCPAgent(BaseAgent):
             dirs = self.get_result_directories(task_config["case_dir"], task_config["case_name"])
             state_file = dirs["results_dir"] / f"{task_config['case_name']}.pvsm"
 
-            # Count tokens
-            input_tokens = self.count_tokens(task_description)
-            output_tokens = self.count_tokens(full_response)
+            # Use actual API token usage if available, otherwise estimate
+            if total_input_tokens > 0 or total_output_tokens > 0:
+                # Use actual API-reported usage
+                input_tokens = total_input_tokens
+                output_tokens = total_output_tokens
+                token_source = "api_reported"
+            else:
+                # Fallback to comprehensive estimation
+                input_tokens, output_tokens = self.estimate_comprehensive_tokens(
+                    agent, task_description, full_response
+                )
+                token_source = "estimated"
 
             return AgentResult(
                 success=True,
@@ -207,10 +219,11 @@ class ParaViewMCPAgent(BaseAgent):
                 output_files={"state": str(state_file)},
                 metadata={
                     "duration": duration,
-                    "token_usage": {
+                    # Token usage is handled by unified_runner, not stored in metadata
+                    "_token_info": {
                         "input_tokens": input_tokens,
                         "output_tokens": output_tokens,
-                        "total_tokens": input_tokens + output_tokens
+                        "source": token_source
                     }
                 }
             )

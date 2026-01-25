@@ -237,16 +237,26 @@ class MCPClient:
         else:
             raise ValueError(f"Unsupported server type: {type}")
 
-        session = await self.exit_stack.enter_async_context(
-            ClientSession(
-                read_stream=read,
-                write_stream=write,
-                client_info=mcp_types.Implementation(
-                    name="huggingface_hub.MCPClient",
-                    version=get_hf_hub_version(),
-                ),
+        # Try to create session with client_info, fall back without it if not supported
+        try:
+            session = await self.exit_stack.enter_async_context(
+                ClientSession(
+                    read_stream=read,
+                    write_stream=write,
+                    client_info=mcp_types.Implementation(
+                        name="huggingface_hub.MCPClient",
+                        version=get_hf_hub_version(),
+                    ),
+                )
             )
-        )
+        except TypeError:
+            # Older MCP versions don't support client_info parameter
+            session = await self.exit_stack.enter_async_context(
+                ClientSession(
+                    read_stream=read,
+                    write_stream=write,
+                )
+            )
 
         logger.debug("Initializing session...")
         await session.initialize()
@@ -334,12 +344,14 @@ class MCPClient:
             tools = raw_tools
         
         # Create the streaming request
+        # Request usage statistics in streaming mode (supported by Anthropic, OpenAI, etc.)
         response = await self.client.chat.completions.create(
             model=self.payload_model,
             messages=messages,
             tools=tools,
             tool_choice="auto",
             stream=True,
+            stream_options={"include_usage": True},  # Request usage stats in stream
         )
 
         message: Dict[str, Any] = {"role": "unknown", "content": ""}
@@ -350,34 +362,34 @@ class MCPClient:
         async for chunk in response:
             num_of_chunks += 1
             delta = chunk.choices[0].delta if chunk.choices and len(chunk.choices) > 0 else None
-            if not delta:
-                continue
 
-            # Process message
-            if delta.role:
-                message["role"] = delta.role
-            if delta.content:
-                message["content"] += delta.content
+            # Process delta if present
+            if delta:
+                # Process message
+                if delta.role:
+                    message["role"] = delta.role
+                if delta.content:
+                    message["content"] += delta.content
 
-            # Process tool calls
-            if delta.tool_calls:
-                for tool_call in delta.tool_calls:
-                    # Aggregate chunks into tool calls
-                    if tool_call.index not in final_tool_calls:
-                        if (
-                            tool_call.function.arguments is None or tool_call.function.arguments == "{}"
-                        ):  # Corner case (depends on provider)
-                            tool_call.function.arguments = ""
-                        final_tool_calls[tool_call.index] = tool_call
+                # Process tool calls
+                if delta.tool_calls:
+                    for tool_call in delta.tool_calls:
+                        # Aggregate chunks into tool calls
+                        if tool_call.index not in final_tool_calls:
+                            if (
+                                tool_call.function.arguments is None or tool_call.function.arguments == "{}"
+                            ):  # Corner case (depends on provider)
+                                tool_call.function.arguments = ""
+                            final_tool_calls[tool_call.index] = tool_call
 
-                    elif tool_call.function.arguments:
-                        final_tool_calls[tool_call.index].function.arguments += tool_call.function.arguments
+                        elif tool_call.function.arguments:
+                            final_tool_calls[tool_call.index].function.arguments += tool_call.function.arguments
 
-            # Optionally exit early if no tools in first chunks
-            if exit_if_first_chunk_no_tool and num_of_chunks <= 2 and len(final_tool_calls) == 0:
-                return
+                # Optionally exit early if no tools in first chunks
+                if exit_if_first_chunk_no_tool and num_of_chunks <= 2 and len(final_tool_calls) == 0:
+                    return
 
-            # Yield each chunk to caller
+            # Yield each chunk to caller (including final chunk with usage but no delta)
             yield chunk
 
         # Add the assistant message with tool calls (if any) to messages

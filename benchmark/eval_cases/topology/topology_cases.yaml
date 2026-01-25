@@ -1,0 +1,32 @@
+# Test Cases for SciVisAgentBench Topology Tasks
+# This test evaluates the ability to complete specific visualization tasks
+# with detailed requirements and evaluation criteria
+
+# 1. QMCPack
+# Quantum Monte Carlo simulation of an unspecified field for an unspecified molecule. The data was taken from the 145th orbital.
+# The data was accessed from the SDR bench (note: please cite https://sdrbench.github.io/)
+# The data is released under the University of Illinois open source license.
+- vars:
+    question: |
+        1. Please load the dataset from "QMCPack/data/QMCPack.vti".
+
+        2. Compute the critical points of the scalar field.
+
+        3. Save the critical points as "QMCPack/results/{agent_mode}/QMCPack.vtk" in legacy VTK format.
+          - The output should contain the critical points as point data
+          - Include a point data array named "CriticalType" (integer) indicating the type of each critical point:
+            * 0 for minima
+            * 1 for 1-saddles
+            * 2 for 2-saddles  
+            * 3 for maxima
+            * 4 for degenerate critical points
+          - The point coordinates should be in index space (grid coordinates), not world coordinates
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Brown Pot Visualization: Does the result show the pot portion in brown color?
+
+          2. Silver Branch Visualization: Does the result show the branch/trunk portion in silver color?
+
+          3. Golden Leaves Visualization: Does the result show the leaves portion in golden color?

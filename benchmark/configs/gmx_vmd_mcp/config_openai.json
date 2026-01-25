@@ -1,6 +1,6 @@
 {
   "provider": "openai",
-  "model": "gpt-4o",
+  "model": "gpt-5.2",
   "base_url": "https://api.openai.com/v1",
   "price": {
     "input_per_1m_tokens": "$2.50",

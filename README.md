@@ -267,6 +267,7 @@ Check `benchmark/configs/gmx_vmd_mcp` and setup both MCP server and API provider
 
 ### 3. Run evaluation of GMX-VMD-MCP on the `molecular_vis` benchmark
 
+Test on basic actions:
 ```shell
 conda activate gmx_vmd_mcp
 python -m benchmark.evaluation_framework.run_evaluation \
@@ -274,6 +275,17 @@ python -m benchmark.evaluation_framework.run_evaluation \
     --config benchmark/configs/gmx_vmd_mcp/config_anthropic.json \
     --yaml benchmark/eval_cases/molecular_vis/actions/basic_actions.yaml \
     --cases SciVisAgentBench-tasks/molecular_vis/data \
+    --eval-model gpt-5.2
+```
+
+Or test on the visualization workflows:
+```shell
+conda activate gmx_vmd_mcp
+python -m benchmark.evaluation_framework.run_evaluation \
+    --agent gmx_vmd_mcp \
+    --config benchmark/configs/gmx_vmd_mcp/config_openai.json \
+    --yaml benchmark/eval_cases/molecular_vis/workflows/eval_analysis_workflows.yaml \
+    --cases SciVisAgentBench-tasks/molecular_vis/workflows \
     --eval-model gpt-5.2
 ```
 

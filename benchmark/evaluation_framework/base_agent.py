@@ -95,6 +95,130 @@ class BaseAgent(ABC):
         self.agent_name = config.get("agent_name", self.__class__.__name__)
         self.eval_mode = config.get("eval_mode", "generic")  # e.g., "mcp", "pvpython", "generic"
 
+        # Initialize tokenizer for token counting
+        self._tokenizer = None
+        try:
+            import tiktoken
+            # Use cl100k_base which works for both GPT-4 and is a reasonable approximation for other models
+            self._tokenizer = tiktoken.get_encoding("cl100k_base")
+        except Exception:
+            pass
+
+    def count_tokens(self, text: str) -> int:
+        """
+        Count tokens in text using tiktoken or fallback approximation.
+
+        Args:
+            text: Text to count tokens for
+
+        Returns:
+            int: Estimated token count
+        """
+        if self._tokenizer is None:
+            # Fallback: rough approximation (1 token ≈ 0.75 words)
+            return int(len(text.split()) * 1.33)
+        try:
+            return len(self._tokenizer.encode(text))
+        except Exception:
+            return int(len(text.split()) * 1.33)
+
+    def estimate_comprehensive_tokens(self, agent, task_description: str, full_response: str,
+                                     num_tools: int = 0) -> tuple:
+        """
+        Estimate comprehensive token usage including all overhead.
+
+        This method accounts for:
+        - System prompts
+        - Tool schemas
+        - Conversation history
+        - Response text
+        - Tool call overhead
+
+        Args:
+            agent: The agent object (e.g., TinyAgent) with messages and tools
+            task_description: User's task description
+            full_response: Complete response text
+            num_tools: Number of tools available (if agent doesn't expose this)
+
+        Returns:
+            tuple: (input_tokens, output_tokens)
+        """
+        # === INPUT TOKENS ===
+
+        # 1. System prompt
+        system_prompt_tokens = 0
+        if hasattr(agent, 'prompt') and agent.prompt:
+            system_prompt_tokens = self.count_tokens(agent.prompt)
+        elif hasattr(agent, 'system_prompt') and agent.system_prompt:
+            system_prompt_tokens = self.count_tokens(agent.system_prompt)
+
+        # 2. Tool definitions
+        tool_schema_tokens = 0
+        if hasattr(agent, 'available_tools') and agent.available_tools:
+            num_tools = len(agent.available_tools)
+        if num_tools > 0:
+            # Each tool schema: ~100-200 tokens (name, description, parameters)
+            tool_schema_tokens = num_tools * 150
+
+        # 3. Task description
+        task_tokens = self.count_tokens(task_description)
+
+        # 4. Conversation history
+        history_tokens = 0
+        if hasattr(agent, 'messages') and agent.messages:
+            for msg in agent.messages:
+                # Count message content
+                content = msg.get('content', '')
+                if isinstance(content, str):
+                    history_tokens += self.count_tokens(content)
+                elif isinstance(content, list):
+                    # Handle multi-modal content
+                    for item in content:
+                        if isinstance(item, dict) and item.get('type') == 'text':
+                            history_tokens += self.count_tokens(item.get('text', ''))
+
+                # Count tool calls in history (part of input context on subsequent turns)
+                if msg.get('tool_calls'):
+                    for tc in msg.get('tool_calls', []):
+                        if isinstance(tc, dict):
+                            # Function name + arguments
+                            history_tokens += 20  # Base overhead
+                            if tc.get('function', {}).get('arguments'):
+                                args_str = tc['function']['arguments']
+                                if isinstance(args_str, str):
+                                    history_tokens += self.count_tokens(args_str)
+                                else:
+                                    history_tokens += self.count_tokens(json.dumps(args_str))
+
+        # 5. API formatting overhead (approximately 10% for JSON structure, role labels, etc.)
+        total_input = int((system_prompt_tokens + tool_schema_tokens + task_tokens + history_tokens) * 1.1)
+
+        # === OUTPUT TOKENS ===
+
+        # 1. Response text
+        response_tokens = self.count_tokens(full_response)
+
+        # 2. Tool calls overhead
+        tool_call_tokens = 0
+        if hasattr(agent, 'messages') and agent.messages:
+            for msg in agent.messages:
+                if msg.get('role') == 'assistant' and msg.get('tool_calls'):
+                    for tc in msg.get('tool_calls', []):
+                        if isinstance(tc, dict):
+                            # JSON structure + function name + arguments
+                            tool_call_tokens += 30  # Base overhead
+                            if tc.get('function', {}).get('arguments'):
+                                args_str = tc['function']['arguments']
+                                if isinstance(args_str, str):
+                                    tool_call_tokens += self.count_tokens(args_str)
+                                else:
+                                    tool_call_tokens += self.count_tokens(json.dumps(args_str))
+
+        # 3. Formatting overhead (15% for JSON structure, stop sequences, etc.)
+        total_output = int((response_tokens + tool_call_tokens) * 1.15)
+
+        return total_input, total_output
+
     @abstractmethod
     async def run_task(self, task_description: str, task_config: Dict[str, Any]) -> AgentResult:
         """

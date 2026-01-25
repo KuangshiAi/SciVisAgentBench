@@ -13,7 +13,13 @@ from datetime import datetime
 from abc import ABC, abstractmethod
 from typing import Dict, Any, List
 from difflib import SequenceMatcher
-from paraview.simple import *
+
+# Make ParaView import optional (only needed when generating screenshots from state files)
+try:
+    from paraview.simple import *
+    PARAVIEW_AVAILABLE = True
+except ImportError:
+    PARAVIEW_AVAILABLE = False
 
 # Optional imports for code comparison (will handle ImportError gracefully)
 try:

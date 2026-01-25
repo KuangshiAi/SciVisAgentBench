@@ -264,7 +264,7 @@ class UnifiedTestRunner:
         # Check if this is molecular_vis or bioimage_data benchmark
         # For these benchmarks, use simple case numbering
         cases_path_str = str(self.cases_dir)
-        if 'molecular_vis' in cases_path_str or 'bioimage_data' in cases_path_str:
+        if ('molecular_vis' in cases_path_str and 'workflows' not in cases_path_str) or 'bioimage_data' in cases_path_str:
             return f"case_{index + 1}"
 
         task_description = case_data.get('vars', {}).get('question', '')
@@ -305,9 +305,6 @@ class UnifiedTestRunner:
         task_description = test_case.get_task_description(self.agent.eval_mode)
         task_config = test_case.get_task_config(self.agent.eval_mode)
 
-        # Count input tokens
-        input_tokens = self.count_tokens(task_description)
-
         result = {
             "case_name": test_case.case_name,
             "status": "running",
@@ -318,9 +315,9 @@ class UnifiedTestRunner:
             "response": "",
             "error": None,
             "token_usage": {
-                "input_tokens": input_tokens,
+                "input_tokens": 0,  # Will be updated after task runs
                 "output_tokens": 0,
-                "total_tokens": input_tokens
+                "total_tokens": 0
             }
         }
 
@@ -334,8 +331,18 @@ class UnifiedTestRunner:
 
             agent_result: AgentResult = await self.agent.run_task(task_description, task_config)
 
-            # Count output tokens
-            output_tokens = self.count_tokens(agent_result.response)
+            # Get token usage from agent's _token_info if available (from API or comprehensive estimation)
+            # Otherwise fall back to simple counting
+            if "_token_info" in agent_result.metadata:
+                token_info = agent_result.metadata["_token_info"]
+                input_tokens = token_info.get("input_tokens", 0)
+                output_tokens = token_info.get("output_tokens", 0)
+                token_source = token_info.get("source", "unknown")
+            else:
+                # Fallback: simple token counting (legacy behavior)
+                input_tokens = self.count_tokens(task_description)
+                output_tokens = self.count_tokens(agent_result.response)
+                token_source = "simple_estimate"
 
             # Update result
             result.update({

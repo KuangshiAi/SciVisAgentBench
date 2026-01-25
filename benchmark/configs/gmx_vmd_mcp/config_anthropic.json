@@ -1,6 +1,6 @@
 {
   "provider": "anthropic",
-  "model": "claude-sonnet-4-5-20250929",
+  "model": "claude-sonnet-4-5",
   "base_url": "https://api.anthropic.com",
   "price": {
     "input_per_1m_tokens": "$3.00",

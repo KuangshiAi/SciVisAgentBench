@@ -46,22 +46,6 @@ class NapariMCPAgent(BaseAgent):
         self.tiny_agent = None
         self.current_config_path = None
 
-        # Initialize token counter
-        try:
-            import tiktoken
-            self.tokenizer = tiktoken.encoding_for_model("gpt-4o")
-        except Exception:
-            self.tokenizer = None
-
-    def count_tokens(self, text: str) -> int:
-        """Count tokens in text."""
-        if self.tokenizer is None:
-            return len(text.split()) * 2  # Rough approximation
-        try:
-            return len(self.tokenizer.encode(text))
-        except Exception:
-            return len(text.split()) * 2
-
     async def setup(self):
         """Setup the agent."""
         print(f"Setting up Napari MCP agent with model: {self.config.get('model', 'unknown')}")
@@ -134,6 +118,10 @@ class NapariMCPAgent(BaseAgent):
             assistant_response_parts = []  # Only assistant's text
             full_response_parts = []  # Complete log including tool calls
 
+            # Track actual token usage from API
+            total_input_tokens = 0
+            total_output_tokens = 0
+
             async with agent:
                 await agent.load_tools()
                 print(f"Agent loaded with {len(agent.available_tools)} tools")
@@ -142,6 +130,21 @@ class NapariMCPAgent(BaseAgent):
                 print(f"Starting execution...")
 
                 async for chunk in agent.run(task_description):
+                    # Try to extract usage from chunk (if available)
+                    # OpenAI streams include usage in the final chunk when stream_options.include_usage=True
+                    if hasattr(chunk, 'usage') and chunk.usage is not None:
+                        usage = chunk.usage
+                        # Anthropic-style field names
+                        if hasattr(usage, 'input_tokens') and usage.input_tokens:
+                            total_input_tokens = usage.input_tokens  # Use assignment, not +=, as usage is cumulative
+                        if hasattr(usage, 'output_tokens') and usage.output_tokens:
+                            total_output_tokens = usage.output_tokens
+                        # OpenAI-style field names
+                        if hasattr(usage, 'prompt_tokens') and usage.prompt_tokens:
+                            total_input_tokens = usage.prompt_tokens
+                        if hasattr(usage, 'completion_tokens') and usage.completion_tokens:
+                            total_output_tokens = usage.completion_tokens
+
                     if hasattr(chunk, 'choices') and chunk.choices:
                         delta = chunk.choices[0].delta
                         if delta and delta.content:
@@ -160,9 +163,18 @@ class NapariMCPAgent(BaseAgent):
 
             duration = time.time() - start_time
 
-            # Count tokens
-            input_tokens = self.count_tokens(task_description)
-            output_tokens = self.count_tokens(full_response)
+            # Use actual API token usage if available, otherwise estimate
+            if total_input_tokens > 0 or total_output_tokens > 0:
+                # Use actual API-reported usage
+                input_tokens = total_input_tokens
+                output_tokens = total_output_tokens
+                token_source = "api_reported"
+            else:
+                # Fallback to comprehensive estimation
+                input_tokens, output_tokens = self.estimate_comprehensive_tokens(
+                    agent, task_description, full_response
+                )
+                token_source = "estimated"
 
             # Get output file paths
             dirs = self.get_result_directories(task_config["case_dir"], task_config["case_name"])
@@ -173,10 +185,11 @@ class NapariMCPAgent(BaseAgent):
                 metadata={
                     "duration": duration,
                     "assistant_response": assistant_response,  # For evaluation
-                    "token_usage": {
+                    # Token usage is handled by unified_runner, not stored in metadata
+                    "_token_info": {
                         "input_tokens": input_tokens,
                         "output_tokens": output_tokens,
-                        "total_tokens": input_tokens + output_tokens
+                        "source": token_source
                     }
                 }
             )
