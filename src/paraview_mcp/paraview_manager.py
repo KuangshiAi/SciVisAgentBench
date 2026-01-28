@@ -325,6 +325,62 @@ class ParaViewManager:
             self.logger.error(error_msg)
             return False, error_msg
 
+    def execute_python_code(self, code: str):
+        """
+        Execute arbitrary Python code in the ParaView Python environment.
+        This allows access to any ParaView API not covered by existing functions.
+
+        IMPORTANT: This function provides full access to the ParaView Python API.
+        The code is executed with access to:
+        - All paraview.simple functions (already imported with 'from paraview.simple import *')
+        - The ParaViewManager instance as 'pv_manager'
+        - Standard Python libraries
+
+        Args:
+            code (str): Python code to execute
+
+        Returns:
+            Tuple of (bool, str, Any): (success, message, result)
+                - success: True if execution succeeded
+                - message: Status message or error description
+                - result: Return value from the code execution (if any)
+        """
+        try:
+            # Create execution context with access to paraview.simple and this manager
+            exec_globals = {
+                '__builtins__': __builtins__,
+                'pv_manager': self,
+                'logger': self.logger,
+            }
+
+            # Import all paraview.simple functions into the execution context
+            from paraview import simple
+            for name in dir(simple):
+                if not name.startswith('_'):
+                    exec_globals[name] = getattr(simple, name)
+
+            # Execute the code
+            exec_locals = {}
+            exec(code, exec_globals, exec_locals)
+
+            # Get the result if there's a 'result' variable defined
+            result = exec_locals.get('result', None)
+
+            # If code defines a return message, use it
+            if 'message' in exec_locals:
+                message = exec_locals['message']
+            else:
+                message = "Code executed successfully"
+
+            self.logger.info(f"Successfully executed Python code: {code[:100]}...")
+            return True, message, result
+
+        except Exception as e:
+            import traceback
+            error_msg = f"Error executing Python code: {str(e)}\n{traceback.format_exc()}"
+            self.logger.error(error_msg)
+            return False, error_msg, None
+
     def set_background_color(self, red=0.32, green=0.34, blue=0.43):
         """
         Set the background color of the active view.
@@ -1398,7 +1454,7 @@ class ParaViewManager:
     def get_screenshot(self):
         """
         Capture a screenshot from the current view.
-        
+
         Returns:
             tuple: (success, message, img_path)
         """
@@ -1408,7 +1464,7 @@ class ParaViewManager:
             processServerEvents()
             from paraview import servermanager
             from paraview.simple import SetActiveView, RenderAllViews, SaveScreenshot, ResetCamera
-            
+
             # Get the active render view from the GUI connection
             pxm = servermanager.ProxyManager()
             gui_view = None
@@ -1417,26 +1473,86 @@ class ParaViewManager:
                 if view_proxy.GetXMLName() == "RenderView":
                     gui_view = view_proxy
                     break
-            
+
             if not gui_view:
                 print("No existing GUI render view found. Make sure the ParaView GUI is connected.")
                 import sys
                 sys.exit(1)
-            
+
             # Set the found GUI view active
             SetActiveView(gui_view)
             RenderAllViews()
-            
+
             import tempfile
             with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
                 temp_path = tmp.name
-            
+
             SaveScreenshot(temp_path, gui_view)
-            # SaveScreenshot(temp_path, gui_view, ImageResolution=[1920, 1080])            
+            # SaveScreenshot(temp_path, gui_view, ImageResolution=[1920, 1080])
             return True, "Screenshot captured", temp_path
         except Exception as e:
             self.logger.error(f"Error getting screenshot: {str(e)}")
             return False, f"Error getting screenshot: {str(e)}", None
+
+    def save_screenshot(self, file_path, image_resolution=None):
+        """
+        Save a screenshot from the current view to a specified file path.
+
+        Args:
+            file_path (str): Full path where the screenshot will be saved (including filename and extension)
+            image_resolution (list, optional): [width, height] for the screenshot resolution.
+                                              If None, uses the current view size.
+
+        Returns:
+            tuple: (success, message, saved_path)
+        """
+        try:
+            import os
+            from pathlib import Path
+            from paraview.collaboration import processServerEvents
+            processServerEvents()
+            from paraview import servermanager
+            from paraview.simple import SetActiveView, RenderAllViews, SaveScreenshot
+
+            # Ensure parent directory exists
+            path = Path(file_path)
+            path.parent.mkdir(parents=True, exist_ok=True)
+
+            # Get the active render view from the GUI connection
+            pxm = servermanager.ProxyManager()
+            gui_view = None
+            views = pxm.GetProxiesInGroup("views")
+            for (group, name), view_proxy in views.items():
+                if view_proxy.GetXMLName() == "RenderView":
+                    gui_view = view_proxy
+                    break
+
+            if not gui_view:
+                return False, "No existing GUI render view found. Make sure the ParaView GUI is connected.", None
+
+            # Set the found GUI view active
+            SetActiveView(gui_view)
+            RenderAllViews()
+
+            # Save screenshot with optional resolution
+            if image_resolution:
+                SaveScreenshot(str(path), gui_view, ImageResolution=image_resolution)
+            else:
+                SaveScreenshot(str(path), gui_view)
+
+            # Verify the file was created
+            if os.path.exists(file_path):
+                file_size = os.path.getsize(file_path)
+                message = f"Screenshot saved successfully to {file_path} ({file_size} bytes)"
+                self.logger.info(message)
+                return True, message, str(path)
+            else:
+                return False, f"Failed to save screenshot to {file_path}", None
+
+        except Exception as e:
+            error_msg = f"Error saving screenshot: {str(e)}"
+            self.logger.error(error_msg)
+            return False, error_msg, None
     
 
     def rotate_camera(self, azimuth=30.0, elevation=0.0):

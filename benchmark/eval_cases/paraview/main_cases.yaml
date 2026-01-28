@@ -419,6 +419,7 @@
         8) Save the visualization image as a png file "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.png"
         9) (Option 1) Save the paraview state as "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.pvsm" if you are using ParaView as the visualization tool
         10) (Option 2) Save the cxx code script as "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.cxx" if you are using VTK as the visualization tool
+        You should only choose one of Option 1 or Option 2 to save your work. Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
@@ -447,6 +448,7 @@
         6) Save the visualization image as a png file "argon-bubble/results/{agent_mode}/argon-bubble.png"
         7) (Option 1) Save the paraview state as "argon-bubble/results/{agent_mode}/argon-bubble.pvsm" if you are using ParaView as the visualization tool
         8) (Option 2) Save the cxx code script as "argon-bubble/results/{agent_mode}/argon-bubble.cxx" if you are using VTK as the visualization tool
+        You should only choose one of Option 1 or Option 2 to save your work. Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
@@ -475,6 +477,7 @@
         8) Save the visualization image as a png file "richtmyer/results/{agent_mode}/richtmyer.png"
         9) (Option 1) Save the paraview state as "richtmyer/results/{agent_mode}/richtmyer.pvsm" if you are using ParaView as the visualization tool
         10) (Option 2) Save the cxx code script as "richtmyer/results/{agent_mode}/richtmyer.cxx" if you are using VTK as the visualization tool
+        You should only choose one of Option 1 or Option 2 to save your work. Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
@@ -503,6 +506,7 @@
         8) Save the visualization image as a png file "miranda/results/{agent_mode}/miranda.png"
         9) (Option 1) Save the paraview state as "miranda/results/{agent_mode}/miranda.pvsm" if you are using ParaView as the visualization tool
         10) (Option 2) Save the cxx code script as "miranda/results/{agent_mode}/miranda.cxx" if you are using VTK as the visualization tool
+        You should only choose one of Option 1 or Option 2 to save your work. Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
@@ -531,6 +535,7 @@
         8) Save the visualization image as a png file "rotstrat/results/{agent_mode}/rotstrat.png"
         9) (Option 1) Save the paraview state as "rotstrat/results/{agent_mode}/rotstrat.pvsm" if you are using ParaView as the visualization tool
         10) (Option 2) Save the cxx code script as "rotstrat/results/{agent_mode}/rotstrat.cxx" if you are using VTK as the visualization tool
+        You should only choose one of Option 1 or Option 2 to save your work. Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision

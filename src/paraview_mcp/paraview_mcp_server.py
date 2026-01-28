@@ -838,10 +838,81 @@ def create_delaunay3d(alpha: float = 0.0, offset: float = 2.0, tolerance: float 
         return message
 
 @mcp.tool()
+def save_screenshot(file_path: str, image_resolution: list[int] = None) -> str:
+    """
+    Save a screenshot from the current view to a specified file path.
+
+    Args:
+        file_path: Path where the screenshot will be saved (e.g., "/path/to/screenshot.png")
+        image_resolution: Optional [width, height] for the screenshot resolution.
+                         If not provided, uses the current view's resolution.
+
+    Returns:
+        Status message indicating success or failure with the saved file path
+    """
+    # Convert list to tuple if provided
+    resolution = tuple(image_resolution) if image_resolution else None
+    success, message, saved_path = pv_manager.save_screenshot(file_path, resolution)
+
+    if success:
+        return f"{message}"
+    else:
+        return f"Error: {message}"
+
+@mcp.tool()
+def execute_python_code(code: str) -> str:
+    """
+    Execute arbitrary Python code in the ParaView Python environment.
+    This provides direct access to any ParaView API not covered by other tools.
+
+    IMPORTANT USAGE NOTES:
+    - The code has access to all paraview.simple functions (GetActiveSource, Show, Hide, etc.)
+    - Use 'pv_manager' to access the ParaViewManager instance and its attributes
+    - Use 'logger' for logging messages
+    - Set a 'result' variable if you want to return a value
+    - Set a 'message' variable to customize the success message
+
+    Example code snippets:
+
+    1. Get data bounds:
+       source = GetActiveSource()
+       bounds = source.GetDataInformation().GetBounds()
+       result = bounds
+       message = f"Data bounds: {bounds}"
+
+    2. Apply custom filter properties:
+       source = GetActiveSource()
+       source.SomeProperty = [1.0, 2.0, 3.0]
+       UpdatePipeline()
+       message = "Property updated successfully"
+
+    3. Access original source:
+       orig = pv_manager.original_source
+       if orig:
+           result = orig.GetDataInformation().GetNumberOfPoints()
+           message = f"Original source has {result} points"
+
+    Args:
+        code: Python code to execute
+
+    Returns:
+        Status message with execution result
+    """
+    success, message, result = pv_manager.execute_python_code(code)
+
+    if success:
+        if result is not None:
+            return f"{message}\nResult: {result}"
+        else:
+            return message
+    else:
+        return f"Execution failed: {message}"
+
+@mcp.tool()
 def list_commands() -> str:
     """
     List all available commands in this ParaView MCP server.
-    
+
     Returns:
         List of available commands
     """
@@ -876,12 +947,14 @@ def list_commands() -> str:
         "compute_surface_area: Compute the surface area of the active surface",
         "save_contour_as_stl: Save the active surface as STL",
         "get_screenshot: Capture a screenshot and display it in chat",
+        "save_screenshot: Save a screenshot to a specified file path",
         "rotate_camera: Rotate the camera view",
         "reset_camera: Reset the camera to show all data",
         "plot_over_line: Create a plot over line filter",
         "warp_by_vector: Warp the active source by a vector field",
         "save_paraview_state: Save the current ParaView state to a file",
         "save_txt_file: Save text content to a file",
+        "execute_python_code: Execute arbitrary Python code to access any ParaView API, do no use it if the functions you want to call is already included above",
     ]
     
     return "Available ParaView commands:\n\n" + "\n".join(commands)
