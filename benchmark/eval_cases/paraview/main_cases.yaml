@@ -545,3 +545,447 @@
           2. Does the blueish region show areas with low opacity?
 
           3. Does the reddish region show areas with high opacity?
+
+
+# Vector Field Cases
+# 17. MHD Turbulence Velocity Field (t=10) (mhd-turbulence_glyph)
+# Isothermal magnetohydrodynamic (MHD) simulations capturing compressible turbulence phenomena relevant to astrophysical systems. 
+# MHD turbulence is an essential component of the solar wind, galaxy formation, and interstellar medium (ISM) dynamics. 
+# The simulations model fluid dynamics governed by conservation equations for mass, momentum, and magnetic fields, exploring MHD flows across multiple regimes—subsonic and supersonic velocities, as well as sub-Alfvénic and super-Alfvénic magnetic conditions.
+# Three field types are captured: density (scalar), velocity (vector), and magnetic field (vector). Data source: The Well (Polymathic AI).
+- vars:
+    question: |
+        Load the MHD turbulence velocity field dataset from "mhd-turbulence_glyph/data/mhd-turbulence_glyph.vti" (VTI format, 128x128x128 grid).
+        Create a slice at z=64 through the volume. On this slice, place arrow glyphs oriented by the velocity vector field and scaled by velocity magnitude. 
+        Color the arrows using the 'Cool to Warm' colormap mapped to velocity magnitude. 
+        Use a sampling stride of 4 to avoid overcrowding. Set the glyph scale factor to 5.0. 
+        Add a color bar labeled 'Velocity Magnitude'. 
+        Use a dark background (RGB: 0.1, 0.1, 0.15). 
+        Set the camera to a top-down view looking along the negative z-axis. Render at 1024x1024 resolution.
+        Save the paraview state as "mhd-turbulence_glyph/results/{agent_mode}/mhd-turbulence_glyph.pvsm".
+        Save the visualization image as "mhd-turbulence_glyph/results/{agent_mode}/mhd-turbulence_glyph.png".
+        (Optional, if use python script) Save the python script as "mhd-turbulence_glyph/results/{agent_mode}/mhd-turbulence_glyph.py".
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+        1) Arrow glyphs oriented by velocity vector
+        2) Glyphs scaled by velocity magnitude
+        3) Color mapping using Cool to Warm colormap on magnitude
+        4) Color bar present with label 'Velocity Magnitude'
+        5) Dark background color, Top-down camera view, and Output resolution 1024x1024
+
+
+# 18. Rayleigh-Taylor Instability Velocity Field (t=50) (rti-velocity_glyph)
+# Rayleigh-Taylor instability simulations examining how varying spectral characteristics and random phase components influence the development of turbulent mixing. 
+# The simulations investigate three key physical aspects: the impact of coherence on randomized initial conditions, how initial energy spectrum shapes affect resulting flow structures, and the transition from Boussinesq to non-Boussinesq regimes where mixing becomes asymmetric.
+# The dataset captures the self-similar growth of the turbulent mixing zone, enabling validation of the dimensionless mixing parameter and observation of the characteristic energy cascade. 
+# Data source: The Well (Polymathic AI)
+- vars:
+    question: |
+        Load the Rayleigh-Taylor instability velocity field dataset from "rti-velocity_glyph/data/rti-velocity_glyph.vti" (VTI format, 128x128x128 grid). 
+        Create a slice at y=64 through the volume. 
+        Place arrow glyphs on the slice, oriented by the velocity vector. Use uniform arrow size (no magnitude scaling, scale factor 3.0).
+        Color the arrows by velocity magnitude using the 'Viridis (matplotlib)' colormap. Use a sampling stride of 3. 
+        Add a color bar labeled 'Velocity Magnitude'.
+        Use a black background. 
+        Set the camera to view along the negative y-axis. Render at 1024x1024.
+        Save the paraview state as "rti-velocity_glyph/results/{agent_mode}/rti-velocity_glyph.pvsm".
+        Save the visualization image as "rti-velocity_glyph/results/{agent_mode}/rti-velocity_glyph.png".
+        (Optional, if use python script) Save the python script as "rti-velocity_glyph/results/{agent_mode}/rti-velocity_glyph.py".
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+        1) Arrow glyphs oriented by velocity vector
+        2) Uniform arrow size (no magnitude scaling)
+        3) Color by velocity magnitude with Viridis colormap 
+        4) Color bar present labeled 'Velocity Magnitude'
+        5) Black background, Camera along negative y-axis, and Output resolution 1024x1024
+
+
+# 19. MHD Magnetic Field (t=10) (mhd-magfield_glyph)
+# Isothermal magnetohydrodynamic (MHD) simulations capturing compressible turbulence phenomena relevant to astrophysical systems.
+# MHD turbulence is an essential component of the solar wind, galaxy formation, and interstellar medium (ISM) dynamics. 
+# The simulations model fluid dynamics governed by conservation equations for mass, momentum, and magnetic fields, exploring MHD flows across multiple regimes—subsonic and supersonic velocities, as well as sub-Alfvénic and super-Alfvénic magnetic conditions. 
+# Three field types are captured: density (scalar), velocity (vector), and magnetic field (vector). 
+# Data source: The Well (Polymathic AI)
+- vars:
+    question: |
+        Load the MHD magnetic field dataset from "mhd-magfield_glyph/data/mhd-magfield_glyph.vti" (VTI format, 128x128x128 grid with components bx, by, bz). 
+        Create a slice at x=64 through the volume. 
+        Place arrow glyphs oriented by the magnetic field vector and scaled by field magnitude (scale factor 5.0). 
+        Color the arrows using the 'Plasma (matplotlib)' colormap mapped to magnitude. Use stride of 4. 
+        Add a color bar labeled 'Magnetic Field Magnitude'. 
+        Use a dark navy background (RGB: 0.0, 0.0, 0.15). Set camera to view along the negative x-axis. Render at 1024x1024.
+        Save the paraview state as "mhd-magfield_glyph/results/{agent_mode}/mhd-magfield_glyph.pvsm".
+        Save the visualization image as "mhd-magfield_glyph/results/{agent_mode}/mhd-magfield_glyph.png".
+        (Optional, if use python script) Save the python script as "mhd-magfield_glyph/results/{agent_mode}/mhd-magfield_glyph.py".
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+        1) Arrow glyphs oriented by magnetic field vector
+        2) Glyphs scaled by field magnitude
+        3) Plasma colormap applied to magnitude
+        4) Color bar present labeled 'Magnetic Field Magnitude
+        5) Dark navy background, Camera along negative x-axis, Output resolution 1024x1024
+
+
+# 20. MHD Turbulence Velocity Field (t=30) (mhd-turbulence_streamline)
+# Isothermal magnetohydrodynamic (MHD) simulations capturing compressible turbulence phenomena relevant to astrophysical systems.
+# MHD turbulence is an essential component of the solar wind, galaxy formation, and interstellar medium (ISM) dynamics.
+# The simulations model fluid dynamics governed by conservation equations for mass, momentum, and magnetic fields, exploring MHD flows across multiple regimes—subsonic and supersonic velocities, as well as sub-Alfvénic and super-Alfvénic magnetic conditions.
+# Three field types are captured: density (scalar), velocity (vector), and magnetic field (vector). 
+# Data source: The Well (Polymathic AI)
+- vars:
+    question: |
+        Load the MHD turbulence velocity field dataset "mhd-turbulence_streamline/data/mhd-turbulence_streamline.vti" (VTI format, 128x128x128 grid). 
+        Generate 3D streamlines seeded from a line source along the z-axis at x=64, y=64 (from z=0 to z=127), with 50 seed points. 
+        Color the streamlines by velocity magnitude using the 'Turbo' colormap. Set streamline tube radius to 0.3 using the Tube filter. 
+        Add a color bar labeled 'Velocity Magnitude'. Use a dark background (RGB: 0.05, 0.05, 0.1). Set an isometric camera view. Render at 1024x1024.
+        Save the paraview state as "mhd-turbulence_streamline/results/{agent_mode}/mhd-turbulence_streamline.pvsm".
+        Save the visualization image as "mhd-turbulence_streamline/results/{agent_mode}/mhd-turbulence_streamline.png".
+        (Optional, if use python script) Save the python script as "mhd-turbulence_streamline/results/{agent_mode}/mhd-turbulence_streamline.py".
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+       1) Streamlines generated from line seed along z-axis, with similar pattern compared to groundtruth
+       2) Streamlines rendered as tubes
+       3) Color by velocity magnitude with Turbo colormap
+       4) Color bar labeled 'Velocity Magnitude'
+       5) Dark background, Isometric camera view, Output resolution 1024x1024
+
+
+# 21. Rayleigh-Taylor Instability Velocity Field (t=70) (rti-velocity_streamline)
+# Rayleigh-Taylor instability simulations examining how varying spectral characteristics and random phase components influence the development of turbulent mixing. 
+# The simulations investigate three key physical aspects: the impact of coherence on randomized initial conditions, how initial energy spectrum shapes affect resulting flow structures, and the transition from Boussinesq to non-Boussinesq regimes where mixing becomes asymmetric.
+# The dataset captures the self-similar growth of the turbulent mixing zone, enabling validation of the dimensionless mixing parameter and observation of the characteristic energy cascade. 
+# Data source: The Well (Polymathic AI)
+- vars:
+    question: |
+        Load the Rayleigh-Taylor instability velocity field dataset from "rti-velocity_streamline/data/rti-velocity_streamline.vti" (VTI format, 128x128x128 grid). 
+        Generate streamlines seeded from a plane at y=64 (using a Point Cloud seed with 200 points distributed on the xz-plane at y=64). 
+        Color the streamlines by the vz component using a 'Cool to Warm (Extended)' diverging colormap. Render streamlines as tubes with radius 0.4. 
+        Add a color bar labeled 'Vz Component'. 
+        Dark background (RGB: 0.02, 0.02, 0.05). Use an isometric camera view. Render at 1024x1024.
+        Save the paraview state as "rti-velocity_streamline/results/{agent_mode}/rti-velocity_streamline.pvsm".
+        Save the visualization image as "rti-velocity_streamline/results/{agent_mode}/rti-velocity_streamline.png".
+        (Optional, if use python script) Save the python script as "rti-velocity_streamline/results/{agent_mode}/rti-velocity_streamline.py".
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+        1) Streamlines seeded from y=64 plane region, with similar pattern compared to groundtruth
+        2) Streamlines rendered as tubes
+        3) Color by vz with Cool to Warm diverging colormap
+        4) Color bar labeled 'Vz Component'
+        5) Dark background, Isometric camera view, Output resolution 1024x1024
+
+
+# 22. Turbulent Radiative Layer Velocity Field (tcool=0.10, t=50) (trl-velocity_streamline)
+# Turbulent Radiative Layer simulations of astrophysical mixing processes where cold, dense gas interfaces with hot, dilute gas moving at subsonic velocities. 
+# The cold dense gas on the bottom and hot dilute gas on the top becomes unstable to the Kelvin-Helmholtz instability. 
+# When turbulence causes mixing, intermediate-temperature gas forms and rapidly cools, creating a net mass transfer from the hot phase to the cold phase—a process relevant to interstellar and circumgalactic environments. 
+# Generated using Athena++. Data source: The Well (Polymathic AI)
+- vars:
+    question: |
+        Load the turbulent radiative layer velocity field dataset from "trl-velocity_streamline/data/trl-velocity_streamline.vti" (VTI format, 256x128x128 grid). 
+        Generate streamlines seeded from a line along the x-axis at y=64, z=64 (from x=0 to x=255), with 100 seed points. 
+        Color streamlines by velocity magnitude using the 'Inferno (matplotlib)' colormap. Render as tubes with radius 0.5. 
+        Add a color bar labeled 'Velocity Magnitude'. 
+        Dark background (RGB: 0.0, 0.0, 0.0). Set an isometric camera view. Render at 1024x1024."
+        Save the paraview state as "trl-velocity_streamline/results/{agent_mode}/trl-velocity_streamline.pvsm".
+        Save the visualization image as "trl-velocity_streamline/results/{agent_mode}/trl-velocity_streamline.png".
+        (Optional, if use python script) Save the python script as "trl-velocity_streamline/results/{agent_mode}/trl-velocity_streamline.py".
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+        1) Streamlines seeded along x-axis line, with similar pattern compared to groundtruth
+        2) Streamlines rendered as tubes 
+        3) Color by magnitude with Inferno colormap
+        4) Color bar labeled 'Velocity Magnitude'
+        5) Black background, Isometric camera view, Output resolution 1024x1024
+
+
+# 23. MHD Magnetic Field (t=40) (mhd-magfield_volvis)
+# Isothermal magnetohydrodynamic (MHD) simulations capturing compressible turbulence phenomena relevant to astrophysical systems.
+# MHD turbulence is an essential component of the solar wind, galaxy formation, and interstellar medium (ISM) dynamics. 
+# The simulations model fluid dynamics governed by conservation equations for mass, momentum, and magnetic fields, exploring MHD flows across multiple regimes—subsonic and supersonic velocities, as well as sub-Alfvénic and super-Alfvénic magnetic conditions. 
+# Three field types are captured: density (scalar), velocity (vector), and magnetic field (vector). 
+# Data source: The Well (Polymathic AI)
+- vars:
+    question: |
+        Load the MHD magnetic field dataset from "mhd-magfield_volvis/data/mhd-magfield_volvis.vti" (VTI format, 128x128x128 grid). 
+        Compute the magnetic field magnitude from components (bx, by, bz). Perform volume rendering of the magnitude field. 
+        Use the 'Cool to Warm' colormap with an opacity transfer function that makes low-magnitude regions transparent and high-magnitude regions opaque. 
+        Add a color bar labeled 'B Magnitude'. 
+        Use a dark background (RGB: 0.0, 0.0, 0.05). Set an isometric camera view. Render at 1024x1024.
+        Save the paraview state as "mhd-magfield_volvis/results/{agent_mode}/mhd-magfield_volvis.pvsm".
+        Save the visualization image as "mhd-magfield_volvis/results/{agent_mode}/mhd-magfield_volvis.png".
+        (Optional, if use python script) Save the python script as "mhd-magfield_volvis/results/{agent_mode}/mhd-magfield_volvis.py".
+        Do not save any other files, and always save the visualization image.        
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+        1) Volume rendering representation applied based on magnitude field, generally similar to groundtruth
+        2) Cool to Warm colormap
+        3) Opacity transfer function correctly set: low=transparent, high=opaque
+        4) Color bar labeled 'B Magnitude' 
+        5) Dark background, Isometric camera, Output resolution 1024x1024
+
+
+# 24. Turbulence Gravity Cooling Velocity (temp=1000K, dens=4.45, metal=0.1Z, t=20) (tgc-velocity_volvis)
+# Turbulence-gravity-cooling simulations modeling turbulent fluid with gravity representing the interstellar medium in galaxies. 
+# These simulations capture the formation of dense filaments that seed star formation, with filament frequency and timescales varying based on cooling strength.
+# The dataset encompasses three density regimes with systematically varied initial temperatures and metallicity levels representing different cosmic epochs, 
+# governed by coupled equations for pressure, density, momentum, and internal energy incorporating gravitational forces, viscosity, and radiative heating/cooling. 
+# Data source: The Well (Polymathic AI).
+- vars:
+    question: |
+        Load the turbulence-gravity-cooling velocity field dataset from "tgc-velocity_volvis/data/tgc-velocity_volvis.vti" (VTI format, 64x64x64 grid). 
+        Perform volume rendering of velocity magnitude. Use the 'Viridis (matplotlib)' colormap. 
+        Set opacity transfer function to gradually increase from 0 at minimum to 0.8 at maximum. 
+        Add a color bar labeled 'Velocity Magnitude'. 
+        Dark gray background (RGB: 0.1, 0.1, 0.1). Isometric camera view. Render at 1024x1024.
+        Save the paraview state as "tgc-velocity_volvis/results/{agent_mode}/tgc-velocity_volvis.pvsm".
+        Save the visualization image as "tgc-velocity_volvis/results/{agent_mode}/tgc-velocity_volvis.png".
+        (Optional, if use python script) Save the python script as "tgc-velocity_volvis/results/{agent_mode}/tgc-velocity_volvis.py".
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+        1) Volume rendering applied, generally similar to groundtruth
+        2) Viridis colormap
+        3) Gradual opacity transfer function
+        4) Color bar labeled 'Velocity Magnitude'
+        5) Dark gray background, Isometric camera, Output resolution 1024x1024
+
+
+# 25. Rayleigh-Taylor Instability Velocity Field (t=40) (rti-velocity_divergence)
+# Rayleigh-Taylor instability simulations examining how varying spectral characteristics and random phase components influence the development of turbulent mixing. 
+# The simulations investigate three key physical aspects: the impact of coherence on randomized initial conditions, how initial energy spectrum shapes affect resulting flow structures, and the transition from Boussinesq to non-Boussinesq regimes where mixing becomes asymmetric.
+# The dataset captures the self-similar growth of the turbulent mixing zone, enabling validation of the dimensionless mixing parameter and observation of the characteristic energy cascade. 
+# Data source: The Well (Polymathic AI)
+- vars:
+    question: |
+        Load the Rayleigh-Taylor instability velocity field from "rti-velocity_divergence/data/rti-velocity_divergence.vti" (VTI format, 128x128x128). 
+        Compute the divergence of the velocity field using the Gradient filter with 'Compute Divergence' enabled. 
+        Extract a slice at z=64 and color it by divergence using the 'Cool to Warm' diverging colormap (centered at 0). 
+        Add a color bar labeled 'Velocity Divergence'. 
+        White background. Top-down camera view along negative z-axis. Render at 1024x1024.
+        Save the paraview state as "rti-velocity_divergence/results/{agent_mode}/rti-velocity_divergence.pvsm".
+        Save the visualization image as "rti-velocity_divergence/results/{agent_mode}/rti-velocity_divergence.png".
+        (Optional, if use python script) Save the python script as "rti-velocity_divergence/results/{agent_mode}/rti-velocity_divergence.py".
+        Do not save any other files, and always save the visualization image
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+        1) Divergence computation from velocity field, with similar pattern compared to groundtruth
+        2) Cool to Warm diverging colormap centered at 0
+        3) Color bar labeled 'Velocity Divergence'
+        4) White background, Top-down camera along negative z, Output resolution 1024x1024
+
+
+# 26. Turbulent Radiative Layer Velocity Field (tcool=1.00, t=30) (trl-velocity_isosurface)
+# Turbulent Radiative Layer simulations of astrophysical mixing processes where cold, dense gas interfaces with hot, dilute gas moving at subsonic velocities. 
+# The cold dense gas on the bottom and hot dilute gas on the top becomes unstable to the Kelvin-Helmholtz instability. 
+# When turbulence causes mixing, intermediate-temperature gas forms and rapidly cools, creating a net mass transfer from the hot phase to the cold phase—a process relevant to interstellar and circumgalactic environments. 
+# Generated using Athena++. Data source: The Well (Polymathic AI)
+- vars:
+    question: |
+        Load the turbulent radiative layer velocity field dataset from "trl-velocity_isosurface/data/trl-velocity_isosurface.vti" (VTI format, 256x128x128). 
+        Extract an isosurface of velocity magnitude at the value 0.8. Color the isosurface by the vx component using the 'Cool to Warm' colormap. 
+        Add a color bar labeled 'Vx Component'. 
+        Dark background (RGB: 0.05, 0.05, 0.1). Isometric camera view. Render at 1024x1024.
+        Save the paraview state as "trl-velocity_isosurface/results/{agent_mode}/trl-velocity_isosurface.pvsm".
+        Save the visualization image as "trl-velocity_isosurface/results/{agent_mode}/trl-velocity_isosurface.png".
+        (Optional, if use python script) Save the python script as "trl-velocity_isosurface/results/{agent_mode}/trl-velocity_isosurface.py".
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+        1) Isosurface extraction at magnitude=0.8, with similar pattern compared to groundtruth
+        2) Isosurface colored by vx component
+        3) Cool to Warm colormap
+        4) Color bar labeled 'Vx Component'
+        5) Dark background, Isometric camera, Output resolution 1024x1024
+
+
+# 27. Supernova Explosion Velocity Field (t=30) (supernova-velocity_streamline)
+# Supernova explosion simulations capturing the physical dynamics of a stellar explosion propagating through a dense interstellar medium.
+# The simulations inject thermal energy of 10^51 ergs at the center of a computational domain, generating a blastwave that sweeps through ambient gas and creates supernova feedback structures—an explosion inside a compression of a monatomic ideal gas modeling conditions in the Milky Way Galaxy interstellar medium. 
+# The simulations employ sophisticated physics including radiative cooling and heating. 
+# Data source: The Well (Polymathic AI).
+- vars:
+    question: |
+        Load the supernova explosion velocity field dataset from "supernova-velocity_streamline/data/supernova-velocity_streamline.vti" (VTI format, 128x128x128 grid). 
+        Generate streamlines seeded from a line source along the diagonal from (20,20,20) to (108,108,108) with 80 seed points. 
+        Color streamlines by velocity magnitude using the 'Magma (matplotlib)' colormap. 
+        Render as tubes with radius 0.4. 
+        Add a color bar labeled 'Velocity Magnitude'. 
+        Dark background (RGB: 0.02, 0.0, 0.05). Isometric camera view. Render at 1024x1024.
+        Save the paraview state as "supernova-velocity_streamline/results/{agent_mode}/supernova-velocity_streamline.pvsm".
+        Save the visualization image as "supernova-velocity_streamline/results/{agent_mode}/supernova-velocity_streamline.png".
+        (Optional, if use python script) Save the python script as "supernova-velocity_streamline/results/{agent_mode}/supernova-velocity_streamline.py".
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+        1) Streamlines seeded from diagonal line, with similar pattern compared to groundtruth
+        2) Streamlines as tubes
+        3) Color by magnitude with Magma colormap
+        4) Color bar labeled 'Velocity Magnitude'
+        5) Dark background, Isometric camera, Output resolution 1024x1024
+
+
+# 28. MHD Turbulence Velocity Field (t=50) (mhd-turbulence_vorticity)
+# Isothermal magnetohydrodynamic (MHD) simulations capturing compressible turbulence phenomena relevant to astrophysical systems.
+# MHD turbulence is an essential component of the solar wind, galaxy formation, and interstellar medium (ISM) dynamics.
+# The simulations model fluid dynamics governed by conservation equations for mass, momentum, and magnetic fields, exploring MHD flows across multiple regimes—subsonic and supersonic velocities, as well as sub-Alfvénic and super-Alfvénic magnetic conditions.
+# Three field types are captured: density (scalar), velocity (vector), and magnetic field (vector). 
+# Data source: The Well (Polymathic AI)
+- vars:
+    question: |
+        Load the MHD turbulence velocity field dataset "mhd-turbulence_vorticity/data/mhd-turbulence_vorticity.vti" (VTI format, 128x128x128 grid).
+        Compute the vorticity field (curl of velocity) using the Gradient filter with 'Compute Vorticity' enabled.
+        Then compute vorticity magnitude. Perform volume rendering of vorticity magnitude using the 'Plasma (matplotlib)' colormap. 
+        Set opacity to highlight high-vorticity regions. 
+        Add a color bar labeled 'Vorticity Magnitude'. 
+        Black background. Isometric camera. Render at 1024x1024.
+        Save the paraview state as "mhd-turbulence_vorticity/results/{agent_mode}/mhd-turbulence_vorticity.pvsm".
+        Save the visualization image as "mhd-turbulence_vorticity/results/{agent_mode}/mhd-turbulence_vorticity.png".
+        (Optional, if use python script) Save the python script as "mhd-turbulence_vorticity/results/{agent_mode}/mhd-turbulence_vorticity.py".
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+       1) Vorticity computation (curl of velocity), similar pattern compared to groundtruth
+       2) Volume rendering of vorticity magnitude
+       3) Plasma colormap
+       4) Opacity highlights high-vorticity regions
+       5) Color bar labeled 'Vorticity Magnitude'
+       6) Black background, Isometric camera, Output resolution 1024x1024
+
+
+# 29. Supernova Explosion Velocity Field (t=40) (supernova-velocity_isosurface)
+# Supernova explosion simulations capturing the physical dynamics of a stellar explosion propagating through a dense interstellar medium.
+# The simulations inject thermal energy of 10^51 ergs at the center of a computational domain, generating a blastwave that sweeps through ambient gas and creates supernova feedback structures—an explosion inside a compression of a monatomic ideal gas modeling conditions in the Milky Way Galaxy interstellar medium. 
+# The simulations employ sophisticated physics including radiative cooling and heating. 
+# Data source: The Well (Polymathic AI).
+- vars:
+    question: |
+        Load the supernova explosion velocity field from "supernova-velocity_isosurface/data/supernova-velocity_isosurface.vti" (VTI format, 128x128x128).
+        Extract an isosurface of velocity magnitude at threshold 0.7. Color the isosurface by the vz component using 'Blue to Red Rainbow' colormap. 
+        Add a color bar labeled 'Vz Component'. 
+        Dark background (RGB: 0.0, 0.0, 0.0). Isometric camera view. Render at 1024x1024.
+        Save the paraview state as "supernova-velocity_isosurface/results/{agent_mode}/supernova-velocity_isosurface.pvsm".
+        Save the visualization image as "supernova-velocity_isosurface/results/{agent_mode}/supernova-velocity_isosurface.png".
+        (Optional, if use python script) Save the python script as "supernova-velocity_isosurface/results/{agent_mode}/supernova-velocity_isosurface.py".
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+        1) Isosurface at magnitude=0.7, similar pattern compared to groundtruth
+        2) Colored by vz component
+        3) Blue to Red Rainbow colormap
+        4) Color bar labeled 'Vz Component'
+        5) Black background, Isometric camera, Output resolution 1024x1024
+
+
+# 30. MHD Magnetic Field (t=60) (mhd-magfield_isosurface)
+# Isothermal magnetohydrodynamic (MHD) simulations capturing compressible turbulence phenomena relevant to astrophysical systems.
+# MHD turbulence is an essential component of the solar wind, galaxy formation, and interstellar medium (ISM) dynamics. 
+# The simulations model fluid dynamics governed by conservation equations for mass, momentum, and magnetic fields, exploring MHD flows across multiple regimes—subsonic and supersonic velocities, as well as sub-Alfvénic and super-Alfvénic magnetic conditions. 
+# Three field types are captured: density (scalar), velocity (vector), and magnetic field (vector). 
+# Data source: The Well (Polymathic AI)
+- vars:
+    question: |
+        Load the MHD magnetic field dataset from "mhd-magfield_isosurface/data/mhd-magfield_isosurface.vti" (VTI format, 128x128x128). 
+        Extract an isosurface of magnetic field magnitude at threshold 0.8. Color the isosurface by the bx component using 'Turbo' colormap. 
+        Add a color bar labeled 'Bx Component'. 
+        Dark navy background (RGB: 0.0, 0.0, 0.1). Isometric camera view. Render at 1024x1024.  
+        Save the paraview state as "mhd-magfield_isosurface/results/{agent_mode}/mhd-magfield_isosurface.pvsm".
+        Save the visualization image as "mhd-magfield_isosurface/results/{agent_mode}/mhd-magfield_isosurface.png".
+        (Optional, if use python script) Save the python script as "mhd-magfield_isosurface/results/{agent_mode}/mhd-magfield_isosurface.py".
+        Do not save any other files, and always save the visualization image.    
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+        1) Isosurface at magnitude=0.8, similar pattern compared to groundtruth
+        2) Colored by bx component
+        3) Turbo colormap
+        4) Color bar labeled 'Bx Component'
+        5) Dark navy background, Isometric camera, Output resolution 1024x1024
+
+
+# 31. Turbulence Gravity Cooling Velocity (temp=100K, dens=0.445, metal=Z, t=10) (tgc-velocity_contour)
+# Turbulence-gravity-cooling simulations modeling turbulent fluid with gravity representing the interstellar medium in galaxies. 
+# These simulations capture the formation of dense filaments that seed star formation, with filament frequency and timescales varying based on cooling strength.
+# The dataset encompasses three density regimes with systematically varied initial temperatures and metallicity levels representing different cosmic epochs, 
+# governed by coupled equations for pressure, density, momentum, and internal energy incorporating gravitational forces, viscosity, and radiative heating/cooling. 
+# Data source: The Well (Polymathic AI).
+- vars:
+    question: |
+        Load the turbulence-gravity-cooling velocity field dataset from "tgc-velocity_contour/data/tgc-velocity_contour.vti" (VTI format, 64x64x64). 
+        Extract a slice at z=32 and color it by velocity magnitude using 'Viridis (matplotlib)' colormap. 
+        Also add contour lines of velocity magnitude on the same slice at values [0.3, 0.6, 0.9, 1.2] using the Contour filter on the slice output. 
+        Display contour lines in white. Add a color bar labeled 'Velocity Magnitude'. 
+        Light gray background (RGB: 0.9, 0.9, 0.9). Top-down camera. Render at 1024x1024.
+        Save the paraview state as "tgc-velocity_contour/results/{agent_mode}/tgc-velocity_contour.pvsm".
+        Save the visualization image as "tgc-velocity_contour/results/{agent_mode}/tgc-velocity_contour.png".
+        (Optional, if use python script) Save the python script as "tgc-velocity_contour/results/{agent_mode}/tgc-velocity_contour.py".
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+        1) Slice at z=32 colored by magnitude, similar pattern compared to groundtruth
+        2) Viridis colormap on slice
+        3) Contour lines at specified values, similar pattern compared to groundtruth
+        4) White contour lines
+        5) Color bar labeled 'Velocity Magnitude'
+        6) Light gray background, Top-down camera, Output resolution 1024x1024
+
+
+# 32. Rayleigh-Taylor Instability Velocity Field (t=80) (rti-velocity_slices)
+# Rayleigh-Taylor instability simulations examining how varying spectral characteristics and random phase components influence the development of turbulent mixing. 
+# The simulations investigate three key physical aspects: the impact of coherence on randomized initial conditions, how initial energy spectrum shapes affect resulting flow structures, and the transition from Boussinesq to non-Boussinesq regimes where mixing becomes asymmetric.
+# The dataset captures the self-similar growth of the turbulent mixing zone, enabling validation of the dimensionless mixing parameter and observation of the characteristic energy cascade. 
+# Data source: The Well (Polymathic AI)
+- vars:
+    question: |
+        Load the Rayleigh-Taylor instability velocity field from "rti-velocity_slices/data/rti-velocity_slices.vti" (VTI format, 128x128x128). 
+        Create three orthogonal slices: at x=64 (YZ-plane), y=64 (XZ-plane), and z=64 (XY-plane). 
+        Color all three slices by velocity magnitude using the 'Turbo' colormap. 
+        Add a color bar labeled 'Velocity Magnitude'. 
+        Dark background (RGB: 0.05, 0.05, 0.05). Set an isometric camera view that shows all three slices. Render at 1024x1024.
+        Save the paraview state as "rti-velocity_slices/results/{agent_mode}/rti-velocity_slices.pvsm".
+        Save the visualization image as "rti-velocity_slices/results/{agent_mode}/rti-velocity_slices.png".
+        (Optional, if use python script) Save the python script as "rti-velocity_slices/results/{agent_mode}/rti-velocity_slices.py".
+        Do not save any other files, and always save the visualization image
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+        1) Three orthogonal slices at x=64, y=64, z=64, similar pattern compared to groundtruth
+        2) All slices colored by velocity magnitude
+        3) Turbo colormap
+        4) Color bar labeled 'Velocity Magnitude'
+        5) Dark background, Isometric camera showing all three slices, Output resolution 1024x1024

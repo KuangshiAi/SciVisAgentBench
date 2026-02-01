@@ -9,12 +9,10 @@
 - vars:
     question: |
         1. Please load the dataset from "QMCPack/data/QMCPack.vti".
-
         2. Compute the critical points of the scalar field.
-
         3. Save the critical points as "QMCPack/results/{agent_mode}/QMCPack.vtk" in legacy VTK format.
           - The output should contain the critical points as point data
-          - Include a point data array named "CriticalType" (integer) indicating the type of each critical point:
+          - Include an array called "CriticalType" that labels each point according to what type of critical type it is. Use the following convention:
             * 0 for minima
             * 1 for 1-saddles
             * 2 for 2-saddles  
@@ -22,11 +20,109 @@
             * 4 for degenerate critical points
           - The point coordinates should be in index space (grid coordinates), not world coordinates
   assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          1. Brown Pot Visualization: Does the result show the pot portion in brown color?
+    - type: rule_based
+      eval_script: QMCPack/GS/QMCPack_eval.py
+      eval_function: evaluateQmcpackCriticalPoints
+      gs_file: QMCPack/GS/QMCPack.vtk
 
-          2. Silver Branch Visualization: Does the result show the branch/trunk portion in silver color?
 
-          3. Golden Leaves Visualization: Does the result show the leaves portion in golden color?
+# 2. Brain
+# Symmetric 2D 2x2 tensor field. The (1,1), (1,2) and (2,2) components are given by the arrays A, B, and D respectively (the (2,1) component is equal to the (1,2) component).
+# This is a 2D slice of the diffusion tensor of an MRI scan of a brain. 
+# Specifically, to produce the data, we started by downloading the data from patient 23 from this study: https://www.nature.com/articles/s41597-021-01092-6. 
+# Then, we extracted the diffusion tensor. We discarded the (2,1) entry that was produced, and set values outside of the brain to 0. 
+# We then took the slice where Z=50 (zero indexed) and discarded components of the tensor that use Z to derive a 2x2 tensor.
+- vars:
+    question: |
+        1. Load the file "brain/data/brain.vti". It is a symmetric tensor field, where the (1,1), (1,2) and (2,2) components of the tensor are respectively given by the arrays A, B, and D.
+        2. Compute degenerate points of the tensor field.
+        3. Save the degenerate points as "brain/results/{agent_mode}/brain.vtk" in legacy VTK format. Label the type of degenerate point for each point in an array called DegeneracyType. Use a value of 0 for trisectors and 1 for wedges.
+  assert:
+    - type: rule_based
+      eval_script: brain/GS/brain_eval.py
+      eval_function: evaluateDegeneratePoints
+      gs_file: brain/GS/brain.vtk
+      rs_file: brain/results/{agent_mode}/brain.vtk
+
+
+# 3. Heated Cylinder
+# "The dataset is a flow around a heated cylinder.
+# The data was taken from the computer graphics lab at ETH Zurich: https://cgl.ethz.ch/research/visualization/data.php.
+# We took time step 1000 of the "Heated Cylinder with Bossinesq Approximation" dataset. 
+# We computed the flow magnitude to produce a scalar field.
+- vars:
+    question: |
+        1. Please load the file "cylinder/data/cylinder.vti"
+        2. Apply persistence simplification of 0.01 to the Speed field.
+        3. Compute the Morse-Smale segmentation of the simplified Speed field.
+        4. Save the Morse-Smale segmentation as "cylinder/results/{agent_mode}/cylinder.vti". It should have a point array called Partition. For each point x, the array "Partition" should store the id number of the region in the segmentation that x belongs to.
+  assert:
+    - type: rule_based
+      eval_script: cylinder/GS/cylinder_eval.py
+      eval_function: evaluateMSSEgmentation
+      gs_file: cylinder/GS/cylinder.vti
+      rs_file: cylinder/results/{agent_mode}/cylinder.vti
+
+
+# 4. Hurricane Isabel
+# Wind speed at each point in a 3D region for a single time step for hurricane Isabel.
+# The data was accessed from the SDR Bench (please cite): https://sdrbench.github.io/. 
+# It, in-turn, came from the IEEE SciVis contest 2004: http://vis.computer.org/vis2004contest/data.html.
+# To derive the field, we used the three components of the wind velocity to derive a wind speed scalar field. 
+# We truncated the data from 500x500x100 to 500x500x90 so that the land component would not be present in the field.
+- vars:
+    question: |
+          1. Load the file "isabel/data/isabel.vti".
+          2. Apply persistent simplification to the field "sf" with a persistence threshold of 0.4
+          3. Compute the merge tree of the simplified field.
+          4. Save the nodes of the merge tree as "isabel/results/{agent_mode}/isabel_nodes.vtk" in legacy VTK format. 
+            This file should have two point arrays. One should be called "CriticalType" and should store the type of critical point for each node. 
+            It should follow the following convention: 0: minima. 1: 1-saddles. 2: 2-saddles. 3: maxima. 4: degenerate critical points. 
+            The other point array should be called "Scalar" and should contain the scalar field value at each point in the merge tree.
+          5. Save the edges of the merge tree as "isabel/results/{agent_mode}/isabel_edges.vtk" in legacy VTK format. 
+            The file should store each edge as a separate cell with type vtkLine.
+  assert:
+    - type: rule_based
+      eval_script: isabel/GS/isabel_eval.py
+      eval_function: evaluateMergeTree
+      gs_file: 
+        - isabel/GS/isabel_nodes.vtk
+        - isabel/GS/isabel_edges.vtk
+      rs_file: 
+        - isabel/results/{agent_mode}/isabel_nodes.vtk
+        - isabel/results/{agent_mode}/isabel_edges.vtk
+
+
+# 5. Ocean Flow
+# This is the 2x2 gradient tensor field of a slice of the Indian Ocean. 
+# This tensor field is derived from the  Global Ocean Physics Reanalysis dataset from EU Copernicus Marine. 
+# The gradient was taken numerically. For exact specifics, please see (https://arxiv.org/pdf/2508.09235) page 12 (under appendix A, the Ocean dataset is described).
+- vars:
+    question: |    
+          1. Please load the asymmetric tensor field from "ocean/data/ocean.vti". The (1,1), (1,2), (2,1) and (2,2) entries are respectively given by the arrays A, B, C, and D
+          
+          2. Compute the eigenvector partition of the dataset.
+          
+          3. Save the degenerate points as "ocean/results/{agent_mode}/ocean_points.vtk" in legacy VTK format. 
+          Include a point array called DegeneracyType which classifies each degenerate point. 
+          It should have a value of 0 for trisectors and 1 for wedges.
+          
+          4. Save the partition information from the eigenvector partition as "ocean/results/{agent_mode}/ocean_eigenvector.vti" as VTK image data. 
+          It should give regions identifiers as follows: 0: W_{c,s}. 1: W_{r,s}. 2: W_{r,n}. 3: W_{c,n}
+          
+          5. Compute the eigenvalue partition of the dataset.
+          
+          6. Save the partition information from the eigenvalue partition as "ocean/results/{agent_mode}/ocean_eigenvalue_partition.vti" as VTK image data. 
+          It should give region identifiers as follows: 0: positive scaling. 1: counterclockwise rotation. 2: negative scaling. 3: clockwise rotation. 4: anisotropic stretching.
+  assert:
+    - type: rule_based
+      eval_script: ocean/GS/ocean_eval.py
+      eval_function: evaluate2DAsymmetricTFTopology
+      gs_file: 
+        - ocean/GS/ocean_points.vtk
+        - ocean/GS/ocean_eigenvector.vti
+        - ocean/GS/ocean_eigenvalue.vti
+      rs_file: 
+        - ocean/results/{agent_mode}/ocean_points.vtk
+        - ocean/results/{agent_mode}/ocean_eigenvector.vti
+        - ocean/results/{agent_mode}/ocean_eigenvalue.vti
