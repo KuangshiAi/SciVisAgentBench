@@ -3,6 +3,13 @@
 # Each test focuses on testing one specific function with appropriate parameters
 # We suggest using https://www.ebi.ac.uk/bioimage-archive/galleries/S-BIAD7.html IM1 as dataset_001
 # We suggest using https://uk1s3.embassy.ebi.ac.uk/bia-integrator-data/pages/S-BIAD573.html IM1 as dataset_002
+#
+# Taxonomy Level: Task (small-scale visualization task involving a few operations)
+# Each task is marked with a comment indicating the end of the task and the task name
+
+# ============================================================
+# TASK 1: Napari - Load & Layer Management
+# ============================================================
 
 # Test: open_file - Load a multi-dimensional image file (T, Z, Y, X, C)
 - vars:
@@ -60,6 +67,13 @@
     cache: false
     runSerially: true
 
+# END OF TASK 1: Napari - Load & Layer Management
+# Operations: Load multi-dimensional file, delete layers, load single image file, retrieve layer information
+
+# ============================================================
+# TASK 2: Napari - 3D/4D Navigation
+# ============================================================
+
 # Test: Z-stack Navigation - Scroll through different depths
 - vars:
     question: |
@@ -91,7 +105,14 @@
   options:
     cache: false
     runSerially: true
-    
+
+# END OF TASK 2: Napari - 3D/4D Navigation
+# Operations: Z-stack navigation, time series navigation
+
+# ============================================================
+# TASK 3: Napari - Color & Opacity
+# ============================================================
+
 # Test: set_colormap - Change layer colormap
 - vars:
     question: |
@@ -133,6 +154,13 @@
   options:
     cache: false
     runSerially: true
+
+# END OF TASK 3: Napari - Color & Opacity
+# Operations: Set colormap, adjust opacity, change blending mode
+
+# ============================================================
+# TASK 4: Napari - Contrast Adjustment
+# ============================================================
 
 # Test: auto_contrast - Auto-adjust contrast
 - vars:
@@ -189,6 +217,13 @@
   options:
     cache: false
     runSerially: true
+
+# END OF TASK 4: Napari - Contrast Adjustment
+# Operations: Auto-adjust contrast, set specific contrast limits, adjust gamma correction, change interpolation mode
+
+# ============================================================
+# TASK 5: Napari - Camera Control
+# ============================================================
 
 # Test: toggle_view - Switch between 2D and 3D view
 - vars:
@@ -260,6 +295,13 @@
     cache: false
     runSerially: true
 
+# END OF TASK 5: Napari - Camera Control
+# Operations: Switch 2D/3D view, get dimension info, get camera settings, reset camera, adjust camera zoom
+
+# ============================================================
+# TASK 6: Napari - Visibility & Screenshot
+# ============================================================
+
 # Test: set_layer_visibility - Toggle layer visibility
 - vars:
     question: |
@@ -302,6 +344,13 @@
     cache: false
     runSerially: true
 
+# END OF TASK 6: Napari - Visibility & Screenshot
+# Operations: Hide layer, show layer, take screenshot
+
+# ============================================================
+# TASK 7: Napari - Annotations
+# ============================================================
+
 # # Test: get_layer_statistics - Get layer statistics
 # - vars:
 #     question: |
@@ -343,6 +392,13 @@
   options:
     cache: false
     runSerially: true
+
+# END OF TASK 7: Napari - Annotations
+# Operations: Add shape annotations
+
+# ============================================================
+# TASK 8: Napari - Scale Bar & Export
+# ============================================================
 
 # # Test: measure_distance - Measure distance between points - doesn't work 
 # - vars:
@@ -400,6 +456,13 @@
     cache: false
     runSerially: true
 
+# END OF TASK 8: Napari - Scale Bar & Export
+# Operations: Show scale bar with units, save screenshot to file
+
+# ============================================================
+# TASK 9: Napari - Export & Cleanup
+# ============================================================
+
 # Test: save_layers - Save layer to file
 - vars:
     question: |
@@ -427,6 +490,13 @@
   options:
     cache: false
     runSerially: true
+
+# END OF TASK 9: Napari - Export & Cleanup
+# Operations: Save layer to file, remove layer
+
+# ============================================================
+# TASK 10: Napari - Error Handling
+# ============================================================
 
 # Test: Error handling - Try to load non-existent file
 - vars:
@@ -456,6 +526,13 @@
     cache: false
     runSerially: true
 
+# END OF TASK 10: Napari - Error Handling
+# Operations: Handle non-existent file, handle non-existent layer removal
+
+# ============================================================
+# TASK 11: Napari - 3D Rendering
+# ============================================================
+
 # Test: 3D View and Iso-surface Rendering
 - vars:
     question: |
@@ -484,3 +561,6 @@
   options:
     cache: false
     runSerially: true
+
+# END OF TASK 11: Napari - 3D Rendering
+# Operations: Enable iso-surface rendering in 3D, remove test layers for cleanup

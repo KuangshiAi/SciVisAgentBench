@@ -1,6 +1,13 @@
 # Basic Actions for Molecular Visualization Benchmark
 # These actions test core functionality of molecular visualization tools
-#https://www.rcsb.org/structure/1CRN
+# https://www.rcsb.org/structure/1CRN
+#
+# Taxonomy Level: Task (small-scale visualization task involving a few operations)
+# Each task is marked with a comment indicating the end of the task and the task name
+
+# ============================================================
+# TASK 1: 1CRN - Load & Basic Representations
+# ============================================================
 
 # Loading a CIF file
 - vars:
@@ -47,6 +54,13 @@
     cache: false
     runSerially: true
 
+# END OF TASK 1: 1CRN - Load & Basic Representations
+# Operations: Load CIF file, Van der Waals representation, Licorice representation
+
+# ============================================================
+# TASK 2: 1CRN - Color by Properties
+# ============================================================
+
 # Coloring by element
 - vars:
     question: |
@@ -92,6 +106,13 @@
     cache: false
     runSerially: true
 
+# END OF TASK 2: 1CRN - Color by Properties
+# Operations: Color by element, color by chain, color by residue type
+
+# ============================================================
+# TASK 3: 1CRN - Region Selection
+# ============================================================
+
 # Selecting and coloring specific residues
 - vars:
     question: |
@@ -121,6 +142,13 @@
   options:
     cache: false
     runSerially: true
+
+# END OF TASK 3: 1CRN - Region Selection
+# Operations: Select and color specific residues, select and color specific atoms
+
+# ============================================================
+# TASK 4: 1CRN - Multi-Representation
+# ============================================================
 
 # Multiple representations
 - vars:
@@ -166,6 +194,13 @@
   options:
     cache: false
     runSerially: true
+
+# END OF TASK 4: 1CRN - Multi-Representation
+# Operations: Create multiple representations (cartoon + licorice), adjust material properties (opaque), adjust representation parameters (radius)
+
+# ============================================================
+# TASK 5: 1CRN - Advanced Coloring
+# ============================================================
 
 # Coloring by B-factor (temperature factor)
 - vars:
@@ -227,6 +262,13 @@
     cache: false
     runSerially: true
 
+# END OF TASK 5: 1CRN - Advanced Coloring
+# Operations: Color by B-factor, select and color water molecules, color by charge, color by hydrophobicity
+
+# ============================================================
+# TASK 6: 1CRN - Active Site Selection
+# ============================================================
+
 # Selecting and highlighting active site
 - vars:
     question: |
@@ -272,6 +314,13 @@
     cache: false
     runSerially: true
 
+# END OF TASK 6: 1CRN - Active Site Selection
+# Operations: Distance-based selection (5Å around residue), distinguish protein vs non-protein components, adjust view settings (background color)
+
+# ============================================================
+# TASK 7: 1CRN - Spatial Queries
+# ============================================================
+
 # Selecting specific atom types in a range
 - vars:
     question: |
@@ -301,6 +350,13 @@
   options:
     cache: false
     runSerially: true
+
+# END OF TASK 7: 1CRN - Spatial Queries
+# Operations: Select specific atom types in residue ranges, distance-based atom selection
+
+# ============================================================
+# TASK 8: 1CRN - Visibility Control
+# ============================================================
 
 # Selecting and hiding specific residues
 - vars:
@@ -362,6 +418,13 @@
     cache: false
     runSerially: true
 
+# END OF TASK 8: 1CRN - Visibility Control
+# Operations: Hide specific residues, show only specific element types, show only backbone, show only side chains
+
+# ============================================================
+# TASK 9: 1CRN - Residue Selection
+# ============================================================
+
 # Selecting aromatic residues
 - vars:
     question: |
@@ -392,6 +455,13 @@
     cache: false
     runSerially: true
 
+# END OF TASK 9: 1CRN - Residue Selection
+# Operations: Select aromatic residues, select charged residues with differential coloring
+
+# ============================================================
+# TASK 10: 1CRN - Combined Representations
+# ============================================================
+
 # Multiple selections with different representations
 - vars:
     question: |
@@ -421,6 +491,13 @@
   options:
     cache: false
     runSerially: true
+
+# END OF TASK 10: 1CRN - Combined Representations
+# Operations: Multiple representations with different color schemes (cartoon by chain + VdW by element), multiple representations with structural segmentation (backbone vs side chains)
+
+# ============================================================
+# TASK 11: 1CRN - Distance-based Selection
+# ============================================================
 
 # Selecting and coloring by distance from specific atom
 - vars:
@@ -466,6 +543,13 @@
   options:
     cache: false
     runSerially: true
+
+# END OF TASK 11: 1CRN - Distance-based Selection
+# Operations: Distance from specific atom (CA of residue), combined criteria (element type AND residue range), element-specific coloring (sulfur atoms)
+
+# ============================================================
+# TASK 12: 1CRN - Gradient Coloring
+# ============================================================
 
 # Coloring by residue number
 - vars:
@@ -526,6 +610,13 @@
   options:
     cache: false
     runSerially: true
+
+# END OF TASK 12: 1CRN - Gradient Coloring
+# Operations: Color by residue number (gradient), element selection in residue ranges, element + residue type combination (oxygen in polar residues), distance-based with element filter
+
+# ============================================================
+# TASK 13: 1CRN - Multi-Criteria Selection
+# ============================================================
 
 # Selecting and coloring by atom selection - backbone with sidechain by element
 - vars:
@@ -631,3 +722,6 @@
   options:
     cache: false
     runSerially: true
+
+# END OF TASK 13: 1CRN - Multi-Criteria Selection
+# Operations: Multi-representation with element-specific coloring (backbone cartoon + side chain licorice by element), complex distance and element queries (carbon near nitrogen atoms), Boolean logic selection (OR criteria), complex multi-criteria with distance, CA-only visualization, heteroatom isolation, multiple element type filtering
