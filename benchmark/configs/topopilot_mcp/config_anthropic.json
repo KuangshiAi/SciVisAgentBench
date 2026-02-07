@@ -1,0 +1,22 @@
+{
+  "provider": "anthropic",
+  "model": "claude-sonnet-4-5",
+  "base_url": "https://api.anthropic.com",
+  "price": {
+    "input_per_1m_tokens": "$3.00",
+    "output_per_1m_tokens": "$15.00"
+  },
+  "rate_limits": {
+    "requests_per_minute": 900,
+    "input_tokens_per_minute": 400000,
+    "output_tokens_per_minute": 75000
+  },
+  "servers": [
+    {
+      "type": "http",
+      "config": {
+        "url": "http://127.0.0.1:8000/mcp"
+      }
+    }
+  ]
+}

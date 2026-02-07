@@ -80,3 +80,6 @@ exp_win.sh
 
 benchmark/configs/paraview_mcp/config_openai_mac.json
 benchmark/configs/paraview_mcp/config_anthropic_mac.json
+
+src/TopoPilot2
+src/session

@@ -50,7 +50,8 @@ from evaluation_framework import get_agent, list_agents, UnifiedTestRunner
 from evaluation_framework.agents import (
     ParaViewMCPAgent,
     NapariMCPAgent,
-    ChatVisAgent
+    ChatVisAgent,
+    TopoPilotMCPAgent
 )
 
 

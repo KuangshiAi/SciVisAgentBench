@@ -47,6 +47,8 @@ class YAMLTestCase:
         self.evaluation_subtypes = []  # List of all subtypes
         self.assertions = []  # Store all assertions for assertion-based evaluation
         self.is_assertion_based = False  # Flag to indicate if this is assertion-based
+        self.rule_based_assertions = []  # Store rule_based assertions
+        self.is_rule_based = False  # Flag for rule_based evaluation
 
         # Check if this is assertion-based evaluation
         # (contains-all, not-contains, etc. instead of just llm-rubric)
@@ -64,10 +66,16 @@ class YAMLTestCase:
                     self.rubrics[subtype] = rubric_value
                     if subtype not in self.evaluation_subtypes:
                         self.evaluation_subtypes.append(subtype)
+            elif assert_type == 'rule_based':
+                self.rule_based_assertions.append(assert_item)
 
         # If we have non-LLM assertions, mark as assertion-based
         if has_non_llm_assertions:
             self.is_assertion_based = True
+
+        # If we have rule_based assertions, mark as rule-based
+        if self.rule_based_assertions:
+            self.is_rule_based = True
 
         # Backward compatibility
         self.llm_rubric = self.rubrics.get('vision', '')
@@ -87,8 +95,10 @@ class YAMLTestCase:
         """Check if this is a valid test case."""
         has_task = bool(self.task_description)
 
-        # Valid if it has either rubrics OR assertions
-        if self.is_assertion_based:
+        # Valid if it has either rubrics, assertions, or rule_based assertions
+        if self.is_rule_based:
+            return has_task and bool(self.rule_based_assertions)
+        elif self.is_assertion_based:
             has_assertions = bool(self.assertions)
             return has_task and has_assertions
         else:
@@ -413,8 +423,19 @@ class UnifiedTestRunner:
 
     async def run_evaluation(self, test_case: YAMLTestCase) -> Dict:
         """Run evaluation for a test case."""
+        # Check if this is rule-based evaluation (topology-style eval scripts)
+        if test_case.is_rule_based:
+            from .topology_evaluator import evaluate_rule_based_assertions
+
+            result = evaluate_rule_based_assertions(
+                assertions=test_case.rule_based_assertions,
+                data_dir=str(self.data_dir),
+                agent_mode=self.agent.eval_mode,
+            )
+            return result
+
         # Check if this is assertion-based evaluation
-        if test_case.is_assertion_based:
+        elif test_case.is_assertion_based:
             # Use AssertionEvaluator
             sys.path.insert(0, str(Path(__file__).parent.parent / "evaluation_helpers"))
             from assertion_evaluator import AssertionEvaluator
@@ -506,11 +527,18 @@ class UnifiedTestRunner:
         assertion_passed_cases = 0  # For assertion-based evaluations
 
         for result in results:
-            if "evaluation" in result and result["evaluation"].get("status") == "completed":
+            if "evaluation" in result and result["evaluation"].get("status") in ("completed", "partial_error"):
                 eval_data = result["evaluation"]
 
+                # Check if this is rule-based evaluation (topology eval scripts)
+                if eval_data.get("eval_type") == "rule_based":
+                    score = eval_data.get("score", 0)
+                    max_score = eval_data.get("max_score", 10)
+                    total_eval_score += score
+                    total_eval_max_score += max_score
+                    evaluated_cases += 1
                 # Check if this is assertion-based evaluation
-                if "assertion_results" in eval_data:
+                elif "assertion_results" in eval_data:
                     # Assertion-based: use the top-level score field (1 for pass, 0 for fail)
                     score = eval_data.get("score", 0)
                     total_eval_score += score

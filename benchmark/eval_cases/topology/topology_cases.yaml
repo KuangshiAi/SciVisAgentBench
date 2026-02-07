@@ -2,15 +2,15 @@
 # This test evaluates the ability to complete specific visualization tasks
 # with detailed requirements and evaluation criteria
 
-# 1. QMCPack
+# 1. QMCPACK
 # Quantum Monte Carlo simulation of an unspecified field for an unspecified molecule. The data was taken from the 145th orbital.
 # The data was accessed from the SDR bench (note: please cite https://sdrbench.github.io/)
 # The data is released under the University of Illinois open source license.
 - vars:
     question: |
-        1. Please load the dataset from "QMCPack/data/QMCPack.vti".
+        1. Please load the dataset from "QMCPACK/data/QMCPACK.vti".
         2. Compute the critical points of the scalar field.
-        3. Save the critical points as "QMCPack/results/{agent_mode}/QMCPack.vtk" in legacy VTK format.
+        3. Save the critical points as "QMCPACK/results/{agent_mode}/QMCPACK.vtk" in legacy VTK format.
           - The output should contain the critical points as point data
           - Include an array called "CriticalType" that labels each point according to what type of critical type it is. Use the following convention:
             * 0 for minima
@@ -21,9 +21,10 @@
           - The point coordinates should be in index space (grid coordinates), not world coordinates
   assert:
     - type: rule_based
-      eval_script: QMCPack/GS/QMCPack_eval.py
+      eval_script: QMCPACK/GS/QMCPACK_eval.py
       eval_function: evaluateQmcpackCriticalPoints
-      gs_file: QMCPack/GS/QMCPack.vtk
+      gs_file: QMCPACK/GS/QMCPACK_gs.vtk
+      rs_file: QMCPACK/results/{agent_mode}/QMCPACK.vtk
 
 
 # 2. Brain
@@ -41,7 +42,7 @@
     - type: rule_based
       eval_script: brain/GS/brain_eval.py
       eval_function: evaluateDegeneratePoints
-      gs_file: brain/GS/brain.vtk
+      gs_file: brain/GS/brain_gs.vtk
       rs_file: brain/results/{agent_mode}/brain.vtk
 
 
@@ -60,7 +61,7 @@
     - type: rule_based
       eval_script: cylinder/GS/cylinder_eval.py
       eval_function: evaluateMSSEgmentation
-      gs_file: cylinder/GS/cylinder.vti
+      gs_file: cylinder/GS/cylinder_gs.vti
       rs_file: cylinder/results/{agent_mode}/cylinder.vti
 
 
@@ -73,7 +74,7 @@
 - vars:
     question: |
           1. Load the file "isabel/data/isabel.vti".
-          2. Apply persistent simplification to the field "sf" with a persistence threshold of 0.4
+          2. Apply persistent simplification to the field "sf" with a persistence threshold of 0.04
           3. Compute the merge tree of the simplified field.
           4. Save the nodes of the merge tree as "isabel/results/{agent_mode}/isabel_nodes.vtk" in legacy VTK format. 
             This file should have two point arrays. One should be called "CriticalType" and should store the type of critical point for each node. 
@@ -84,10 +85,10 @@
   assert:
     - type: rule_based
       eval_script: isabel/GS/isabel_eval.py
-      eval_function: evaluateMergeTree
+      eval_function: evaluateMergetree
       gs_file: 
-        - isabel/GS/isabel_nodes.vtk
-        - isabel/GS/isabel_edges.vtk
+        - isabel/GS/isabel_nodes_gs.vtk
+        - isabel/GS/isabel_edges_gs.vtk
       rs_file: 
         - isabel/results/{agent_mode}/isabel_nodes.vtk
         - isabel/results/{agent_mode}/isabel_edges.vtk
@@ -108,20 +109,21 @@
           It should have a value of 0 for trisectors and 1 for wedges.
           
           4. Save the partition information from the eigenvector partition as "ocean/results/{agent_mode}/ocean_eigenvector.vti" as VTK image data. 
-          It should give regions identifiers as follows: 0: W_{c,s}. 1: W_{r,s}. 2: W_{r,n}. 3: W_{c,n}
+          It should have a point array called Partition that stores the region identifiers as follows: 0: W_{c,s}. 1: W_{r,s}. 2: W_{r,n}. 3: W_{c,n}
           
           5. Compute the eigenvalue partition of the dataset.
           
-          6. Save the partition information from the eigenvalue partition as "ocean/results/{agent_mode}/ocean_eigenvalue_partition.vti" as VTK image data. 
-          It should give region identifiers as follows: 0: positive scaling. 1: counterclockwise rotation. 2: negative scaling. 3: clockwise rotation. 4: anisotropic stretching.
+          6. Save the partition information from the eigenvalue partition as "ocean/results/{agent_mode}/ocean_eigenvalue.vti" as VTK image data. 
+          It should have a point array called Partition that stores the region identifiers as follows: 0: positive scaling. 1: counterclockwise rotation.
+          2: negative scaling. 3: clockwise rotation. 4: anisotropic stretching.
   assert:
     - type: rule_based
       eval_script: ocean/GS/ocean_eval.py
       eval_function: evaluate2DAsymmetricTFTopology
       gs_file: 
-        - ocean/GS/ocean_points.vtk
-        - ocean/GS/ocean_eigenvector.vti
-        - ocean/GS/ocean_eigenvalue.vti
+        - ocean/GS/ocean_points_gs.vtk
+        - ocean/GS/ocean_eigenvector_gs.vti
+        - ocean/GS/ocean_eigenvalue_gs.vti
       rs_file: 
         - ocean/results/{agent_mode}/ocean_points.vtk
         - ocean/results/{agent_mode}/ocean_eigenvector.vti

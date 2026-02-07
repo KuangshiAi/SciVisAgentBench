@@ -130,6 +130,18 @@ For macOS users, the VMD path is typically:
 /Applications/VMD.app/Contents/MacOS/startup.command
 ```
 
+### To install TTK, TopoPilot2 (not open-sourced yet), and SciVisAgentBench requirements:
+```shell
+conda create -n topology -c conda-forge topologytoolkit
+conda activate topology
+
+# First install SciVisAgentBench requirements
+pip install -r requirements.txt
+
+# Then, install TopoPilot2
+pip install -e src/TopoPilot2
+```
+
 ## MCP Logger and Tiny Agent
 
 - `mcp_logger.py` - Enhanced MCP communication logger with structured JSON logging and automatic screenshot capture
@@ -289,6 +301,38 @@ python -m benchmark.evaluation_framework.run_evaluation \
     --eval-model gpt-5.2
 ```
 
+## Run TopoPilot2 (not open-sourced yet) Evaluation
+
+### 1. Start TopoPilot server and client
+
+In a new terminal:
+```shell
+conda activate topology
+TopoPilot
+```
+
+You will see the following if it runs successfully:
+```text
+App running at:
+ - Local:   http://localhost:8080/
+ - Network: http://127.0.0.1:8080/
+```
+
+### 2. Setup agent configs
+
+Check `benchmark/configs/topopilot_mcp` and setup both MCP server and API provider info.
+
+### 3. Run evaluation of TopoPilot2 on the `topology` benchmark
+
+```shell
+conda activate topology
+python -m benchmark.evaluation_framework.run_evaluation \
+    --agent topopilot_mcp \
+    --config benchmark/configs/topopilot_mcp/config_openai.json \
+    --yaml benchmark/eval_cases/topology/topology_cases.yaml \
+    --cases SciVisAgentBench-tasks/topology
+```
+
 ## Anonymize Datasets
 
 We provide a tool to help anonymize volume datasets so that we can test whether the LLM agent (for ParaView) is able to load the dataset and tell what the object is. Store the volume datasets at `SciVisAgentBench-tasks/sci_volume_data`, then anonymize both the yaml file and the datasets with:
@@ -303,7 +347,7 @@ cd ..
 python -m benchmark.evaluation_framework.run_evaluation \
     --agent paraview_mcp \
     --config benchmark/configs/paraview_mcp/config_openai.json \
-    --yamlbenchmark/eval_cases/paraview/what_obj_cases_anonymized.yaml \
+    --yaml benchmark/eval_cases/paraview/what_obj_cases_anonymized.yaml \
     --cases SciVisAgentBench-tasks/anonymized_datasets \
     --eval-model gpt-5.2
 ```
@@ -396,20 +440,26 @@ To set up integration with claude desktop, add the following to claude_desktop_c
         "MCP_DEBUG": "1",
         "PYTHONUNBUFFERED": "1"
       }
-      }
+      },
+      "topopilot": {
+      "type": "http",
+      "url": "http://127.0.0.1:8000/mcp"
+    }
     }
 ```
 
 ## Acknowledgement
 
-SciVisAgentBench was mainly created by Kuangshi Ai (kai@nd.edu), Shusen Liu (liu42@llnl.gov), and Haichao Miao (miao1@llnl.gov). Some of the test cases are provided by Kaiyuan Tang (ktang2@nd.edu). We sincerely thank the open-source community for their invaluable contributions. This project is made possible thanks to the following outstanding projects:
+SciVisAgentBench was by Kuangshi Ai (kai@nd.edu), Shusen Liu (liu42@llnl.gov), Haichao Miao (miao1@llnl.gov), 
+Thomas Peterka (tpeterka@mcs.anl.gov), Kaiyuan Tang (ktang2@nd.edu), Nathaniel Gorski (nathangorski12@gmail.com), Jianxin Sun (sunjianxin66@gmail.com), Helgi I. Ingolfsson (ingolfsson1@llnl.gov), and Guoxi Liu (liu.12722@osu.edu). We sincerely thank the open-source community for their invaluable contributions. This project is made possible thanks to the following outstanding projects:
 
 - [ParaView-MCP](https://github.com/LLNL/paraview_mcp)
 - [Bioimage-agent](https://github.com/LLNL/bioimage-agent)
 - [ChatVis](https://github.com/tpeterka/ChatVis)
 - [GMX-VMD-MCP](https://github.com/egtai/gmx-vmd-mcp)
+- TopoPilot2 (To be released soon)
 
 ## License
 
-© 2025 University of Notre Dame.  
+© 2026 University of Notre Dame.  
 Released under the [License](./LICENSE).

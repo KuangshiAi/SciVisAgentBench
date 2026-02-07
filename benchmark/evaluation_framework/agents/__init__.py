@@ -10,10 +10,12 @@ from .paraview_mcp_agent import ParaViewMCPAgent
 from .napari_mcp_agent import NapariMCPAgent
 from .chatvis_agent import ChatVisAgent
 from .gmx_vmd_mcp_agent import GmxVmdMcpAgent
+from .topopilot_mcp_agent import TopoPilotMCPAgent
 
 __all__ = [
     'ParaViewMCPAgent',
     'NapariMCPAgent',
     'ChatVisAgent',
     'GmxVmdMcpAgent',
+    'TopoPilotMCPAgent',
 ]

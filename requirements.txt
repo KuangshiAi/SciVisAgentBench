@@ -18,3 +18,6 @@ opencv-python
 # Human evaluation UI dependencies
 flask>=2.3.0
 pyyaml>=6.0
+# Topology Eval
+gudhi
+POT
