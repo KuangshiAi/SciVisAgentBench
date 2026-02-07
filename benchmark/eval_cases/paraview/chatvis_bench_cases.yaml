@@ -19,6 +19,13 @@
 
           4. Legend and Readability: Is there a clear legend identifying each variable line with readable labels and proper visual organization?
 
+    - type: code-similarity
+      subtype: code
+      gs_file:
+        - line-plot/GS/line-plot_gs.py
+      rs_file:
+        - line-plot/results/{agent_mode}/line-plot.py
+
 # 2. ml-dvr
 - vars:
     question: |
@@ -37,6 +44,13 @@
           3. Isometric View Setup: Is the visualization displayed from an isometric viewpoint that provides a clear three-dimensional perspective of the volume?
 
           4. Visual Clarity and Detail: Are the volume details clearly visible with proper lighting and shading that enhances depth perception?
+
+    - type: code-similarity
+      subtype: code
+      gs_file:
+        - ml-dvr/GS/ml-dvr_gs.py
+      rs_file:
+        - ml-dvr/results/{agent_mode}/ml-dvr.py
 
 # 3. ml-iso
 - vars:
@@ -57,6 +71,13 @@
 
           4. Visual Presentation: Is the isosurface clearly visible with good contrast and coloring that enhances the understanding of the data structure?
 
+    - type: code-similarity
+      subtype: code
+      gs_file:
+        - ml-iso/GS/ml-iso_gs.py
+      rs_file:
+        - ml-iso/results/{agent_mode}/ml-iso.py
+
 # 4. ml-slice-iso
 - vars:
     question: |
@@ -76,6 +97,13 @@
 
           4. View Direction: Is the visualization displayed from the correct +x direction view that provides clear visibility of the slice and contours?
 
+    - type: code-similarity
+      subtype: code
+      gs_file:
+        - ml-slice-iso/GS/ml-slice-iso_gs.py
+      rs_file:
+        - ml-slice-iso/results/{agent_mode}/ml-slice-iso.py
+
 # 5. points-surf-clip
 - vars:
     question: |
@@ -94,6 +122,13 @@
           3. Wireframe Representation: Is the result displayed as a clear wireframe showing the triangulated mesh structure with visible edges?
 
           4. Geometric Integrity: Does the clipped wireframe maintain proper connectivity and show the expected geometric features without artifacts?
+
+    - type: code-similarity
+      subtype: code
+      gs_file:
+        - points-surf-clip/GS/points-surf-clip_gs.py
+      rs_file:
+        - points-surf-clip/results/{agent_mode}/points-surf-clip.py
 
 # 6. shrink-sphere
 - vars:
@@ -115,6 +150,13 @@
 
           4. Visual Quality: Does the visualization clearly show the contrast between the wireframe structure and the shrunken elements with appropriate white background?
 
+    - type: code-similarity
+      subtype: code
+      gs_file:
+        - shrink-sphere/GS/shrink-sphere_gs.py
+      rs_file:
+        - shrink-sphere/results/{agent_mode}/shrink-sphere.py
+
 # 7. stream-glyph
 - vars:
     question: |
@@ -134,6 +176,13 @@
           3. Temperature Color Mapping: Are both streamlines and glyphs correctly colored by the Temp variable with appropriate color scaling?
 
           4. View Configuration: Is the visualization displayed from the correct +x view direction providing clear visibility of the flow patterns and structures?
+
+    - type: code-similarity
+      subtype: code
+      gs_file:
+        - stream-glyph/GS/stream-glyph_gs.py
+      rs_file:
+        - stream-glyph/results/{agent_mode}/stream-glyph.py
 
 # 8. time-varying
 - vars:
@@ -158,6 +207,13 @@
 
           4. View Direction and Layout: Is the +y direction view properly set and are both views arranged side-by-side in the correct layout configuration?
 
+    - type: code-similarity
+      subtype: code
+      gs_file:
+        - time-varying/GS/time-varying_gs.py
+      rs_file:
+        - time-varying/results/{agent_mode}/time-varying.py
+
 # 9. chart-opacity
 - vars:
     question: |
@@ -177,6 +233,13 @@
           3. Opacity Settings: Is the arc_length variable displayed with full opacity (1.0) while Points_Z and RTData show reduced opacity (0.3)?
 
           4. Chart Clarity: Does the chart provide clear visualization of the data trends with appropriate axis scaling and readable formatting?
+
+    - type: code-similarity
+      subtype: code
+      gs_file:
+        - chart-opacity/GS/chart-opacity_gs.py
+      rs_file:
+        - chart-opacity/results/{agent_mode}/chart-opacity.py
 
 # 10. color-blocks
 - vars:
@@ -202,6 +265,13 @@
 
           4. View Configuration: Is the dataset displayed from the -y direction with blue-gray background and visible color bar legend?
 
+    - type: code-similarity
+      subtype: code
+      gs_file:
+        - color-blocks/GS/color-blocks_gs.py
+      rs_file:
+        - color-blocks/results/{agent_mode}/color-blocks.py
+
 # 11. color-data
 - vars:
     question: |
@@ -222,6 +292,13 @@
           3. Surface Coloring: Is the surface representation properly colored by the x coordinate of the calculated result?
 
           4. Color Bar Display: Is the color bar/legend visible and properly displaying the color mapping scale and values?
+
+    - type: code-similarity
+      subtype: code
+      gs_file:
+        - color-data/GS/color-data_gs.py
+      rs_file:
+        - color-data/results/{agent_mode}/color-data.py
 
 # 12. export-gltf
 - vars:
@@ -251,6 +328,13 @@
 
           4. Clean Presentation: Are the color bar and orientation axes properly hidden for a clean visualization appearance?
 
+    - type: code-similarity
+      subtype: code
+      gs_file:
+        - export-gltf/GS/export-gltf_gs.py
+      rs_file:
+        - export-gltf/results/{agent_mode}/export-gltf.py
+
 # 13. import-gltf
 - vars:
     question: |
@@ -272,6 +356,13 @@
           3. Camera Positioning: Is the camera positioned in the positive Y direction with appropriate zoom to fit all imported geometry?
 
           4. Layout Configuration: Is the view properly sized to 300x300 pixels with correct rendering and background palette?
+
+    - type: code-similarity
+      subtype: code
+      gs_file:
+        - import-gltf/GS/import-gltf_gs.py
+      rs_file:
+        - import-gltf/results/{agent_mode}/import-gltf.py
 
 # 14. render-histogram
 - vars:
@@ -298,6 +389,13 @@
 
           4. Color Map Consistency: Are both the wavelet visualization and histogram using the same Cool to Warm color map?
 
+    - type: code-similarity
+      subtype: code
+      gs_file:
+        - render-histogram/GS/render-histogram_gs.py
+      rs_file:
+        - render-histogram/results/{agent_mode}/render-histogram.py
+
 # 15. reset-camera-direction
 - vars:
     question: |
@@ -316,6 +414,13 @@
           3. Camera Direction: Is the camera positioned according to the specified direction vector [0.5, 1, 0.5]?
 
           4. View Quality: Does the visualization provide a clear view of the wavelet structure from the specified camera angle?
+
+    - type: code-similarity
+      subtype: code
+      gs_file:
+        - reset-camera-direction/GS/reset-camera-direction_gs.py
+      rs_file:
+        - reset-camera-direction/results/{agent_mode}/reset-camera-direction.py
 
 # 16. save-transparent
 - vars:
@@ -336,6 +441,13 @@
           3. Transparent Background: Is the screenshot saved with a properly transparent background instead of solid color?
 
           4. Visual Quality: Does the transparent cone maintain good visual quality and edge definition?
+
+    - type: code-similarity
+      subtype: code
+      gs_file:
+        - save-transparent/GS/save-transparent_gs.py
+      rs_file:
+        - save-transparent/results/{agent_mode}/save-transparent.py
 
 # 17. subseries-of-time-series
 - vars:
@@ -360,6 +472,13 @@
 
           4. Final Visualization: Is the multi-block dataset properly displayed showing the sliced geometry from the time series?
 
+    - type: code-similarity
+      subtype: code
+      gs_file:
+        - subseries-of-time-series/GS/subseries-of-time-series_gs.py
+      rs_file:
+        - subseries-of-time-series/results/{agent_mode}/subseries-of-time-series.py
+
 # 18. write-ply
 - vars:
     question: |
@@ -380,6 +499,13 @@
           3. PLY Import: Is the exported PLY file correctly loaded back into ParaView maintaining geometric fidelity?
 
           4. Visualization Quality: Does the imported cube display properly with correct surface representation and rendering?
+
+    - type: code-similarity
+      subtype: code
+      gs_file:
+        - write-ply/GS/write-ply_gs.py
+      rs_file:
+        - write-ply/results/{agent_mode}/write-ply.py
 
 # 19. climate
 - vars:
@@ -403,6 +529,13 @@
           3. Cone Glyph Direction: Are the cone glyphs properly configured with specified parameters and showing velocity direction accurately?
 
           4. View Configuration: Is the visualization displayed from -z direction with appropriate scaling and white background as specified?
+
+    - type: code-similarity
+      subtype: code
+      gs_file:
+        - climate/GS/climate_gs.py
+      rs_file:
+        - climate/results/{agent_mode}/climate.py
 
 # 20. materials
 - vars:
@@ -428,3 +561,10 @@
           3. Clipping and Color Mapping: Is the plane clipping correctly applied and Viridis colormap properly used for Phase variable?
 
           4. Camera and Layout: Is the camera positioned correctly in (-1, 0, -1) direction with appropriate fitting and legends visible?
+
+    - type: code-similarity
+      subtype: code
+      gs_file:
+        - materials/GS/materials_gs.py
+      rs_file:
+        - materials/results/{agent_mode}/materials.py

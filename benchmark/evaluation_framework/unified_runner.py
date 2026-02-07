@@ -66,6 +66,17 @@ class YAMLTestCase:
                     self.rubrics[subtype] = rubric_value
                     if subtype not in self.evaluation_subtypes:
                         self.evaluation_subtypes.append(subtype)
+            elif assert_type == 'code-similarity':
+                self.assertions.append(assert_item)
+                subtype = assert_item.get('subtype', 'code')
+                # Store the entire config (gs_file, rs_file) as the rubric
+                code_config = {
+                    'gs_file': assert_item.get('gs_file', []),
+                    'rs_file': assert_item.get('rs_file', [])
+                }
+                self.rubrics[subtype] = code_config
+                if subtype not in self.evaluation_subtypes:
+                    self.evaluation_subtypes.append(subtype)
             elif assert_type == 'rule_based':
                 self.rule_based_assertions.append(assert_item)
 

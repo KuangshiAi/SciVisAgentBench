@@ -540,13 +540,13 @@ Be specific about what you observe in the images and how well the results meet t
         print("Evaluating output generation...")
 
         # Start with full score - assume outputs were generated
-        score = 10
+        score = 5
         explanations = ["Output generation assumed successful (will be verified by subsequent evaluations)"]
 
         # Initialize the score - it will be updated by other evaluation methods if they fail
         self.evaluation_results["scores"]["output_generation"] = {
             "score": score,
-            "max_score": 10,
+            "max_score": 5,
             "explanation": "; ".join(explanations)
         }
 
@@ -561,7 +561,7 @@ Be specific about what you observe in the images and how well the results meet t
         """
         self.evaluation_results["scores"]["output_generation"] = {
             "score": 0,
-            "max_score": 10,
+            "max_score": 5,
             "explanation": f"Output generation failed: {reason}"
         }
     

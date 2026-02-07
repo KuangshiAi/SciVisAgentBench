@@ -308,6 +308,118 @@ Be specific about what aspects of the answers meet or don't meet the criteria.""
                 "reason": str(e)
             }
 
+    async def evaluate_code(
+        self,
+        case_dir: str,
+        case_name: str,
+        code_config: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Run code similarity evaluation.
+
+        Args:
+            case_dir: Test case directory
+            case_name: Test case name
+            code_config: Code evaluation configuration with gs_file and rs_file paths
+
+        Returns:
+            Evaluation result dictionary
+        """
+        try:
+            print("Evaluating code similarity...")
+
+            # Get evaluator
+            evaluator = self.get_evaluator_for_case(case_dir, case_name)
+
+            # Parse file paths from config
+            gs_files = code_config.get('gs_file', [])
+            rs_files = code_config.get('rs_file', [])
+
+            # Default paths if not specified
+            if not gs_files:
+                gs_files = [f"{case_name}/GS/{case_name}_gs.py"]
+            if not rs_files:
+                rs_files = [f"{case_name}/results/{self.eval_mode}/{case_name}.py"]
+
+            # Get the first file (for now, we only compare one pair)
+            gs_file = gs_files[0] if gs_files else None
+            rs_file = rs_files[0] if rs_files else None
+
+            if not gs_file or not rs_file:
+                return {
+                    "status": "failed",
+                    "subtype": "code",
+                    "reason": "Ground truth or result file path not specified"
+                }
+
+            # Replace {agent_mode} placeholder
+            gs_file = gs_file.replace('{agent_mode}', self.eval_mode)
+            rs_file = rs_file.replace('{agent_mode}', self.eval_mode)
+
+            # Make paths absolute
+            gs_path = Path(case_dir).parent / gs_file
+            rs_path = Path(case_dir).parent / rs_file
+
+            # Override evaluator's default paths
+            evaluator.gs_code_path = str(gs_path)
+            evaluator.generated_code_path = str(rs_path)
+
+            # Run code similarity evaluation
+            code_score = evaluator.evaluate_code_similarity()
+
+            # Get the score details
+            scores = evaluator.evaluation_results.get("scores", {})
+            code_details = scores.get("code_similarity", {})
+
+            # Scale from 20 to 10 points for consistency
+            original_score = code_details.get("score", 0)
+            original_max = code_details.get("max_score", 20)
+            scaled_score = int((original_score / original_max) * 10) if original_max > 0 else 0
+            scaled_max = 10
+
+            similarity_raw = code_details.get("similarity_raw_score", 0)
+            explanation = f"Code similarity: {similarity_raw:.3f} (scaled to {scaled_score}/10 points)"
+
+            return {
+                "status": "completed",
+                "subtype": "code",
+                "gs_file": str(gs_path),
+                "rs_file": str(rs_path),
+                "scores": {
+                    "code_similarity": scaled_score,
+                    "total_score": scaled_score,
+                    "max_possible_score": scaled_max,
+                    "percentage": (scaled_score / scaled_max * 100) if scaled_max > 0 else 0
+                },
+                "detailed_scores": {
+                    "code_similarity": {
+                        "score": scaled_score,
+                        "max_score": scaled_max,
+                        "explanation": explanation,
+                        "similarity_raw_score": similarity_raw
+                    }
+                },
+                "evaluator_metadata": {
+                    "evaluator_type": f"{self.eval_mode}_code_similarity",
+                    "evaluator_version": "1.0.0",
+                    "scoring_scheme": {
+                        "code_similarity": "10 points",
+                        "total_possible": "10 points"
+                    }
+                }
+            }
+
+        except Exception as e:
+            print(f"❌ Code evaluation failed: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return {
+                "status": "failed",
+                "subtype": "code",
+                "reason": str(e),
+                "traceback": traceback.format_exc()
+            }
+
     async def run_evaluation(
         self,
         case_dir: str,
@@ -359,6 +471,12 @@ Be specific about what aspects of the answers meet or don't meet the criteria.""
                     case_name,
                     rubrics.get('text', '')
                 )
+            elif subtype == 'code':
+                result = await self.evaluate_code(
+                    case_dir,
+                    case_name,
+                    rubrics.get('code', {})
+                )
             else:
                 print(f"⚠️  Unknown evaluation subtype: {subtype}")
                 continue
@@ -380,6 +498,11 @@ Be specific about what aspects of the answers meet or don't meet the criteria.""
                     print(f"   - Visualization quality: {viz_qual}/{goals * 10}")
                     print(f"   - Output generation: {output_gen}/5")
                     print(f"   - Efficiency: {efficiency}/10")
+                elif subtype == 'code' and 'scores' in result:
+                    code_sim = result['scores'].get('code_similarity', 0)
+                    similarity_raw = result.get('detailed_scores', {}).get('code_similarity', {}).get('similarity_raw_score', 0)
+                    print(f"✅ {subtype} evaluation completed: {subtype_score}/{subtype_max}")
+                    print(f"   - Code similarity: {code_sim}/10 (raw: {similarity_raw:.3f})")
                 else:
                     print(f"✅ {subtype} evaluation completed: {subtype_score}/{subtype_max}")
             else:
