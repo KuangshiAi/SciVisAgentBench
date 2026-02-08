@@ -989,3 +989,185 @@
         3) Turbo colormap
         4) Color bar labeled 'Velocity Magnitude'
         5) Dark background, Isometric camera showing all three slices, Output resolution 1024x1024
+
+# 33. MHD Magnetic Field Stream Surface (t=20) (mhd-magfield_streamsurface)
+# Isothermal magnetohydrodynamic (MHD) simulations capturing compressible turbulence phenomena relevant to astrophysical systems.
+# MHD turbulence is an essential component of the solar wind, galaxy formation, and interstellar medium (ISM) dynamics. 
+# The simulations model fluid dynamics governed by conservation equations for mass, momentum, and magnetic fields, exploring MHD flows across multiple regimes—subsonic and supersonic velocities, as well as sub-Alfvénic and super-Alfvénic magnetic conditions. 
+# Three field types are captured: density (scalar), velocity (vector), and magnetic field (vector). 
+# Data source: The Well (Polymathic AI)
+- vars:
+    question: |
+        Load the MHD magnetic field dataset from "mhd-magfield_streamsurface/data/mhd-magfield_streamsurface.vti" (VTI format, 128x128x128 grid with components bx, by, bz). 
+        Generate a stream surface seeded from a line source along the y-axis at x=64, z=64 (from y=20 to y=108), with 30 seed points. 
+        The stream surface should be traced in both forward and backward directions along the magnetic field lines. 
+        Color the stream surface by magnetic field magnitude using the 'Cool to Warm' colormap. Enable surface lighting with specular reflection for better 3D perception. 
+        Add a color bar labeled 'Magnetic Field Magnitude'. 
+        Use a dark navy background (RGB: 0.0, 0.0, 0.12). Set an isometric camera view. Render at 1024x1024 resolution.
+        Save the paraview state as "mhd-magfield_streamsurface/results/{agent_mode}/mhd-magfield_streamsurface.pvsm".
+        Save the visualization image as "mhd-magfield_streamsurface/results/{agent_mode}/mhd-magfield_streamsurface.png".
+        (Optional, if use python script) Save the python script as "mhd-magfield_streamsurface/results/{agent_mode}/mhd-magfield_streamsurface.py".
+        Do not save any other files, and always save the visualization image.    
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+        1) Stream surface generation from line seed along y-axis, bidirectional integration along magnetic field
+        2) Surface coloring by magnetic field magnitude
+        3) Cool to Warm colormap applied correctly
+        4) Specular lighting enabled 
+        5) Color bar with label 'Magnetic Field Magnitude'
+        6) Dark navy background (RGB: 0.0, 0.0, 0.12), Isometric camera view, Output resolution 1024x1024
+
+
+# 34. Rayleigh-Taylor Instability Stream Surface (t=60) (rti-velocity_streamsurface)
+# Rayleigh-Taylor instability simulations examining how varying spectral characteristics and random phase components influence the development of turbulent mixing. 
+# The simulations investigate three key physical aspects: the impact of coherence on randomized initial conditions, how initial energy spectrum shapes affect resulting flow structures, and the transition from Boussinesq to non-Boussinesq regimes where mixing becomes asymmetric.
+# The dataset captures the self-similar growth of the turbulent mixing zone, enabling validation of the dimensionless mixing parameter and observation of the characteristic energy cascade. 
+# Data source: The Well (Polymathic AI)
+- vars:
+    question: |
+        Load the Rayleigh-Taylor instability velocity field dataset from "rti-velocity_streamsurface/data/rti-velocity_streamsurface.vti" (VTI format, 128x128x128 grid). 
+        Generate a stream surface seeded from a circular ring at y=64 (the mixing interface), centered at x=64, z=64 with radius 30, using 40 seed points distributed around the circle. 
+        Trace the stream surface in both directions along the velocity field. Color the stream surface by the vy (vertical velocity) component using the 'Cool to Warm (Extended)' diverging colormap centered at zero. 
+        Set surface opacity to 0.85 for slight transparency. Add a color bar labeled 'Vertical Velocity (vy)'. 
+        Use a black background (RGB: 0.0, 0.0, 0.0). 
+        Set camera to view at 45 degrees elevation to show the mushroom-shaped instability structures. Render at 1024x1024 resolution.
+        Save the paraview state as "rti-velocity_streamsurface/results/{agent_mode}/rti-velocity_streamsurface.pvsm".
+        Save the visualization image as "rti-velocity_streamsurface/results/{agent_mode}/rti-velocity_streamsurface.png".
+        (Optional, if use python script) Save the python script as "rti-velocity_streamsurface/results/{agent_mode}/rti-velocity_streamsurface.py".
+        Do not save any other files, and always save the visualization image
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+        1) Stream surface from circular ring seed at y=64
+        2) Circle centered at (64, 64) in xz-plane with radius 30
+        3) Bidirectional integration along velocity field 
+        4) Surface coloring by vy (vertical velocity) component, Surface opacity set to 0.85
+        5) Cool to Warm (Extended) diverging colormap
+        6) Color bar with label 'Vertical Velocity (vy)'
+        7) Black background, Elevated camera view (45 degrees), Output resolution 1024x1024
+
+
+# 35. Supernova Explosion Pathlines (Multi-timestep) (supernova-velocity_pathline)
+# Supernova explosion simulations capturing the physical dynamics of a stellar explosion propagating through a dense interstellar medium.
+# The simulations inject thermal energy of 10^51 ergs at the center of a computational domain, generating a blastwave that sweeps through ambient gas and creates supernova feedback structures—an explosion inside a compression of a monatomic ideal gas modeling conditions in the Milky Way Galaxy interstellar medium. 
+# The simulations employ sophisticated physics including radiative cooling and heating. 
+# Data source: The Well (Polymathic AI).
+- vars:
+    question: |
+        Load the supernova explosion velocity field time series from "supernova-velocity_pathline/data/supernova-velocity_pathline_{timestep}.vti", where "timestep" in {0000, 0005, 0010, 0015, 0020} (5 timesteps, VTI format, 128x128x128 grid each). 
+        Visualize the temporal evolution of flow patterns by generating streamlines from each timestep and overlaying them. 
+        Seed 50 particles from a spherical shell centered at (64, 64, 64) with radius 20 (near the explosion center). 
+        For each timestep, trace streamlines in the forward direction with maximum length 80. 
+        Render streamlines as tubes with radius 0.25. Color each timestep differently to show temporal progression (blue for t=0 through red for t=20). 
+        Also include a magnitude-colored version using the 'Turbo' colormap for the final timestep. 
+        Add a color bar labeled 'Velocity Magnitude'. Use a dark background (RGB: 0.02, 0.0, 0.04). Set an isometric camera view. Render at 1024x1024 resolution.
+        Save the paraview state as "supernova-velocity_pathline/results/{agent_mode}/supernova-velocity_pathline.pvsm".
+        Save the visualization image as "supernova-velocity_pathline/results/{agent_mode}/supernova-velocity_pathline.png".
+        (Optional, if use python script) Save the python script as "supernova-velocity_pathline/results/{agent_mode}/supernova-velocity_pathline.py".
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+        1) Time-varying vector field handling, Streamline generation for each timestep 
+        2) Spherical shell seed centered at (64,64,64) with radius 20
+        3) 50 seed particles, Forward streamline tracing with max length 80
+        4) Tube rendering with radius 0.25, Color-coded temporal progression (blue to red) 
+        5) Turbo colormap for magnitude coloring, Color bar with label 'Velocity Magnitude'
+        6) Dark background (RGB: 0.02, 0.0, 0.04), Isometric camera view, Output resolution 1024x1024
+
+
+# 36. MHD Turbulence Path Surface (Multi-timestep) (mhd-turbulence_pathsurface)
+# Isothermal magnetohydrodynamic (MHD) simulations capturing compressible turbulence phenomena relevant to astrophysical systems.
+# MHD turbulence is an essential component of the solar wind, galaxy formation, and interstellar medium (ISM) dynamics.
+# The simulations model fluid dynamics governed by conservation equations for mass, momentum, and magnetic fields, exploring MHD flows across multiple regimes—subsonic and supersonic velocities, as well as sub-Alfvénic and super-Alfvénic magnetic conditions.
+# Three field types are captured: density (scalar), velocity (vector), and magnetic field (vector). 
+# Data source: The Well (Polymathic AI)
+- vars:
+    question: |
+        Load the MHD turbulence velocity field time series from "mhd-turbulence_pathsurface/data/mhd-turbulence_pathsurface_{timestep}.vti", where "timestep" in {0000, 0010, 0020, 0030, 0040} (5 timesteps, VTI format, 128x128x128 grid each). 
+        Visualize the temporal evolution by generating stream surfaces (ribbons) from each timestep with varying opacity. 
+        Use a line seed along the z-axis at x=64, y=64 (from z=40 to z=88) with 20 seed points. 
+        Trace streamlines bidirectionally with maximum length 150. Create ribbon surfaces from the streamlines with width 0.8. 
+        Apply progressive opacity (0.3 for t=0, increasing to 0.9 for t=40) to show temporal layering. Color all surfaces by velocity magnitude using the 'Viridis (matplotlib)' colormap. 
+        Add a color bar labeled 'Velocity Magnitude'. Use a dark gray background (RGB: 0.08, 0.08, 0.1). Set an isometric camera view. Render at 1024x1024.
+        Save the paraview state as "mhd-turbulence_pathsurface/results/{agent_mode}/mhd-turbulence_pathsurface.pvsm".
+        Save the visualization image as "mhd-turbulence_pathsurface/results/{agent_mode}/mhd-turbulence_pathsurface.png".
+        (Optional, if use python script) Save the python script as "mhd-turbulence_pathsurface/results/{agent_mode}/mhd-turbulence_pathsurface.py".
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1) Time-varying vector field handling, Stream surface generation for each timestep
+          2) Line seed along z-axis at x=64, y=64
+          3) Seed from z=40 to z=88 with 20 points, Bidirectional streamline tracing
+          4) Ribbon surface creation with width 0.8
+          5) Progressive opacity (0.3 to 0.9)
+          6) Viridis (matplotlib) colormap,  Color bar with label 'Velocity Magnitude'
+          7) Dark gray background (RGB: 0.08, 0.08, 0.1), Isometric camera view, Output resolution 1024x1024
+
+
+# 37. Rayleigh-Taylor Instability Streaklines (Multi-timestep) (rti-velocity_streakline)
+# Rayleigh-Taylor instability simulations examining how varying spectral characteristics and random phase components influence the development of turbulent mixing. 
+# The simulations investigate three key physical aspects: the impact of coherence on randomized initial conditions, how initial energy spectrum shapes affect resulting flow structures, and the transition from Boussinesq to non-Boussinesq regimes where mixing becomes asymmetric.
+# The dataset captures the self-similar growth of the turbulent mixing zone, enabling validation of the dimensionless mixing parameter and observation of the characteristic energy cascade. 
+# Data source: The Well (Polymathic AI)
+- vars:
+    question: |
+        Load the Rayleigh-Taylor instability velocity field time series from "rti-velocity_streakline/data/rti-velocity_streakline_{timestep}.vti", where "timestep" in {0030, 0040, 0050, 0060, 0070} (5 timesteps, VTI format, 128x128x128 grid each). 
+        Visualize temporal flow evolution by generating streamlines from 4 fixed injection points at each timestep. 
+        Place injection points at y=64 (the mixing interface): at (32, 64, 64), (64, 64, 32), (96, 64, 64), and (64, 64, 96). 
+        For each timestep, trace streamlines bidirectionally with maximum length 100. 
+        Render as tubes with radius 0.4. Color each timestep differently (blue for t=30 through red for t=70) with increasing opacity for later times. 
+        Add a final layer colored by vy (vertical velocity) using the 'Cool to Warm' diverging colormap. 
+        Add a color bar labeled 'Vertical Velocity (vy)'. 
+        Use a black background. Set camera to view from an elevated angle (elevation 35 degrees). Render at 1024x1024 resolution.
+        Save the paraview state as "rti-velocity_streakline/results/{agent_mode}/rti-velocity_streakline.pvsm".
+        Save the visualization image as "rti-velocity_streakline/results/{agent_mode}/rti-velocity_streakline.png".
+        (Optional, if use python script) Save the python script as "rti-velocity_streakline/results/{agent_mode}/rti-velocity_streakline.py".
+        Do not save any other files, and always save the visualization image
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1) Time-varying vector field handling, Streamline generation from 4 injection points
+          2) Injection points at (32,64,64), (64,64,32), (96,64,64), (64,64,96)
+          3) Bidirectional tracing with max length 100
+          4) Tube rendering with radius 0.4
+          5) Color-coded temporal progression (blue to red),  Cool to Warm diverging colormap for vy
+          6) Color bar with label 'Vertical Velocity (vy)'
+          7) Black background, Elevated camera view (elevation 35 degrees), Output resolution 1024x1024
+
+
+# 38. Turbulent Radiative Layer Timelines (Multi-timestep) (trl-velocity_timeline)
+# Turbulent Radiative Layer simulations of astrophysical mixing processes where cold, dense gas interfaces with hot, dilute gas moving at subsonic velocities. 
+# The cold dense gas on the bottom and hot dilute gas on the top becomes unstable to the Kelvin-Helmholtz instability. 
+# When turbulence causes mixing, intermediate-temperature gas forms and rapidly cools, creating a net mass transfer from the hot phase to the cold phase—a process relevant to interstellar and circumgalactic environments. 
+# Generated using Athena++. Data source: The Well (Polymathic AI)
+- vars:
+    question: |
+        Load the turbulent radiative layer velocity field time series from "trl-velocity_timeline/data/trl-velocity_timeline_{timestep}.vti", where "timestep" in {0020, 0030, 0040, 0050, 0060} (5 timesteps, VTI format, 256x128x128 grid each). 
+        Visualize temporal evolution by generating streamlines from a line seed at each timestep. 
+        Seed 50 points along the z-axis at x=128, y=64 (from z=20 to z=108). For each timestep, trace streamlines bidirectionally with maximum length 150. 
+        Render as tubes with radius 0.5. Color each timestep using Spectral-like colors (blue for t=20, cyan for t=30, green for t=40, yellow for t=50, red for t=60) with increasing opacity for later times. 
+        Add a magnitude-colored layer using the 'Spectral' colormap for reference. 
+        Add a color bar labeled 'Velocity Magnitude'. 
+        Use a dark background (RGB: 0.0, 0.0, 0.02). Set camera to an oblique view (azimuth 45, elevation 20) for the elongated domain. Render at 1024x1024 resolution.
+        Save the paraview state as "trl-velocity_timeline/results/{agent_mode}/trl-velocity_timeline.pvsm".
+        Save the visualization image as "trl-velocity_timeline/results/{agent_mode}/trl-velocity_timeline.png".
+        (Optional, if use python script) Save the python script as "trl-velocity_timeline/results/{agent_mode}/trl-velocity_timeline.py".
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+        1) Time-varying vector field handling (256x128x128 grid), Streamline generation from line seed for each timestep
+        2) Line seed along z-axis at x=128, y=64, 50 seed points from z=20 to z=108
+        3) Bidirectional tracing with max length 150, Tube rendering with radius 0.5
+        4) Spectral color-coded temporal progression
+        5) Spectral colormap for magnitude, Color bar with label 'Velocity Magnitude'
+        6) Dark background (RGB: 0.0, 0.0, 0.02), Oblique camera view (azimuth 45, elevation 20), Output resolution 1024x1024

@@ -538,10 +538,14 @@ Be specific about what you observe in the images and how well the results meet t
             return 0
         
         try:
-            # Use the inherited code comparison method
+            # Use the inherited code comparison method with adjusted weights
+            # w_embed=0.4, w_diff=0.4, w_ast=0.2 for better discrimination
             similarity_score = self.compare_code_with_reference(
                 self.generated_code_path,
-                self.gs_code_path
+                self.gs_code_path,
+                w_embed=0.4,
+                w_diff=0.4,
+                w_ast=0.2
             )
             
             # Convert similarity score (0-1) to points (0-20)
