@@ -375,11 +375,11 @@ class MCPAutoEvaluator(SciVisEvaluator):
     def _create_evaluation_prompt(self, visualization_goals: str, goals_count: int) -> str:
         """
         Create the evaluation prompt for LLM
-        
+
         Args:
             visualization_goals (str): The visualization goals text
             goals_count (int): Number of goals to evaluate
-            
+
         Returns:
             str: Complete evaluation prompt
         """
@@ -388,20 +388,42 @@ class MCPAutoEvaluator(SciVisEvaluator):
         for i in range(1, goals_count + 1):
             goal_format_lines.append(f'    "goal_{i}_score": <score_0_to_10>,')
             goal_format_lines.append(f'    "goal_{i}_explanation": "<detailed explanation>",')
-        
+
         goal_format = '\n'.join(goal_format_lines)
-        
+
+        # Try to load task description if available
+        task_desc_path = os.path.join(self.case_dir, "task_description.txt")
+        task_description = ""
+        if os.path.exists(task_desc_path):
+            with open(task_desc_path, 'r', encoding='utf-8') as f:
+                task_description = f"\n**Original Task Description:**\n{f.read().strip()}\n"
+
         prompt = f"""
-You are an expert scientific visualization evaluator. You will be shown two sets of images:
+You are an expert scientific visualization evaluator. You are evaluating visualization results for the test case: **{self.case_name}**
+{task_description}
+You will be shown two sets of images:
 
-1. Ground Truth Images (first 3 images): These show the expected/correct visualization for the {self.case_name} test case
-2. Result Images (next 3 images): These show the agent-generated visualization results
+1. Ground Truth Images (first N images): These show the expected/correct visualization that accomplishes the task
+2. Result Images (next N images): These show the agent-generated visualization attempting to accomplish the task
 
-Please evaluate the Result Images against the Ground Truth Images based on these specific visualization goals:
+**Note:** The number of images in each set may vary (could be 1, 3, or more images per set). Ground truth images come first, followed by result images.
+
+**Evaluation Criteria:**
 
 {visualization_goals}
 
-For each visualization goal, provide a score from 0-10 points based on how well the result matches the ground truth and meets the criteria.
+**Scoring Guidelines:**
+
+ALL scoring must be based on comparing the Result Images with the Ground Truth Images. For each visualization goal:
+
+- **10 points**: Perfect match - The result and ground truth are visually identical or nearly identical for this criterion
+- **8-9 points**: Excellent match - Minor differences that don't significantly affect the visualization quality
+- **6-7 points**: Good match - Noticeable differences but the core requirement is met
+- **4-5 points**: Partial match - Significant differences, requirement only partially fulfilled
+- **2-3 points**: Poor match - Major differences, requirement mostly not met
+- **0-1 points**: No match - Completely different from ground truth or requirement not addressed at all
+
+**Important:** If the result perfectly matches the ground truth for a specific criterion, you MUST give it 10 points. The scoring should reflect the degree of visual similarity between ground truth and result.
 
 Please respond with a JSON object in the following format:
 {{
@@ -410,18 +432,18 @@ Please respond with a JSON object in the following format:
     "overall_explanation": "<summary of overall assessment>"
 }}
 
-Be specific about what you observe in the images and how well the results match the expected visualization goals.
+Be specific about what you observe in both images and how well the results match the ground truth for each criterion.
 """
         return prompt
     
     def _create_result_only_evaluation_prompt(self, visualization_goals: str, goals_count: int) -> str:
         """
         Create the evaluation prompt for LLM when only result images are available
-        
+
         Args:
             visualization_goals (str): The visualization goals text
             goals_count (int): Number of goals to evaluate
-            
+
         Returns:
             str: Complete evaluation prompt for result-only evaluation
         """
@@ -430,19 +452,37 @@ Be specific about what you observe in the images and how well the results match 
         for i in range(1, goals_count + 1):
             goal_format_lines.append(f'    "goal_{i}_score": <score_0_to_10>,')
             goal_format_lines.append(f'    "goal_{i}_explanation": "<detailed explanation>",')
-        
+
         goal_format = '\n'.join(goal_format_lines)
-        
+
+        # Try to load task description if available
+        task_desc_path = os.path.join(self.case_dir, "task_description.txt")
+        task_description = ""
+        if os.path.exists(task_desc_path):
+            with open(task_desc_path, 'r', encoding='utf-8') as f:
+                task_description = f"\n**Original Task Description:**\n{f.read().strip()}\n"
+
         prompt = f"""
-You are an expert scientific visualization evaluator. You will be shown visualization result images for the {self.case_name} test case.
+You are an expert scientific visualization evaluator. You are evaluating visualization results for the test case: **{self.case_name}**
+{task_description}
+You will be shown visualization result images attempting to accomplish the task described above.
 
-Note: Ground truth images are not available for this evaluation, so please evaluate based on how well the visualization achieves the stated goals and general visualization quality principles.
+**Note:** Ground truth images are NOT available for this evaluation. Please evaluate based on how well the visualization achieves the stated goals and general visualization quality principles.
 
-Please evaluate the visualization results based on these specific visualization goals:
+**Evaluation Criteria:**
 
 {visualization_goals}
 
-For each visualization goal, provide a score from 0-10 points based on how well the result meets the criteria and demonstrates good visualization practices.
+**Scoring Guidelines (without ground truth reference):**
+
+For each visualization goal, score from 0-10 based on how well the criterion is met:
+
+- **10 points**: Criterion perfectly fulfilled with excellent visualization quality
+- **8-9 points**: Criterion well fulfilled with minor imperfections
+- **6-7 points**: Criterion mostly fulfilled with noticeable issues
+- **4-5 points**: Criterion partially fulfilled, significant issues present
+- **2-3 points**: Criterion barely addressed, major issues
+- **0-1 points**: Criterion not addressed or fundamentally incorrect
 
 Please respond with a JSON object in the following format:
 {{

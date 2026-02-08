@@ -349,12 +349,23 @@ async def main():
                 print(f"Evaluating existing results for: {args.case}")
                 eval_result = await runner.run_evaluation(target_case)
 
-                # Create a dummy result with evaluation
-                result = {
-                    "status": "eval_only",
-                    "case_name": args.case,
-                    "evaluation": eval_result
-                }
+                # Load previous test result if it exists
+                previous_result = runner.load_latest_result(target_case)
+
+                if previous_result:
+                    # Merge evaluation with existing test data
+                    result = previous_result.copy()
+                    result["evaluation"] = eval_result
+                    # Update status to indicate eval-only run
+                    result["status"] = "eval_only"
+                else:
+                    # No previous result found, create minimal result
+                    result = {
+                        "status": "eval_only",
+                        "case_name": args.case,
+                        "evaluation": eval_result
+                    }
+
                 await runner.save_centralized_result(target_case, result)
 
                 print(f"\n✓ Evaluation complete for {args.case}")
@@ -370,12 +381,23 @@ async def main():
                     try:
                         eval_result = await runner.run_evaluation(test_case)
 
-                        # Create a dummy result with evaluation
-                        result = {
-                            "status": "eval_only",
-                            "case_name": test_case.case_name,
-                            "evaluation": eval_result
-                        }
+                        # Load previous test result if it exists
+                        previous_result = runner.load_latest_result(test_case)
+
+                        if previous_result:
+                            # Merge evaluation with existing test data
+                            result = previous_result.copy()
+                            result["evaluation"] = eval_result
+                            # Update status to indicate eval-only run
+                            result["status"] = "eval_only"
+                        else:
+                            # No previous result found, create minimal result
+                            result = {
+                                "status": "eval_only",
+                                "case_name": test_case.case_name,
+                                "evaluation": eval_result
+                            }
+
                         await runner.save_centralized_result(test_case, result)
 
                         print(f"✓ Evaluation complete")

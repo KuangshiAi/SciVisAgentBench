@@ -409,6 +409,39 @@ class UnifiedTestRunner:
 
         return result
 
+    def load_latest_result(self, test_case: YAMLTestCase) -> Optional[Dict]:
+        """
+        Load the latest test result for a given case.
+
+        Returns None if no result file is found.
+        """
+        if not self.output_dir.exists():
+            return None
+
+        # Find all result files for this case
+        result_files = list(self.output_dir.glob(f"{test_case.case_name}_result_*.json"))
+
+        if not result_files:
+            return None
+
+        # Sort by timestamp (extracted from filename) and get the latest
+        def get_timestamp(filepath):
+            stem = filepath.stem  # e.g., "chart-opacity_result_1770506163"
+            parts = stem.split('_')
+            try:
+                return int(parts[-1])
+            except (ValueError, IndexError):
+                return 0
+
+        latest_file = max(result_files, key=get_timestamp)
+
+        try:
+            with open(latest_file, 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"⚠️  Error loading previous result from {latest_file}: {e}")
+            return None
+
     async def save_centralized_result(self, test_case: YAMLTestCase, result: Dict):
         """Save test result to centralized output directory."""
         self.output_dir.mkdir(parents=True, exist_ok=True)
