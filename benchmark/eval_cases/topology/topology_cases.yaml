@@ -19,12 +19,24 @@
             * 3 for maxima
             * 4 for degenerate critical points
           - The point coordinates should be in index space (grid coordinates), not world coordinates
+        4. Analyze the visualization and answer the following questions:
+          Q1: How many index 1 saddles are there: 
+          (A) 248 (B) 274 (C) 299 (D) 344
+
+          Q2: What is the type of critical point closest to coordinates (4,58,12): 
+          (A) minimum (B) 1-saddle (C) 2-saddle (D) maximum
+        Save the answers to the analysis questions in plain text as "QMCPACK/results/{agent_mode}/answers.txt".
   assert:
     - type: rule_based
       eval_script: QMCPACK/GS/QMCPACK_eval.py
       eval_function: evaluateQmcpackCriticalPoints
       gs_file: QMCPACK/GS/QMCPACK_gs.vtk
       rs_file: QMCPACK/results/{agent_mode}/QMCPACK.vtk
+    - type: llm-rubric
+      subtype: text
+      value: |
+          1. Q1 correct answer: (C)
+          2. Q2 correct answer: (D)
 
 
 # 2. Brain
@@ -38,12 +50,23 @@
         1. Load the file "brain/data/brain.vti". It is a symmetric tensor field, where the (1,1), (1,2) and (2,2) components of the tensor are respectively given by the arrays A, B, and D.
         2. Compute degenerate points of the tensor field.
         3. Save the degenerate points as "brain/results/{agent_mode}/brain.vtk" in legacy VTK format. Label the type of degenerate point for each point in an array called DegeneracyType. Use a value of 0 for trisectors and 1 for wedges.
+        4. Analyze the visualization and answer the following questions:
+          Q1: Are there more trisectors than wedges? (yes/no)
+
+          Q2: Out of all degenerate points, the sum of one point's coordinates is the highest. What is this highest sum, rounded to the nearest integer?
+          (A) 124 (B) 136 (C) 148 (D) 160
+        Save the answers to the analysis questions in plain text as "brain/results/{agent_mode}/answers.txt".
   assert:
     - type: rule_based
       eval_script: brain/GS/brain_eval.py
       eval_function: evaluateDegeneratePoints
       gs_file: brain/GS/brain_gs.vtk
       rs_file: brain/results/{agent_mode}/brain.vtk
+    - type: llm-rubric
+      subtype: text
+      value: |
+          1. Q1 correct answer: yes
+          2. Q2 correct answer: (B)
 
 
 # 3. Heated Cylinder
@@ -57,12 +80,24 @@
         2. Apply persistence simplification of 0.01 to the Speed field.
         3. Compute the Morse-Smale segmentation of the simplified Speed field.
         4. Save the Morse-Smale segmentation as "cylinder/results/{agent_mode}/cylinder.vti". It should have a point array called Partition. For each point x, the array "Partition" should store the id number of the region in the segmentation that x belongs to.
+        5. Analyze the visualization and answer the following questions:
+          Q1: How many unique partition regions are there?
+          (A) 152 (B) 163 (C) 174 (D) 185
+
+          Q2: How many points are in the largest partition region?
+          (A) 6879 (B) 7968 (C) 8796 (D) 9687
+        Save the answers to the analysis questions in plain text as "cylinder/results/{agent_mode}/answers.txt".
   assert:
     - type: rule_based
       eval_script: cylinder/GS/cylinder_eval.py
       eval_function: evaluateMSSEgmentation
       gs_file: cylinder/GS/cylinder_gs.vti
       rs_file: cylinder/results/{agent_mode}/cylinder.vti
+    - type: llm-rubric
+      subtype: text
+      value: |
+          1. Q1 correct answer: (A)
+          2. Q2 correct answer: (D)
 
 
 # 4. Hurricane Isabel
@@ -82,6 +117,16 @@
             The other point array should be called "Scalar" and should contain the scalar field value at each point in the merge tree.
           5. Save the edges of the merge tree as "isabel/results/{agent_mode}/isabel_edges.vtk" in legacy VTK format. 
             The file should store each edge as a separate cell with type vtkLine.
+          6. Analyze the visualization and answer the following questions:
+          Q1: The parent node of the leaf (377, 265, 0) has coordinates (x,y,z). What is x+y+z?
+          (A) 627 (B) 854 (C) 992 (D) 1039
+
+          Q2: How many edges are there in the merge tree?
+          (A) 154 (B) 195 (C) 204 (D) 254
+
+          Q3: What is the highest scalar field value of a minimum, rounded to the nearest whole number?
+          (A) 12 (B) 26 (C) 31 (D) 58
+          Save the answers to the analysis questions in plain text as "isabel/results/{agent_mode}/answers.txt".
   assert:
     - type: rule_based
       eval_script: isabel/GS/isabel_eval.py
@@ -92,7 +137,12 @@
       rs_file: 
         - isabel/results/{agent_mode}/isabel_nodes.vtk
         - isabel/results/{agent_mode}/isabel_edges.vtk
-
+    - type: llm-rubric
+      subtype: text
+      value: |
+          1. Q1 correct answer: (A)
+          2. Q2 correct answer: (B)
+          3. Q3 correct answer: (C)
 
 # 5. Ocean Flow
 # This is the 2x2 gradient tensor field of a slice of the Indian Ocean. 
@@ -116,6 +166,16 @@
           6. Save the partition information from the eigenvalue partition as "ocean/results/{agent_mode}/ocean_eigenvalue.vti" as VTK image data. 
           It should have a point array called Partition that stores the region identifiers as follows: 0: positive scaling. 1: counterclockwise rotation.
           2: negative scaling. 3: clockwise rotation. 4: anisotropic stretching.
+
+          7. Analyze the visualization and answer the following questions:
+          Q1: Are there more trisectors than wedges? (yes/no)
+
+          Q2: How many points have the most common classification in the eigenvector partition?
+          (A) 752342 (B) 802842 (C) 826348 (D) 994682
+
+          Q3: Which is the least common classification in the eigenvalue partition?
+          (A) Positive scaling (B) counterclockwise rotation (C) negative scaling (D) clockwise rotation
+          Save the answers to the analysis questions in plain text as "ocean/results/{agent_mode}/answers.txt".
   assert:
     - type: rule_based
       eval_script: ocean/GS/ocean_eval.py
@@ -128,3 +188,9 @@
         - ocean/results/{agent_mode}/ocean_points.vtk
         - ocean/results/{agent_mode}/ocean_eigenvector.vti
         - ocean/results/{agent_mode}/ocean_eigenvalue.vti
+    - type: llm-rubric
+      subtype: text
+      value: |
+          1. Q1 correct answer: no
+          2. Q2 correct answer: (C)
+          3. Q3 correct answer: (C)
