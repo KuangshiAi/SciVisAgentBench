@@ -76,6 +76,8 @@ class NapariMCPAgent(BaseAgent):
             if "env" not in server:
                 server["env"] = {}
             server["env"]["TEST_CASE_NAME"] = case_name
+            # DO NOT set NAPARI_WORKING_DIR - the agent should use absolute paths
+            # instead of relying on os.chdir() which can cause path confusion
 
         # Save config
         with open(case_config_file, 'w', encoding='utf-8') as f:

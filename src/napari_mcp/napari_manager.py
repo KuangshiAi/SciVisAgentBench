@@ -146,11 +146,62 @@ class NapariManager:  # pylint: disable=too-few-public-methods
     # screenshot helper
     # ------------------------------------------------------------------
     def screenshot(self, filename: str | None = None) -> tuple[bool, str]:
-        """Ask the remote viewer to save a JPG screenshot and return the absolute path as a string."""
-        args = []
-        if filename is not None:
-            args.append(filename)
-        return self.send_command("napari-socket.screenshot", args)
+        """Ask the remote viewer to save a JPG screenshot and return the absolute path as a string.
+
+        If filename is provided, the temporary screenshot will be copied to the specified location.
+        """
+        # Get screenshot from napari (saves to temp location)
+        success, temp_path = self.send_command("napari-socket.screenshot", [])
+
+        if not success:
+            return False, temp_path
+
+        # If no custom filename requested, return temp path
+        if filename is None:
+            return True, temp_path
+
+        # Copy to custom location
+        try:
+            from pathlib import Path
+            import shutil
+
+            # Convert to absolute path
+            dest_path = Path(filename).resolve()
+
+            # Create parent directories if they don't exist
+            dest_path.parent.mkdir(parents=True, exist_ok=True)
+
+            # Copy the file
+            shutil.copy2(temp_path, dest_path)
+
+            return True, str(dest_path)
+        except Exception as e:
+            return False, f"Failed to copy screenshot: {str(e)}"
+
+    # ------------------------------------------------------------------
+    # text file helper
+    # ------------------------------------------------------------------
+    def save_text(self, filename: str, content: str) -> tuple[bool, str]:
+        """Save text content to a file.
+
+        This is a client-side operation that doesn't require napari interaction.
+        """
+        try:
+            from pathlib import Path
+
+            # Convert to absolute path
+            filepath = Path(filename).resolve()
+
+            # Create parent directories if they don't exist
+            filepath.parent.mkdir(parents=True, exist_ok=True)
+
+            # Write content to file
+            with open(filepath, 'w', encoding='utf-8') as f:
+                f.write(content)
+
+            return True, str(filepath)
+        except Exception as e:
+            return False, f"Failed to save text: {str(e)}"
 
     # ------------------------------------------------------------------
     # layer introspection helper

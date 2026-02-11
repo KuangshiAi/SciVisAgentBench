@@ -14,7 +14,7 @@
 # Test: open_file - Load a multi-dimensional image file (T, Z, Y, X, C)
 - vars:
     question: |
-      Load the file "dataset_001/dataset_001.tiff" into the viewer.
+      Load the file "data/dataset_001/dataset_001.tiff" into the viewer.
       Respond with <1> if the file was successfully loaded, or <0> if it failed. Only respond with <1> or <0>.
   assert:
     - type: contains-all
@@ -42,7 +42,7 @@
 # Test: open_file - Load a single image file
 - vars:
     question: |
-      Load the file "dataset_002/dataset_002.tif" into the viewer.
+      Load the file "data/dataset_002/dataset_002.tif" into the viewer.
       Respond with <1> if the file was successfully loaded, or <0> if it failed. Only respond with <1> or <0>.
   assert:
     - type: contains-all

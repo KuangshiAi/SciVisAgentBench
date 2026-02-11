@@ -173,33 +173,79 @@ def clear_case_results(cases_dir: str, case_name: str = None):
     dirs_to_remove = ["results", "evaluation_results", "test_results"]
 
     # Get list of cases to clear
+    # For bioimage_data, we need to handle nested structure: bioimage_data/eval_xxx/operation_1
+    cases_to_clear = []
+
     if case_name:
-        cases_to_clear = [case_name]
+        # Specific case - need to find it in nested structure
+        for subdir in cases_path.iterdir():
+            if subdir.is_dir() and not subdir.name.startswith('.'):
+                case_path = subdir / case_name
+                if case_path.exists():
+                    cases_to_clear.append((subdir.name, case_name))
     else:
-        # Get all subdirectories (test cases)
-        cases_to_clear = [d.name for d in cases_path.iterdir() if d.is_dir() and not d.name.startswith('.')]
+        # All cases - find all nested cases
+        for subdir in cases_path.iterdir():
+            if subdir.is_dir() and not subdir.name.startswith('.'):
+                # Check if this is a YAML-named directory with operation_X subdirectories
+                has_operation_subdirs = any(
+                    d.name.startswith('operation_') for d in subdir.iterdir()
+                    if d.is_dir()
+                )
+                if has_operation_subdirs:
+                    # This is a YAML-named directory with cases
+                    for case_subdir in subdir.iterdir():
+                        if case_subdir.is_dir() and not case_subdir.name.startswith('.'):
+                            cases_to_clear.append((subdir.name, case_subdir.name))
+                else:
+                    # This is a direct case directory
+                    cases_to_clear.append(('', subdir.name))
 
     cleared_count = 0
-    for case in cases_to_clear:
-        case_dir = cases_path / case
+    cleared_files_count = 0
+
+    for yaml_dir, case in cases_to_clear:
+        if yaml_dir:
+            # Nested structure: bioimage_data/eval_xxx/operation_1
+            case_dir = cases_path / yaml_dir / case
+            parent_dir = cases_path / yaml_dir
+        else:
+            # Direct structure
+            case_dir = cases_path / case
+            parent_dir = None
+
         if not case_dir.exists():
             print(f"Warning: Case directory not found: {case_dir}")
             continue
 
+        # Clear subdirectories within the case
         for dir_name in dirs_to_remove:
             dir_path = case_dir / dir_name
             if dir_path.exists():
                 try:
                     shutil.rmtree(dir_path)
-                    print(f"  ✓ Cleared {case}/{dir_name}/")
+                    display_path = f"{yaml_dir}/{case}/{dir_name}" if yaml_dir else f"{case}/{dir_name}"
+                    print(f"  ✓ Cleared {display_path}/")
                     cleared_count += 1
                 except Exception as e:
-                    print(f"  ✗ Error clearing {case}/{dir_name}/: {e}")
+                    print(f"  ✗ Error clearing {dir_path}: {e}")
 
-    if cleared_count > 0:
-        print(f"\n✓ Cleared {cleared_count} result directories")
+        # Clear .png and .txt files from parent directory (for bioimage_data structure)
+        if parent_dir and parent_dir.exists():
+            for pattern in ['*.png', '*.txt']:
+                for file_path in parent_dir.glob(pattern):
+                    if file_path.is_file():
+                        try:
+                            file_path.unlink()
+                            print(f"  ✓ Cleared {yaml_dir}/{file_path.name}")
+                            cleared_files_count += 1
+                        except Exception as e:
+                            print(f"  ✗ Error clearing {file_path}: {e}")
+
+    if cleared_count > 0 or cleared_files_count > 0:
+        print(f"\n✓ Cleared {cleared_count} directories and {cleared_files_count} files")
     else:
-        print("\nℹ No result directories found to clear")
+        print("\nℹ No result directories or files found to clear")
 
 
 def list_registered_agents():

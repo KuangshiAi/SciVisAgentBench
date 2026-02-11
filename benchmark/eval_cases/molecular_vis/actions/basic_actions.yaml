@@ -12,7 +12,7 @@
 # Loading a CIF file
 - vars:
     question: |
-        Remove all molecules from and load the data "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench/SciVisAgentBench-tasks/molecular_vis/data/1CRN.cif".
+        Remove all molecules from and load the data from "data/1CRN.cif".
         Take a screenshot to confirm if the dataset has been loaded.
         Respond with <1> if the cif file has been loaded and the molecule is visible in the viewport, or <0> if it failed. Only respond with <1> or <0>.
   assert:

@@ -1,19 +1,30 @@
 # Basic Visualization Workflow Tests
-# Use https://www.ebi.ac.uk/bioimage-archive/galleries/S-BIAD7.html IM1 to test the workflows.
+# Use https://www.ebi.ac.uk/bioimage-archive/galleries/S-BIAD573.html IM1 to test the workflows.
 
 # Test: Multi-channel Overlay with Colormaps with channels
 - vars:
     question: |
-      Load the "dataset_001/dataset_001.tiff" dataset into napari. 
-      Depending on the number of channels, set the colormap for each channel to the corresponding color.
-      Use additive blending for all channels to create an overlay visualization.
-      Take a screenshot of the result.
-      Respond with <1> if all channels are visible with their respective colors in the overlay, or <0> if it failed. Only respond with <1> or <0>.
+      1. Load the "data/dataset_001/dataset_002.tif" dataset into napari. 
+      2. Depending on the number of channels, set the colormap for the first channel 0 to red and channel 1 to green.
+      3. Switch to the 3D view. 
+      4. Use additive blending for all channels to create an overlay visualization.
+      5. Go the timestep 14. 
+        Q1: Does the cell show protrusions? (Yes/No)
+      6. Take a screenshot of the result, save it to "eval_visualization_workflows/screenshot_1.png"
+      7. Answer Q1 in a plain text file "eval_visualization_workflows/Q1_answer.txt".
   assert:
-    - type: contains-all
-      value: "<1>"
-    - type: not-contains
-      value: "<0>"
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Does the visualization show a green cell with red blobs on the inside? 
+          2. Does the result rendering look similar to ground truth?
+      gs-file: GS/dataset_002_1.png
+      rs-file: eval_visualization_workflows/screenshot_1.png
+    - type: llm-rubric
+      subtype: text
+      value: |
+          1. Q1 correct answer: Yes
+      rs-file: eval_visualization_workflows/Q1_answer.txt                    
   options:
     cache: false
     runSerially: true
@@ -21,69 +32,34 @@
 # Test: Hide All Channels Except for the Channel with the Cells
 - vars:
     question: |
-      Set all layers invisible except for the layer that contains the individual cells. 
-      Take a screenshots to check if only individual cell bodies are shown.
-      Respond with <1> if only individual cell bodies are shown, or <0> if it failed. Only respond with <1> or <0>.
+      1. Set all layers invisible except for the layer that contains the individual cells. 
+      2. Take a screenshots of the result, save it to "eval_visualization_workflows/screenshot_2.png".
   assert:
-    - type: contains-all
-      value: "<1>"
-    - type: not-contains
-      value: "<0>"
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Are there only the green cells visible with no red blobs on the inside?
+      rs-file: eval_visualization_workflows/screenshot_2.png
   options:
     cache: false
     runSerially: true
-
-# Test: Contrast and Gamma Adjustment to Display Nucleus
-- vars:
-    question: |
-      Adjust the gamma value in channel 0 so that the bright cell organelles are only visible but the cell membrane is suppressed.  
-      Take screenshots to check if the contrast and gamma adjustments were successful.
-      Respond with <1> if the contrast and gamma adjustments were successful, or <0> if it failed. Only respond with <1> or <0>.
-  assert:
-    - type: contains-all
-      value: "<1>"
-    - type: not-contains
-      value: "<0>"
-  options:
-    cache: false
-    runSerially: true
-
 
 # Test: Advanced 3D Camera Control and Navigation
 - vars:
     question: |
-      Start with the default 3D view and take an initial screenshot.
-      Rotate the camera to show the 3D data from a different perspective (side view).
-      Take a screenshot to verify the 3D camera rotation.
-      Zoom in on the 3D structures so they appear larger in the viewport.
-      Take a screenshot to verify the 3D zoom.
-      Pan the camera to move the 3D view to show a different region.
-      Take a screenshot to verify the 3D pan.
-      Reset the camera to the default 3D view.
-      Take a final screenshot to verify the 3D reset.
-      Respond with <1> if all 3D camera operations were successful, or <0> if any failed. Only respond with <1> or <0>.
+      1. Start in the 3D view
+      2. Zoom into the cell with protrusions until the cell fills up the entire viewport. 
+      3. Rotate the camera to show the 3D data from a different perspective (side view).
+      4. Take a screenshot of the result, save it to "eval_visualization_workflows/screenshot_3.png".
   assert:
-    - type: contains-all
-      value: "<1>"
-    - type: not-contains
-      value: "<0>"
-  options:
-    cache: false
-    runSerially: true
-
-# Test: Iso-surface Threshold Adjustment
-- vars:
-    question: |
-      Adjust the iso-surface threshold to different values to explore different surface levels.
-      Start with a low threshold (e.g., 0.1) and take a screenshot.
-      Increase the threshold to a medium value (e.g., 0.5) and take a screenshot.
-      Increase the threshold to a high value (e.g., 0.9) and take a screenshot.
-      Respond with <1> if you successfully adjusted iso-surface thresholds and could see different surface levels, or <0> if it failed. Only respond with <1> or <0>.
-  assert:
-    - type: contains-all
-      value: "<1>"
-    - type: not-contains
-      value: "<0>"
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Does the visualization show the green cell from the side? 
+          2. Does the result rendering look similar to the ground truth image?
+      gs-file: GS/dataset_002_2.jpg
+      rs-file: eval_visualization_workflows/screenshot_3.png
+             
   options:
     cache: false
     runSerially: true

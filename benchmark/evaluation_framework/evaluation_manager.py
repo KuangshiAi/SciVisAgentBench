@@ -92,7 +92,10 @@ class EvaluationManager:
         self,
         case_dir: str,
         case_name: str,
-        vision_rubric: str
+        vision_rubric: str,
+        gs_file: Optional[str] = None,
+        rs_file: Optional[str] = None,
+        data_dir: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Run vision-based evaluation using the appropriate evaluator.
@@ -107,6 +110,9 @@ class EvaluationManager:
             case_dir: Test case directory
             case_name: Test case name
             vision_rubric: Vision evaluation rubric
+            gs_file: Optional custom path to ground truth image (relative to data_dir)
+            rs_file: Optional custom path to result image (relative to data_dir)
+            data_dir: Optional data directory (working directory for the agent)
 
         Returns:
             Evaluation result dictionary
@@ -119,6 +125,47 @@ class EvaluationManager:
 
             # Get the appropriate evaluator
             evaluator = self.get_evaluator_for_case(case_dir, case_name)
+
+            # Handle custom file paths by copying them to expected locations
+            import shutil
+
+            # Determine base directory for resolving custom file paths
+            # If data_dir is provided, use it; otherwise fall back to case_dir parent
+            base_dir = Path(data_dir) if data_dir else Path(case_dir).parent
+
+            # Override ground truth image path if gs_file is provided
+            if gs_file:
+                # Replace {agent_mode} placeholder
+                gs_file_resolved = gs_file.replace('{agent_mode}', self.eval_mode)
+                # Make path absolute (relative to base_dir)
+                gs_source = base_dir / gs_file_resolved
+
+                if gs_source.exists():
+                    # Copy to expected location: case_dir/GS/{case_name}_gs.png
+                    gs_dir = Path(case_dir) / "GS"
+                    gs_dir.mkdir(parents=True, exist_ok=True)
+                    gs_dest = gs_dir / f"{case_name}_gs.png"
+                    shutil.copy2(gs_source, gs_dest)
+                    print(f"Copied custom GS file: {gs_source} -> {gs_dest}")
+                else:
+                    print(f"⚠️  Warning: Custom gs_file not found: {gs_source}")
+
+            # Override result image path if rs_file is provided
+            if rs_file:
+                # Replace {agent_mode} placeholder
+                rs_file_resolved = rs_file.replace('{agent_mode}', self.eval_mode)
+                # Make path absolute (relative to base_dir)
+                rs_source = base_dir / rs_file_resolved
+
+                if rs_source.exists():
+                    # Copy to expected location: case_dir/results/{eval_mode}/{case_name}.png
+                    results_dir = Path(case_dir) / "results" / self.eval_mode
+                    results_dir.mkdir(parents=True, exist_ok=True)
+                    rs_dest = results_dir / f"{case_name}.png"
+                    shutil.copy2(rs_source, rs_dest)
+                    print(f"Copied custom RS file: {rs_source} -> {rs_dest}")
+                else:
+                    print(f"⚠️  Warning: Custom rs_file not found: {rs_source}")
 
             # Run individual evaluation components
             # (Don't use run_evaluation() as it looks for JSON rubric files)
@@ -188,7 +235,9 @@ class EvaluationManager:
         self,
         case_dir: str,
         case_name: str,
-        text_rubric: str
+        text_rubric: str,
+        rs_file: Optional[str] = None,
+        data_dir: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Run text-based evaluation using answers.txt file.
@@ -197,6 +246,8 @@ class EvaluationManager:
             case_dir: Test case directory
             case_name: Test case name
             text_rubric: Text evaluation rubric
+            rs_file: Optional custom path to result text file (relative to data_dir)
+            data_dir: Optional data directory (working directory for the agent)
 
         Returns:
             Evaluation result dictionary
@@ -204,13 +255,22 @@ class EvaluationManager:
         try:
             from openai import OpenAI
 
-            # Load the answers.txt file
-            answers_file = Path(case_dir) / "results" / self.eval_mode / "answers.txt"
+            # Load the answers file
+            if rs_file:
+                # Determine base directory for resolving custom file paths
+                base_dir = Path(data_dir) if data_dir else Path(case_dir).parent
+                # Use custom path (relative to base_dir)
+                rs_file_resolved = rs_file.replace('{agent_mode}', self.eval_mode)
+                answers_file = base_dir / rs_file_resolved
+            else:
+                # Use default path
+                answers_file = Path(case_dir) / "results" / self.eval_mode / "answers.txt"
+
             if not answers_file.exists():
                 return {
                     "status": "failed",
                     "subtype": "text",
-                    "reason": f"answers.txt not found: {answers_file}"
+                    "reason": f"answers file not found: {answers_file}"
                 }
 
             with open(answers_file, 'r', encoding='utf-8') as f:
@@ -425,7 +485,9 @@ Be specific about what aspects of the answers meet or don't meet the criteria.""
         case_dir: str,
         case_name: str,
         evaluation_subtypes: List[str],
-        rubrics: Dict[str, str]
+        rubrics: Dict[str, str],
+        file_configs: Optional[Dict[str, Dict[str, str]]] = None,
+        data_dir: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Run comprehensive evaluation for a test case with support for multiple subtypes.
@@ -438,10 +500,14 @@ Be specific about what aspects of the answers meet or don't meet the criteria.""
             case_name: Test case name
             evaluation_subtypes: List of evaluation subtypes (e.g., ["vision", "text"])
             rubrics: Dictionary mapping subtype to rubric text
+            file_configs: Optional dictionary mapping subtype to file paths (gs_file, rs_file)
+            data_dir: Optional data directory (working directory for the agent)
 
         Returns:
             Comprehensive evaluation result dictionary
         """
+        if file_configs is None:
+            file_configs = {}
         if not self.openai_api_key:
             return {
                 "status": "skipped",
@@ -460,16 +526,28 @@ Be specific about what aspects of the answers meet or don't meet the criteria.""
             print(f"Running {subtype} evaluation...")
 
             if subtype == 'vision':
+                # Get file config for vision evaluation
+                vision_config = file_configs.get('vision', {})
+                gs_file = vision_config.get('gs_file')
+                rs_file = vision_config.get('rs_file')
                 result = await self.evaluate_vision(
                     case_dir,
                     case_name,
-                    rubrics.get('vision', '')
+                    rubrics.get('vision', ''),
+                    gs_file=gs_file,
+                    rs_file=rs_file,
+                    data_dir=data_dir
                 )
             elif subtype == 'text':
+                # Get file config for text evaluation
+                text_config = file_configs.get('text', {})
+                rs_file = text_config.get('rs_file')
                 result = await self.evaluate_text(
                     case_dir,
                     case_name,
-                    rubrics.get('text', '')
+                    rubrics.get('text', ''),
+                    rs_file=rs_file,
+                    data_dir=data_dir
                 )
             elif subtype == 'code':
                 result = await self.evaluate_code(

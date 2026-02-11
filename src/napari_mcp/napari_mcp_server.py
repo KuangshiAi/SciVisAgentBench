@@ -120,13 +120,15 @@ def build_mcp(manager: NapariManager) -> FastMCP:
     """
     prompt = (
         "You control a remote napari GUI through a TCP socket. "
-        "Use the screenshot tool to see the current viewport.\n\n"
+        "Use the get_screenshot tool to see the current viewport.\n\n"
         "Available tools:\n"
         "• open_file(path) - load image files (TIFF, PNG, ND2, NPZ, etc.)\n"
         "• remove_layer(name_or_index) - remove a layer\n"
         "• toggle_view() - switch between 2D and 3D view\n"
         "• iso_contour(layer_name=None, threshold=None) - enable iso-surface rendering\n"
-        "• screenshot() - capture current view as JPG\n"
+        "• get_screenshot() - get screenshot to view current state (returns image)\n"
+        "• save_screenshot(filename) - save screenshot to specific file path\n"
+        "• save_text(filename, content) - save text content to file\n"
         "• list_layers() - get info about loaded layers\n"
         "• set_colormap(layer_name, colormap) - change layer colormap\n"
         "• set_opacity(layer_name, opacity) - adjust layer transparency\n"
@@ -237,23 +239,71 @@ def build_mcp(manager: NapariManager) -> FastMCP:
         success, message = manager.iso_contour(layer_name, threshold)
         return _format_response(success, message, "✅ Iso-surface rendering applied successfully")
 
-    @mcp.tool(name="screenshot")
-    def screenshot(filename: str | None = None) -> str:
-        """Take a screenshot of the current view.
+    @mcp.tool(name="save_screenshot")
+    def save_screenshot(filename: str) -> str:
+        """Take a screenshot of the current view and save it to the specified path.
+
+        Args:
+            filename: Path where to save the screenshot (supports .png, .jpg extensions).
+                     IMPORTANT: Always use absolute paths to avoid confusion about working directory.
 
         Returns:
-            Image: Screenshot image object or error message prefixed with ❌
+            str: Success message with the file path or error message prefixed with ❌
 
         Note:
-            Saves a JPG file to a temporary location and returns the image.
+            The function will create parent directories if they don't exist.
             Captures only the canvas area by default.
-            The temporary file is automatically cleaned up by the system.
+            Returns the absolute path to the saved screenshot.
+            ALWAYS provide an absolute path (e.g., /full/path/to/file.png) rather than
+            relative paths (e.g., folder/file.png) to ensure the file is saved to the
+            correct location.
         """
         success, message = manager.screenshot(filename)
         if success:
-            return Image(path=message)  # message is the absolute path to the screenshot
-        return f"\u274c {message}"
-    
+            return f"✅ Screenshot saved to: {message}"
+        return f"❌ {message}"
+
+    @mcp.tool(name="get_screenshot")
+    def get_screenshot() -> Image:
+        """Get a screenshot of the current napari view for the agent to see.
+
+        Returns:
+            Image: Screenshot image that the agent can view directly
+
+        Note:
+            This function returns the screenshot as an image for display to the agent.
+            Use save_screenshot() if you want to save the screenshot to a specific file path.
+        """
+        success, temp_path = manager.screenshot(None)
+        if success:
+            return Image(path=temp_path)
+        # If screenshot failed, raise an error
+        raise RuntimeError(f"Failed to get screenshot: {temp_path}")
+
+    @mcp.tool(name="save_text")
+    def save_text(filename: str, content: str) -> str:
+        """Save text content to a file.
+
+        Args:
+            filename: Path where to save the text file.
+                     IMPORTANT: Always use absolute paths to avoid confusion about working directory.
+            content: Text content to write to the file
+
+        Returns:
+            str: Success message with the file path or error message prefixed with ❌
+
+        Note:
+            The function will create parent directories if they don't exist.
+            Useful for saving analysis results, answers to questions, or any text data.
+            ALWAYS provide an absolute path (e.g., /full/path/to/file.txt) rather than
+            relative paths (e.g., folder/file.txt) to ensure the file is saved to the
+            correct location.
+        """
+        success, message = manager.save_text(filename, content)
+        if success:
+            return f"✅ Text saved to: {message}"
+        return f"❌ {message}"
+
     @mcp.tool(name="list_layers")
     def list_layers() -> str:            
         """Get info about all loaded layers.
@@ -863,12 +913,16 @@ def build_mcp(manager: NapariManager) -> FastMCP:
 
 def main() -> None:  # pragma: no cover
     """Main entry point for the napari MCP server.
-    
+
     Parses command line arguments, sets up logging, creates the NapariManager,
     builds the MCP server, and starts listening for requests.
     """
     args = _parse_args()
     _setup_logging(args.loglevel)
+
+    # Do NOT change working directory via environment variable
+    # The agent should always use absolute paths when saving files
+    # This prevents confusion about where files are being saved
 
     mgr = NapariManager(host=args.host, port=args.port, timeout=args.timeout)
     mcp = build_mcp(mgr)

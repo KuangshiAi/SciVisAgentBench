@@ -5,20 +5,24 @@
 #Test: Recreate a figure from a dataset. 
 - vars:
     question: |
-      Load the dataset into napari: dataset_001/dataset_001.tiff
-      Read the target figure: dataset_001/dataset_001.png but don't load it into napari.
-      Read the dataset description: dataset_001/dataset_001.yaml. 
-      Set the same colormaps and blending modes as the target figure.
-      Adjust contrast and gamma as needed to match the target figure.
-      Take a screenshot of your recreation.
-      If the recreation does not match the target figure, adjust the visualization settings and take a screenshot again.
-      Stop when the recreation matches the target figure or you have tried five different visualization settings.
-      Respond with <1> if you successfully recreated the figure and it closely matches the target, or <0> if it failed or doesn't match well. Only respond with <1> or <0>.
+      1. Load the dataset into napari: data/dataset_001/dataset_001.tiff
+      2. Read the target figure: data/dataset_001/dataset_001.png but don't load it into napari.
+      3. Read the dataset description: data/dataset_001/dataset_001.yaml. 
+      4. Set the same colormaps and blending modes as the target figure.
+      5. Adjust contrast and gamma as needed to match the target figure.
+      6. Take a screenshot of your recreation.
+      7. If the recreation does not match the target figure, adjust the visualization settings and take a screenshot again.
+      8. Stop when the recreation matches the target figure or you have tried five different visualization settings.
+      9. Save the final screenshot to "eval_figure_recreation/screenshot.png".
   assert:
-    - type: contains-all
-      value: "<1>"
-    - type: not-contains
-      value: "<0>"
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Does the result screenshot look similar to the ground truth image?
+          2. Are the same colormaps and blending modes used as in the target figure?
+          3. Is the contrast and gamma adjusted to match the target figure?
+      gs-file: GS/dataset_001.png
+      rs-file: eval_figure_recreation/screenshot.png                 
   options:
     cache: false
     runSerially: true

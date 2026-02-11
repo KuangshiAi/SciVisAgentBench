@@ -261,7 +261,7 @@ python -m benchmark.evaluation_framework.run_evaluation \
     --agent napari_mcp \
     --config benchmark/configs/napari_mcp/config_openai.json \
     --yaml benchmark/eval_cases/napari/0_actions/eval_basic_napari_functions.yaml \
-    --cases SciVisAgentBench-tasks/bioimage_data/data \
+    --cases SciVisAgentBench-tasks/bioimage_data \
     --eval-model gpt-5.2
 ```
 
@@ -286,7 +286,7 @@ python -m benchmark.evaluation_framework.run_evaluation \
     --agent gmx_vmd_mcp \
     --config benchmark/configs/gmx_vmd_mcp/config_anthropic.json \
     --yaml benchmark/eval_cases/molecular_vis/actions/basic_actions.yaml \
-    --cases SciVisAgentBench-tasks/molecular_vis/data \
+    --cases SciVisAgentBench-tasks/molecular_vis \
     --eval-model gpt-5.2
 ```
 
@@ -295,7 +295,7 @@ Or test on the visualization workflows:
 conda activate gmx_vmd_mcp
 python -m benchmark.evaluation_framework.run_evaluation \
     --agent gmx_vmd_mcp \
-    --config benchmark/configs/gmx_vmd_mcp/config_openai.json \
+    --config benchmark/configs/gmx_vmd_mcp/config_anthropic.json \
     --yaml benchmark/eval_cases/molecular_vis/workflows/eval_analysis_workflows.yaml \
     --cases SciVisAgentBench-tasks/molecular_vis/workflows \
     --eval-model gpt-5.2

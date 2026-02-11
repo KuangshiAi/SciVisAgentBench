@@ -49,6 +49,7 @@ class YAMLTestCase:
         self.is_assertion_based = False  # Flag to indicate if this is assertion-based
         self.rule_based_assertions = []  # Store rule_based assertions
         self.is_rule_based = False  # Flag for rule_based evaluation
+        self.file_configs = {}  # Dictionary mapping subtype to file paths (gs_file, rs_file)
 
         # Check if this is assertion-based evaluation
         # (contains-all, not-contains, etc. instead of just llm-rubric)
@@ -66,6 +67,15 @@ class YAMLTestCase:
                     self.rubrics[subtype] = rubric_value
                     if subtype not in self.evaluation_subtypes:
                         self.evaluation_subtypes.append(subtype)
+
+                    # Extract file paths for custom evaluation
+                    file_config = {}
+                    if 'gs_file' in assert_item or 'gs-file' in assert_item:
+                        file_config['gs_file'] = assert_item.get('gs_file') or assert_item.get('gs-file')
+                    if 'rs_file' in assert_item or 'rs-file' in assert_item:
+                        file_config['rs_file'] = assert_item.get('rs_file') or assert_item.get('rs-file')
+                    if file_config:
+                        self.file_configs[subtype] = file_config
             elif assert_type == 'code-similarity':
                 self.assertions.append(assert_item)
                 subtype = assert_item.get('subtype', 'code')
@@ -96,8 +106,13 @@ class YAMLTestCase:
 
         # Set up paths
         # For assertion-based cases with yaml_filename, use: cases_dir / yaml_filename / case_name
+        # For bioimage_data (napari) cases, also use yaml_filename subdirectory structure
         # For other cases, use: cases_dir / case_name
-        if self.is_assertion_based and self.yaml_filename:
+        cases_path_str = str(self.cases_dir)
+        use_yaml_subdir = (self.is_assertion_based and self.yaml_filename) or \
+                         ('bioimage_data' in cases_path_str and self.yaml_filename)
+
+        if use_yaml_subdir:
             self.case_path = self.cases_dir / self.yaml_filename / case_name
         else:
             self.case_path = self.cases_dir / case_name
@@ -209,6 +224,9 @@ class UnifiedTestRunner:
             repo_root = Path.cwd()  # Assumes running from repo root
             self.output_dir = repo_root / "test_results" / benchmark_name / agent_name
 
+        # Store YAML filename for later use (without extension)
+        self.yaml_filename = self.yaml_path.stem
+
         self.openai_api_key = openai_api_key or os.getenv('OPENAI_API_KEY')
         self.eval_model = eval_model
 
@@ -286,7 +304,7 @@ class UnifiedTestRunner:
         # For these benchmarks, use simple case numbering
         cases_path_str = str(self.cases_dir)
         if ('molecular_vis' in cases_path_str and 'workflows' not in cases_path_str) or 'bioimage_data' in cases_path_str:
-            return f"case_{index + 1}"
+            return f"operation_{index + 1}"
 
         task_description = case_data.get('vars', {}).get('question', '')
 
@@ -444,8 +462,14 @@ class UnifiedTestRunner:
 
     async def save_centralized_result(self, test_case: YAMLTestCase, result: Dict):
         """Save test result to centralized output directory."""
-        self.output_dir.mkdir(parents=True, exist_ok=True)
-        centralized_file = self.output_dir / f"{test_case.case_name}_result_{int(time.time())}.json"
+        # For napari_mcp agent, add yaml filename subdirectory
+        if self.agent.agent_name == "napari_mcp" or self.agent.agent_name == "gmx_vmd_mcp":
+            output_dir = self.output_dir / self.yaml_filename
+        else:
+            output_dir = self.output_dir
+
+        output_dir.mkdir(parents=True, exist_ok=True)
+        centralized_file = output_dir / f"{test_case.case_name}_result_{int(time.time())}.json"
 
         # Add model metadata from agent config
         if hasattr(self.agent, 'config') and self.agent.config:
@@ -499,7 +523,9 @@ class UnifiedTestRunner:
                 case_dir=str(test_case.case_path),
                 case_name=test_case.case_name,
                 evaluation_subtypes=test_case.evaluation_subtypes,
-                rubrics=test_case.rubrics
+                rubrics=test_case.rubrics,
+                file_configs=test_case.file_configs,
+                data_dir=str(test_case.data_dir)
             )
 
     async def run_all_test_cases(self, run_evaluation: bool = True) -> Dict:
