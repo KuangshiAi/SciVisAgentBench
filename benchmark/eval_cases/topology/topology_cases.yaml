@@ -194,3 +194,114 @@
           1. Q1 correct answer: no
           2. Q2 correct answer: (C)
           3. Q3 correct answer: (C)
+
+
+# 6. noisyTerrain
+# This dataset is a terrain with random scalar values added to create noise, originally from Julien Tierny. See https://github.com/topology-tool-kit/ttk-data.
+- vars:
+    question: |    
+          1. Load the dataset from "noisyTerrain/data/noisyTerrain.vtu".
+          2. Compute the persistence diagram on the scalar field named "Blend".
+          3. Apply a threshold to filter out pairs with persistence value less than 1.
+          4. Save the persistence diagram as "noisyTerrain/results/{agent_mode}/noisyTerrain.vtk" in legacy VTK format.
+            - The output should contain the points in the persistence diagram as point data, and each persistence pair is represented as a cell.
+            - Include the following three scalar arrays with the given names and purposes:
+              * "Birth" array: store the birth value of each pair.
+              * "Persistence" array: store the persistence value of each pair.
+              * "IsFinite" array: use 1 to mark finite persistence and 0 to mark infinite persistence.
+  assert:
+    - type: rule_based
+      eval_script: noisyTerrain/GS/noisyTerrain_eval.py
+      eval_function: evaluateNoisyTerrainPersistenceDiagram
+      gs_file: 
+        - noisyTerrain/GS/noisyTerrain_gs.vtk
+      rs_file: 
+        - noisyTerrain/results/{agent_mode}/noisyTerrain.vtk
+
+
+# 7. molecule
+# This dataset contains electron density and reduced gradient for a simple Ethane-Diol molecule, which is originally from Roberto Alvarez Boto. See https://github.com/topology-tool-kit/ttk-data.
+- vars:
+    question: |    
+          1. Load the data file "molecule/data/molecule.vti".
+          2. Compute the Morse-Smale segmentation on the scalar field named "log(s)".
+          3. Save the Morse-Smale segmentation as "molecule/results/{agent_mode}/molecule.vti". 
+          It should have a point array called "Segmentation". 
+          For each point x, the array "Segmentation" should store the id number of the region in the segmentation that x belongs to.
+  assert:
+    - type: rule_based
+      eval_script: molecule/GS/molecule_eval.py
+      eval_function: 
+      gs_file: 
+        - molecule/GS/molecule_gs.vtk
+      rs_file: 
+        - molecule/results/{agent_mode}/molecule.vtk
+
+
+# 8. moons
+# This 2D data set is based on the scikit-learn clustering examples (see https://scikit-learn.org/stable/modules/clustering.html), which computes a density field using Gaussian Resampling on the original point cloud.
+- vars:
+    question: |    
+          1. Load the data file "moons/data/moons.vti".
+          2. Apply topological simplification to the field "SplatterValues" with a persistence threshold of 10.
+          3. Compute the Morse-Smale segmentation on the simplified scalar field.
+          4. Save only the Ascending Manifold as "moons/results/{agent_mode}/moons.vti".
+          It should have a point array called "AscendingManifold". 
+          For each point x, the array "AscendingManifold" should store the id number of the region that x belongs to.
+  assert:
+    - type: rule_based
+      eval_script: moons/GS/moons_eval.py
+      eval_function: evaluateMoonAscendingManifold
+      gs_file: 
+        - moons/GS/moons_gs.vtk
+      rs_file: 
+        - moons/results/{agent_mode}/moons.vtk
+
+
+# 9. dragon
+# The dataset is the scanned dragon model in the ttk-data GitHub repo (https://github.com/topology-tool-kit/ttk-data), originally from VisionAIR (VISION Advanced Infrastructure for Research).
+- vars:
+    question: |    
+        1. Load the dataset from "dragon/data/dragon.vtu".
+
+        2. Compute the Morse-Smale complex on the scalar field named "density". Make sure 1-Separatrices are computed.
+
+        3. Compute the critical points on the previous elevation scalar field. 
+
+        4. Save the critical points as "dragon/results/{agent_mode}/dragon.vtk" in legacy VTK format.
+            - The output should contain the critical points as point dataset
+            - Include an array called "CriticalType" that labels each point according to what type of critical type it is. Use the following convention: 
+                * 0 for minima
+                * 1 for 1-saddles
+                * 2 for 2-saddles
+                * 3 for maxima
+            - The point coordinates should be in world coordinates 
+
+        5. Analyze the visualization and answer the following questions:
+
+        Q1: How many saddle-maximum pairs are present in the dataset? 
+        (A) 2 (B) 4 (C) 6 (D) 10.
+
+        Q2: How many minima are computed?
+        (A) 2 (B) 5 (C) 8 (D) 10.
+
+        Q3: Are there any saddle-saddle pairs in the persistence diagram?
+        (Yes/No)
+
+        Save the answers to the analysis questions in plain text as "dragon/results/{agent_mode}/answers.txt".
+  assert:
+    - type: rule_based
+      eval_script: dragon/GS/dragon_eval.py
+      eval_function: evaluateDragonCriticalPoints
+      gs_file: 
+        - dragon/GS/dragon_gs.vtk
+      rs_file: 
+        - dragon/results/{agent_mode}/dragon.vtk
+    - type: llm-rubric
+      subtype: text
+      value: |
+          1. Q1 correct answer: (C) 6
+
+          2. Q2 correct answer: (B) 5
+
+          3. Q3 correct answer: No
