@@ -617,7 +617,7 @@ def generate_summary_section(
                         {summary['overall_percentage']:.1f}%
                     </div>
                     <div class="sub-value">
-                        {summary['total_score']}/{summary['max_score']} points
+                        {summary['total_score']}/{summary['max_score']} Points
                     </div>
                 </div>
 
@@ -627,7 +627,7 @@ def generate_summary_section(
                         {summary['completed_cases']}/{summary['total_cases']}
                     </div>
                     <div class="sub-value">
-                        Completed successfully
+                        Completed Successfully
                     </div>
                 </div>
 
@@ -637,7 +637,7 @@ def generate_summary_section(
                         {summary['avg_vision_score']:.1f}%
                     </div>
                     <div class="sub-value">
-                        Visualization quality
+                        Visualization Quality
                     </div>
                 </div>
 
@@ -647,7 +647,7 @@ def generate_summary_section(
                         {summary['avg_code_score']:.1f}%
                     </div>
                     <div class="sub-value">
-                        Code quality match
+                        Code Quality Match
                     </div>
                 </div>
 
@@ -696,9 +696,9 @@ def generate_summary_section(
                 <h4 style="color: #667eea; margin-bottom: 10px;">ℹ️ About Scaled Metrics</h4>
                 <p style="color: #666; line-height: 1.6; margin: 0;">
                     <strong>Scaled metrics</strong> account for completion rate to enable fair comparison across different evaluation modes.
-                    Formula: <em>PSNR<sub>scaled</sub> = (completed_cases / total_cases) × PSNR̄</em>,
-                    <em>SSIM<sub>scaled</sub> = (completed_cases / total_cases) × SSIM̄</em>,
-                    <em>LPIPS<sub>scaled</sub> = 1.0 - (completed_cases / total_cases) × (1.0 - LPIPS̄)</em>.
+                    Formula: <em>PSNR<sub>scaled</sub> = (completed_cases / total_cases) × avg(PSNR)</em>,
+                    <em>SSIM<sub>scaled</sub> = (completed_cases / total_cases) × avg(SSIM)</em>,
+                    <em>LPIPS<sub>scaled</sub> = 1.0 - (completed_cases / total_cases) × (1.0 - avg(LPIPS))</em>.
                     Cases with infinite PSNR (perfect match) are excluded from PSNR calculation.
                 </p>
             </div>
