@@ -236,9 +236,10 @@ class ParaViewManager:
 
         Steps performed:
         1.  Delete every source and filter currently in the pipeline.
-        2.  Wipe all cached handles in this `ParaViewManager` instance.
-        3.  Reset the active render view (camera, background, etc.).
-        4.  Force a render so the UI immediately reflects the change.
+        2.  Clear all scalar bars (color legends) from the view.
+        3.  Wipe all cached handles in this `ParaViewManager` instance.
+        4.  Reset the active render view (camera, background, etc.).
+        5.  Force a render so the UI immediately reflects the change.
 
         Returns
         -------
@@ -266,7 +267,28 @@ class ParaViewManager:
                         self.logger.warning(f"Could not delete proxy: {err}")
 
             # --------------------------------------------------------
-            # 2.  Reset our own cached state
+            # 2.  Clear all scalar bars (color legends)
+            # --------------------------------------------------------
+            view = GetActiveView()
+            if view:
+                # Hide all scalar bars in the view
+                from paraview.simple import GetScalarBar
+
+                # Get all representations in the view
+                representations = view.Representations
+                if representations:
+                    for rep in representations:
+                        # Try to get and hide scalar bar for this representation
+                        try:
+                            if hasattr(rep, 'LookupTable') and rep.LookupTable:
+                                scalar_bar = GetScalarBar(rep.LookupTable, view)
+                                if scalar_bar:
+                                    scalar_bar.Visibility = 0
+                        except Exception as err:
+                            self.logger.warning(f"Could not hide scalar bar: {err}")
+
+            # --------------------------------------------------------
+            # 3.  Reset our own cached state
             # --------------------------------------------------------
             self.original_source = None
             if hasattr(self, "isosurface_filter"):
@@ -274,9 +296,10 @@ class ParaViewManager:
             self._data_folder = ""
 
             # --------------------------------------------------------
-            # 3.  Reset the active view & camera
+            # 4.  Reset the active view & camera
             # --------------------------------------------------------
-            view = GetActiveView()
+            if not view:
+                view = GetActiveView()
             if view:
                 # One call handles both camera framing *and* clipping range
                 ResetCamera(view)
@@ -305,7 +328,7 @@ class ParaViewManager:
                     view.CameraParallelProjection = 0
 
             # --------------------------------------------------------
-            # 4.  Force a redraw so the GUI updates immediately
+            # 5.  Force a redraw so the GUI updates immediately
             # --------------------------------------------------------
             try:
                 if view:
