@@ -76,8 +76,6 @@ benchmark/eval_cases/molecular_vis/actions/workspace/*
 
 benchmark/human_judge/evaluations/*
 
-exp_win.sh
-
 benchmark/configs/paraview_mcp/config_openai_mac.json
 benchmark/configs/paraview_mcp/config_anthropic_mac.json
 
