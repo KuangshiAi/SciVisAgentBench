@@ -83,3 +83,5 @@ benchmark/configs/paraview_mcp/config_anthropic_mac.json
 
 src/TopoPilot2
 src/session
+
+.claude

@@ -94,10 +94,13 @@ class PVPythonAutoEvaluator(SciVisEvaluator):
 
         for line in lines:
             line = line.strip()
-            # Check if line starts with a number followed by a period or dot
-            if line and line[0].isdigit() and '. ' in line:
-                # Numbered goal: extract text after "N. "
-                goal_text = line.split('. ', 1)[1]
+            # Check if line starts with a number followed by a period or parenthesis
+            if line and line[0].isdigit() and ('. ' in line or ') ' in line):
+                # Numbered goal: extract text after "N. " or "N) "
+                if '. ' in line:
+                    goal_text = line.split('. ', 1)[1]
+                else:
+                    goal_text = line.split(') ', 1)[1]
                 goals.append(goal_text)
             elif line and not line[0].isdigit():
                 # Non-numbered goal: treat entire line as a goal if it's substantive
