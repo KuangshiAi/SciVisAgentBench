@@ -99,7 +99,10 @@ class YAMLTestCase:
             self.is_rule_based = True
 
         # Backward compatibility
+        # Try 'vision' first, then fall back to the first available rubric
         self.llm_rubric = self.rubrics.get('vision', '')
+        if not self.llm_rubric and self.evaluation_subtypes:
+            self.llm_rubric = self.rubrics.get(self.evaluation_subtypes[0], '')
         self.evaluation_subtype = 'vision' if 'vision' in self.rubrics else (
             self.evaluation_subtypes[0] if self.evaluation_subtypes else 'vision'
         )
@@ -500,6 +503,19 @@ class UnifiedTestRunner:
                 data_dir=str(self.data_dir),
                 agent_mode=self.agent.eval_mode,
             )
+
+            # If there are also llm-rubric assertions, run them too
+            if test_case.evaluation_subtypes and test_case.rubrics:
+                llm_result = await self.evaluation_manager.run_evaluation(
+                    case_dir=str(test_case.case_path),
+                    case_name=test_case.case_name,
+                    evaluation_subtypes=test_case.evaluation_subtypes,
+                    rubrics=test_case.rubrics,
+                    file_configs=test_case.file_configs,
+                    data_dir=str(test_case.data_dir)
+                )
+                result["llm_evaluation"] = llm_result
+
             return result
 
         # Check if this is assertion-based evaluation
