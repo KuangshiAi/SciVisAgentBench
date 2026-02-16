@@ -125,7 +125,7 @@ def main():
 
     # Load configuration
     try:
-        with open(config_path, 'r') as f:
+        with open(config_path, 'r', encoding='utf-8') as f:
             config = json.load(f)
     except Exception as e:
         print(f"❌ Error loading config: {e}")

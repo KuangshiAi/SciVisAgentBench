@@ -52,7 +52,7 @@ class EvaluationReporter:
 
         for json_file in json_files:
             try:
-                with open(json_file, 'r') as f:
+                with open(json_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                     data['_result_file'] = json_file.name
                     # Extract timestamp from filename (e.g., line-plot_result_1770505853.json)
@@ -84,7 +84,7 @@ class EvaluationReporter:
     def load_yaml_cases(self) -> Dict[str, Dict[str, Any]]:
         """Load test case definitions from YAML."""
         try:
-            with open(self.yaml_path, 'r') as f:
+            with open(self.yaml_path, 'r', encoding='utf-8') as f:
                 yaml_data = yaml.safe_load(f)
 
             cases = {}
@@ -93,8 +93,9 @@ class EvaluationReporter:
                     # Extract case name from the question
                     question = item['vars'].get('question', '')
                     # Try to extract case name from file paths in the question
+                    # Pattern matches directory name before /data/ or /results/ (includes underscores)
                     import re
-                    match = re.search(r'([a-z0-9-]+)/(?:data|results)/', question)
+                    match = re.search(r'([a-z0-9_-]+)/(?:data|results)/', question)
                     if match:
                         case_name = match.group(1)
                         cases[case_name] = item
@@ -217,7 +218,7 @@ class EvaluationReporter:
             latest_file = max(test_result_files, key=get_timestamp)
 
             try:
-                with open(latest_file, 'r') as f:
+                with open(latest_file, 'r', encoding='utf-8') as f:
                     test_data = json.load(f)
                     token_usage = test_data.get('token_usage', {})
                     if token_usage:
@@ -234,19 +235,82 @@ class EvaluationReporter:
 
         for result in results:
             case_name = result.get('case_name', 'unknown')
+            case_dir = self.cases_dir / case_name
+
+            if not case_dir.exists():
+                continue
+
+            # Detect agent mode from result data
+            agent_mode = self._detect_agent_mode(result)
 
             # Try to find and copy result images
-            case_dir = self.cases_dir / case_name
-            if case_dir.exists():
-                # Look for result images (pvpython mode)
-                result_img = case_dir / "results" / "pvpython" / f"{case_name}.png"
+            result_img_found = False
+
+            # Pattern 1: results/{agent_mode}/{case_name}.png
+            for mode in [agent_mode, 'pvpython', 'mcp']:
+                if result_img_found:
+                    break
+                result_img = case_dir / "results" / mode / f"{case_name}.png"
                 if result_img.exists():
                     shutil.copy(result_img, images_dir / f"{case_name}_result.png")
+                    result_img_found = True
+                    break
 
-                # Look for ground truth images
-                gt_img = case_dir / "GS" / f"{case_name}_gs.png"
-                if gt_img.exists():
-                    shutil.copy(gt_img, images_dir / f"{case_name}_gt.png")
+            # Pattern 2: evaluation_results/{agent_mode}/screenshots/result_*.png
+            if not result_img_found:
+                for mode in [agent_mode, 'pvpython', 'mcp']:
+                    eval_results_dir = case_dir / "evaluation_results" / mode / "screenshots"
+                    if eval_results_dir.exists():
+                        # Look for any result_*.png files
+                        result_imgs = list(eval_results_dir.glob("result_*.png"))
+                        if result_imgs:
+                            # Use the first one found, or prefer diagonal view
+                            img_to_copy = result_imgs[0]
+                            for img in result_imgs:
+                                if 'diagonal' in img.name:
+                                    img_to_copy = img
+                                    break
+                            shutil.copy(img_to_copy, images_dir / f"{case_name}_result.png")
+                            result_img_found = True
+                            break
+
+            # Try to find and copy ground truth images
+            gt_img_found = False
+
+            # Pattern 1: GS/{case_name}_gs.png
+            gt_img = case_dir / "GS" / f"{case_name}_gs.png"
+            if gt_img.exists():
+                shutil.copy(gt_img, images_dir / f"{case_name}_gt.png")
+                gt_img_found = True
+
+            # Pattern 2: GS/gs_*.png (try diagonal view first)
+            if not gt_img_found:
+                gs_dir = case_dir / "GS"
+                if gs_dir.exists():
+                    gs_imgs = list(gs_dir.glob("gs_*.png"))
+                    if gs_imgs:
+                        # Prefer diagonal view
+                        img_to_copy = gs_imgs[0]
+                        for img in gs_imgs:
+                            if 'diagonal' in img.name:
+                                img_to_copy = img
+                                break
+                        shutil.copy(img_to_copy, images_dir / f"{case_name}_gt.png")
+                        gt_img_found = True
+
+    def _detect_agent_mode(self, result: Dict[str, Any]) -> str:
+        """Detect the agent mode from result data."""
+        # Try to extract from task_description
+        task_desc = result.get('task_description', '')
+        if 'agent_mode' in task_desc:
+            # Extract agent_mode value from text like 'Your agent_mode is "pvpython"'
+            import re
+            match = re.search(r'agent_mode["\s]*is["\s]+"(\w+)"', task_desc)
+            if match:
+                return match.group(1)
+
+        # Fallback to agent name
+        return self.agent_name
 
     def generate_report(self) -> Path:
         """Generate the HTML report."""

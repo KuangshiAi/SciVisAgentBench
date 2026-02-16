@@ -767,7 +767,25 @@ def generate_case_section(result: Dict[str, Any], yaml_data: Dict[str, Any], tok
     # Get overall score
     scores = eval_data.get('scores', {})
     total_score = scores.get('total_score', 0)
-    max_score = scores.get('max_possible_score', 1)
+    max_score = scores.get('max_possible_score', None)
+
+    # If max_score is not available (e.g., test failed), calculate it from rubric
+    if max_score is None:
+        # First, try to get goals_count from evaluation data if it exists
+        eval_data = result.get('evaluation', {})
+        subtype_results = eval_data.get('subtype_results', {})
+        if 'vision' in subtype_results:
+            goals_count = subtype_results['vision'].get('goals_count', 0)
+        else:
+            # Parse from rubric - count lines starting with "1.", "2.", etc. or "1)", "2)", etc.
+            llm_rubric = result.get('llm_rubric', '')
+            # Split by lines and count lines starting with digit followed by . or )
+            goals_count = len([line for line in llm_rubric.split('\n')
+                             if line.strip() and line.strip()[0].isdigit() and
+                             (line.strip()[1] == '.' or line.strip()[1] == ')')])
+        # Calculate max score: visualization_quality (goals * 10) + output_generation (5) + efficiency (10) + code_similarity (10)
+        max_score = goals_count * 10 + 5 + 10 + 10 if goals_count > 0 else 1
+
     percentage = scores.get('percentage', 0)
 
     # Determine status
@@ -778,11 +796,17 @@ def generate_case_section(result: Dict[str, Any], yaml_data: Dict[str, Any], tok
     elif eval_status == 'completed' and percentage < 50:
         status_badge = '<span class="status-badge status-warning">⚠️ LOW SCORE</span>'
 
-    # Get task description
-    task_desc = yaml_data.get('vars', {}).get('question', 'No description available')
+    # Get task description - try YAML first, then fall back to result JSON
+    task_desc = yaml_data.get('vars', {}).get('question', '')
+    if not task_desc:
+        # Fallback to task_description from result JSON
+        task_desc = result.get('task_description', 'No description available')
 
-    # Generate rubric scores section
-    rubric_html = generate_rubric_section(eval_data)
+    # Generate rubric scores section (pass result for failed cases)
+    rubric_html = generate_rubric_section(eval_data, result)
+
+    # Generate text-based Q&A section if present
+    text_html = generate_text_section(eval_data)
 
     # Generate metrics section (pass token_usage from test results)
     metrics_html = generate_metrics_section(eval_data, result, token_usage)
@@ -810,6 +834,8 @@ def generate_case_section(result: Dict[str, Any], yaml_data: Dict[str, Any], tok
 
                 {rubric_html}
 
+                {text_html}
+
                 {metrics_html}
             </div>
         </section>
@@ -835,50 +861,88 @@ def generate_image_section(case_name: str) -> str:
     """
 
 
-def generate_rubric_section(eval_data: Dict[str, Any]) -> str:
+def generate_rubric_section(eval_data: Dict[str, Any], result: Dict[str, Any] = None) -> str:
     """Generate rubric evaluation scores section."""
     subtype_results = eval_data.get('subtype_results', {})
 
-    if 'vision' not in subtype_results:
-        return ""
-
-    vision_data = subtype_results['vision']
-    rubric = vision_data.get('rubric', '')
-    detailed_scores = vision_data.get('detailed_scores', {})
-    viz_quality = detailed_scores.get('visualization_quality', {})
-
-    llm_response = viz_quality.get('llm_raw_response', {})
+    # Check if we have evaluation data
+    if 'vision' in subtype_results:
+        vision_data = subtype_results['vision']
+        rubric = vision_data.get('rubric', '')
+        detailed_scores = vision_data.get('detailed_scores', {})
+        viz_quality = detailed_scores.get('visualization_quality', {})
+        llm_response = viz_quality.get('llm_raw_response', {})
+        goals_count = vision_data.get('goals_count', 0)
+        viz_quality_max = viz_quality.get('max_score', goals_count * 10)
+        viz_score = viz_quality.get('score', 0)
+        has_evaluation = True
+    else:
+        # No evaluation - test failed, but we can still show the rubric structure
+        if result is None:
+            return ""
+        rubric = result.get('llm_rubric', '')
+        if not rubric:
+            return ""
+        llm_response = {}
+        goals_count = 0
+        has_evaluation = False
 
     # Parse the original rubric criteria
     rubric_criteria = []
     if rubric:
-        # Split rubric by numbered goals (e.g., "1. ", "2. ")
         import re
-        criteria_parts = re.split(r'\n\s*\d+\.\s+', rubric)
+        # Try splitting by "1) 2) 3)" format first (handles both inline and newline-separated)
+        # Pattern: digit(s) followed by ) and optional whitespace
+        criteria_parts = re.split(r'\s*\d+\)\s+', rubric)
         # Remove empty first element and clean up whitespace
         rubric_criteria = [c.strip() for c in criteria_parts if c.strip()]
 
+        # If that didn't produce multiple criteria, try "1. 2. 3." format with newlines
+        if len(rubric_criteria) <= 1:
+            criteria_parts = re.split(r'\n\s*\d+\.\s+', rubric)
+            rubric_criteria = [c.strip() for c in criteria_parts if c.strip()]
+
+        # If still only one criterion, try inline "1. 2. 3." format (less common)
+        if len(rubric_criteria) <= 1:
+            criteria_parts = re.split(r'\s+\d+\.\s+', rubric)
+            rubric_criteria = [c.strip() for c in criteria_parts if c.strip()]
+
+    # If no goals_count from evaluation, infer from rubric
+    if not has_evaluation:
+        goals_count = len(rubric_criteria) if rubric_criteria else len(re.findall(r'\n\s*\d+\.', rubric))
+        viz_quality_max = goals_count * 10
+        viz_score = 0
+
     # Extract individual goal scores
     rubric_items = []
-    goals_count = vision_data.get('goals_count', 0)
-
-    # Get max scores for display
-    viz_quality_max = viz_quality.get('max_score', goals_count * 10)
 
     for i in range(1, goals_count + 1):
-        goal_score = llm_response.get(f'goal_{i}_score', 0)
-        goal_explanation = llm_response.get(f'goal_{i}_explanation', '')
+        goal_score = llm_response.get(f'goal_{i}_score', 0) if has_evaluation else 0
+        goal_explanation = llm_response.get(f'goal_{i}_explanation', '') if has_evaluation else ''
 
         # Get the original rubric criterion for this goal
         criterion = rubric_criteria[i-1] if i-1 < len(rubric_criteria) else f'Goal {i} criterion not available'
 
         # If no explanation, show why (failed or not evaluated)
         if not goal_explanation:
-            eval_status = vision_data.get('status', 'unknown')
-            if eval_status == 'failed':
-                goal_explanation = '<em style="color: #dc2626;">Evaluation failed - no assessment available</em>'
+            if not has_evaluation:
+                # Test failed before evaluation
+                test_status = result.get('status', 'unknown') if result else 'unknown'
+                error_msg = result.get('error') if result else None
+                if error_msg is None:
+                    error_msg = 'Unknown error'
+                # Truncate long error messages
+                if len(error_msg) > 200:
+                    error_msg_display = error_msg[:200] + '...'
+                else:
+                    error_msg_display = error_msg
+                goal_explanation = f'<em style="color: #dc2626;">Test execution failed - no evaluation performed. Error: {error_msg_display}</em>'
             else:
-                goal_explanation = '<em style="color: #9ca3af;">Not evaluated</em>'
+                eval_status = vision_data.get('status', 'unknown') if 'vision_data' in locals() else 'unknown'
+                if eval_status == 'failed':
+                    goal_explanation = '<em style="color: #dc2626;">Evaluation failed - no assessment available</em>'
+                else:
+                    goal_explanation = '<em style="color: #9ca3af;">Not evaluated</em>'
 
         rubric_items.append(f"""
             <div class="rubric-item">
@@ -896,16 +960,24 @@ def generate_rubric_section(eval_data: Dict[str, Any]) -> str:
         """)
 
     # Overall assessment
-    overall_explanation = llm_response.get('overall_explanation', '')
+    overall_explanation = llm_response.get('overall_explanation', '') if has_evaluation else ''
     if not overall_explanation:
-        eval_status = vision_data.get('status', 'unknown')
-        if eval_status == 'failed':
-            overall_explanation = '<em style="color: #dc2626;">Evaluation failed - no overall assessment available</em>'
+        if not has_evaluation:
+            # Test failed before evaluation
+            test_status = result.get('status', 'unknown') if result else 'unknown'
+            error_msg = result.get('error') if result else None
+            if error_msg is None:
+                error_msg = 'Unknown error'
+            overall_explanation = f'<em style="color: #dc2626;">Test execution failed - no evaluation was performed.<br><br><strong>Error:</strong> {error_msg}</em>'
         else:
-            overall_explanation = '<em style="color: #9ca3af;">No overall explanation available</em>'
+            eval_status = vision_data.get('status', 'unknown') if 'vision_data' in locals() else 'unknown'
+            if eval_status == 'failed':
+                overall_explanation = '<em style="color: #dc2626;">Evaluation failed - no overall assessment available</em>'
+            else:
+                overall_explanation = '<em style="color: #9ca3af;">No overall explanation available</em>'
 
     # Show total score breakdown
-    viz_score = viz_quality.get('score', 0)
+    # viz_score is already set above (line 851 for successful cases, line 877 for failed cases)
     score_summary = f"""
         <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
             <h4 style="color: #667eea; margin-bottom: 10px;">Score Summary</h4>
@@ -938,6 +1010,54 @@ def generate_rubric_section(eval_data: Dict[str, Any]) -> str:
                     <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
                     <p style="color: #666;">{overall_explanation}</p>
                 </div>
+            </div>
+        </div>
+    """
+
+
+def generate_text_section(eval_data: Dict[str, Any]) -> str:
+    """Generate text-based Q&A evaluation section."""
+    subtype_results = eval_data.get('subtype_results', {})
+
+    if 'text' not in subtype_results:
+        return ""
+
+    text_data = subtype_results['text']
+    rubric = text_data.get('rubric', '')
+    answers_content = text_data.get('answers_content', '')
+    scores = text_data.get('scores', {})
+    explanation = text_data.get('explanation', '')
+
+    total_score = scores.get('total_score', 0)
+    max_score = scores.get('max_possible_score', 0)
+    percentage = scores.get('percentage', 0)
+
+    # Parse questions from rubric
+    questions_html = f'<div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: \'Monaco\', \'Courier New\', monospace; font-size: 0.9em; line-height: 1.6;">{rubric}</div>'
+
+    # Format answers
+    answers_html = f'<div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: \'Monaco\', \'Courier New\', monospace; font-size: 0.9em; line-height: 1.6;">{answers_content}</div>'
+
+    # Format evaluation
+    eval_html = f'<div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>{explanation}</div>'
+
+    return f"""
+        <div class="section-box">
+            <h3 class="expandable">📝 Text-Based Q&A Evaluation</h3>
+            <div class="expandable-content">
+                <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <h4 style="color: #667eea; margin-bottom: 10px;">Score</h4>
+                    <div style="font-size: 2em; font-weight: 700; color: #667eea;">{total_score}/{max_score} ({percentage:.1f}%)</div>
+                </div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Questions & Correct Answers</h4>
+                {questions_html}
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
+                {answers_html}
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
+                {eval_html}
             </div>
         </div>
     """
@@ -1007,6 +1127,20 @@ def generate_metrics_section(eval_data: Dict[str, Any], result: Dict[str, Any], 
                     <div class="metric-value">{image_metrics['lpips']:.4f}</div>
                 </div>
             """)
+
+    # Text Q&A metrics
+    if 'text' in subtype_results:
+        text_data = subtype_results['text']
+        text_scores = text_data.get('scores', {})
+        metrics.append(f"""
+            <div class="metric-box">
+                <div class="metric-label">Text Q&A Score</div>
+                <div class="metric-value">{text_scores.get('total_score', 0)}/{text_scores.get('max_possible_score', 0)}</div>
+                <div class="metric-subvalue">
+                    {text_scores.get('percentage', 0):.1f}%
+                </div>
+            </div>
+        """)
 
     # Token usage - prioritize parameter from test results, fallback to result data
     # The token_usage parameter comes from test_results/pvpython/test_result_*.json
