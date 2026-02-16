@@ -4,7 +4,7 @@
 # Test: Multi-channel Overlay with Colormaps with channels
 - vars:
     question: |
-      1. Load the "data/dataset_001/dataset_002.tif" dataset into napari. 
+      1. Load the "data/dataset_002/dataset_002.tif" dataset into napari. 
       2. Depending on the number of channels, set the colormap for the first channel 0 to red and channel 1 to green.
       3. Switch to the 3D view. 
       4. Use additive blending for all channels to create an overlay visualization.

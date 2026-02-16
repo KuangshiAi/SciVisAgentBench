@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluation Report - gmx_vmd_mcp</title>
+    <style>
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .header-meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .agent-name {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .timestamp {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .summary {
+            padding: 40px;
+            background: #f8f9fa;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .summary h2 {
+            color: #667eea;
+            margin-bottom: 25px;
+            font-size: 2em;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+
+        .summary-card h3 {
+            color: #667eea;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .summary-card .value {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .summary-card .sub-value {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .score-excellent { color: #10b981; }
+        .score-good { color: #3b82f6; }
+        .score-fair { color: #f59e0b; }
+        .score-poor { color: #ef4444; }
+
+        .config-info {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .config-info h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .config-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .config-item label {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+
+        .config-item value {
+            font-size: 1em;
+            color: #333;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        .case-nav {
+            padding: 30px 40px;
+            background: white;
+            border-bottom: 2px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .case-nav h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .case-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .case-link {
+            padding: 8px 16px;
+            background: #f3f4f6;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 500;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+
+        .case-link:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .case-section {
+            padding: 40px;
+            border-bottom: 3px solid #f3f4f6;
+        }
+
+        .case-section:last-child {
+            border-bottom: none;
+        }
+
+        .case-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .case-title-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .case-title {
+            font-size: 1.8em;
+            color: #333;
+            font-weight: 700;
+        }
+
+        .status-badge {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.7em;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .status-failed {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .status-warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .case-score {
+            font-size: 1.5em;
+            font-weight: 700;
+            padding: 10px 25px;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .case-content {
+            display: grid;
+            gap: 30px;
+        }
+
+        .section-box {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section-box h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .task-description {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+            border: 1px solid #e5e7eb;
+        }
+
+        .image-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .image-box {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .image-box h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .image-box img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+        }
+
+        .image-box .no-image {
+            width: 100%;
+            height: 300px;
+            background: #f3f4f6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            font-size: 1.1em;
+        }
+
+        .rubric-scores {
+            display: grid;
+            gap: 15px;
+        }
+
+        .rubric-item {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .rubric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .rubric-title {
+            font-weight: 700;
+            color: #333;
+            flex: 1;
+        }
+
+        .rubric-score {
+            font-size: 1.3em;
+            font-weight: 700;
+            padding: 5px 15px;
+            border-radius: 20px;
+            background: #667eea;
+            color: white;
+        }
+
+        .rubric-criterion {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            color: #333;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .rubric-criterion strong {
+            color: #667eea;
+            font-style: normal;
+        }
+
+        .rubric-explanation {
+            color: #666;
+            line-height: 1.6;
+            margin-top: 10px;
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            border-left: 3px solid #667eea;
+        }
+
+        .rubric-explanation strong {
+            color: #764ba2;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .metric-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .metric-label {
+            font-size: 0.85em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .metric-subvalue {
+            font-size: 0.9em;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .code-similarity {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+        }
+
+        .code-similarity h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .code-sim-score {
+            font-size: 2em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .code-sim-details {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .expandable {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .expandable::before {
+            content: '▼ ';
+            display: inline-block;
+            transition: transform 0.3s;
+        }
+
+        .expandable.collapsed::before {
+            transform: rotate(-90deg);
+        }
+
+        .expandable-content {
+            margin-top: 15px;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .expandable-content.collapsed {
+            max-height: 0;
+            margin-top: 0;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .footer p {
+            margin: 5px 0;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .image-comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .case-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .case-title-group {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .case-title {
+                font-size: 1.5em;
+            }
+        }
+    
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🎯 SciVisAgentBench Evaluation Report</h1>
+            <div class="header-meta">
+                <span class="agent-name">gmx_vmd_mcp</span>
+                <span class="timestamp">Generated: 2026-02-16T16:33:41.967274</span>
+            </div>
+        </header>
+
+        
+        <section class="summary">
+            <h2>📊 Overall Performance</h2>
+
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h3>Overall Score</h3>
+                    <div class="value score-fair">
+                        60.0%
+                    </div>
+                    <div class="sub-value">
+                        66/110 Points
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h3>Test Cases</h3>
+                    <div class="value">
+                        2/2
+                    </div>
+                    <div class="sub-value">
+                        Completed Successfully
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h3>Avg Vision Score</h3>
+                    <div class="value">
+                        55.2%
+                    </div>
+                    <div class="sub-value">
+                        Visualization Quality
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h3>Avg Code Similarity</h3>
+                    <div class="value">
+                        0.0%
+                    </div>
+                    <div class="sub-value">
+                        Code Quality Match
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h3>PSNR (Scaled)</h3>
+                    <div class="value">
+                        N/A
+                    </div>
+                    <div class="sub-value">
+                        Peak SNR (0/2 valid)
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h3>SSIM (Scaled)</h3>
+                    <div class="value">
+                        N/A
+                    </div>
+                    <div class="sub-value">
+                        Structural Similarity
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h3>LPIPS (Scaled)</h3>
+                    <div class="value">
+                        N/A
+                    </div>
+                    <div class="sub-value">
+                        Perceptual Distance
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h3>Completion Rate</h3>
+                    <div class="value">
+                        100.0%
+                    </div>
+                    <div class="sub-value">
+                        Tasks completed
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; padding: 15px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #667eea;">
+                <h4 style="color: #667eea; margin-bottom: 10px;">ℹ️ About Scaled Metrics</h4>
+                <p style="color: #666; line-height: 1.6; margin: 0;">
+                    <strong>Scaled metrics</strong> account for completion rate to enable fair comparison across different evaluation modes.
+                    Formula: <em>PSNR<sub>scaled</sub> = (completed_cases / total_cases) × avg(PSNR)</em>,
+                    <em>SSIM<sub>scaled</sub> = (completed_cases / total_cases) × avg(SSIM)</em>,
+                    <em>LPIPS<sub>scaled</sub> = 1.0 - (completed_cases / total_cases) × (1.0 - avg(LPIPS))</em>.
+                    Cases with infinite PSNR (perfect match) are excluded from PSNR calculation.
+                </p>
+            </div>
+
+            <div class="config-info">
+                <h3>🔧 Configuration</h3>
+                <div class="config-grid">
+                    <div class="config-item">
+                        <label>Provider</label>
+                        <value>anthropic</value>
+                    </div>
+                    <div class="config-item">
+                        <label>Model</label>
+                        <value>claude-sonnet-4-5</value>
+                    </div>
+                    <div class="config-item">
+                        <label>Base URL</label>
+                        <value>https://api.anthropic.com</value>
+                    </div>
+                    <div class="config-item">
+                        <label>Input Price</label>
+                        <value>$3.00</value>
+                    </div>
+                    <div class="config-item">
+                        <label>Output Price</label>
+                        <value>$15.00</value>
+                    </div>
+                </div>
+            </div>
+        </section>
+    
+
+        <nav class="case-nav">
+            <h3>Jump to Case:</h3>
+            <div class="case-links">
+                <a href="#curved-membrane" class="case-link">curved-membrane</a>
+<a href="#ras-raf-membrane" class="case-link">ras-raf-membrane</a>
+            </div>
+        </nav>
+
+        
+        <section class="case-section" id="curved-membrane">
+            <div class="case-header">
+                <div class="case-title-group">
+                    <h2 class="case-title">📝 curved-membrane</h2>
+                    
+                </div>
+                <div class="case-score">23/45 (51.1%)</div>
+            </div>
+
+            <div class="case-content">
+                <div class="section-box">
+                    <h3>📋 Task Description</h3>
+                    <div class="task-description">1. Please load the Martini coarse-grained simulation file from "curved-membrane/data/curved-membrane." into VMD.
+
+2. Use VMD to show a zoomed in view of the membrane side coloring the water blue and the lipid phosphate (PO4 beads) red, and take a screenshot.
+
+3. Analyze the visualization and answer the following questions:
+Q1: Is there any water that penetrates into the membrane phase? (yes/no)
+
+4. Save your work:
+Save the VMD state as "curved-membrane/results/{agent_mode}/curved-membrane.vmd".
+Save the screenshot of the visualization as "curved-membrane/results/{agent_mode}/curved-membrane.png".
+Save the answers to the analysis questions in plain text as "curved-membrane/results/{agent_mode}/answers.txt".
+</div>
+                </div>
+
+                
+        <div class="section-box">
+            <h3>🖼️ Visualization Comparison</h3>
+            <div class="image-comparison">
+                <div class="image-box">
+                    <h4>Ground Truth</h4>
+                    <img src="images/curved-membrane_gt.png" alt="Ground Truth" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
+                </div>
+                <div class="image-box">
+                    <h4>Agent Result</h4>
+                    <img src="images/curved-membrane_result.png" alt="Result" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
+                </div>
+            </div>
+        </div>
+    
+
+                
+        <div class="section-box">
+            <h3 class="expandable">📏 Vision Evaluation Rubrics</h3>
+            <div class="expandable-content">
+                
+        <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+            <h4 style="color: #667eea; margin-bottom: 10px;">Score Summary</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">3/20</div>
+                </div>
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">2</div>
+                </div>
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Points/Goal</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">10</div>
+                </div>
+            </div>
+        </div>
+    
+                <div class="rubric-scores" style="margin-top: 15px;">
+                    
+            <div class="rubric-item">
+                <div class="rubric-header">
+                    <div class="rubric-title">Goal 1</div>
+                    <div class="rubric-score">2/10</div>
+                </div>
+                <div class="rubric-criterion">
+                    <strong>Criterion:</strong> 1. Does the visualization show a side view of a bilayer rather than a top-down or oblique view?
+                </div>
+                <div class="rubric-explanation">
+                    <strong>Judge's Assessment:</strong> Ground truth shows a clear side view of a curved bilayer: two opposing leaflets with red PO4 bands and blue water regions above/below. The result image does not show a discernible membrane side profile; it appears as a sparse cloud of tiny points with no clear bilayer geometry or leaflet structure. Orientation (side vs top/oblique) cannot be confirmed from the result, and it does not visually match the ground truth side-view presentation.
+                </div>
+            </div>
+         
+            <div class="rubric-item">
+                <div class="rubric-header">
+                    <div class="rubric-title">Goal 2</div>
+                    <div class="rubric-score">1/10</div>
+                </div>
+                <div class="rubric-criterion">
+                    <strong>Criterion:</strong> Is water present above and below the bilayer, with a mostly empty region in the middle corresponding to the bilayer core?
+                </div>
+                <div class="rubric-explanation">
+                    <strong>Judge's Assessment:</strong> In the ground truth, water (blue) clearly occupies bulk regions on both sides of the membrane, with a relatively empty/low-water bilayer core between the red PO4 layers. In the result, there is no clear separation into water-above/water-below regions and no obvious empty membrane core; the distribution looks uniform/noisy and the expected bilayer interior void is not apparent. Thus the key spatial organization is not reproduced.
+                </div>
+            </div>
+        
+                </div>
+                <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
+                    <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
+                    <p style="color: #666;">Compared to the ground truth, the result fails to depict a recognizable side-view lipid bilayer and does not show the expected water–membrane–water layering with an empty hydrophobic core. The rendering style (tiny scattered points) prevents assessing membrane penetration and does not meet the visualization goals.</p>
+                </div>
+            </div>
+        </div>
+    
+
+                
+        <div class="section-box">
+            <h3 class="expandable">📝 Text-Based Q&A Evaluation</h3>
+            <div class="expandable-content">
+                <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <h4 style="color: #667eea; margin-bottom: 10px;">Score</h4>
+                    <div style="font-size: 2em; font-weight: 700; color: #667eea;">10/10 (100.0%)</div>
+                </div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Questions & Correct Answers</h4>
+                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Q1 correct answer: Yes</div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Analysis of Curved Membrane Martini Coarse-Grained Simulation
+================================================================
+
+Q1: Is there any water that penetrates into the membrane phase?
+
+Answer: yes
+
+Explanation:
+Based on the visualization showing water beads (blue, W beads) and lipid phosphate beads (red, PO4 beads), water penetration into the membrane phase is observable. The membrane structure shows two distinct phosphate layers (red) forming the inner and outer leaflets of the bilayer. While the majority of water beads are located in the bulk aqueous phases on both sides of the curved membrane, some blue water beads can be seen within the membrane interior (the hydrophobic core region between the two phosphate layers). This indicates that water molecules do penetrate into the membrane phase, which is a known phenomenon in molecular dynamics simulations, particularly in curved or stressed membrane systems where defects or transient pores may allow water penetration.</div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided answer is exactly "yes," which matches the required correct answer. The accompanying explanation is consistent with the claim (water beads observed within the membrane interior between phosphate layers) and does not contradict the criterion. Therefore it fully meets the evaluation criterion.</div>
+            </div>
+        </div>
+    
+
+                
+        <div class="section-box">
+            <h3>📊 Detailed Metrics</h3>
+            <div class="metrics-grid">
+            <div class="metric-box">
+                <div class="metric-label">Visualization Quality</div>
+                <div class="metric-value">3/20</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Generation</div>
+                <div class="metric-value">5/5</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Efficiency</div>
+                <div class="metric-value">5/10</div>
+                <div class="metric-subvalue">
+                    Completed in 389.50 seconds (very slow)
+                </div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Text Q&A Score</div>
+                <div class="metric-value">10/10</div>
+                <div class="metric-subvalue">
+                    100.0%
+                </div>
+            </div>
+        </div>
+            
+        </div>
+    
+            </div>
+        </section>
+    
+
+        <section class="case-section" id="ras-raf-membrane">
+            <div class="case-header">
+                <div class="case-title-group">
+                    <h2 class="case-title">📝 ras-raf-membrane</h2>
+                    
+                </div>
+                <div class="case-score">43/65 (66.2%)</div>
+            </div>
+
+            <div class="case-content">
+                <div class="section-box">
+                    <h3>📋 Task Description</h3>
+                    <div class="task-description">Your agent_mode is "mcp", use it when saving results. Your working directory is "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench/SciVisAgentBench-tasks/molecular_vis/workflows", and you should have access to it. In the following prompts, we will use relative path with respect to your working path. But remember, when you load or save any file, always stick to absolute path.
+
+1. Please load the Martini coarse-grained simulation file from "ras-raf-membrane/data/ras-raf-membrane.gro" into VMD. The simulations has a membrane and a RAS-RAF protein complex.
+
+2. Use VMD to show a zoomed in side view of the membrane and center on the protein with the protein below the membrane.
+For the bilayer only show the PO4 lipids beads and ROH cholesterol bead and color them gray. 
+Also show the protein back bone beads coloring RAS (resid 2 to 187) red and RAF (resid 188 to 329) blue.
+Take a screenshot of the visualization.
+
+3. Analyze the visualization and answer the following questions:
+Q1: Are there any cholesterol head groups in the bilayer center? (yes/no)
+
+Q2: How many lipids are there within 1.5 nm of the RAF protein?
+  A. 0
+  B. 0-3
+  C. 3-5
+  D. >5
+
+4. Save your work:
+Save the VMD state as "ras-raf-membrane/results/{agent_mode}/ras-raf-membrane.vmd".
+Save the screenshot of the visualization as "ras-raf-membrane/results/{agent_mode}/ras-raf-membrane.png".
+Save the answers to the analysis questions in plain text as "ras-raf-membrane/results/{agent_mode}/answers.txt".</div>
+                </div>
+
+                
+        <div class="section-box">
+            <h3>🖼️ Visualization Comparison</h3>
+            <div class="image-comparison">
+                <div class="image-box">
+                    <h4>Ground Truth</h4>
+                    <img src="images/ras-raf-membrane_gt.png" alt="Ground Truth" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
+                </div>
+                <div class="image-box">
+                    <h4>Agent Result</h4>
+                    <img src="images/ras-raf-membrane_result.png" alt="Result" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
+                </div>
+            </div>
+        </div>
+    
+
+                
+        <div class="section-box">
+            <h3 class="expandable">📏 Vision Evaluation Rubrics</h3>
+            <div class="expandable-content">
+                
+        <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+            <h4 style="color: #667eea; margin-bottom: 10px;">Score Summary</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">23/30</div>
+                </div>
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">3</div>
+                </div>
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Points/Goal</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">10</div>
+                </div>
+            </div>
+        </div>
+    
+                <div class="rubric-scores" style="margin-top: 15px;">
+                    
+            <div class="rubric-item">
+                <div class="rubric-header">
+                    <div class="rubric-title">Goal 1</div>
+                    <div class="rubric-score">7/10</div>
+                </div>
+                <div class="rubric-criterion">
+                    <strong>Criterion:</strong> 1. Camera Position: Is the image centered on a protein complex composed of clearly distinguishable half red RAS and half blue RAF components?
+                </div>
+                <div class="rubric-explanation">
+                    <strong>Judge's Assessment:</strong> Ground truth shows a centered side view with the protein complex clearly visible below the bilayer, with a large red RAS portion and smaller blue RAF portion (distinct halves). The result image shows the same red/blue protein below the membrane and the colors are distinguishable, but the protein is smaller in the frame and sits lower/left rather than being tightly centered and zoomed like the ground truth. Overall composition matches but with weaker centering/zoom.
+                </div>
+            </div>
+         
+            <div class="rubric-item">
+                <div class="rubric-header">
+                    <div class="rubric-title">Goal 2</div>
+                    <div class="rubric-score">8/10</div>
+                </div>
+                <div class="rubric-criterion">
+                    <strong>Criterion:</strong> Membrane Placement: Is a lipid bilayer clearly visible above the protein?
+                </div>
+                <div class="rubric-explanation">
+                    <strong>Judge's Assessment:</strong> In the ground truth, the membrane bilayer is clearly visible as two gray bead layers above the protein. The result also clearly shows a bilayer above the protein with two gray bands spanning the image. Minor issue: the result has a noticeable background artifact/gradient on the right side and the membrane occupies a slightly different vertical placement, but the bilayer-above-protein requirement is met well.
+                </div>
+            </div>
+         
+            <div class="rubric-item">
+                <div class="rubric-header">
+                    <div class="rubric-title">Goal 3</div>
+                    <div class="rubric-score">8/10</div>
+                </div>
+                <div class="rubric-criterion">
+                    <strong>Criterion:</strong> Correct Leaflet Ordering: Is the inner leaflet of the bilayer closer to the protein and the outer leaflet positioned farther away?
+                </div>
+                <div class="rubric-explanation">
+                    <strong>Judge's Assessment:</strong> Ground truth shows correct leaflet ordering: the lower leaflet (inner leaflet) is closest to the protein and the upper leaflet is farther away, with a clear gap between leaflets. The result also shows two separated leaflets with the lower leaflet nearer the protein and the upper leaflet above it. The spacing/relative positioning is very similar, though not as cleanly framed as the ground truth.
+                </div>
+            </div>
+        
+                </div>
+                <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
+                    <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
+                    <p style="color: #666;">The result reproduces the key scientific layout: a side-view bilayer with two leaflets above a red/blue RAS-RAF complex below, with correct leaflet ordering. The main deviations from the ground truth are weaker centering/zoom on the protein and visible background rendering artifacts, but the essential structural relationships match well.</p>
+                </div>
+            </div>
+        </div>
+    
+
+                
+        <div class="section-box">
+            <h3 class="expandable">📝 Text-Based Q&A Evaluation</h3>
+            <div class="expandable-content">
+                <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <h4 style="color: #667eea; margin-bottom: 10px;">Score</h4>
+                    <div style="font-size: 2em; font-weight: 700; color: #667eea;">10/20 (50.0%)</div>
+                </div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Questions & Correct Answers</h4>
+                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Q1 correct answer: Yes
+2. Q2 correct answer: C. 3-5</div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Analysis Results for RAS-RAF Membrane Simulation
+================================================
+
+Q1: Are there any cholesterol head groups in the bilayer center?
+Answer: yes
+
+Explanation: Analysis found 4 ROH (cholesterol head group) beads within 0.5 nm of the bilayer center (z-center at 123.02 nm). The bilayer spans from z = 93.84 nm to z = 152.21 nm.
+
+
+Q2: How many lipids are there within 1.5 nm of the RAF protein?
+Answer: B
+
+Explanation: Analysis found 2 lipid beads (PO4 or ROH) within 1.5 nm (15 Angstroms) of the RAF protein (resid 188-329). This falls in the range of 0-3 lipids, corresponding to option B.
+
+Additional Details:
+- RAF protein contains 135 backbone beads
+- Total lipid beads in system: 3172 (PO4 + ROH)
+- Lipid beads near RAF: 2</div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes) — Score: 10/10. The provided answer to Q1 is "yes," which exactly matches the required correct answer. The accompanying explanation (4 ROH beads within 0.5 nm of the bilayer center) is consistent with the claim and supports the correctness.
+
+Criterion 2 (Q2 correct answer: C (3–5)) — Score: 0/10. The provided answer to Q2 is option B (0–3), justified by finding 2 lipid beads within 1.5 nm of RAF. However, the evaluation criterion states the correct answer should be C (3–5). Since the selected option does not match the required correct option, it fails the criterion regardless of the internal consistency of the explanation.</div>
+            </div>
+        </div>
+    
+
+                
+        <div class="section-box">
+            <h3>📊 Detailed Metrics</h3>
+            <div class="metrics-grid">
+            <div class="metric-box">
+                <div class="metric-label">Visualization Quality</div>
+                <div class="metric-value">23/30</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Generation</div>
+                <div class="metric-value">5/5</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Efficiency</div>
+                <div class="metric-value">5/10</div>
+                <div class="metric-subvalue">
+                    Completed in 98.45 seconds (very slow)
+                </div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Text Q&A Score</div>
+                <div class="metric-value">10/20</div>
+                <div class="metric-subvalue">
+                    50.0%
+                </div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Input Tokens</div>
+                <div class="metric-value">23,420</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Tokens</div>
+                <div class="metric-value">581</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Tokens</div>
+                <div class="metric-value">24,001</div>
+            </div>
+        </div>
+            
+        </div>
+    
+            </div>
+        </section>
+    
+
+        <footer class="footer">
+            <p>Generated by SciVisAgentBench Evaluation Reporter</p>
+            <p>Timestamp: 2026-02-16T16:33:41.967274</p>
+        </footer>
+    </div>
+
+    <script>
+        
+        // Expandable sections
+        document.querySelectorAll('.expandable').forEach(element => {
+            element.addEventListener('click', function() {
+                this.classList.toggle('collapsed');
+                const content = this.nextElementSibling;
+                if (content && content.classList.contains('expandable-content')) {
+                    content.classList.toggle('collapsed');
+                }
+            });
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Initialize expandable sections as collapsed
+        document.querySelectorAll('.expandable-content').forEach(content => {
+            content.style.maxHeight = content.scrollHeight + 'px';
+        });
+
+        console.log('📊 Evaluation Report Loaded');
+    
+    </script>
+</body>
+</html>

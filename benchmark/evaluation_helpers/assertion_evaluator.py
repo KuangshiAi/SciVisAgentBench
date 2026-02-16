@@ -242,7 +242,7 @@ Please evaluate whether the agent's response meets the criteria. Respond with ex
                 passed = True
                 status = "passed"
                 details = "Response contains <1> (success)"
-                score = 1
+                score = 10  # Score 10 for pass (matching other test case scoring)
             elif '<0>' in agent_response_stripped:
                 passed = False
                 status = "failed"
@@ -291,6 +291,9 @@ Please evaluate whether the agent's response meets the criteria. Respond with ex
 
         # For binary responses, we treat it as 1 assertion (not 2)
         effective_assertions = 1 if is_binary_response else len(assertions)
+        # Binary responses are worth 10 points (matching other test cases), non-binary worth 1 point each
+        max_score_per_assertion = 10 if is_binary_response else 1
+        max_possible_score = effective_assertions * max_score_per_assertion
 
         final_result = {
             "status": "completed",
@@ -302,11 +305,12 @@ Please evaluate whether the agent's response meets the criteria. Respond with ex
                 "total_score": total_score,
                 "total_passed": total_passed,
                 "total_assertions": effective_assertions,
+                "max_possible_score": max_possible_score,
                 "pass_rate": total_passed / effective_assertions if effective_assertions else 0,
                 "average_score": total_score / effective_assertions if effective_assertions else 0
             },
-            # Top-level score field for easy access (binary: 1 if all passed, 0 otherwise)
-            "score": 1 if total_passed == effective_assertions else 0,
+            # Top-level score field for easy access (binary: 10 if passed, 0 if failed; non-binary: 1 if all passed, 0 otherwise)
+            "score": total_score if is_binary_response else (1 if total_passed == effective_assertions else 0),
             "timestamp": datetime.now().isoformat()
         }
 
@@ -318,6 +322,6 @@ Please evaluate whether the agent's response meets the criteria. Respond with ex
 
         print(f"✅ Evaluation completed for {self.case_name}")
         print(f"Passed: {total_passed}/{effective_assertions} ({final_result['scores']['pass_rate']:.1%})")
-        print(f"Score: {final_result['score']} (Total: {total_score}/{effective_assertions})")
+        print(f"Score: {final_result['score']} (Total: {total_score}/{max_possible_score})")
 
         return final_result

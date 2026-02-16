@@ -88,16 +88,25 @@ class EvaluationReporter:
                 yaml_data = yaml.safe_load(f)
 
             cases = {}
-            for item in yaml_data:
+            import re
+
+            for idx, item in enumerate(yaml_data):
                 if 'vars' in item:
                     # Extract case name from the question
                     question = item['vars'].get('question', '')
+                    case_name = None
+
                     # Try to extract case name from file paths in the question
                     # Pattern matches directory name before /data/ or /results/ (includes underscores)
-                    import re
                     match = re.search(r'([a-z0-9_-]+)/(?:data|results)/', question)
                     if match:
                         case_name = match.group(1)
+                    else:
+                        # Fallback: use operation_{index+1} naming pattern
+                        # This works for napari workflows and similar cases
+                        case_name = f"operation_{idx + 1}"
+
+                    if case_name:
                         cases[case_name] = item
 
             return cases

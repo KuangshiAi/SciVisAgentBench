@@ -625,12 +625,15 @@ class UnifiedTestRunner:
                     evaluated_cases += 1
                 # Check if this is assertion-based evaluation
                 elif "assertion_results" in eval_data:
-                    # Assertion-based: use the top-level score field (1 for pass, 0 for fail)
+                    # Assertion-based: use the score and max_possible_score from scores
+                    eval_scores = eval_data.get("scores", {})
                     score = eval_data.get("score", 0)
+                    max_score = eval_scores.get("max_possible_score", 1)  # Default to 1 if not specified
                     total_eval_score += score
-                    total_eval_max_score += 1  # Each assertion-based case is worth 1 point
+                    total_eval_max_score += max_score
                     evaluated_cases += 1
-                    if score == 1:
+                    # Count as passed if score equals max_score
+                    if score == max_score:
                         assertion_passed_cases += 1
                 else:
                     # Score-based: use scores.total_score and max_possible_score
