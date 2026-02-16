@@ -26,6 +26,7 @@
           Q2: What is the type of critical point closest to coordinates (4,58,12): 
           (A) minimum (B) 1-saddle (C) 2-saddle (D) maximum
         Save the answers to the analysis questions in plain text as "QMCPACK/results/{agent_mode}/answers.txt".
+        Do not save any files other than the specified result files.
   assert:
     - type: rule_based
       eval_script: QMCPACK/GS/QMCPACK_eval.py
@@ -56,6 +57,7 @@
           Q2: Out of all degenerate points, the sum of one point's coordinates is the highest. What is this highest sum, rounded to the nearest integer?
           (A) 124 (B) 136 (C) 148 (D) 160
         Save the answers to the analysis questions in plain text as "brain/results/{agent_mode}/answers.txt".
+        Do not save any files other than the specified result files.
   assert:
     - type: rule_based
       eval_script: brain/GS/brain_eval.py
@@ -87,6 +89,7 @@
           Q2: How many points are in the largest partition region?
           (A) 6879 (B) 7968 (C) 8796 (D) 9687
         Save the answers to the analysis questions in plain text as "cylinder/results/{agent_mode}/answers.txt".
+        Do not save any files other than the specified result files.
   assert:
     - type: rule_based
       eval_script: cylinder/GS/cylinder_eval.py
@@ -127,6 +130,7 @@
           Q3: What is the highest scalar field value of a minimum, rounded to the nearest whole number?
           (A) 12 (B) 26 (C) 31 (D) 58
           Save the answers to the analysis questions in plain text as "isabel/results/{agent_mode}/answers.txt".
+          Do not save any files other than the specified result files.
   assert:
     - type: rule_based
       eval_script: isabel/GS/isabel_eval.py
@@ -176,6 +180,7 @@
           Q3: Which is the least common classification in the eigenvalue partition?
           (A) Positive scaling (B) counterclockwise rotation (C) negative scaling (D) clockwise rotation
           Save the answers to the analysis questions in plain text as "ocean/results/{agent_mode}/answers.txt".
+          Do not save any files other than the specified result files.
   assert:
     - type: rule_based
       eval_script: ocean/GS/ocean_eval.py
@@ -209,6 +214,7 @@
               * "Birth" array: store the birth value of each pair.
               * "Persistence" array: store the persistence value of each pair.
               * "IsFinite" array: use 1 to mark finite persistence and 0 to mark infinite persistence.
+          Do not save any files other than the specified result files.
   assert:
     - type: rule_based
       eval_script: noisyTerrain/GS/noisyTerrain_eval.py
@@ -228,6 +234,7 @@
           3. Save the Morse-Smale segmentation as "molecule/results/{agent_mode}/molecule.vti". 
           It should have a point array called "Segmentation". 
           For each point x, the array "Segmentation" should store the id number of the region in the segmentation that x belongs to.
+          Do not save any files other than the specified result files.
   assert:
     - type: rule_based
       eval_script: molecule/GS/molecule_eval.py
@@ -248,6 +255,7 @@
           4. Save only the Ascending Manifold as "moons/results/{agent_mode}/moons.vti".
           It should have a point array called "AscendingManifold". 
           For each point x, the array "AscendingManifold" should store the id number of the region that x belongs to.
+          Do not save any files other than the specified result files.
   assert:
     - type: rule_based
       eval_script: moons/GS/moons_eval.py
@@ -276,6 +284,7 @@
                 * 2 for 2-saddles
                 * 3 for maxima
             - The point coordinates should be in world coordinates 
+        Do not save any files other than the specified result files.
   assert:
     - type: rule_based
       eval_script: dragon/GS/dragon_eval.py
