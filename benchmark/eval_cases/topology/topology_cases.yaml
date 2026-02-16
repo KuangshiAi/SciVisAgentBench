@@ -231,11 +231,11 @@
   assert:
     - type: rule_based
       eval_script: molecule/GS/molecule_eval.py
-      eval_function: 
+      eval_function: evaluateMoleculeSegmentation
       gs_file: 
-        - molecule/GS/molecule_gs.vtk
+        - molecule/GS/molecule_gs.vti
       rs_file: 
-        - molecule/results/{agent_mode}/molecule.vtk
+        - molecule/results/{agent_mode}/molecule.vti
 
 
 # 8. moons
@@ -253,9 +253,9 @@
       eval_script: moons/GS/moons_eval.py
       eval_function: evaluateMoonAscendingManifold
       gs_file: 
-        - moons/GS/moons_gs.vtk
+        - moons/GS/moons_gs.vti
       rs_file: 
-        - moons/results/{agent_mode}/moons.vtk
+        - moons/results/{agent_mode}/moons.vti
 
 
 # 9. dragon
@@ -276,19 +276,6 @@
                 * 2 for 2-saddles
                 * 3 for maxima
             - The point coordinates should be in world coordinates 
-
-        5. Analyze the visualization and answer the following questions:
-
-        Q1: How many saddle-maximum pairs are present in the dataset? 
-        (A) 2 (B) 4 (C) 6 (D) 10.
-
-        Q2: How many minima are computed?
-        (A) 2 (B) 5 (C) 8 (D) 10.
-
-        Q3: Are there any saddle-saddle pairs in the persistence diagram?
-        (Yes/No)
-
-        Save the answers to the analysis questions in plain text as "dragon/results/{agent_mode}/answers.txt".
   assert:
     - type: rule_based
       eval_script: dragon/GS/dragon_eval.py
@@ -297,11 +284,3 @@
         - dragon/GS/dragon_gs.vtk
       rs_file: 
         - dragon/results/{agent_mode}/dragon.vtk
-    - type: llm-rubric
-      subtype: text
-      value: |
-          1. Q1 correct answer: (C) 6
-
-          2. Q2 correct answer: (B) 5
-
-          3. Q3 correct answer: No
