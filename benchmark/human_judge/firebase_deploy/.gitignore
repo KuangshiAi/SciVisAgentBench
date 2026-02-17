@@ -1,0 +1,32 @@
+# Firebase
+.firebase/
+.firebaserc
+
+# Service account keys (NEVER commit these!)
+serviceAccountKey.json
+*-firebase-adminsdk-*.json
+
+# Generated data
+data/cases.json
+data/cases_firebase.json
+
+# Images (too large for git, use Firebase Storage instead)
+images/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Node modules (if using)
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

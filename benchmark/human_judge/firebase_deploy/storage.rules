@@ -1,0 +1,10 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Images are publicly readable but only writable via admin scripts
+    match /images/{allPaths=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}

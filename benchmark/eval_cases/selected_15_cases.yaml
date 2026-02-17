@@ -1,0 +1,87 @@
+# Selected 15 Cases for Human Evaluation
+# These cases represent diverse visualization capabilities across the benchmark
+#
+# Each case specifies:
+#   - name: The case directory name
+#   - path: Path to the case directory (relative to workspace root)
+#   - yaml: Path to the YAML file containing evaluation criteria
+#   - description: Brief description of what the case tests
+
+cases:
+  # From main benchmark (7 cases)
+  - name: argon-bubble
+    path: SciVisAgentBench-tasks/main/argon-bubble
+    yaml: benchmark/eval_cases/paraview/main_cases.yaml
+    description: Color & Opacity Mapping, Volume Rendering
+
+  - name: bonsai
+    path: SciVisAgentBench-tasks/main/bonsai
+    yaml: benchmark/eval_cases/paraview/main_cases.yaml
+    description: Volume Rendering
+
+  - name: trl-velocity_streamline
+    path: SciVisAgentBench-tasks/main/trl-velocity_streamline
+    yaml: benchmark/eval_cases/paraview/main_cases.yaml
+    description: Temporal Processing (Streamline)
+
+  - name: tornado
+    path: SciVisAgentBench-tasks/main/tornado
+    yaml: benchmark/eval_cases/paraview/main_cases.yaml
+    description: Glyph & Marker Placement
+
+  - name: tgc-velocity_contour
+    path: SciVisAgentBench-tasks/main/tgc-velocity_contour
+    yaml: benchmark/eval_cases/paraview/main_cases.yaml
+    description: Surface & Contour Extraction
+
+  - name: rti-velocity_slices
+    path: SciVisAgentBench-tasks/main/rti-velocity_slices
+    yaml: benchmark/eval_cases/paraview/main_cases.yaml
+    description: View & Camera Control, Data Subsetting & Extraction
+
+  - name: supernova-velocity_isosurface
+    path: SciVisAgentBench-tasks/main/supernova-velocity_isosurface
+    yaml: benchmark/eval_cases/paraview/main_cases.yaml
+    description: Surface & Contour Extraction (isosurface)
+
+  # From chatvis_bench (6 cases)
+  - name: time-varying
+    path: SciVisAgentBench-tasks/chatvis_bench/time-varying
+    yaml: benchmark/eval_cases/paraview/chatvis_bench_cases.yaml
+    description: Temporal Processing
+
+  - name: chart-opacity
+    path: SciVisAgentBench-tasks/chatvis_bench/chart-opacity
+    yaml: benchmark/eval_cases/paraview/chatvis_bench_cases.yaml
+    description: Plot & Chart Generation
+
+  - name: climate
+    path: SciVisAgentBench-tasks/chatvis_bench/climate
+    yaml: benchmark/eval_cases/paraview/chatvis_bench_cases.yaml
+    description: Field Computation
+
+  - name: materials
+    path: SciVisAgentBench-tasks/chatvis_bench/materials
+    yaml: benchmark/eval_cases/paraview/chatvis_bench_cases.yaml
+    description: Scientific Insight Derivation
+
+  - name: subseries-of-time-series
+    path: SciVisAgentBench-tasks/chatvis_bench/subseries-of-time-series
+    yaml: benchmark/eval_cases/paraview/chatvis_bench_cases.yaml
+    description: Dataset Restructuring
+
+  - name: shrink-sphere
+    path: SciVisAgentBench-tasks/chatvis_bench/shrink-sphere
+    yaml: benchmark/eval_cases/paraview/chatvis_bench_cases.yaml
+    description: Geometric & Topological Transformation
+
+  # From molecular_vis/workflows (2 cases)
+  - name: curved-membrane
+    path: SciVisAgentBench-tasks/molecular_vis/workflows/curved-membrane
+    yaml: benchmark/eval_cases/molecular_vis/workflows/eval_analysis_workflows.yaml
+    description: Data Subsetting & Extraction
+
+  - name: ras-raf-membrane
+    path: SciVisAgentBench-tasks/molecular_vis/workflows/ras-raf-membrane
+    yaml: benchmark/eval_cases/molecular_vis/workflows/eval_analysis_workflows.yaml
+    description: View & Camera Control

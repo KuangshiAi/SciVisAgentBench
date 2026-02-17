@@ -1,0 +1,15 @@
+{
+  "rules": {
+    "evaluations": {
+      ".read": true,
+      ".write": true,
+      "$evaluationId": {
+        ".validate": "newData.hasChildren(['case_name', 'ratings', 'timestamp'])"
+      }
+    },
+    "sessions": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}

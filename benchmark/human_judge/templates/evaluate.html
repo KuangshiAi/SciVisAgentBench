@@ -571,6 +571,26 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="case-navigation" style="margin-top: 20px;">
+                    <div class="nav-buttons">
+                        <button class="btn-secondary" onclick="previousCase()" ${currentCaseIndex === 0 ? 'disabled' : ''}>
+                            ← Previous
+                        </button>
+                        <button class="btn-secondary" onclick="nextCase()" ${currentCaseIndex >= totalCases - 1 ? 'disabled' : ''}>
+                            Next →
+                        </button>
+                    </div>
+                    <div class="case-info-header">
+                        Case ${currentCaseIndex + 1} of ${totalCases}: ${caseData.case_name}
+                        <span class="evaluation-status ${isEvaluated ? 'status-evaluated' : 'status-not-evaluated'}">
+                            ${isEvaluated ? '✓ Evaluated' : '○ Not Evaluated'}
+                        </span>
+                    </div>
+                    <button class="btn-success" onclick="saveEvaluation()">
+                        Save Evaluation
+                    </button>
+                </div>
             `;
 
             document.getElementById('evaluation-content').innerHTML = html;
@@ -583,12 +603,28 @@
 
             return imagePaths.map((path, index) => {
                 const viewName = getViewName(path, index);
-                return `
-                    <div class="image-container">
-                        <div class="image-label">${viewName}</div>
-                        <img src="/images/${path}" alt="${label} - ${viewName}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 fill=%22%23999%22%3EImage not found%3C/text%3E%3C/svg%3E'">
-                    </div>
-                `;
+                const isVideo = path.toLowerCase().endsWith('.avi') || path.toLowerCase().endsWith('.mp4');
+
+                if (isVideo) {
+                    // Determine video MIME type
+                    const mimeType = path.toLowerCase().endsWith('.mp4') ? 'video/mp4' : 'video/x-msvideo';
+                    return `
+                        <div class="image-container">
+                            <div class="image-label">${viewName}</div>
+                            <video controls style="width: 100%; border: 1px solid #ddd; border-radius: 4px; display: block;">
+                                <source src="/images/${path}" type="${mimeType}">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="image-container">
+                            <div class="image-label">${viewName}</div>
+                            <img src="/images/${path}" alt="${label} - ${viewName}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 fill=%22%23999%22%3EImage not found%3C/text%3E%3C/svg%3E'">
+                        </div>
+                    `;
+                }
             }).join('');
         }
 
