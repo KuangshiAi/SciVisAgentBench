@@ -687,7 +687,7 @@ def generate_summary_section(
                         {completion_rate * 100:.1f}%
                     </div>
                     <div class="sub-value">
-                        Tasks completed
+                        Tasks Completed
                     </div>
                 </div>
             </div>
@@ -699,7 +699,7 @@ def generate_summary_section(
                     Formula: <em>PSNR<sub>scaled</sub> = (completed_cases / total_cases) × avg(PSNR)</em>,
                     <em>SSIM<sub>scaled</sub> = (completed_cases / total_cases) × avg(SSIM)</em>,
                     <em>LPIPS<sub>scaled</sub> = 1.0 - (completed_cases / total_cases) × (1.0 - avg(LPIPS))</em>.
-                    Cases with infinite PSNR (perfect match) are excluded from PSNR calculation.
+                    Cases with infinite PSNR (perfect match) are excluded from the PSNR calculation.
                 </p>
             </div>
 
@@ -893,18 +893,14 @@ def generate_rubric_section(eval_data: Dict[str, Any], result: Dict[str, Any] = 
         import re
         # Try splitting by "1) 2) 3)" format first (handles both inline and newline-separated)
         # Pattern: digit(s) followed by ) and optional whitespace
-        criteria_parts = re.split(r'\s*\d+\)\s+', rubric)
+        criteria_parts = re.split(r'(?:^|\s)\d+\)\s*', rubric)
         # Remove empty first element and clean up whitespace
         rubric_criteria = [c.strip() for c in criteria_parts if c.strip()]
 
-        # If that didn't produce multiple criteria, try "1. 2. 3." format with newlines
+        # If that didn't produce multiple criteria, try "1. 2. 3." format
+        # Pattern matches number+dot at start of string or after whitespace
         if len(rubric_criteria) <= 1:
-            criteria_parts = re.split(r'\n\s*\d+\.\s+', rubric)
-            rubric_criteria = [c.strip() for c in criteria_parts if c.strip()]
-
-        # If still only one criterion, try inline "1. 2. 3." format (less common)
-        if len(rubric_criteria) <= 1:
-            criteria_parts = re.split(r'\s+\d+\.\s+', rubric)
+            criteria_parts = re.split(r'(?:^|\s)\d+\.\s*', rubric)
             rubric_criteria = [c.strip() for c in criteria_parts if c.strip()]
 
     # If no goals_count from evaluation, infer from rubric
