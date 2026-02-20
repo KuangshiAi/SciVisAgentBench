@@ -135,7 +135,11 @@ class YAMLTestCase:
             return has_task and has_rubrics
 
     def get_task_description(self, agent_mode: str) -> str:
-        """Get the task description with working directory information."""
+        """Get the task description with working directory information.
+
+        Args:
+            agent_mode: The full agent mode string (e.g., "paraview_mcp_claude-sonnet-4-5_exp1")
+        """
         if not self.task_description:
             raise ValueError(f"No task description found for case {self.case_name}")
 
@@ -243,11 +247,13 @@ class UnifiedTestRunner:
         self.test_cases: List[YAMLTestCase] = []
 
         # Initialize evaluation manager
+        # eval_mode for framework paths (mcp/pvpython), agent_mode for results paths
         self.evaluation_manager = EvaluationManager(
-            eval_mode=agent.eval_mode,
+            eval_mode=agent.eval_mode,  # For framework directory structure
             openai_api_key=self.openai_api_key,
             eval_model=eval_model,
-            static_screenshot=static_screenshot
+            static_screenshot=static_screenshot,
+            agent_mode=agent.agent_mode  # For finding result files
         )
 
         # Initialize token counter
@@ -343,12 +349,13 @@ class UnifiedTestRunner:
 
         start_time = datetime.now()
 
-        # Get task description and config
-        task_description = test_case.get_task_description(self.agent.eval_mode)
-        task_config = test_case.get_task_config(self.agent.eval_mode)
+        # Get task description and config (use agent_mode)
+        task_description = test_case.get_task_description(self.agent.agent_mode)
+        task_config = test_case.get_task_config(self.agent.agent_mode)
 
         result = {
             "case_name": test_case.case_name,
+            "agent_mode": self.agent.agent_mode,  # Add agent_mode to results
             "status": "running",
             "start_time": start_time.isoformat(),
             "task_description": task_description,
@@ -506,7 +513,7 @@ class UnifiedTestRunner:
             result = evaluate_rule_based_assertions(
                 assertions=test_case.rule_based_assertions,
                 data_dir=str(self.data_dir),
-                agent_mode=self.agent.eval_mode,
+                agent_mode=self.agent.agent_mode,  # Use full agent_mode
             )
 
             # If there are also llm-rubric assertions, run them too
@@ -532,7 +539,7 @@ class UnifiedTestRunner:
             evaluator = AssertionEvaluator(
                 case_dir=str(test_case.case_path),
                 case_name=test_case.case_name,
-                eval_mode=self.agent.eval_mode,
+                eval_mode=self.agent.agent_mode,  # Use full agent_mode
                 openai_api_key=self.openai_api_key,
                 eval_model=self.eval_model
             )
@@ -652,7 +659,8 @@ class UnifiedTestRunner:
             "end_time": end_time.isoformat(),
             "duration_seconds": (end_time - start_time).total_seconds(),
             "agent": str(self.agent),
-            "eval_mode": self.agent.eval_mode,
+            "agent_mode": self.agent.agent_mode,  # Use agent_mode instead of eval_mode
+            "eval_mode": self.agent.eval_mode,  # Keep for backwards compatibility
             "total_cases": total_cases,
             "successful_cases": successful_cases,
             "failed_cases": failed_cases,

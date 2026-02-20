@@ -89,11 +89,18 @@ class BaseAgent(ABC):
                    - api_key: API key for LLM provider
                    - provider: LLM provider (openai, anthropic, etc.)
                    - servers: MCP server configurations (for MCP agents)
+                   - experiment_number: Experiment number (default: "exp_default")
                    - Any agent-specific configuration
         """
         self.config = config
         self.agent_name = config.get("agent_name", self.__class__.__name__)
         self.eval_mode = config.get("eval_mode", "generic")  # e.g., "mcp", "pvpython", "generic"
+
+        # Construct agent_mode: {agent_name}_{backbone_llm}_{experiment_number}
+        # Example: paraview_mcp_claude-sonnet-4-5_exp1
+        backbone_llm = config.get("model", "unknown_model").replace("/", "-")
+        experiment_number = config.get("experiment_number", "exp_default")
+        self.agent_mode = f"{self.agent_name}_{backbone_llm}_{experiment_number}"
 
         # Initialize tokenizer for token counting
         self._tokenizer = None
@@ -363,16 +370,16 @@ class BaseAgent(ABC):
 
         Returns:
             Dictionary with standard directory paths:
-            - results_dir: Where to save agent outputs (state files, images, etc.)
-            - test_results_dir: Where to save test result JSON
-            - evaluation_dir: Where evaluation results will be saved
+            - results_dir: Where to save agent outputs (state files, images, etc.) - uses agent_mode for experiment tracking
+            - test_results_dir: Where to save test result JSON - uses eval_mode for framework compatibility
+            - evaluation_dir: Where evaluation results will be saved - uses eval_mode for framework compatibility
         """
         case_path = Path(case_dir)
 
         return {
-            "results_dir": case_path / "results" / self.eval_mode,
-            "test_results_dir": case_path / "test_results" / self.eval_mode,
-            "evaluation_dir": case_path / "evaluation_results" / self.eval_mode,
+            "results_dir": case_path / "results" / self.agent_mode,  # Use agent_mode for experiment-specific results
+            "test_results_dir": case_path / "test_results" / self.eval_mode,  # Use eval_mode for framework
+            "evaluation_dir": case_path / "evaluation_results" / self.eval_mode,  # Use eval_mode for framework
         }
 
     def save_test_result(
@@ -428,6 +435,7 @@ class BaseAgent(ABC):
         test_result = {
             "timestamp": datetime.now().isoformat(),
             "case_name": case_name,
+            "agent_mode": self.agent_mode,  # Add agent_mode to all result files
             "status": "completed" if result.success else "failed",
             "duration": result.metadata.get("duration", 0),
             "token_usage": {

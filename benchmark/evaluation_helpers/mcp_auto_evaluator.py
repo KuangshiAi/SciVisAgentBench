@@ -33,29 +33,32 @@ class MCPAutoEvaluator(SciVisEvaluator):
     Automatic evaluator for MCP test cases using LLM judge
     """
     
-    def __init__(self, case_dir: str, case_name: str, openai_api_key: str = None, model: str = "gpt-4o", static_screenshot: bool = False):
+    def __init__(self, case_dir: str, case_name: str, openai_api_key: str = None, model: str = "gpt-4o", static_screenshot: bool = False, agent_mode: str = None):
         """
         Initialize the MCP evaluator
-        
+
         Args:
             case_dir (str): Path to the test case directory
             case_name (str): Name of the test case
             openai_api_key (str): OpenAI API key for LLM evaluation
             model (str): OpenAI model to use for evaluation
             static_screenshot (bool): If True, use pre-generated screenshots/videos instead of generating from state files
+            agent_mode (str): Full agent mode string (e.g., "paraview_mcp_gpt-4o_exp1") for finding result files. If None, defaults to "mcp"
         """
         super().__init__(case_dir, case_name, eval_mode="mcp")
         self.static_screenshot = static_screenshot
-        
+        self.agent_mode = agent_mode if agent_mode else "mcp"  # Use agent_mode for results path, default to "mcp"
+
         # Initialize LLM evaluator
         self.llm_evaluator = LLMEvaluator(api_key=openai_api_key, model=model)
-        
-        # Initialize image metrics calculator
+
+        # Initialize image metrics calculator (still uses "mcp" for eval framework)
         self.image_metrics_calculator = CaseImageMetrics(case_dir, case_name, eval_mode="mcp")
-        
+
         # Set paths for MCP evaluation
         self.gs_state_path = os.path.join(case_dir, "GS", f"{case_name}_gs.pvsm")
-        self.result_state_path = os.path.join(case_dir, "results", "mcp", f"{case_name}.pvsm")
+        # Use agent_mode for results path (where agent actually saved files)
+        self.result_state_path = os.path.join(case_dir, "results", self.agent_mode, f"{case_name}.pvsm")
         self.visualization_goals_path = os.path.join(case_dir, "visualization_goals.txt")
         self.screenshot_dir = os.path.join(case_dir, "evaluation_results", "mcp", "screenshots")
         

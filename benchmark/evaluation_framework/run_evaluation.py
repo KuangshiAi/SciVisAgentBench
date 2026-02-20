@@ -152,6 +152,19 @@ def parse_args():
         help="List available test cases and exit"
     )
 
+    # Experiment tracking
+    parser.add_argument(
+        "--experiment-number",
+        "--exp",
+        default="exp_default",
+        help="Experiment number for tracking multiple runs (e.g., exp1, exp2, trial_3). Default: exp_default"
+    )
+
+    parser.add_argument(
+        "--agent-mode",
+        help="For eval-only mode: specify the full agent_mode string (e.g., 'paraview_mcp_claude-sonnet-4-5_exp1'). If not provided, will be constructed from agent name, model, and experiment number."
+    )
+
     return parser.parse_args()
 
 
@@ -335,9 +348,14 @@ async def main():
         with open(args.config, 'r') as f:
             config = json.load(f)
 
+        # Add experiment_number to config
+        config["experiment_number"] = args.experiment_number
+
         # Create agent instance
         print(f"\nCreating agent: {args.agent}")
+        print(f"Experiment number: {args.experiment_number}")
         agent = agent_class(config)
+        print(f"Agent mode: {agent.agent_mode}")
 
         # Create test runner (pass config for rate limiting)
         runner = UnifiedTestRunner(
@@ -379,6 +397,14 @@ async def main():
                 print("Set OPENAI_API_KEY environment variable or use --openai-api-key")
                 return 1
 
+            # For eval-only mode, use agent_mode if provided, otherwise construct it
+            if args.agent_mode:
+                eval_agent_mode = args.agent_mode
+                print(f"Using provided agent_mode: {eval_agent_mode}")
+            else:
+                eval_agent_mode = agent.agent_mode
+                print(f"Using constructed agent_mode: {eval_agent_mode}")
+
             # Run evaluation on all cases
             if args.case:
                 # Find specific case
@@ -404,11 +430,15 @@ async def main():
                     result["evaluation"] = eval_result
                     # Update status to indicate eval-only run
                     result["status"] = "eval_only"
+                    # Update agent_mode if provided
+                    if args.agent_mode:
+                        result["agent_mode"] = eval_agent_mode
                 else:
                     # No previous result found, create minimal result
                     result = {
                         "status": "eval_only",
                         "case_name": args.case,
+                        "agent_mode": eval_agent_mode,
                         "evaluation": eval_result
                     }
 
@@ -436,11 +466,15 @@ async def main():
                             result["evaluation"] = eval_result
                             # Update status to indicate eval-only run
                             result["status"] = "eval_only"
+                            # Update agent_mode if provided
+                            if args.agent_mode:
+                                result["agent_mode"] = eval_agent_mode
                         else:
                             # No previous result found, create minimal result
                             result = {
                                 "status": "eval_only",
                                 "case_name": test_case.case_name,
+                                "agent_mode": eval_agent_mode,
                                 "evaluation": eval_result
                             }
 

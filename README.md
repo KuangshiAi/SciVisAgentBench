@@ -212,7 +212,8 @@ python -m benchmark.evaluation_framework.run_evaluation \
     --config benchmark/configs/paraview_mcp/config_openai.json \
     --yaml benchmark/eval_cases/paraview/main_cases.yaml \
     --cases SciVisAgentBench-tasks/main \
-    --eval-model gpt-5.2
+    --eval-model gpt-5.2 \
+    --experiment-number exp1
 ```
 
 ## Run ChatVis Evaluation
@@ -230,7 +231,8 @@ python -m benchmark.evaluation_framework.run_evaluation \
     --config benchmark/configs/chatvis/config_openai.json \
     --yaml benchmark/eval_cases/paraview/chatvis_bench_cases.yaml\
     --cases SciVisAgentBench-tasks/chatvis_bench \
-    --eval-model gpt-5.2
+    --eval-model gpt-5.2 \
+    --experiment-number exp1
 ```
 
 ## Run bioimage-agent Evaluation
@@ -262,7 +264,8 @@ python -m benchmark.evaluation_framework.run_evaluation \
     --config benchmark/configs/napari_mcp/config_openai.json \
     --yaml benchmark/eval_cases/napari/0_actions/eval_basic_napari_functions.yaml \
     --cases SciVisAgentBench-tasks/bioimage_data \
-    --eval-model gpt-5.2
+    --eval-model gpt-5.2 \
+    --experiment-number exp1
 ```
 
 You may also run evaluation with level-1 workflow tasks (`benchmark/eval_cases/napari/1_workflows`).
@@ -287,7 +290,8 @@ python -m benchmark.evaluation_framework.run_evaluation \
     --config benchmark/configs/gmx_vmd_mcp/config_anthropic.json \
     --yaml benchmark/eval_cases/molecular_vis/actions/basic_actions.yaml \
     --cases SciVisAgentBench-tasks/molecular_vis \
-    --eval-model gpt-5.2
+    --eval-model gpt-5.2 \
+    --experiment-number exp1
 ```
 
 Or test on the visualization workflows:
@@ -298,7 +302,8 @@ python -m benchmark.evaluation_framework.run_evaluation \
     --config benchmark/configs/gmx_vmd_mcp/config_anthropic.json \
     --yaml benchmark/eval_cases/molecular_vis/workflows/eval_analysis_workflows.yaml \
     --cases SciVisAgentBench-tasks/molecular_vis/workflows \
-    --eval-model gpt-5.2
+    --eval-model gpt-5.2 \
+    --experiment-number exp1
 ```
 
 ## Run TopoPilot2 (not open-sourced yet) Evaluation
@@ -330,7 +335,8 @@ python -m benchmark.evaluation_framework.run_evaluation \
     --agent topopilot_mcp \
     --config benchmark/configs/topopilot_mcp/config_openai.json \
     --yaml benchmark/eval_cases/topology/topology_cases.yaml \
-    --cases SciVisAgentBench-tasks/topology
+    --cases SciVisAgentBench-tasks/topology \
+    --experiment-number exp1
 ```
 
 ## Anonymize Datasets
@@ -349,7 +355,20 @@ python -m benchmark.evaluation_framework.run_evaluation \
     --config benchmark/configs/paraview_mcp/config_openai.json \
     --yaml benchmark/eval_cases/paraview/what_obj_cases_anonymized.yaml \
     --cases SciVisAgentBench-tasks/anonymized_datasets \
-    --eval-model gpt-5.2
+    --eval-model gpt-5.2 \
+    --experiment-number exp1
+```
+
+## Evaluation Only Mode
+Evaluate existing results by specifying "agent_mode" and the cases to be evaluated.
+```shell
+python -m benchmark.evaluation_framework.run_evaluation \
+    --agent paraview_mcp \
+    --config benchmark/configs/paraview_mcp/config_openai.json \
+    --yaml SciVisAgentBench-tasks/main/main_cases.yaml \
+    --cases SciVisAgentBench-tasks/main \
+    --eval-only \
+    --agent-mode "paraview_mcp_claude-sonnet-4-5_exp1"
 ```
 
 ## Evaluate Your Own Agents

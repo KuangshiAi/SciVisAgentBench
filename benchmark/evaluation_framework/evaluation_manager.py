@@ -33,18 +33,21 @@ class EvaluationManager:
         eval_mode: str = "mcp",
         openai_api_key: Optional[str] = None,
         eval_model: str = "gpt-4o",
-        static_screenshot: bool = False
+        static_screenshot: bool = False,
+        agent_mode: Optional[str] = None
     ):
         """
         Initialize the evaluation manager.
 
         Args:
-            eval_mode: Evaluation mode - "mcp", "pvpython", or "generic"
+            eval_mode: Evaluation mode - "mcp", "pvpython", or "generic" (for framework paths)
             openai_api_key: OpenAI API key for LLM evaluation
             eval_model: Model to use for LLM evaluation
             static_screenshot: If True, use pre-generated screenshots instead of generating from state files
+            agent_mode: Full agent mode string (e.g., "paraview_mcp_gpt-4o_exp1") for finding result files. If None, uses eval_mode
         """
         self.eval_mode = eval_mode
+        self.agent_mode = agent_mode if agent_mode else eval_mode  # Use agent_mode for results, default to eval_mode
         self.openai_api_key = openai_api_key or os.getenv("OPENAI_API_KEY")
         self.eval_model = eval_model
         self.static_screenshot = static_screenshot
@@ -74,7 +77,8 @@ class EvaluationManager:
                 case_name=case_name,
                 openai_api_key=self.openai_api_key,
                 model=self.eval_model,
-                static_screenshot=self.static_screenshot
+                static_screenshot=self.static_screenshot,
+                agent_mode=self.agent_mode  # Pass agent_mode for finding result files
             )
         elif self.eval_mode == "pvpython":
             from pvpython_auto_evaluator import PVPythonAutoEvaluator
