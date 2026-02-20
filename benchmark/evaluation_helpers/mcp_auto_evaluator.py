@@ -60,7 +60,7 @@ class MCPAutoEvaluator(SciVisEvaluator):
         # Use agent_mode for results path (where agent actually saved files)
         self.result_state_path = os.path.join(case_dir, "results", self.agent_mode, f"{case_name}.pvsm")
         self.visualization_goals_path = os.path.join(case_dir, "visualization_goals.txt")
-        self.screenshot_dir = os.path.join(case_dir, "evaluation_results", "mcp", "screenshots")
+        self.screenshot_dir = os.path.join(case_dir, "evaluation_results", self.agent_mode, "screenshots")
         
         # Ensure screenshot directory exists
         os.makedirs(self.screenshot_dir, exist_ok=True)
@@ -161,7 +161,7 @@ class MCPAutoEvaluator(SciVisEvaluator):
                 )
                 
                 # Load result screenshots/video
-                result_base_path = os.path.join(self.case_dir, "results", "mcp")
+                result_base_path = os.path.join(self.case_dir, "results", self.agent_mode)
                 result_screenshots = load_static_screenshots_or_video(
                     result_base_path,
                     self.case_name,
@@ -213,7 +213,7 @@ class MCPAutoEvaluator(SciVisEvaluator):
                 
             else:
                 # Check for pre-existing GT image and result images
-                results_dir = os.path.join(self.case_dir, "results", "mcp")
+                results_dir = os.path.join(self.case_dir, "results", self.agent_mode)
                 single_gt_image = os.path.join(self.case_dir, "GS", f"{self.case_name}_gs.png")
                 single_result_image = os.path.join(results_dir, f"{self.case_name}.png")
                 multi_result_images = [

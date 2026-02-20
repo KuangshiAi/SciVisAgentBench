@@ -168,7 +168,7 @@ The rate limiting feature helps prevent hitting API provider limits. Add a `rate
 ```json
 {
   "provider": "anthropic",
-  "model": "claude-sonnet-4-5",
+  "model": "claude-sonnet-4-6",
   "base_url": "https://api.anthropic.com",
   "price": {
     "input_per_1m_tokens": "$3.00",
@@ -368,7 +368,7 @@ python -m benchmark.evaluation_framework.run_evaluation \
     --yaml SciVisAgentBench-tasks/main/main_cases.yaml \
     --cases SciVisAgentBench-tasks/main \
     --eval-only \
-    --agent-mode "paraview_mcp_claude-sonnet-4-5_exp1"
+    --agent-mode "paraview_mcp_claude-sonnet-4-6_exp1"
 ```
 
 ## Evaluate Your Own Agents

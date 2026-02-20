@@ -205,8 +205,11 @@ class EvaluationReporter:
             if not case_dir.exists():
                 continue
 
-            # Look for test result JSON files in test_results/pvpython/
-            test_results_dir = case_dir / "test_results" / "pvpython"
+            # Get agent_mode from result, fallback to "pvpython" for legacy results
+            agent_mode = result.get('agent_mode', 'pvpython')
+
+            # Look for test result JSON files in test_results/{agent_mode}/
+            test_results_dir = case_dir / "test_results" / agent_mode
             if not test_results_dir.exists():
                 continue
 

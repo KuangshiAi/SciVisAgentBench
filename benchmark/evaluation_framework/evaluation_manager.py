@@ -87,7 +87,8 @@ class EvaluationManager:
                 case_name=case_name,
                 openai_api_key=self.openai_api_key,
                 model=self.eval_model,
-                static_screenshot=self.static_screenshot
+                static_screenshot=self.static_screenshot,
+                agent_mode=self.agent_mode  # Pass agent_mode for finding result files
             )
         else:
             raise ValueError(f"Unsupported eval_mode: {self.eval_mode}")

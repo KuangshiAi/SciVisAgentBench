@@ -72,13 +72,13 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Bone Isolation: Are the bones clearly visible while soft tissue and background are suppressed? Thin fin rays should be distinguishable without major loss.
+          1. Overall Visualization Goal: Does the result match the ground truth X-ray visualization of the carp skeleton?
 
-          2. Viewpoint Selection: Does the chosen viewpoint display the entire carp skeleton (head, spine, ribs, fins, tail) without critical occlusion?
+          2. Bone Visibility: Are the bones clearly visible with soft tissue and background suppressed, similar to the ground truth? Are thin fin rays distinguishable?
 
-          3. X-ray Appearance: Does the visualization resemble an X-ray (monochrome or grayscale, transparent look, consistent lighting)?
+          3. Skeletal Structure: Is the entire carp skeleton (head, spine, ribs, fins, tail) visible and similar in appearance to the ground truth?
 
-          4. Correct Data Setup: Was the dataset loaded with proper spacing (0.78125x0.390625x1.0)? The carp skeleton should appear in its correct proportions without distortion (i.e., the fish shape looks anatomically normal).
+          4. X-ray Appearance: Does the visualization have a monochrome/grayscale X-ray appearance similar to the ground truth?
     - type: llm-rubric
       subtype: text
       value: |
@@ -112,13 +112,13 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: Does the result present a clean, X-ray–style volume rendering where the chameleon's bony structures are clearly emphasized and soft tissue is faint but discernible?
+          1. Overall Visualization Goal: Does the result match the ground truth X-ray-style volume rendering of the chameleon?
 
-          2. Data Loading Correctness: Is the RAW volume loaded with the specified metadata (float32, little-endian, 256×256×270, 1 component) so that the histogram looks reasonable and the anatomy is not flipped or distorted?
+          2. Bone Structure Visibility: Are the chameleon's bony structures clearly visible and similar to the ground truth, with the skull, jaw, and spine clearly distinguishable?
 
-          3. Transfer Function Quality: Does the grayscale transfer function make low-intensity tissue mostly transparent while assigning higher opacity to bones/skin ridges, yielding good depth cues without over-saturation or banding?
+          3. Soft Tissue Rendering: Is the soft tissue faintly visible and transparent, similar to the ground truth appearance?
 
-          4. Camera & Framing: Is the camera positioned and zoomed to focus on the chameleon's head, keeping it sharply framed (no clipping), with a stable viewpoint that highlights key anatomical details?
+          4. Depth and Contrast: Does the visualization show similar depth cues and contrast between bones and soft tissue as the ground truth?
 
 # 4. Engine Dataset
 - vars:
@@ -179,13 +179,13 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: How well does the result achieve the overall goal of showing tornado flow patterns with glyphs and streamlines?
+          1. Overall Visualization Goal: Does the result match the ground truth streamline visualization of solar-plume flow structures?
 
-          2. Glyph Visualization: Does the result show velocity glyphs that are appropriately sized and visible?
+          2. Streamline Patterns: Do the streamlines show similar flow patterns and structures as the ground truth, particularly in the plume region?
 
-          3. Streamline Visualization: Does the result show streamlines that follow the flow patterns effectively?
+          3. Streamline Coverage: Is the spatial distribution and density of streamlines similar to the ground truth?
 
-          4. Tube Rendering: Are the streamlines rendered as tubes with appropriate thickness?
+          4. Visual Appearance: Do the streamline tubes appear similar in thickness and visibility to the ground truth?
 
 # 6. Supernova Dataset
 - vars:
@@ -241,11 +241,13 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: How well does the result reveal the tangaroa flow structures using streamlines expanded into surfaces with the Ribbon filter?
+          1. Overall Visualization Goal: Does the result match the ground truth visualization of tangaroa flow structures using ribbon surfaces?
 
-          2. Streamline Seeding: Are streamlines correctly seeded from a Point Cloud centered at [81.6814, 80.708, 23.5093] with radius 29.9, and is the seed sphere hidden?
+          2. Flow Surface Patterns: Do the ribbon surfaces show similar flow patterns and structures as the ground truth?
 
-          3. Ribbon Visualization: Are the streamlines rendered with the Ribbon filter, set to width 0.3, with Display representation as Surface, effectively showing flow surfaces?
+          3. Surface Coverage: Is the spatial distribution and coverage of the flow surfaces similar to the ground truth?
+
+          4. Visual Appearance: Do the ribbon surfaces appear similar in width and structure to the ground truth?
 
 # 8. Tornado Dataset
 - vars:
@@ -311,11 +313,13 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: How well does the result present a clear iso-surface rendering of the vortex scalar field at value −0.2?
+          1. Overall Visualization Goal: Does the result match the ground truth isosurface rendering of the vortex scalar field?
 
-          2. Contour Appearance: Is the contour rendered with Solid Color set to beige and made the only visible object in the pipeline?
+          2. Isosurface Structure: Does the isosurface show the same vortex structure and topology as the ground truth?
 
-          3. Lighting & Shading: Are Ambient Occlusion and a directional head light (Coords = Camera, Intensity = 0.2) applied?
+          3. Surface Appearance: Does the surface color and shading appear similar to the ground truth?
+
+          4. Visualization Clarity: Are the vortex features clearly visible and comparable to the ground truth?
 
 # 10. Foot Dataset
 - vars:
@@ -416,18 +420,19 @@
         5) Set the viewpoint parameters as: [600, 0, 0] to position; [0, 0, 0] to focal point; [0, -1, 0] to camera up direction
         6) White background
         7) Visualization image resolution is 1024x1024
-        8) Save the visualization image as a png file "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.png"
-        9) (Option 1) Save the paraview state as "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.pvsm" if you are using ParaView as the visualization tool
-        10) (Option 2) Save the cxx code script as "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.cxx" if you are using VTK as the visualization tool
+        8) Don't show color/scalar bar or coordinate axes.
+        9) Save the visualization image as a png file "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.png"
+        10) (Option 1) Save the paraview state as "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.pvsm" if you are using ParaView as the visualization tool
+        11) (Option 2) Save the cxx code script as "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.cxx" if you are using VTK as the visualization tool
         You should only choose one of Option 1 or Option 2 to save your work. Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: Does the result present a good isosurface rendering compared to groundtruth?
-          
+          1. Does the result present 2 isosurfaces, one showing the inner part of the chameleon and one showing the outer part of the chameleon?
+
           2. Is the skin of the Chameleon object of green color?
-          
+
           3. Is the bone of the Chameleon object of white color?
 
 
@@ -445,9 +450,10 @@
         3) Set the color transfer function to assign a warm red color [0.71, 0.02, 0.15] to the highest value, a cool color [0.23, 0.29, 0.75] to the lowest value, and a grey color[0.87, 0.87, 0.87] to the midrange value
         4) Set the viewpoint parameters as: [0, 450, 0] to position; [0, 0, -15] to focal point; [0, 0, -1] to camera up direction
         5) Visualization image resolution is 1024x1024. White background. Shade turned off. Volume rendering ray casting sample distance is 0.1
-        6) Save the visualization image as a png file "argon-bubble/results/{agent_mode}/argon-bubble.png"
-        7) (Option 1) Save the paraview state as "argon-bubble/results/{agent_mode}/argon-bubble.pvsm" if you are using ParaView as the visualization tool
-        8) (Option 2) Save the cxx code script as "argon-bubble/results/{agent_mode}/argon-bubble.cxx" if you are using VTK as the visualization tool
+        6) Don't show color/scalar bar or coordinate axes.
+        7) Save the visualization image as a png file "argon-bubble/results/{agent_mode}/argon-bubble.png"
+        8) (Option 1) Save the paraview state as "argon-bubble/results/{agent_mode}/argon-bubble.pvsm" if you are using ParaView as the visualization tool
+        9) (Option 2) Save the cxx code script as "argon-bubble/results/{agent_mode}/argon-bubble.cxx" if you are using VTK as the visualization tool
         You should only choose one of Option 1 or Option 2 to save your work. Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
@@ -474,9 +480,10 @@
         5) Set the viewpoint parameters as: [420, 420, -550] to position; [128, 128, 150] to focal point; [-1, -1, 1] to camera up direction
         6) Turn on the shade and set the ambient, diffuse and specular as 1.0
         7) White background. Volume rendering ray casting sample distance is 0.1
-        8) Save the visualization image as a png file "richtmyer/results/{agent_mode}/richtmyer.png"
-        9) (Option 1) Save the paraview state as "richtmyer/results/{agent_mode}/richtmyer.pvsm" if you are using ParaView as the visualization tool
-        10) (Option 2) Save the cxx code script as "richtmyer/results/{agent_mode}/richtmyer.cxx" if you are using VTK as the visualization tool
+        8) Don't show color/scalar bar or coordinate axes.
+        9) Save the visualization image as a png file "richtmyer/results/{agent_mode}/richtmyer.png"
+        10) (Option 1) Save the paraview state as "richtmyer/results/{agent_mode}/richtmyer.pvsm" if you are using ParaView as the visualization tool
+        11) (Option 2) Save the cxx code script as "richtmyer/results/{agent_mode}/richtmyer.cxx" if you are using VTK as the visualization tool
         You should only choose one of Option 1 or Option 2 to save your work. Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
@@ -484,9 +491,9 @@
       value: |
           1. Does the visualization show a clear surface with peaks and valleys?
 
-          2. Are the peaks highlighted with the color yellow?
+          2. Are the peaks highlighted with the reddish color?
 
-          3. Are the valleys highlighted with the color blue?
+          3. Are the valleys highlighted with the bluish color?
 
 
 # 15. Rayleigh-Taylor Instability (Miranda)
@@ -503,9 +510,10 @@
         5) Volume rendering ray casting sample distance is 0.1
         6) White background
         7) Visualization image resolution is 1024x1024
-        8) Save the visualization image as a png file "miranda/results/{agent_mode}/miranda.png"
-        9) (Option 1) Save the paraview state as "miranda/results/{agent_mode}/miranda.pvsm" if you are using ParaView as the visualization tool
-        10) (Option 2) Save the cxx code script as "miranda/results/{agent_mode}/miranda.cxx" if you are using VTK as the visualization tool
+        8) Don't show color/scalar bar or coordinate axes.
+        9) Save the visualization image as a png file "miranda/results/{agent_mode}/miranda.png"
+        10) (Option 1) Save the paraview state as "miranda/results/{agent_mode}/miranda.pvsm" if you are using ParaView as the visualization tool
+        11) (Option 2) Save the cxx code script as "miranda/results/{agent_mode}/miranda.cxx" if you are using VTK as the visualization tool
         You should only choose one of Option 1 or Option 2 to save your work. Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
@@ -532,9 +540,10 @@
         5) Volume rendering ray casting sample distance is 0.1
         6) White background
         7) Visualization image resolution is 1024x1024
-        8) Save the visualization image as a png file "rotstrat/results/{agent_mode}/rotstrat.png"
-        9) (Option 1) Save the paraview state as "rotstrat/results/{agent_mode}/rotstrat.pvsm" if you are using ParaView as the visualization tool
-        10) (Option 2) Save the cxx code script as "rotstrat/results/{agent_mode}/rotstrat.cxx" if you are using VTK as the visualization tool
+        8) Don't show color/scalar bar or coordinate axes.
+        9) Save the visualization image as a png file "rotstrat/results/{agent_mode}/rotstrat.png"
+        10) (Option 1) Save the paraview state as "rotstrat/results/{agent_mode}/rotstrat.pvsm" if you are using ParaView as the visualization tool
+        11) (Option 2) Save the cxx code script as "rotstrat/results/{agent_mode}/rotstrat.cxx" if you are using VTK as the visualization tool
         You should only choose one of Option 1 or Option 2 to save your work. Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
@@ -542,9 +551,9 @@
       value: |
           1. Does the visualization image clearly show the shape of turbulence compared to ground truth?
 
-          2. Does the blueish region show areas with low opacity?
+          2. Does the visualization show the shape of a vortex in the upper right part of the image?
 
-          3. Does the reddish region show areas with high opacity?
+          3. Does the visualization show the shape of a vortex in the bottom left corner of the image?
 
 
 # Vector Field Cases
@@ -570,11 +579,13 @@
     - type: llm-rubric
       subtype: vision
       value: |
-        1) Arrow glyphs oriented by velocity vector
-        2) Glyphs scaled by velocity magnitude
-        3) Color mapping using Cool to Warm colormap on magnitude
-        4) Color bar present with label 'Velocity Magnitude'
-        5) Dark background color, Top-down camera view, and Output resolution 1024x1024
+          1. Overall Visualization Goal: Does the result match the ground truth glyph visualization of the MHD turbulence velocity field?
+
+          2. Glyph Patterns: Do the arrow glyphs show similar orientation and spatial patterns as the ground truth?
+
+          3. Glyph Scaling: Do the glyphs show similar size variations as the ground truth, reflecting the velocity magnitude patterns?
+
+          4. Color Mapping: Is the color distribution across glyphs visually similar to the ground truth?
 
 
 # 18. Rayleigh-Taylor Instability Velocity Field (t=50) (rti-velocity_glyph)
@@ -599,11 +610,13 @@
     - type: llm-rubric
       subtype: vision
       value: |
-        1) Arrow glyphs oriented by velocity vector
-        2) Uniform arrow size (no magnitude scaling)
-        3) Color by velocity magnitude with Viridis colormap 
-        4) Color bar present labeled 'Velocity Magnitude'
-        5) Black background, Camera along negative y-axis, and Output resolution 1024x1024
+          1. Overall Visualization Goal: Does the result match the ground truth glyph visualization of the RTI velocity field?
+
+          2. Glyph Patterns: Do the arrow glyphs show similar orientation and spatial patterns as the ground truth?
+
+          3. Glyph Appearance: Do the glyphs appear with similar uniform sizing as the ground truth?
+
+          4. Color Mapping: Is the color distribution across glyphs visually similar to the ground truth?
 
 
 # 19. MHD Magnetic Field (t=10) (mhd-magfield_glyph)
@@ -628,11 +641,13 @@
     - type: llm-rubric
       subtype: vision
       value: |
-        1) Arrow glyphs oriented by magnetic field vector
-        2) Glyphs scaled by field magnitude
-        3) Plasma colormap applied to magnitude
-        4) Color bar present labeled 'Magnetic Field Magnitude
-        5) Dark navy background, Camera along negative x-axis, Output resolution 1024x1024
+          1. Overall Visualization Goal: Does the result match the ground truth glyph visualization of the MHD magnetic field?
+
+          2. Glyph Patterns: Do the arrow glyphs show similar orientation and spatial patterns as the ground truth?
+
+          3. Glyph Scaling: Do the glyphs show similar size variations as the ground truth, reflecting the field magnitude patterns?
+
+          4. Color Mapping: Is the color distribution across glyphs visually similar to the ground truth?
 
 
 # 20. MHD Turbulence Velocity Field (t=30) (mhd-turbulence_streamline)
@@ -655,11 +670,13 @@
     - type: llm-rubric
       subtype: vision
       value: |
-       1) Streamlines generated from line seed along z-axis, with similar pattern compared to groundtruth
-       2) Streamlines rendered as tubes
-       3) Color by velocity magnitude with Turbo colormap
-       4) Color bar labeled 'Velocity Magnitude'
-       5) Dark background, Isometric camera view, Output resolution 1024x1024
+          1. Overall Visualization Goal: Does the result match the ground truth streamline visualization of the MHD turbulence velocity field?
+
+          2. Streamline Patterns: Do the streamlines show similar flow patterns and structures as the ground truth?
+
+          3. Streamline Coverage: Is the spatial distribution and density of streamlines similar to the ground truth?
+
+          4. Color Mapping: Is the color distribution along streamlines visually similar to the ground truth?
 
 
 # 21. Rayleigh-Taylor Instability Velocity Field (t=70) (rti-velocity_streamline)
@@ -682,11 +699,11 @@
     - type: llm-rubric
       subtype: vision
       value: |
-        1) Streamlines seeded from y=64 plane region, with similar pattern compared to groundtruth
-        2) Streamlines rendered as tubes
-        3) Color by vz with Cool to Warm diverging colormap
-        4) Color bar labeled 'Vz Component'
-        5) Dark background, Isometric camera view, Output resolution 1024x1024
+          1) Streamlines seeded from y=64 plane region, with similar pattern compared to groundtruth
+          2) Streamlines rendered as tubes
+          3) Color by vz with Cool to Warm diverging colormap
+          4) Color bar labeled 'Vz Component'
+          5) Dark background, Isometric camera view, Output resolution 1024x1024
 
 
 # 22. Turbulent Radiative Layer Velocity Field (tcool=0.10, t=50) (trl-velocity_streamline)
@@ -709,11 +726,11 @@
     - type: llm-rubric
       subtype: vision
       value: |
-        1) Streamlines seeded along x-axis line, with similar pattern compared to groundtruth
-        2) Streamlines rendered as tubes 
-        3) Color by magnitude with Inferno colormap
-        4) Color bar labeled 'Velocity Magnitude'
-        5) Black background, Isometric camera view, Output resolution 1024x1024
+          1) Streamlines seeded along x-axis line, with similar pattern compared to groundtruth
+          2) Streamlines rendered as tubes
+          3) Color by magnitude with Inferno colormap
+          4) Color bar labeled 'Velocity Magnitude'
+          5) Black background, Isometric camera view, Output resolution 1024x1024
 
 
 # 23. MHD Magnetic Field (t=40) (mhd-magfield_volvis)
@@ -732,16 +749,18 @@
         Save the paraview state as "mhd-magfield_volvis/results/{agent_mode}/mhd-magfield_volvis.pvsm".
         Save the visualization image as "mhd-magfield_volvis/results/{agent_mode}/mhd-magfield_volvis.png".
         (Optional, if use python script) Save the python script as "mhd-magfield_volvis/results/{agent_mode}/mhd-magfield_volvis.py".
-        Do not save any other files, and always save the visualization image.        
+        Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
       value: |
-        1) Volume rendering representation applied based on magnitude field, generally similar to groundtruth
-        2) Cool to Warm colormap
-        3) Opacity transfer function correctly set: low=transparent, high=opaque
-        4) Color bar labeled 'B Magnitude' 
-        5) Dark background, Isometric camera, Output resolution 1024x1024
+          1. Overall Visualization Goal: Does the result match the ground truth volume rendering of the MHD magnetic field magnitude?
+
+          2. Volume Structure: Are the internal structures and features visible in the volume rendering similar to the ground truth?
+
+          3. Opacity Distribution: Does the transparency/opacity distribution appear similar to the ground truth, showing the same depth and internal features?
+
+          4. Color Mapping: Is the color distribution throughout the volume visually similar to the ground truth?
 
 
 # 24. Turbulence Gravity Cooling Velocity (temp=1000K, dens=4.45, metal=0.1Z, t=20) (tgc-velocity_volvis)
@@ -765,11 +784,13 @@
     - type: llm-rubric
       subtype: vision
       value: |
-        1) Volume rendering applied, generally similar to groundtruth
-        2) Viridis colormap
-        3) Gradual opacity transfer function
-        4) Color bar labeled 'Velocity Magnitude'
-        5) Dark gray background, Isometric camera, Output resolution 1024x1024
+          1. Overall Visualization Goal: Does the result match the ground truth volume rendering of the TGC velocity field magnitude?
+
+          2. Volume Structure: Are the internal structures and features visible in the volume rendering similar to the ground truth?
+
+          3. Opacity Distribution: Does the transparency/opacity distribution appear similar to the ground truth, showing the same depth and internal features?
+
+          4. Color Mapping: Is the color distribution throughout the volume visually similar to the ground truth?
 
 
 # 25. Rayleigh-Taylor Instability Velocity Field (t=40) (rti-velocity_divergence)
@@ -792,10 +813,13 @@
     - type: llm-rubric
       subtype: vision
       value: |
-        1) Divergence computation from velocity field, with similar pattern compared to groundtruth
-        2) Cool to Warm diverging colormap centered at 0
-        3) Color bar labeled 'Velocity Divergence'
-        4) White background, Top-down camera along negative z, Output resolution 1024x1024
+          1. Overall Visualization Goal: Does the result match the ground truth visualization of the RTI velocity divergence field?
+
+          2. Divergence Patterns: Are the divergence patterns and structures visible in the result similar to the ground truth?
+
+          3. Spatial Distribution: Does the spatial distribution of positive and negative divergence regions match the ground truth?
+
+          4. Color Mapping: Is the color distribution visually similar to the ground truth, showing similar divergence values?
 
 
 # 26. Turbulent Radiative Layer Velocity Field (tcool=1.00, t=30) (trl-velocity_isosurface)
@@ -817,11 +841,13 @@
     - type: llm-rubric
       subtype: vision
       value: |
-        1) Isosurface extraction at magnitude=0.8, with similar pattern compared to groundtruth
-        2) Isosurface colored by vx component
-        3) Cool to Warm colormap
-        4) Color bar labeled 'Vx Component'
-        5) Dark background, Isometric camera, Output resolution 1024x1024
+          1. Overall Visualization Goal: Does the result match the ground truth isosurface visualization of the TRL velocity field?
+
+          2. Isosurface Structure: Does the isosurface show similar topology and shape as the ground truth?
+
+          3. Surface Features: Are key features and structures on the isosurface similar to the ground truth?
+
+          4. Color Mapping: Is the color distribution across the isosurface visually similar to the ground truth?
 
 
 # 27. Supernova Explosion Velocity Field (t=30) (supernova-velocity_streamline)
@@ -845,11 +871,13 @@
     - type: llm-rubric
       subtype: vision
       value: |
-        1) Streamlines seeded from diagonal line, with similar pattern compared to groundtruth
-        2) Streamlines as tubes
-        3) Color by magnitude with Magma colormap
-        4) Color bar labeled 'Velocity Magnitude'
-        5) Dark background, Isometric camera, Output resolution 1024x1024
+          1. Overall Visualization Goal: Does the result match the ground truth streamline visualization of the supernova velocity field?
+
+          2. Streamline Patterns: Do the streamlines show similar flow patterns and structures as the ground truth?
+
+          3. Streamline Coverage: Is the spatial distribution and density of streamlines similar to the ground truth?
+
+          4. Color Mapping: Is the color distribution along streamlines visually similar to the ground truth?
 
 
 # 28. MHD Turbulence Velocity Field (t=50) (mhd-turbulence_vorticity)
@@ -874,12 +902,13 @@
     - type: llm-rubric
       subtype: vision
       value: |
-       1) Vorticity computation (curl of velocity), similar pattern compared to groundtruth
-       2) Volume rendering of vorticity magnitude
-       3) Plasma colormap
-       4) Opacity highlights high-vorticity regions
-       5) Color bar labeled 'Vorticity Magnitude'
-       6) Black background, Isometric camera, Output resolution 1024x1024
+          1. Overall Visualization Goal: Does the result match the ground truth volume rendering of the MHD turbulence vorticity field?
+
+          2. Vorticity Patterns: Are the vorticity structures and patterns visible in the result similar to the ground truth?
+
+          3. Volume Features: Are high-vorticity regions highlighted with similar opacity and visibility as the ground truth?
+
+          4. Color Mapping: Is the color distribution throughout the volume visually similar to the ground truth?
 
 
 # 29. Supernova Explosion Velocity Field (t=40) (supernova-velocity_isosurface)
@@ -901,11 +930,13 @@
     - type: llm-rubric
       subtype: vision
       value: |
-        1) Isosurface at magnitude=0.7, similar pattern compared to groundtruth
-        2) Colored by vz component
-        3) Blue to Red Rainbow colormap
-        4) Color bar labeled 'Vz Component'
-        5) Black background, Isometric camera, Output resolution 1024x1024
+          1. Overall Visualization Goal: Does the result match the ground truth isosurface visualization of the supernova velocity field?
+
+          2. Isosurface Structure: Does the isosurface show similar topology and shape as the ground truth?
+
+          3. Surface Features: Are key features and structures on the isosurface similar to the ground truth?
+
+          4. Color Mapping: Is the color distribution across the isosurface visually similar to the ground truth?
 
 
 # 30. MHD Magnetic Field (t=60) (mhd-magfield_isosurface)
@@ -923,16 +954,18 @@
         Save the paraview state as "mhd-magfield_isosurface/results/{agent_mode}/mhd-magfield_isosurface.pvsm".
         Save the visualization image as "mhd-magfield_isosurface/results/{agent_mode}/mhd-magfield_isosurface.png".
         (Optional, if use python script) Save the python script as "mhd-magfield_isosurface/results/{agent_mode}/mhd-magfield_isosurface.py".
-        Do not save any other files, and always save the visualization image.    
+        Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
       value: |
-        1) Isosurface at magnitude=0.8, similar pattern compared to groundtruth
-        2) Colored by bx component
-        3) Turbo colormap
-        4) Color bar labeled 'Bx Component'
-        5) Dark navy background, Isometric camera, Output resolution 1024x1024
+          1. Overall Visualization Goal: Does the result match the ground truth isosurface visualization of the MHD magnetic field?
+
+          2. Isosurface Structure: Does the isosurface show similar topology and shape as the ground truth?
+
+          3. Surface Features: Are key features and structures on the isosurface similar to the ground truth?
+
+          4. Color Mapping: Is the color distribution across the isosurface visually similar to the ground truth?
 
 
 # 31. Turbulence Gravity Cooling Velocity (temp=100K, dens=0.445, metal=Z, t=10) (tgc-velocity_contour)
@@ -956,12 +989,13 @@
     - type: llm-rubric
       subtype: vision
       value: |
-        1) Slice at z=32 colored by magnitude, similar pattern compared to groundtruth
-        2) Viridis colormap on slice
-        3) Contour lines at specified values, similar pattern compared to groundtruth
-        4) White contour lines
-        5) Color bar labeled 'Velocity Magnitude'
-        6) Light gray background, Top-down camera, Output resolution 1024x1024
+          1. Overall Visualization Goal: Does the result match the ground truth slice and contour visualization of the TGC velocity field?
+
+          2. Slice Pattern: Does the colored slice show similar patterns and structures as the ground truth?
+
+          3. Contour Lines: Are the contour lines positioned and shaped similarly to the ground truth?
+
+          4. Color Mapping: Is the color distribution on the slice visually similar to the ground truth?
 
 
 # 32. Rayleigh-Taylor Instability Velocity Field (t=80) (rti-velocity_slices)
@@ -984,11 +1018,13 @@
     - type: llm-rubric
       subtype: vision
       value: |
-        1) Three orthogonal slices at x=64, y=64, z=64, similar pattern compared to groundtruth
-        2) All slices colored by velocity magnitude
-        3) Turbo colormap
-        4) Color bar labeled 'Velocity Magnitude'
-        5) Dark background, Isometric camera showing all three slices, Output resolution 1024x1024
+          1. Overall Visualization Goal: Does the result match the ground truth three-orthogonal-slice visualization of the RTI velocity field?
+
+          2. Slice Patterns: Do all three slices show similar patterns and structures as the ground truth?
+
+          3. Slice Positioning: Are the three orthogonal slices positioned and oriented similarly to the ground truth?
+
+          4. Color Mapping: Is the color distribution across all slices visually similar to the ground truth?
 
 # 33. MHD Magnetic Field Stream Surface (t=20) (mhd-magfield_streamsurface)
 # Isothermal magnetohydrodynamic (MHD) simulations capturing compressible turbulence phenomena relevant to astrophysical systems.
@@ -1007,17 +1043,18 @@
         Save the paraview state as "mhd-magfield_streamsurface/results/{agent_mode}/mhd-magfield_streamsurface.pvsm".
         Save the visualization image as "mhd-magfield_streamsurface/results/{agent_mode}/mhd-magfield_streamsurface.png".
         (Optional, if use python script) Save the python script as "mhd-magfield_streamsurface/results/{agent_mode}/mhd-magfield_streamsurface.py".
-        Do not save any other files, and always save the visualization image.    
+        Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
       value: |
-        1) Stream surface generation from line seed along y-axis, bidirectional integration along magnetic field
-        2) Surface coloring by magnetic field magnitude
-        3) Cool to Warm colormap applied correctly
-        4) Specular lighting enabled 
-        5) Color bar with label 'Magnetic Field Magnitude'
-        6) Dark navy background (RGB: 0.0, 0.0, 0.12), Isometric camera view, Output resolution 1024x1024
+          1. Overall Visualization Goal: Does the result match the ground truth stream surface visualization of the MHD magnetic field?
+
+          2. Surface Patterns: Does the stream surface show similar flow patterns and structures as the ground truth?
+
+          3. Surface Coverage: Is the spatial extent and shape of the stream surface similar to the ground truth?
+
+          4. Color Mapping: Is the color distribution across the surface visually similar to the ground truth?
 
 
 # 34. Rayleigh-Taylor Instability Stream Surface (t=60) (rti-velocity_streamsurface)
@@ -1041,13 +1078,13 @@
     - type: llm-rubric
       subtype: vision
       value: |
-        1) Stream surface from circular ring seed at y=64
-        2) Circle centered at (64, 64) in xz-plane with radius 30
-        3) Bidirectional integration along velocity field 
-        4) Surface coloring by vy (vertical velocity) component, Surface opacity set to 0.85
-        5) Cool to Warm (Extended) diverging colormap
-        6) Color bar with label 'Vertical Velocity (vy)'
-        7) Black background, Elevated camera view (45 degrees), Output resolution 1024x1024
+          1. Overall Visualization Goal: Does the result match the ground truth stream surface visualization of the RTI velocity field?
+
+          2. Surface Patterns: Does the stream surface show similar flow patterns and structures as the ground truth?
+
+          3. Surface Coverage: Is the spatial extent and shape of the stream surface similar to the ground truth?
+
+          4. Color Mapping: Is the color distribution across the surface visually similar to the ground truth?
 
 
 # 35. Supernova Explosion Pathlines (Multi-timestep) (supernova-velocity_pathline)
@@ -1072,12 +1109,13 @@
     - type: llm-rubric
       subtype: vision
       value: |
-        1) Time-varying vector field handling, Streamline generation for each timestep 
-        2) Spherical shell seed centered at (64,64,64) with radius 20
-        3) 50 seed particles, Forward streamline tracing with max length 80
-        4) Tube rendering with radius 0.25, Color-coded temporal progression (blue to red) 
-        5) Turbo colormap for magnitude coloring, Color bar with label 'Velocity Magnitude'
-        6) Dark background (RGB: 0.02, 0.0, 0.04), Isometric camera view, Output resolution 1024x1024
+          1. Overall Visualization Goal: Does the result match the ground truth pathline visualization of the supernova velocity field?
+
+          2. Pathline Patterns: Do the pathlines show similar trajectories and flow structures as the ground truth?
+
+          3. Pathline Coverage: Is the spatial distribution and density of pathlines similar to the ground truth?
+
+          4. Color Mapping: Is the color distribution along pathlines visually similar to the ground truth?
 
 
 # 36. MHD Turbulence Path Surface (Multi-timestep) (mhd-turbulence_pathsurface)
@@ -1102,13 +1140,13 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          1) Time-varying vector field handling, Stream surface generation for each timestep
-          2) Line seed along z-axis at x=64, y=64
-          3) Seed from z=40 to z=88 with 20 points, Bidirectional streamline tracing
-          4) Ribbon surface creation with width 0.8
-          5) Progressive opacity (0.3 to 0.9)
-          6) Viridis (matplotlib) colormap,  Color bar with label 'Velocity Magnitude'
-          7) Dark gray background (RGB: 0.08, 0.08, 0.1), Isometric camera view, Output resolution 1024x1024
+          1. Overall Visualization Goal: Does the result match the ground truth path surface visualization of the MHD turbulence velocity field?
+
+          2. Surface Patterns: Does the path surface show similar flow patterns and structures as the ground truth?
+
+          3. Surface Coverage: Is the spatial extent and shape of the path surface similar to the ground truth?
+
+          4. Color Mapping: Is the color distribution across the surface visually similar to the ground truth?
 
 
 # 37. Rayleigh-Taylor Instability Streaklines (Multi-timestep) (rti-velocity_streakline)
@@ -1134,13 +1172,13 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          1) Time-varying vector field handling, Streamline generation from 4 injection points
-          2) Injection points at (32,64,64), (64,64,32), (96,64,64), (64,64,96)
-          3) Bidirectional tracing with max length 100
-          4) Tube rendering with radius 0.4
-          5) Color-coded temporal progression (blue to red),  Cool to Warm diverging colormap for vy
-          6) Color bar with label 'Vertical Velocity (vy)'
-          7) Black background, Elevated camera view (elevation 35 degrees), Output resolution 1024x1024
+          1. Overall Visualization Goal: Does the result match the ground truth streakline visualization of the RTI velocity field?
+
+          2. Streakline Patterns: Do the streaklines show similar trajectories and flow structures as the ground truth?
+
+          3. Streakline Coverage: Is the spatial distribution of streaklines from the injection points similar to the ground truth?
+
+          4. Color Mapping: Is the color distribution along streaklines visually similar to the ground truth?
 
 
 # 38. Turbulent Radiative Layer Timelines (Multi-timestep) (trl-velocity_timeline)
@@ -1165,9 +1203,10 @@
     - type: llm-rubric
       subtype: vision
       value: |
-        1) Time-varying vector field handling (256x128x128 grid), Streamline generation from line seed for each timestep
-        2) Line seed along z-axis at x=128, y=64, 50 seed points from z=20 to z=108
-        3) Bidirectional tracing with max length 150, Tube rendering with radius 0.5
-        4) Spectral color-coded temporal progression
-        5) Spectral colormap for magnitude, Color bar with label 'Velocity Magnitude'
-        6) Dark background (RGB: 0.0, 0.0, 0.02), Oblique camera view (azimuth 45, elevation 20), Output resolution 1024x1024
+          1. Overall Visualization Goal: Does the result match the ground truth timeline visualization of the TRL velocity field?
+
+          2. Timeline Patterns: Do the timelines show similar trajectories and temporal evolution as the ground truth?
+
+          3. Timeline Coverage: Is the spatial distribution and density of timelines similar to the ground truth?
+
+          4. Color Mapping: Is the color distribution along timelines visually similar to the ground truth?

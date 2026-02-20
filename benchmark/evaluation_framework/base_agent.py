@@ -378,8 +378,8 @@ class BaseAgent(ABC):
 
         return {
             "results_dir": case_path / "results" / self.agent_mode,  # Use agent_mode for experiment-specific results
-            "test_results_dir": case_path / "test_results" / self.eval_mode,  # Use eval_mode for framework
-            "evaluation_dir": case_path / "evaluation_results" / self.eval_mode,  # Use eval_mode for framework
+            "test_results_dir": case_path / "test_results" / self.agent_mode,  # Use agent_mode for experiment tracking
+            "evaluation_dir": case_path / "evaluation_results" / self.agent_mode,  # Use agent_mode for experiment tracking
         }
 
     def save_test_result(

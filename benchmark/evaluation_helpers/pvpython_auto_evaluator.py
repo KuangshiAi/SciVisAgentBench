@@ -33,19 +33,21 @@ class PVPythonAutoEvaluator(SciVisEvaluator):
     Automatic evaluator for pvpython test cases using LLM judge and code comparison
     """
     
-    def __init__(self, case_dir: str, case_name: str, openai_api_key: str = None, model: str = "gpt-4o", static_screenshot: bool = False):
+    def __init__(self, case_dir: str, case_name: str, openai_api_key: str = None, model: str = "gpt-4o", static_screenshot: bool = False, agent_mode: str = None):
         """
         Initialize the pvpython evaluator
-        
+
         Args:
             case_dir (str): Path to the test case directory
             case_name (str): Name of the test case
             openai_api_key (str): OpenAI API key for LLM evaluation
             model (str): OpenAI model to use for evaluation
             static_screenshot (bool): If True, use pre-generated screenshots/videos instead of generating from state files
+            agent_mode (str): Full agent mode string (e.g., "chatvis_gpt-4o_exp1") for finding result files. If None, defaults to "pvpython"
         """
         super().__init__(case_dir, case_name, eval_mode="pvpython")
         self.static_screenshot = static_screenshot
+        self.agent_mode = agent_mode if agent_mode else "pvpython"  # Use agent_mode for results path, default to "pvpython"
         
         # Initialize LLM evaluator
         self.llm_evaluator = LLMEvaluator(api_key=openai_api_key, model=model)
@@ -56,10 +58,11 @@ class PVPythonAutoEvaluator(SciVisEvaluator):
         # Set paths for pvpython evaluation
         self.gs_state_path = os.path.join(case_dir, "GS", f"{case_name}_gs.pvsm")
         self.gs_code_path = os.path.join(case_dir, "GS", f"{case_name}_gs.py")
-        self.result_state_path = os.path.join(case_dir, "results", "pvpython", f"{case_name}.pvsm")
-        self.generated_code_path = os.path.join(case_dir, "results", "pvpython", f"{case_name}.py")
+        # Use agent_mode for results path (where agent actually saved files)
+        self.result_state_path = os.path.join(case_dir, "results", self.agent_mode, f"{case_name}.pvsm")
+        self.generated_code_path = os.path.join(case_dir, "results", self.agent_mode, f"{case_name}.py")
         self.visualization_goals_path = os.path.join(case_dir, "visualization_goals.txt")
-        self.screenshot_dir = os.path.join(case_dir, "evaluation_results", "pvpython", "screenshots")
+        self.screenshot_dir = os.path.join(case_dir, "evaluation_results", self.agent_mode, "screenshots")
         
         # Ensure screenshot directory exists
         os.makedirs(self.screenshot_dir, exist_ok=True)
@@ -160,7 +163,7 @@ class PVPythonAutoEvaluator(SciVisEvaluator):
                 )
                 
                 # Load result screenshots/video
-                result_base_path = os.path.join(self.case_dir, "results", "pvpython")
+                result_base_path = os.path.join(self.case_dir, "results", self.agent_mode)
                 result_screenshots = load_static_screenshots_or_video(
                     result_base_path,
                     self.case_name,
@@ -212,7 +215,7 @@ class PVPythonAutoEvaluator(SciVisEvaluator):
                 
             else:
                 # Check for pre-existing GT image and result images
-                results_dir = os.path.join(self.case_dir, "results", "pvpython")
+                results_dir = os.path.join(self.case_dir, "results", self.agent_mode)
                 single_gt_image = os.path.join(self.case_dir, "GS", f"{self.case_name}_gs.png")
                 single_result_image = os.path.join(results_dir, f"{self.case_name}.png")
                 multi_result_images = [

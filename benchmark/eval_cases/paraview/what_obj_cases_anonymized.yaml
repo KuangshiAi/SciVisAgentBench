@@ -16,23 +16,23 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          The assistant should identify the data shows an aneurism or vascular structure
+          The visualization image shows an aneurism or vascular structure with a reasonable transfer function, and the object is shown clearly
 
-# # 2. Backpack Dataset
-# - vars:
-#     question: |
-#         Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_002/data/data_002_512x512x373_uint16.raw".
-#         Use visualization tools to determine what object is contained in this dataset. Save the paraview state as "anonymized_datasets/dataset_002/results/{agent_mode}/dataset_002.pvsm"
-#         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_002/results/{agent_mode}/answers.txt"
-#   assert:
-#     - type: llm-rubric
-#       subtype: text
-#       value: |
-#           The assistant should identify that the data shows a backpack
-#     - type: llm-rubric
-#       subtype: vision
-#       value: |
-#           The assistant should identify that the data shows a backpack
+# 2. Backpack Dataset
+- vars:
+    question: |
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_002/data/data_002_512x512x373_uint16.raw".
+        Use visualization tools to determine what object is contained in this dataset. Save the paraview state as "anonymized_datasets/dataset_002/results/{agent_mode}/dataset_002.pvsm"
+        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_002/results/{agent_mode}/answers.txt"
+  assert:
+    - type: llm-rubric
+      subtype: text
+      value: |
+          The assistant should identify that the data shows a backpack
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          The visualization image shows a backpack with a reasonable transfer function, and the object is shown clearly
 
 # 3. Blunt Fin Dataset
 - vars:
@@ -48,7 +48,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          The assistant should identify a fin or aerodynamic strcuture or simulation result in the data
+          The visualization image shows a fin or aerodynamic strcuture or simulation result in the data with a reasonable transfer function, and the object is shown clearly
 
 # 4. Bonsai Dataset
 - vars:
@@ -64,7 +64,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify a bonsai tree or botanical structure in the data
+          The visualization image shows a bonsai tree or botanical structure in the data with a reasonable transfer function, and the object is shown clearly
 
 # 5. Boston Teapot Dataset
 - vars:
@@ -80,7 +80,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify a teapot in the visualization
+          The visualization image shows a teapot in the visualization with a reasonable transfer function, and the object is shown clearly
 
 # 6. Bunny Dataset
 - vars:
@@ -96,7 +96,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify a bunny or rabbit in the 3D scanned data
+          The visualization image shows a bunny or rabbit in the 3D scanned data with a reasonable transfer function, and the object is shown clearly
 
 # 7. Carp Dataset
 - vars:
@@ -112,7 +112,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify a carp or fish anatomy
+          The visualization image shows a carp or fish anatomy with a reasonable transfer function, and the object is shown clearly
 
 # 8. CSAFE Heptane Dataset
 - vars:
@@ -128,7 +128,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should recognize combustion or heptane simulation data
+          The visualization image shows combustion or heptane simulation data with a reasonable transfer function, and the object is shown clearly
 
 # 9. Duct Dataset
 - vars:
@@ -144,7 +144,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify flow patterns in a duct geometry
+          The visualization image shows flow patterns in a duct geometry with a reasonable transfer function, and the object is shown clearly
 
 # 10. Engine Dataset
 - vars:
@@ -160,7 +160,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify an engine or mechanical components
+          The visualization image shows an engine or mechanical components with a reasonable transfer function, and the object is shown clearly
 
 # 11. Foot Dataset
 - vars:
@@ -176,7 +176,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify a foot with bone and tissue structures
+          The visualization image shows a foot with bone and tissue structures with a reasonable transfer function, and the object is shown clearly
 
 # 12. Frog Dataset
 - vars:
@@ -192,7 +192,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify a frog specimen with internal anatomy
+          The visualization image shows a frog specimen with internal anatomy with a reasonable transfer function, and the object is shown clearly
 
 # 13. Fuel Dataset
 - vars:
@@ -208,7 +208,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify fuel combustion or related simulation
+          The visualization image shows fuel combustion or related simulation with a reasonable transfer function, and the object is shown clearly
 
 # 14. Hydrogen Atom Dataset
 - vars:
@@ -224,7 +224,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should recognize hydrogen atom orbital or probability distribution
+          The visualization image shows hydrogen atom orbital or probability distribution with a reasonable transfer function, and the object is shown clearly
 
 # 15. Lobster Dataset
 - vars:
@@ -240,7 +240,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify a lobster or crustacean anatomy
+          The visualization image shows a lobster or crustacean anatomy with a reasonable transfer function, and the object is shown clearly
 
 # 16. Marschner-Lobb Dataset
 - vars:
@@ -256,7 +256,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should recognize Marschner-Lobb synthetic test pattern
+          The visualization image shows Marschner-Lobb synthetic test pattern with a reasonable transfer function, and the object is shown clearly
 
 # 17. MRI Ventricles Dataset
 - vars:
@@ -272,7 +272,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify brain ventricles or ventricular structures
+          The visualization image shows brain ventricles or ventricular structures with a reasonable transfer function, and the object is shown clearly
 
 # 18. MRI Woman Dataset
 - vars:
@@ -288,7 +288,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify human anatomical structures from MRI scan
+          The visualization image shows human anatomical structures from MRI scan with a reasonable transfer function, and the object is shown clearly
 
 # 19. MRT Angio Dataset
 - vars:
@@ -304,7 +304,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify angiography or vascular structures
+          The visualization image shows angiography or vascular structures with a reasonable transfer function, and the object is shown clearly
 
 # 20. Neghip Dataset
 - vars:
@@ -320,7 +320,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should visualize and describe molecule structure
+          The visualization image shows molecule structure with a reasonable transfer function, and the object is shown clearly
 
 # 21. Neocortical Layer 1 Axons Dataset
 - vars:
@@ -336,7 +336,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify neural axons or neocortical network structures
+          The visualization image shows neural axons or neocortical network structures with a reasonable transfer function, and the object is shown clearly
 
 # 22. Nucleon Dataset
 - vars:
@@ -352,7 +352,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should visualize nucleon or particle physics data
+          Should visualize nucleon or particle physics data with a reasonable transfer function, and the object is shown clearly
 
 # 23. Pancreas Dataset
 - vars:
@@ -368,7 +368,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify pancreas or pancreatic anatomy
+          The visualization image shows pancreas or pancreatic anatomy with a reasonable transfer function, and the object is shown clearly
 
 # 24. Shockwave Dataset
 - vars:
@@ -384,7 +384,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify shockwave or wave propagation patterns
+          The visualization image shows shockwave or wave propagation patterns with a reasonable transfer function, and the object is shown clearly
 
 # 25. Silicium Dataset
 - vars:
@@ -400,7 +400,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify silicon crystal or material structure
+          The visualization image shows silicon crystal or material structure with a reasonable transfer function, and the object is shown clearly
 
 # 26. Skull Dataset
 - vars:
@@ -432,7 +432,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify a statue leg or sculptural form
+          The visualization image shows a statue leg or sculptural form with a reasonable transfer function, and the object is shown clearly
 
 # 28. Stent Dataset
 - vars:
@@ -459,7 +459,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify supernova or astrophysical explosion simulation
+          The visualization image shows supernova or astrophysical explosion simulation with a reasonable transfer function, and the object is shown clearly
 
 # 30. TACC Turbulence Dataset
 - vars:
@@ -475,7 +475,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify turbulence or vortex flow structures
+          The visualization image shows turbulence or vortex flow structures with a reasonable transfer function, and the object is shown clearly
 
 # 31. Tooth Dataset
 - vars:
@@ -491,7 +491,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify tooth or dental anatomy
+          The visualization image shows tooth or dental anatomy with a reasonable transfer function, and the object is shown clearly
 
 # 32. Tornado Dataset
 - vars:
@@ -507,7 +507,7 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify tornado or vortex flow pattern
+          The visualization image shows tornado or vortex flow pattern with a reasonable transfer function, and the object is shown clearly
 
 # 33. Visible Male Dataset
 - vars:
@@ -523,4 +523,4 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          Should identify human anatomical structures 
+          The visualization image shows human anatomical structures with a reasonable transfer function, and the object is shown clearly

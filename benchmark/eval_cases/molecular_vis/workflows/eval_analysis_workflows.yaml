@@ -7,7 +7,7 @@
 # Tutorial 4 is on curved membranes which is used here as an example of bilayer visualization. 
 - vars:
     question: |
-        1. Please load the Martini coarse-grained simulation file from "curved-membrane/data/curved-membrane." into VMD.
+        1. Please load the Martini coarse-grained simulation file from "curved-membrane/data/curved-membrane.gro" into VMD.
 
         2. Use VMD to show a zoomed in view of the membrane side coloring the water blue and the lipid phosphate (PO4 beads) red, and take a screenshot.
 

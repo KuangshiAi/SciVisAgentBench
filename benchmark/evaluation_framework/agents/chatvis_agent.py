@@ -139,7 +139,7 @@ class ChatVisAgent(BaseAgent):
 
     def save_script(self, code: str, case_name: str, case_dir: Path):
         """Save generated script to results directory."""
-        generated_dir = case_dir / "results" / "pvpython"
+        generated_dir = case_dir / "results" / self.agent_mode
         generated_dir.mkdir(parents=True, exist_ok=True)
         fn = generated_dir / f"{case_name}.py"
         fn.write_text(code, encoding="utf-8")
@@ -285,7 +285,7 @@ class ChatVisAgent(BaseAgent):
                 self.save_script(code, case_name, case_dir)
 
                 # Verify state file
-                state_dir = case_dir / "results" / "pvpython"
+                state_dir = case_dir / "results" / self.agent_mode
                 pvsm = state_dir / f"{case_name}.pvsm"
 
                 if pvsm.exists():

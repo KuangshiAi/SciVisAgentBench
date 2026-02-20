@@ -236,23 +236,34 @@ class MultiCaseLoader:
     def _get_result_images(self, case_dir: Path, case_name: str, benchmark_type: str, gs_images: List[Path]) -> List[Path]:
         """Get result images/videos for a case."""
         if benchmark_type == "chatvis_bench":
-            # ChatVis: prefer MP4 video for temporal cases in results/pvpython/
-            result_dir = case_dir / "results" / "pvpython"
-            if result_dir.exists():
-                # Check for MP4 first (web-friendly video)
-                mp4_file = result_dir / f"{case_name}.mp4"
-                if mp4_file.exists():
-                    return [mp4_file]
+            # ChatVis: prefer MP4 video for temporal cases
+            # Try agent_mode directories first (e.g., chatvis_claude-sonnet-4-6_exp1), then fall back to pvpython
+            result_dirs = []
+            results_base = case_dir / "results"
+            if results_base.exists():
+                # Get all subdirectories, prioritizing those starting with "chatvis"
+                all_subdirs = [d for d in results_base.iterdir() if d.is_dir()]
+                chatvis_dirs = [d for d in all_subdirs if d.name.startswith("chatvis")]
+                pvpython_dirs = [d for d in all_subdirs if d.name == "pvpython"]
+                result_dirs = chatvis_dirs + pvpython_dirs + [d for d in all_subdirs if d not in chatvis_dirs and d not in pvpython_dirs]
 
-                # Fall back to PNG snapshot
-                png_files = list(result_dir.glob("*.png"))
-                if png_files:
-                    return [png_files[0]]
+            # Try each directory in order of preference
+            for result_dir in result_dirs[:1] if result_dirs else [case_dir / "results" / "pvpython"]:
+                if result_dir.exists():
+                    # Check for MP4 first (web-friendly video)
+                    mp4_file = result_dir / f"{case_name}.mp4"
+                    if mp4_file.exists():
+                        return [mp4_file]
 
-                # Last resort: AVI (likely won't play in browser)
-                avi_file = result_dir / f"{case_name}.avi"
-                if avi_file.exists():
-                    return [avi_file]
+                    # Fall back to PNG snapshot
+                    png_files = list(result_dir.glob("*.png"))
+                    if png_files:
+                        return [png_files[0]]
+
+                    # Last resort: AVI (likely won't play in browser)
+                    avi_file = result_dir / f"{case_name}.avi"
+                    if avi_file.exists():
+                        return [avi_file]
 
             return []
 
