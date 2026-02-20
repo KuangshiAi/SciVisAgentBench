@@ -121,8 +121,12 @@ class NapariMCPAgent(BaseAgent):
             full_response_parts = []  # Complete log including tool calls
 
             # Track actual token usage from API
+            # Use message ID deduplication as per Claude Agent SDK docs
+            processed_message_ids = set()
             total_input_tokens = 0
             total_output_tokens = 0
+            total_cache_creation_tokens = 0
+            total_cache_read_tokens = 0
 
             async with agent:
                 await agent.load_tools()
@@ -133,19 +137,32 @@ class NapariMCPAgent(BaseAgent):
 
                 async for chunk in agent.run(task_description):
                     # Try to extract usage from chunk (if available)
-                    # OpenAI streams include usage in the final chunk when stream_options.include_usage=True
+                    # Per Claude Agent SDK: Only count each message ID once
+                    # Multiple messages with same ID have identical usage - charge only once per step
                     if hasattr(chunk, 'usage') and chunk.usage is not None:
-                        usage = chunk.usage
-                        # Anthropic-style field names
-                        if hasattr(usage, 'input_tokens') and usage.input_tokens:
-                            total_input_tokens = usage.input_tokens  # Use assignment, not +=, as usage is cumulative
-                        if hasattr(usage, 'output_tokens') and usage.output_tokens:
-                            total_output_tokens = usage.output_tokens
-                        # OpenAI-style field names
-                        if hasattr(usage, 'prompt_tokens') and usage.prompt_tokens:
-                            total_input_tokens = usage.prompt_tokens
-                        if hasattr(usage, 'completion_tokens') and usage.completion_tokens:
-                            total_output_tokens = usage.completion_tokens
+                        # Get message ID to deduplicate
+                        message_id = getattr(chunk, 'id', None)
+                        if message_id and message_id not in processed_message_ids:
+                            processed_message_ids.add(message_id)
+                            usage = chunk.usage
+
+                            # Anthropic-style field names
+                            if hasattr(usage, 'input_tokens') and usage.input_tokens:
+                                total_input_tokens += usage.input_tokens
+                            if hasattr(usage, 'output_tokens') and usage.output_tokens:
+                                total_output_tokens += usage.output_tokens
+
+                            # Anthropic cache tokens (CRITICAL for accurate counting!)
+                            if hasattr(usage, 'cache_creation_input_tokens') and usage.cache_creation_input_tokens:
+                                total_cache_creation_tokens += usage.cache_creation_input_tokens
+                            if hasattr(usage, 'cache_read_input_tokens') and usage.cache_read_input_tokens:
+                                total_cache_read_tokens += usage.cache_read_input_tokens
+
+                            # OpenAI-style field names (fallback)
+                            if not hasattr(usage, 'input_tokens') and hasattr(usage, 'prompt_tokens') and usage.prompt_tokens:
+                                total_input_tokens += usage.prompt_tokens
+                            if not hasattr(usage, 'output_tokens') and hasattr(usage, 'completion_tokens') and usage.completion_tokens:
+                                total_output_tokens += usage.completion_tokens
 
                     if hasattr(chunk, 'choices') and chunk.choices:
                         delta = chunk.choices[0].delta
@@ -168,7 +185,8 @@ class NapariMCPAgent(BaseAgent):
             # Use actual API token usage if available, otherwise estimate
             if total_input_tokens > 0 or total_output_tokens > 0:
                 # Use actual API-reported usage
-                input_tokens = total_input_tokens
+                # Per Anthropic docs: total_input = input_tokens + cache_creation_input_tokens + cache_read_input_tokens
+                input_tokens = total_input_tokens + total_cache_creation_tokens + total_cache_read_tokens
                 output_tokens = total_output_tokens
                 token_source = "api_reported"
             else:
@@ -191,6 +209,8 @@ class NapariMCPAgent(BaseAgent):
                     "_token_info": {
                         "input_tokens": input_tokens,
                         "output_tokens": output_tokens,
+                        "cache_creation_input_tokens": total_cache_creation_tokens,
+                        "cache_read_input_tokens": total_cache_read_tokens,
                         "source": token_source
                     }
                 }

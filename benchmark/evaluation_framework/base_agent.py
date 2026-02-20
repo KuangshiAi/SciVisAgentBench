@@ -122,6 +122,51 @@ class BaseAgent(ABC):
         except Exception:
             return int(len(text.split()) * 1.33)
 
+    def calculate_cost(self, input_tokens: int, output_tokens: int) -> Dict[str, Any]:
+        """
+        Calculate monetary cost based on token usage and pricing configuration.
+
+        Args:
+            input_tokens: Number of input tokens
+            output_tokens: Number of output tokens
+
+        Returns:
+            Dict containing cost breakdown and total cost
+        """
+        pricing = self.config.get("price", {})
+
+        # Parse pricing strings (e.g., "$3.00" -> 3.00)
+        def parse_price(price_str):
+            if isinstance(price_str, (int, float)):
+                return float(price_str)
+            if isinstance(price_str, str):
+                # Remove $ and any other non-numeric characters except . and -
+                price_str = price_str.replace('$', '').replace(',', '').strip()
+                try:
+                    return float(price_str)
+                except ValueError:
+                    return 0.0
+            return 0.0
+
+        input_price_per_1m = parse_price(pricing.get("input_per_1m_tokens", 0))
+        output_price_per_1m = parse_price(pricing.get("output_per_1m_tokens", 0))
+
+        # Calculate costs
+        input_cost = (input_tokens / 1_000_000) * input_price_per_1m
+        output_cost = (output_tokens / 1_000_000) * output_price_per_1m
+        total_cost = input_cost + output_cost
+
+        return {
+            "input_cost_usd": round(input_cost, 6),
+            "output_cost_usd": round(output_cost, 6),
+            "total_cost_usd": round(total_cost, 6),
+            "pricing": {
+                "input_per_1m_tokens": input_price_per_1m,
+                "output_per_1m_tokens": output_price_per_1m,
+                "currency": "USD"
+            }
+        }
+
     def estimate_comprehensive_tokens(self, agent, task_description: str, full_response: str,
                                      num_tools: int = 0) -> tuple:
         """
@@ -360,17 +405,38 @@ class BaseAgent(ABC):
         if output_path is None:
             output_path = dirs["test_results_dir"] / f"test_result_{int(time.time())}.json"
 
+        # Extract token usage info
+        token_usage = result.metadata.get("token_usage", {
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "total_tokens": 0
+        })
+
+        # Get token source from _token_info if available
+        token_source = "unknown"
+        if "_token_info" in result.metadata:
+            token_source = result.metadata["_token_info"].get("source", "unknown")
+        elif "token_source" in result.metadata:
+            token_source = result.metadata["token_source"]
+
+        # Calculate monetary cost
+        input_tokens = token_usage.get("input_tokens", 0)
+        output_tokens = token_usage.get("output_tokens", 0)
+        cost_info = self.calculate_cost(input_tokens, output_tokens)
+
         # Format in the expected structure for SciVisEvaluator
         test_result = {
             "timestamp": datetime.now().isoformat(),
             "case_name": case_name,
             "status": "completed" if result.success else "failed",
             "duration": result.metadata.get("duration", 0),
-            "token_usage": result.metadata.get("token_usage", {
-                "input_tokens": 0,
-                "output_tokens": 0,
-                "total_tokens": 0
-            }),
+            "token_usage": {
+                "input_tokens": input_tokens,
+                "output_tokens": output_tokens,
+                "total_tokens": token_usage.get("total_tokens", input_tokens + output_tokens),
+                "source": token_source
+            },
+            "cost": cost_info,
             "response": result.response,
             "task_description": task_description,
             "error": result.error,

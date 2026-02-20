@@ -386,6 +386,9 @@ class UnifiedTestRunner:
                 output_tokens = self.count_tokens(agent_result.response)
                 token_source = "simple_estimate"
 
+            # Calculate monetary cost
+            cost_info = self.agent.calculate_cost(input_tokens, output_tokens)
+
             # Update result
             result.update({
                 "status": "completed" if agent_result.success else "failed",
@@ -396,8 +399,10 @@ class UnifiedTestRunner:
                 "token_usage": {
                     "input_tokens": input_tokens,
                     "output_tokens": output_tokens,
-                    "total_tokens": input_tokens + output_tokens
-                }
+                    "total_tokens": input_tokens + output_tokens,
+                    "source": token_source
+                },
+                "cost": cost_info
             })
 
             # Save test result using agent's method

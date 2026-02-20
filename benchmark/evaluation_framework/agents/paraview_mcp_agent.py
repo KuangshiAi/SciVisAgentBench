@@ -79,8 +79,10 @@ class ParaViewMCPAgent(BaseAgent):
 
         return str(case_config_file)
 
-    async def _clear_paraview_state(self, agent: TinyAgent) -> None:
-        """Clear ParaView pipeline state before starting."""
+    async def _clear_paraview_state(self, agent: TinyAgent, processed_message_ids: set,
+                                     total_input_tokens: int, total_output_tokens: int,
+                                     total_cache_creation_tokens: int, total_cache_read_tokens: int) -> tuple:
+        """Clear ParaView pipeline state before starting. Returns updated token counts."""
         try:
             print("Clearing ParaView pipeline state through MCP...")
 
@@ -89,6 +91,29 @@ class ParaViewMCPAgent(BaseAgent):
 
             response_parts = []
             async for chunk in agent.run(clear_message):
+                # Track token usage from clearing operation
+                if hasattr(chunk, 'usage') and chunk.usage is not None:
+                    message_id = getattr(chunk, 'id', None)
+                    if message_id and message_id not in processed_message_ids:
+                        processed_message_ids.add(message_id)
+                        usage = chunk.usage
+
+                        # Accumulate tokens
+                        if hasattr(usage, 'input_tokens') and usage.input_tokens:
+                            total_input_tokens += usage.input_tokens
+                        if hasattr(usage, 'output_tokens') and usage.output_tokens:
+                            total_output_tokens += usage.output_tokens
+                        if hasattr(usage, 'cache_creation_input_tokens') and usage.cache_creation_input_tokens:
+                            total_cache_creation_tokens += usage.cache_creation_input_tokens
+                        if hasattr(usage, 'cache_read_input_tokens') and usage.cache_read_input_tokens:
+                            total_cache_read_tokens += usage.cache_read_input_tokens
+
+                        # OpenAI-style fallback
+                        if not hasattr(usage, 'input_tokens') and hasattr(usage, 'prompt_tokens') and usage.prompt_tokens:
+                            total_input_tokens += usage.prompt_tokens
+                        if not hasattr(usage, 'output_tokens') and hasattr(usage, 'completion_tokens') and usage.completion_tokens:
+                            total_output_tokens += usage.completion_tokens
+
                 if hasattr(chunk, 'choices') and chunk.choices:
                     delta = chunk.choices[0].delta
                     if delta and delta.content:
@@ -107,6 +132,8 @@ class ParaViewMCPAgent(BaseAgent):
 
         except Exception as e:
             print(f"⚠️  Warning: Could not clear ParaView state: {e}")
+
+        return (total_input_tokens, total_output_tokens, total_cache_creation_tokens, total_cache_read_tokens)
 
     async def prepare_task(self, task_config: Dict[str, Any]):
         """Prepare for a specific task."""
@@ -145,16 +172,25 @@ class ParaViewMCPAgent(BaseAgent):
             response_parts = []
 
             # Track actual token usage from API
+            # Use message ID deduplication as per Claude Agent SDK docs
+            processed_message_ids = set()
             total_input_tokens = 0
             total_output_tokens = 0
+            total_cache_creation_tokens = 0
+            total_cache_read_tokens = 0
 
             async with agent:
                 await agent.load_tools()
                 print(f"Agent loaded with {len(agent.available_tools)} tools")
 
-                # Clear ParaView state at the beginning
+                # Clear ParaView state at the beginning and track tokens
                 print("Clearing ParaView state for fresh start...")
-                await self._clear_paraview_state(agent)
+                (total_input_tokens, total_output_tokens,
+                 total_cache_creation_tokens, total_cache_read_tokens) = await self._clear_paraview_state(
+                    agent, processed_message_ids,
+                    total_input_tokens, total_output_tokens,
+                    total_cache_creation_tokens, total_cache_read_tokens
+                )
 
                 # Run the task
                 print(f"Starting execution for task...")
@@ -162,19 +198,57 @@ class ParaViewMCPAgent(BaseAgent):
 
                 async for chunk in agent.run(task_description):
                     # Try to extract usage from chunk (if available)
-                    # OpenAI streams include usage in the final chunk when stream_options.include_usage=True
+                    # Per Claude Agent SDK: Only count each message ID once
+                    # Multiple messages with same ID have identical usage - charge only once per step
                     if hasattr(chunk, 'usage') and chunk.usage is not None:
                         usage = chunk.usage
-                        # Anthropic-style field names
-                        if hasattr(usage, 'input_tokens') and usage.input_tokens:
-                            total_input_tokens = usage.input_tokens  # Use assignment, not +=, as usage is cumulative
-                        if hasattr(usage, 'output_tokens') and usage.output_tokens:
-                            total_output_tokens = usage.output_tokens
-                        # OpenAI-style field names
-                        if hasattr(usage, 'prompt_tokens') and usage.prompt_tokens:
-                            total_input_tokens = usage.prompt_tokens
-                        if hasattr(usage, 'completion_tokens') and usage.completion_tokens:
-                            total_output_tokens = usage.completion_tokens
+                        message_id = getattr(chunk, 'id', None)
+
+                        # Debug: Log chunks without message IDs
+                        if not message_id:
+                            print(f"\n⚠️  WARNING: Chunk has usage but no message ID!")
+                            print(f"   Chunk type: {type(chunk)}")
+                            print(f"   Usage: input={getattr(usage, 'input_tokens', None)}, output={getattr(usage, 'output_tokens', None)}")
+
+                        # Only process if we haven't seen this message ID
+                        if message_id and message_id not in processed_message_ids:
+                            processed_message_ids.add(message_id)
+
+                            # Track both input and output from the same usage object
+                            input_added = 0
+                            output_added = 0
+                            cache_creation_added = 0
+                            cache_read_added = 0
+
+                            # Anthropic-style field names (preferred)
+                            if hasattr(usage, 'input_tokens') and usage.input_tokens:
+                                total_input_tokens += usage.input_tokens
+                                input_added = usage.input_tokens
+                            if hasattr(usage, 'output_tokens') and usage.output_tokens:
+                                total_output_tokens += usage.output_tokens
+                                output_added = usage.output_tokens
+
+                            # Anthropic cache tokens (CRITICAL for accurate counting!)
+                            if hasattr(usage, 'cache_creation_input_tokens') and usage.cache_creation_input_tokens:
+                                total_cache_creation_tokens += usage.cache_creation_input_tokens
+                                cache_creation_added = usage.cache_creation_input_tokens
+                            if hasattr(usage, 'cache_read_input_tokens') and usage.cache_read_input_tokens:
+                                total_cache_read_tokens += usage.cache_read_input_tokens
+                                cache_read_added = usage.cache_read_input_tokens
+
+                            # OpenAI-style field names (fallback if Anthropic fields not present)
+                            if not input_added and hasattr(usage, 'prompt_tokens') and usage.prompt_tokens:
+                                total_input_tokens += usage.prompt_tokens
+                                input_added = usage.prompt_tokens
+                            if not output_added and hasattr(usage, 'completion_tokens') and usage.completion_tokens:
+                                total_output_tokens += usage.completion_tokens
+                                output_added = usage.completion_tokens
+
+                            # Calculate true total input (per Anthropic docs)
+                            true_total_input = total_input_tokens + total_cache_creation_tokens + total_cache_read_tokens
+                            print(f"\n[TOKEN] Step {len(processed_message_ids)} (id={message_id[:8]}...):")
+                            print(f"  +{input_added} input, +{cache_creation_added} cache_write, +{cache_read_added} cache_read, +{output_added} output")
+                            print(f"  Total: {true_total_input:,} input ({total_input_tokens:,}+{total_cache_creation_tokens:,}+{total_cache_read_tokens:,}), {total_output_tokens:,} output")
 
                     if hasattr(chunk, 'choices') and chunk.choices:
                         delta = chunk.choices[0].delta
@@ -203,15 +277,18 @@ class ParaViewMCPAgent(BaseAgent):
             # Use actual API token usage if available, otherwise estimate
             if total_input_tokens > 0 or total_output_tokens > 0:
                 # Use actual API-reported usage
-                input_tokens = total_input_tokens
+                # Per Anthropic docs: total_input = input_tokens + cache_creation_input_tokens + cache_read_input_tokens
+                input_tokens = total_input_tokens + total_cache_creation_tokens + total_cache_read_tokens
                 output_tokens = total_output_tokens
                 token_source = "api_reported"
+                print(f"\n✓ Final token count: {input_tokens:,} input, {output_tokens:,} output (source: {token_source})")
             else:
                 # Fallback to comprehensive estimation
                 input_tokens, output_tokens = self.estimate_comprehensive_tokens(
                     agent, task_description, full_response
                 )
                 token_source = "estimated"
+                print(f"\n⚠️  Final token count: {input_tokens:,} input, {output_tokens:,} output (source: {token_source})")
 
             return AgentResult(
                 success=True,
@@ -223,6 +300,8 @@ class ParaViewMCPAgent(BaseAgent):
                     "_token_info": {
                         "input_tokens": input_tokens,
                         "output_tokens": output_tokens,
+                        "cache_creation_input_tokens": total_cache_creation_tokens,
+                        "cache_read_input_tokens": total_cache_read_tokens,
                         "source": token_source
                     }
                 }
