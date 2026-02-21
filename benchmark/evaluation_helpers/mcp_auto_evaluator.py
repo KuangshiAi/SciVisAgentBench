@@ -33,7 +33,7 @@ class MCPAutoEvaluator(SciVisEvaluator):
     Automatic evaluator for MCP test cases using LLM judge
     """
     
-    def __init__(self, case_dir: str, case_name: str, openai_api_key: str = None, model: str = "gpt-4o", static_screenshot: bool = False, agent_mode: str = None):
+    def __init__(self, case_dir: str, case_name: str, openai_api_key: str = None, model: str = "gpt-4o", static_screenshot: bool = False, agent_mode: str = None, openai_base_url: str = None):
         """
         Initialize the MCP evaluator
 
@@ -44,13 +44,14 @@ class MCPAutoEvaluator(SciVisEvaluator):
             model (str): OpenAI model to use for evaluation
             static_screenshot (bool): If True, use pre-generated screenshots/videos instead of generating from state files
             agent_mode (str): Full agent mode string (e.g., "paraview_mcp_gpt-4o_exp1") for finding result files. If None, defaults to "mcp"
+            openai_base_url (str): Optional custom OpenAI-compatible API endpoint
         """
         super().__init__(case_dir, case_name, eval_mode="mcp")
         self.static_screenshot = static_screenshot
         self.agent_mode = agent_mode if agent_mode else "mcp"  # Use agent_mode for results path, default to "mcp"
 
         # Initialize LLM evaluator
-        self.llm_evaluator = LLMEvaluator(api_key=openai_api_key, model=model)
+        self.llm_evaluator = LLMEvaluator(api_key=openai_api_key, model=model, base_url=openai_base_url)
 
         # Initialize image metrics calculator (still uses "mcp" for eval framework)
         self.image_metrics_calculator = CaseImageMetrics(case_dir, case_name, eval_mode="mcp")
