@@ -1,0 +1,27 @@
+{
+  "provider": "anthropic",
+  "model": "claude-sonnet-4-5",
+  "eval_mode": "generic",
+  "agent_name": "claude_code",
+  "experiment_number": "exp1",
+  "timeout_per_task": 600,
+  "claude_code_path": "claude",
+  "preserve_workdir": false,
+  "auto_approve": true,
+  "custom_system_prompt": "",
+  "environment": {
+    "type": "conda",
+    "name": "paraview_mcp",
+    "packages": [
+      "paraview",
+      "napari",
+      "numpy",
+      "scipy",
+      "matplotlib"
+    ]
+  },
+  "price": {
+    "input_per_1m_tokens": "$3.00",
+    "output_per_1m_tokens": "$15.00"
+  }
+}

@@ -11,6 +11,7 @@ from .napari_mcp_agent import NapariMCPAgent
 from .chatvis_agent import ChatVisAgent
 from .gmx_vmd_mcp_agent import GmxVmdMcpAgent
 from .topopilot_mcp_agent import TopoPilotMCPAgent
+from .claude_code_agent import ClaudeCodeAgent
 
 __all__ = [
     'ParaViewMCPAgent',
@@ -18,4 +19,5 @@ __all__ = [
     'ChatVisAgent',
     'GmxVmdMcpAgent',
     'TopoPilotMCPAgent',
+    'ClaudeCodeAgent',
 ]
