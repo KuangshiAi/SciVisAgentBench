@@ -35,7 +35,8 @@ class DatasetAnonymizer:
     def __init__(self, output_dir: Path = None):
         self.output_dir = output_dir or Path("anonymized_datasets")
         self.dataset_mapping: Dict[str, str] = {}  # Original dataset name -> anonymous
-        self.file_mapping: Dict[str, str] = {}     # Original file path -> anonymous path
+        self.file_mapping: Dict[str, str] = {}     # Original file path -> anonymous path (relative for YAML)
+        self.file_mapping_full: Dict[str, str] = {}  # Original file path -> full anonymous path (for copying)
         self.output_path_mapping: Dict[str, str] = {}  # Original output paths -> anonymous
         self.counter = 0
         self.file_counter = 0
@@ -87,11 +88,17 @@ class DatasetAnonymizer:
         else:
             anon_filename = filename
 
-        # Create the anonymous path
-        anon_path = str(self.output_dir / anon_dataset / "data" / anon_filename)
-        self.file_mapping[original_path] = anon_path
+        # Create the anonymous path (relative path for YAML)
+        output_dir_name = self.output_dir.name if isinstance(self.output_dir, Path) else Path(self.output_dir).name
+        anon_path_relative = f"{output_dir_name}/{anon_dataset}/data/{anon_filename}"
 
-        return anon_path
+        # Also store full path for file copying
+        anon_path_full = str(self.output_dir / anon_dataset / "data" / anon_filename)
+
+        self.file_mapping[original_path] = anon_path_relative
+        self.file_mapping_full[original_path] = anon_path_full
+
+        return anon_path_relative
 
     def _should_anonymize_filename(self, filename: str) -> bool:
         """Check if a filename should be anonymized based on content hints."""
@@ -285,7 +292,7 @@ class DatasetAnonymizer:
         # Generate anonymous mappings for data files
         for original_path in file_paths:
             anon_path = self.generate_anonymous_name(original_path)
-            print(f"  Data: {original_path} -> {Path(anon_path).relative_to(self.output_dir)}")
+            print(f"  Data: {original_path} -> {anon_path}")
 
         # Generate anonymous mappings for output files
         for original_path in output_paths:
@@ -295,8 +302,8 @@ class DatasetAnonymizer:
         # Copy files if not in quick mode
         if not quick_mode:
             print(f"\nCopying dataset files to {self.output_dir}...")
-            for original_path, anon_path in self.file_mapping.items():
-                self.copy_dataset_file(original_path, anon_path, dry_run)
+            for original_path, anon_path_full in self.file_mapping_full.items():
+                self.copy_dataset_file(original_path, anon_path_full, dry_run)
 
         # Create anonymized YAML
         output_yaml = yaml_file.parent / f"{yaml_file.stem}_anonymized{yaml_file.suffix}"
@@ -360,6 +367,7 @@ class DatasetAnonymizer:
             'output_dir': str(self.output_dir),
             'dataset_mapping': self.dataset_mapping,
             'file_mapping': self.file_mapping,
+            'file_mapping_full': self.file_mapping_full,
             'output_path_mapping': self.output_path_mapping,
             'reverse_mapping': {v: k for k, v in self.file_mapping.items()},
             'reverse_output_mapping': {v: k for k, v in self.output_path_mapping.items()},
@@ -386,6 +394,7 @@ class DatasetAnonymizer:
         self.output_dir = Path(mapping_data.get('output_dir', self.output_dir))
         self.dataset_mapping = mapping_data.get('dataset_mapping', {})
         self.file_mapping = mapping_data.get('file_mapping', {})
+        self.file_mapping_full = mapping_data.get('file_mapping_full', {})
         self.output_path_mapping = mapping_data.get('output_path_mapping', {})
         self.counter = len(self.dataset_mapping)
         self.file_counter = len(self.file_mapping)

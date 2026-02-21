@@ -345,11 +345,10 @@ We provide a tool to help anonymize volume datasets so that we can test whether 
 
 ```shell
 conda activate paraview_mcp
-cd benchmark
-python anonymize_dataset.py eval_cases/paraview/what_obj_cases.yaml
+python benchmark/anonymize_dataset.py benchmark/eval_cases/paraview/what_obj_cases.yaml \
+--output-dir SciVisAgentBench-tasks/anonymized_datasets
 
 # Then you can run the "what is the object" test
-cd ..
 python -m benchmark.evaluation_framework.run_evaluation \
     --agent paraview_mcp \
     --config benchmark/configs/paraview_mcp/config_openai.json \
