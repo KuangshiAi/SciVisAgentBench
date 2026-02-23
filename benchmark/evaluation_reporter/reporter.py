@@ -259,7 +259,7 @@ class EvaluationReporter:
             result_img_found = False
 
             # Pattern 1: results/{agent_mode}/{case_name}.png
-            for mode in [agent_mode, 'pvpython', 'mcp']:
+            for mode in [agent_mode, 'pvpython', 'mcp', 'generic']:
                 if result_img_found:
                     break
                 result_img = case_dir / "results" / mode / f"{case_name}.png"
@@ -270,7 +270,7 @@ class EvaluationReporter:
 
             # Pattern 2: evaluation_results/{agent_mode}/screenshots/result_*.png
             if not result_img_found:
-                for mode in [agent_mode, 'pvpython', 'mcp']:
+                for mode in [agent_mode, 'pvpython', 'mcp', 'generic']:
                     eval_results_dir = case_dir / "evaluation_results" / mode / "screenshots"
                     if eval_results_dir.exists():
                         # Look for any result_*.png files
@@ -315,9 +315,10 @@ class EvaluationReporter:
         # Try to extract from task_description
         task_desc = result.get('task_description', '')
         if 'agent_mode' in task_desc:
-            # Extract agent_mode value from text like 'Your agent_mode is "pvpython"'
+            # Extract agent_mode value from text like 'Your agent_mode is "claude_code_claude-sonnet-4-5_exp_default"'
+            # Use [^"]+ to match everything inside quotes (including hyphens, underscores, etc.)
             import re
-            match = re.search(r'agent_mode["\s]*is["\s]+"(\w+)"', task_desc)
+            match = re.search(r'agent_mode["\s]*is["\s]+"([^"]+)"', task_desc)
             if match:
                 return match.group(1)
 
