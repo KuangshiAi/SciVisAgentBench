@@ -201,12 +201,14 @@ Task Requirements:
 - Save all required output files to the specified paths
 - For assertion-based tasks, output <1> for success or <0> for failure
 
-CRITICAL SCREENSHOT REQUIREMENT:
+Output Requirement:
 - After setting up the visualization, you MUST generate a screenshot
-- Use SaveScreenshot() in ParaView to save a PNG image
 - Screenshot filename should match the case name (e.g., "bonsai.png", "engine.png")
 - Save screenshots to the same results directory as state files
 - The screenshot will be used for visual evaluation of your work
+
+Stratergy:
+- You should check the visualization you generate to confirm if the task is accomplished or further modification is needed. 
 
 Task:
 {task}
