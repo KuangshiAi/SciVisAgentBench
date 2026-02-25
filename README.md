@@ -48,7 +48,7 @@ hf download SciVisAgentBench/SciVisAgentBench-tasks \
   --local-dir ~/SciVisAgentBench/SciVisAgentBench-tasks
 ```
 
-Make sure the `SciVisAgentBench-tasks` directory is placed at the same level as the `benchmark` directory, including the `main`, the `bioimage_data`, the `sci_volume_data`, the `molecular_vis`, and the `chatvis_bench` folders, as shown in the project structure:
+Make sure the `SciVisAgentBench-tasks` directory is placed at the same level as the `benchmark` directory, including the `paraview`, the `sci_volume_data`, the `bioimage_data`, the `molecular_vis`, and the `topology` folders, as shown in the project structure:
 
 ```
 SciVisAgentBench/
@@ -56,17 +56,17 @@ SciVisAgentBench/
 │   ├── yaml_runner_paraview_mcp.py
 │   └── ...
 └── SciVisAgentBench-tasks/
-    ├── main/
+    ├── paraview/
     ├── sci_volume_data/
     ├── bioimage_data/
-    ├── chatvis_bench/
+    ├── topology/
     └── molecular_vis/
 ```
 
 ## ParaView-MCP, ChatVis, bioimage-agent, and GMX-VMD-MCP Installation
 We provide out-of-box evaluation for ParaView-MCP, ChatVis, bioimage-agent, and GMX-VMD-MCP in SciVisAgentBench. We suggest installing them in seperated conda virtual environments (ParaView-MCP and ChatVis can share the same environment).
 
-### To install ParaView, ParaView-MCP, and SciVisAgentBench requirements (it also works for ChatVis, make sure the ParaView environment here is the same as your ParaView GUI):
+### To install ParaView, ParaView-MCP, and SciVisAgentBench requirements (it also works for ChatVis, make sure the ParaView version here is the same as your ParaView GUI):
 ```shell
 conda create -n paraview_mcp python=3.10
 conda activate paraview_mcp
@@ -203,15 +203,15 @@ Make sure the ParaView GUI be of the same version as the ParaView server.
 
 Check `benchmark/configs/paraview_mcp` and setup both MCP server and API provider info.
 
-### 4. Run evaluation of ParaView-MCP on the `main` benchmark
+### 4. Run evaluation of ParaView-MCP on the `paraview` benchmark
 
 ```shell
 conda activate paraview_mcp
 python -m benchmark.evaluation_framework.run_evaluation \
     --agent paraview_mcp \
     --config benchmark/configs/paraview_mcp/config_openai.json \
-    --yaml benchmark/eval_cases/paraview/main_cases.yaml \
-    --cases SciVisAgentBench-tasks/main \
+    --yaml benchmark/eval_cases/paraview/paraview_cases.yaml \
+    --cases SciVisAgentBench-tasks/paraview \
     --eval-model gpt-5.2 \
     --experiment-number exp1
 ```
@@ -222,15 +222,15 @@ python -m benchmark.evaluation_framework.run_evaluation \
 
 Check `benchmark/configs/chatvis` and setup API provider info.
 
-### 2. Run evaluation of ChatVis on the `chatvis-bench` benchmark
+### 2. Run evaluation of ChatVis on the `paraview` benchmark
 
 ```shell
 conda activate paraview_mcp
 python -m benchmark.evaluation_framework.run_evaluation \
     --agent chatvis \
     --config benchmark/configs/chatvis/config_openai.json \
-    --yaml benchmark/eval_cases/paraview/chatvis_bench_cases.yaml\
-    --cases SciVisAgentBench-tasks/chatvis_bench \
+    --yaml benchmark/eval_cases/paraview/paraview_cases.yaml\
+    --cases SciVisAgentBench-tasks/paraview \
     --eval-model gpt-5.2 \
     --experiment-number exp1
 ```

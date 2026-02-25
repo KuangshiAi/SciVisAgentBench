@@ -85,3 +85,5 @@ src/session
 .claude
 
 SciVisAgentBench-tasks_beforeFeb24/
+
+exp.sh

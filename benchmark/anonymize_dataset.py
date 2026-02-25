@@ -113,16 +113,17 @@ class DatasetAnonymizer:
             if re.match(pattern, filename, re.IGNORECASE):
                 return False
 
-        # Anonymize if contains descriptive words
+        # Anonymize if contains descriptive words or dataset names
         descriptive_words = [
-            'aneurism', 'backpack', 'blunt', 'fin', 'bonsai', 'brain',
-            'bunny', 'chest', 'christmas', 'tree', 'csafe', 'duct',
-            'engine', 'foot', 'frog', 'head', 'hydrogen', 'atom',
-            'knee', 'lobster', 'mag', 'field', 'marmoset', 'neurons',
-            'mri', 'mrt', 'angio', 'neghip', 'nucleon', 'orange',
-            'present', 'prone', 'stag', 'beetle', 'statue', 'leg',
-            'supernova', 'teapot', 'tooth', 'tornado', 'toutatis',
-            'vessel', 'visible', 'woman', 'male', 'zebrafish'
+            'aneurism', 'atom', 'backpack', 'beetle', 'blunt', 'bonsai', 'boston', 'brain',
+            'bunny', 'carp', 'chest', 'christmas', 'csafe', 'duct',
+            'engine', 'fin', 'foot', 'frog', 'fuel', 'head', 'hydrogen',
+            'knee', 'leg', 'lobster', 'mag', 'field', 'male', 'marmoset',
+            'mri_ventricles', 'mri', 'mrt', 'angio', 'neghip',
+            'neocortical_layer_1_axons', 'neurons', 'nucleon', 'orange',
+            'pancreas', 'present', 'prone', 'silicium', 'skull', 'stag', 'statue',
+            'stent', 'supernova', 'teapot', 'tooth', 'tornado', 'toutatis', 'tree',
+            'vertebra', 'vessel', 'visible', 'woman', 'zebrafish', 'zeiss'
         ]
 
         filename_lower = filename.lower()

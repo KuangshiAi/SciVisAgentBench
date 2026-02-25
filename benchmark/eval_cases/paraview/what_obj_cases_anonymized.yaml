@@ -101,7 +101,7 @@
 # 7. Carp Dataset
 - vars:
     question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_007/data/carp_256x256x512_uint16.raw".
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_007/data/data_007_256x256x512_uint16.raw".
         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_007/results/{agent_mode}/dataset_007.pvsm"
         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_007/results/{agent_mode}/answers.txt"
   assert:
@@ -114,44 +114,12 @@
       value: |
           The visualization image shows a carp or fish anatomy with a reasonable transfer function, and the object is shown clearly
 
-# 8. CSAFE Heptane Dataset
+# 8. Engine Dataset
 - vars:
     question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_008/data/data_007_302x302x302_uint8.raw".
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_008/data/data_008_256x256x128_uint8.raw".
         Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_008/results/{agent_mode}/dataset_008.pvsm"
         Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_008/results/{agent_mode}/answers.txt"
-  assert:
-    - type: llm-rubric
-      subtype: text
-      value: |
-          Should recognize combustion or heptane simulation data
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          The visualization image shows combustion or heptane simulation data with a reasonable transfer function, and the object is shown clearly
-
-# 9. Duct Dataset
-- vars:
-    question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_009/data/data_008_193x194x1000_float32.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_009/results/{agent_mode}/dataset_009.pvsm"
-        Take a screenshot and provide a textual report describing what you observe and save it to "anonymized_datasets/dataset_009/results/{agent_mode}/answers.txt"
-  assert:
-    - type: llm-rubric
-      subtype: text
-      value: |
-          Should identify flow patterns in a duct geometry
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          The visualization image shows flow patterns in a duct geometry with a reasonable transfer function, and the object is shown clearly
-
-# 10. Engine Dataset
-- vars:
-    question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_010/data/data_009_256x256x128_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_010/results/{agent_mode}/dataset_010.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_010/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
       subtype: text
@@ -162,12 +130,12 @@
       value: |
           The visualization image shows an engine or mechanical components with a reasonable transfer function, and the object is shown clearly
 
-# 11. Foot Dataset
+# 9. Foot Dataset
 - vars:
     question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_011/data/data_010_256x256x256_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_011/results/{agent_mode}/dataset_011.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_011/results/{agent_mode}/answers.txt"
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_009/data/data_009_256x256x256_uint8.raw".
+        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_009/results/{agent_mode}/dataset_009.pvsm"
+        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_009/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
       subtype: text
@@ -178,12 +146,12 @@
       value: |
           The visualization image shows a foot with bone and tissue structures with a reasonable transfer function, and the object is shown clearly
 
-# 12. Frog Dataset
+# 10. Frog Dataset
 - vars:
     question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_012/data/data_011_256x256x44_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_012/results/{agent_mode}/dataset_012.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_012/results/{agent_mode}/answers.txt"
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_010/data/data_010_256x256x44_uint8.raw".
+        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_010/results/{agent_mode}/dataset_010.pvsm"
+        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_010/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
       subtype: text
@@ -194,12 +162,12 @@
       value: |
           The visualization image shows a frog specimen with internal anatomy with a reasonable transfer function, and the object is shown clearly
 
-# 13. Fuel Dataset
+# 11. Fuel Dataset
 - vars:
     question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_013/data/fuel_64x64x64_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_013/results/{agent_mode}/dataset_013.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_013/results/{agent_mode}/answers.txt"
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_011/data/data_011_64x64x64_uint8.raw".
+        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_011/results/{agent_mode}/dataset_011.pvsm"
+        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_011/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
       subtype: text
@@ -210,12 +178,12 @@
       value: |
           The visualization image shows fuel combustion or related simulation with a reasonable transfer function, and the object is shown clearly
 
-# 14. Hydrogen Atom Dataset
+# 12. Hydrogen Atom Dataset
 - vars:
     question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_014/data/data_012_128x128x128_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_014/results/{agent_mode}/dataset_014.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_014/results/{agent_mode}/answers.txt"
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_012/data/data_012_128x128x128_uint8.raw".
+        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_012/results/{agent_mode}/dataset_012.pvsm"
+        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_012/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
       subtype: text
@@ -226,12 +194,12 @@
       value: |
           The visualization image shows hydrogen atom orbital or probability distribution with a reasonable transfer function, and the object is shown clearly
 
-# 15. Lobster Dataset
+# 13. Lobster Dataset
 - vars:
     question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_015/data/data_013_301x324x56_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_015/results/{agent_mode}/dataset_015.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_015/results/{agent_mode}/answers.txt"
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_013/data/data_013_301x324x56_uint8.raw".
+        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_013/results/{agent_mode}/dataset_013.pvsm"
+        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_013/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
       subtype: text
@@ -242,28 +210,12 @@
       value: |
           The visualization image shows a lobster or crustacean anatomy with a reasonable transfer function, and the object is shown clearly
 
-# 16. Marschner-Lobb Dataset
+# 14. MRI Ventricles Dataset
 - vars:
     question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_016/data/marschner_lobb_41x41x41_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_016/results/{agent_mode}/dataset_016.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_016/results/{agent_mode}/answers.txt"
-  assert:
-    - type: llm-rubric
-      subtype: text
-      value: |
-          Should recognize Marschner-Lobb synthetic test pattern
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          The visualization image shows Marschner-Lobb synthetic test pattern with a reasonable transfer function, and the object is shown clearly
-
-# 17. MRI Ventricles Dataset
-- vars:
-    question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_017/data/data_014_256x256x124_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_017/results/{agent_mode}/dataset_017.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_017/results/{agent_mode}/answers.txt"
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_014/data/data_014_256x256x124_uint8.raw".
+        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_014/results/{agent_mode}/dataset_014.pvsm"
+        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_014/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
       subtype: text
@@ -274,12 +226,12 @@
       value: |
           The visualization image shows brain ventricles or ventricular structures with a reasonable transfer function, and the object is shown clearly
 
-# 18. MRI Woman Dataset
+# 15. MRI Woman Dataset
 - vars:
     question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_018/data/data_015_256x256x109_uint16.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_018/results/{agent_mode}/dataset_018.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_018/results/{agent_mode}/answers.txt"
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_015/data/data_015_256x256x109_uint16.raw".
+        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_015/results/{agent_mode}/dataset_015.pvsm"
+        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_015/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
       subtype: text
@@ -290,12 +242,12 @@
       value: |
           The visualization image shows human anatomical structures from MRI scan with a reasonable transfer function, and the object is shown clearly
 
-# 19. MRT Angio Dataset
+# 16. MRT Angio Dataset
 - vars:
     question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_019/data/data_016_416x512x112_uint16.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_019/results/{agent_mode}/dataset_019.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_019/results/{agent_mode}/answers.txt"
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_016/data/data_016_416x512x112_uint16.raw".
+        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_016/results/{agent_mode}/dataset_016.pvsm"
+        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_016/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
       subtype: text
@@ -306,28 +258,12 @@
       value: |
           The visualization image shows angiography or vascular structures with a reasonable transfer function, and the object is shown clearly
 
-# 20. Neghip Dataset
+# 17. Neocortical Layer 1 Axons Dataset
 - vars:
     question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_020/data/data_017_64x64x64_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_020/results/{agent_mode}/dataset_020.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_020/results/{agent_mode}/answers.txt"
-  assert:
-    - type: llm-rubric
-      subtype: text
-      value: |
-          Should visualize and describe molecule structure
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          The visualization image shows molecule structure with a reasonable transfer function, and the object is shown clearly
-
-# 21. Neocortical Layer 1 Axons Dataset
-- vars:
-    question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_021/data/neocortical_layer_1_axons_1464x1033x76_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_021/results/{agent_mode}/dataset_021.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_021/results/{agent_mode}/answers.txt"
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_017/data/data_017_1464x1033x76_uint8.raw".
+        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_017/results/{agent_mode}/dataset_017.pvsm"
+        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_017/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
       subtype: text
@@ -338,12 +274,12 @@
       value: |
           The visualization image shows neural axons or neocortical network structures with a reasonable transfer function, and the object is shown clearly
 
-# 22. Nucleon Dataset
+# 18. Nucleon Dataset
 - vars:
     question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_022/data/data_018_41x41x41_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_022/results/{agent_mode}/dataset_022.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_022/results/{agent_mode}/answers.txt"
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_018/data/data_018_41x41x41_uint8.raw".
+        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_018/results/{agent_mode}/dataset_018.pvsm"
+        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_018/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
       subtype: text
@@ -354,12 +290,12 @@
       value: |
           Should visualize nucleon or particle physics data with a reasonable transfer function, and the object is shown clearly
 
-# 23. Pancreas Dataset
+# 19. Pancreas Dataset
 - vars:
     question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_023/data/pancreas_240x512x512_int16.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_023/results/{agent_mode}/dataset_023.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_023/results/{agent_mode}/answers.txt"
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_019/data/data_019_240x512x512_int16.raw".
+        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_019/results/{agent_mode}/dataset_019.pvsm"
+        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_019/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
       subtype: text
@@ -370,28 +306,12 @@
       value: |
           The visualization image shows pancreas or pancreatic anatomy with a reasonable transfer function, and the object is shown clearly
 
-# 24. Shockwave Dataset
+# 20. Silicium Dataset
 - vars:
     question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_024/data/shockwave_64x64x512_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_024/results/{agent_mode}/dataset_024.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_024/results/{agent_mode}/answers.txt"
-  assert:
-    - type: llm-rubric
-      subtype: text
-      value: |
-          Should identify shockwave or wave propagation patterns
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          The visualization image shows shockwave or wave propagation patterns with a reasonable transfer function, and the object is shown clearly
-
-# 25. Silicium Dataset
-- vars:
-    question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_025/data/silicium_98x34x34_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_025/results/{agent_mode}/dataset_025.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_025/results/{agent_mode}/answers.txt"
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_020/data/data_020_98x34x34_uint8.raw".
+        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_020/results/{agent_mode}/dataset_020.pvsm"
+        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_020/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
       subtype: text
@@ -402,12 +322,12 @@
       value: |
           The visualization image shows silicon crystal or material structure with a reasonable transfer function, and the object is shown clearly
 
-# 26. Skull Dataset
+# 21. Skull Dataset
 - vars:
     question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_026/data/skull_256x256x256_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_026/results/{agent_mode}/dataset_026.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_026/results/{agent_mode}/answers.txt"
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_021/data/data_021_256x256x256_uint8.raw".
+        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_021/results/{agent_mode}/dataset_021.pvsm"
+        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_021/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
       subtype: text
@@ -418,12 +338,12 @@
       value: |
           1. Should identify skull or cranial bone structures
 
-# 27. Statue Leg Dataset
+# 22. Statue Leg Dataset
 - vars:
     question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_027/data/data_019_341x341x93_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_027/results/{agent_mode}/dataset_027.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_027/results/{agent_mode}/answers.txt"
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_022/data/data_022_341x341x93_uint8.raw".
+        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_022/results/{agent_mode}/dataset_022.pvsm"
+        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_022/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
       subtype: text
@@ -434,23 +354,23 @@
       value: |
           The visualization image shows a statue leg or sculptural form with a reasonable transfer function, and the object is shown clearly
 
-# 28. Stent Dataset
+# 23. Stent Dataset
 - vars:
     question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_028/data/stent_512x512x174_uint16.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_028/results/{agent_mode}/dataset_028.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_028/results/{agent_mode}/answers.txt"
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_023/data/data_023_512x512x174_uint16.raw".
+        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_023/results/{agent_mode}/dataset_023.pvsm"
+        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_023/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
       value: |
           Should identify a stent or medical device mesh structure
 
-# 29. Supernova Dataset
+# 24. Supernova Dataset
 - vars:
     question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_029/data/data_020_256x256x256_float32.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_029/results/{agent_mode}/dataset_029.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_029/results/{agent_mode}/answers.txt"
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_024/data/data_024_256x256x256_float32.raw".
+        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_024/results/{agent_mode}/dataset_024.pvsm"
+        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_024/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
       subtype: text
@@ -461,28 +381,12 @@
       value: |
           The visualization image shows supernova or astrophysical explosion simulation with a reasonable transfer function, and the object is shown clearly
 
-# 30. TACC Turbulence Dataset
+# 25. Tooth Dataset
 - vars:
     question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_030/data/tacc_turbulence_256x256x256_float32.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_030/results/{agent_mode}/dataset_030.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_030/results/{agent_mode}/answers.txt"
-  assert:
-    - type: llm-rubric
-      subtype: text
-      value: |
-          Should identify turbulence or vortex flow structures
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          The visualization image shows turbulence or vortex flow structures with a reasonable transfer function, and the object is shown clearly
-
-# 31. Tooth Dataset
-- vars:
-    question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_031/data/data_021_103x94x161_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_031/results/{agent_mode}/dataset_031.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_031/results/{agent_mode}/answers.txt"
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_025/data/data_025_103x94x161_uint8.raw".
+        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_025/results/{agent_mode}/dataset_025.pvsm"
+        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_025/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
       subtype: text
@@ -493,12 +397,12 @@
       value: |
           The visualization image shows tooth or dental anatomy with a reasonable transfer function, and the object is shown clearly
 
-# 32. Tornado Dataset
+# 26. Tornado Dataset
 - vars:
     question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_032/data/data_022_64x64x64_float32_scalar3.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_032/results/{agent_mode}/dataset_032.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_032/results/{agent_mode}/answers.txt"
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_026/data/data_026_64x64x64_float32_scalar3.raw".
+        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_026/results/{agent_mode}/dataset_026.pvsm"
+        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_026/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
       subtype: text
@@ -509,12 +413,12 @@
       value: |
           The visualization image shows tornado or vortex flow pattern with a reasonable transfer function, and the object is shown clearly
 
-# 33. Visible Male Dataset
+# 27. Visible Male Dataset
 - vars:
     question: |
-        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_033/data/data_023_128x256x256_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_033/results/{agent_mode}/dataset_033.pvsm"
-        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_033/results/{agent_mode}/answers.txt"
+        Clear the ParaView pipeline and load the data file "anonymized_datasets/dataset_027/data/data_027_128x256x256_uint8.raw".
+        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "anonymized_datasets/dataset_027/results/{agent_mode}/dataset_027.pvsm"
+        Provide a textual report identifying what you observe and save it to "anonymized_datasets/dataset_027/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
       subtype: text
