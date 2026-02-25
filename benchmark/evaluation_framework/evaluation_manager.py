@@ -165,13 +165,13 @@ class EvaluationManager:
             # Override result image path if rs_file is provided
             if rs_file:
                 # Replace {agent_mode} placeholder
-                rs_file_resolved = rs_file.replace('{agent_mode}', self.eval_mode)
+                rs_file_resolved = rs_file.replace('{agent_mode}', self.agent_mode)
                 # Make path absolute (relative to base_dir)
                 rs_source = base_dir / rs_file_resolved
 
                 if rs_source.exists():
-                    # Copy to expected location: case_dir/results/{eval_mode}/{case_name}.png
-                    results_dir = Path(case_dir) / "results" / self.eval_mode
+                    # Copy to expected location: case_dir/results/{agent_mode}/{case_name}.png
+                    results_dir = Path(case_dir) / "results" / self.agent_mode
                     results_dir.mkdir(parents=True, exist_ok=True)
                     rs_dest = results_dir / f"{case_name}.png"
                     shutil.copy2(rs_source, rs_dest)
@@ -272,11 +272,11 @@ class EvaluationManager:
                 # Determine base directory for resolving custom file paths
                 base_dir = Path(data_dir) if data_dir else Path(case_dir).parent
                 # Use custom path (relative to base_dir)
-                rs_file_resolved = rs_file.replace('{agent_mode}', self.eval_mode)
+                rs_file_resolved = rs_file.replace('{agent_mode}', self.agent_mode)
                 answers_file = base_dir / rs_file_resolved
             else:
                 # Use default path
-                answers_file = Path(case_dir) / "results" / self.eval_mode / "answers.txt"
+                answers_file = Path(case_dir) / "results" / self.agent_mode / "answers.txt"
 
             if not answers_file.exists():
                 return {
@@ -414,7 +414,7 @@ Be specific about what aspects of the answers meet or don't meet the criteria.""
             if not gs_files:
                 gs_files = [f"{case_name}/GS/{case_name}_gs.py"]
             if not rs_files:
-                rs_files = [f"{case_name}/results/{self.eval_mode}/{case_name}.py"]
+                rs_files = [f"{case_name}/results/{self.agent_mode}/{case_name}.py"]
 
             # Get the first file (for now, we only compare one pair)
             gs_file = gs_files[0] if gs_files else None
@@ -624,7 +624,7 @@ Be specific about what aspects of the answers meet or don't meet the criteria.""
         }
 
         # Save evaluation result
-        eval_dir = Path(case_dir) / "evaluation_results" / self.eval_mode
+        eval_dir = Path(case_dir) / "evaluation_results" / self.agent_mode
         eval_dir.mkdir(parents=True, exist_ok=True)
         eval_file = eval_dir / f"evaluation_result_{int(time.time())}.json"
 

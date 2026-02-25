@@ -543,7 +543,8 @@ class UnifiedTestRunner:
             evaluator = AssertionEvaluator(
                 case_dir=str(test_case.case_path),
                 case_name=test_case.case_name,
-                eval_mode=self.agent.agent_mode,  # Use full agent_mode
+                eval_mode=self.agent.eval_mode,  # Evaluation mode (mcp/pvpython)
+                agent_mode=self.agent.agent_mode,  # Full agent mode for results paths
                 openai_api_key=self.openai_api_key,
                 eval_model=self.eval_model
             )

@@ -46,9 +46,9 @@ class MCPAutoEvaluator(SciVisEvaluator):
             agent_mode (str): Full agent mode string (e.g., "paraview_mcp_gpt-4o_exp1") for finding result files. If None, defaults to "mcp"
             openai_base_url (str): Optional custom OpenAI-compatible API endpoint
         """
-        super().__init__(case_dir, case_name, eval_mode="mcp")
-        self.static_screenshot = static_screenshot
         self.agent_mode = agent_mode if agent_mode else "mcp"  # Use agent_mode for results path, default to "mcp"
+        super().__init__(case_dir, case_name, eval_mode="mcp", agent_mode=self.agent_mode)
+        self.static_screenshot = static_screenshot
 
         # Initialize LLM evaluator
         self.llm_evaluator = LLMEvaluator(api_key=openai_api_key, model=model, base_url=openai_base_url)

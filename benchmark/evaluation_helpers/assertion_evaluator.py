@@ -25,6 +25,7 @@ class AssertionEvaluator:
         case_dir: str,
         case_name: str,
         eval_mode: str = "mcp",
+        agent_mode: str = None,
         openai_api_key: Optional[str] = None,
         eval_model: str = "gpt-4o"
     ):
@@ -35,18 +36,21 @@ class AssertionEvaluator:
             case_dir: Test case directory
             case_name: Test case name
             eval_mode: Evaluation mode - "mcp" or "pvpython"
+            agent_mode: Full agent mode string (e.g., "paraview_mcp_claude-sonnet-4-5_trial").
+                       If None, defaults to eval_mode for backward compatibility.
             openai_api_key: OpenAI API key for LLM evaluation
             eval_model: Model to use for LLM evaluation
         """
         self.case_dir = Path(case_dir)
         self.case_name = case_name
         self.eval_mode = eval_mode
+        self.agent_mode = agent_mode if agent_mode else eval_mode
         self.openai_api_key = openai_api_key or os.getenv("OPENAI_API_KEY")
         self.eval_model = eval_model
 
         # Paths
-        self.test_results_dir = self.case_dir / "test_results" / self.eval_mode
-        self.evaluation_dir = self.case_dir / "evaluation_results" / self.eval_mode
+        self.test_results_dir = self.case_dir / "test_results" / self.agent_mode
+        self.evaluation_dir = self.case_dir / "evaluation_results" / self.agent_mode
 
     def get_agent_response(self) -> Optional[str]:
         """

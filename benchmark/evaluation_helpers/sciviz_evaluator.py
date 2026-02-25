@@ -35,23 +35,26 @@ class SciVisEvaluator(ABC):
     Abstract base class for scientific visualization test case evaluators
     """
     
-    def __init__(self, case_dir: str, case_name: str, eval_mode: str = "mcp"):
+    def __init__(self, case_dir: str, case_name: str, eval_mode: str = "mcp", agent_mode: str = None):
         """
         Initialize the evaluator
-        
+
         Args:
             case_dir (str): Path to the test case directory
             case_name (str): Name of the test case
             eval_mode (str): Evaluation mode - either "mcp" or "pvpython"
+            agent_mode (str): Full agent mode string (e.g., "paraview_mcp_claude-sonnet-4-5_trial").
+                            If None, defaults to eval_mode for backward compatibility.
         """
         self.case_dir = case_dir
         self.case_name = case_name
         self.eval_mode = eval_mode
-        
+        self.agent_mode = agent_mode if agent_mode else eval_mode
+
         # Set paths based on evaluation mode
         self.evaluation_dir = os.path.join(case_dir, "evaluation_results", eval_mode)
         self.result_state_dir = os.path.join(case_dir, "results", f"{eval_mode}_state")
-        self.test_results_dir = os.path.join(case_dir, "test_results", eval_mode)
+        self.test_results_dir = os.path.join(case_dir, "test_results", self.agent_mode)
         self.rubric_path = os.path.join(case_dir, "evaluation_scripts", f"{case_name}_rubric.json")
         
         # Default data directory - can be overridden by subclasses
@@ -105,8 +108,9 @@ class SciVisEvaluator(ABC):
         if not os.path.exists(self.test_results_dir):
             return {}
         
-        test_result_files = [f for f in os.listdir(self.test_results_dir) 
-                           if f.startswith("test_result_") and f.endswith(".json")]
+        # Look for both old pattern (test_result_*) and new pattern ({case_name}_result_*)
+        test_result_files = [f for f in os.listdir(self.test_results_dir)
+                           if (f.startswith("test_result_") or f.startswith(f"{self.case_name}_result_")) and f.endswith(".json")]
         
         if not test_result_files:
             return {}
@@ -142,21 +146,29 @@ class SciVisEvaluator(ABC):
 
         if test_data:
             # Evaluate execution time
-            if "duration" in test_data:
+            # Check multiple possible locations for duration
+            duration = None
+            if "duration_seconds" in test_data:
+                duration = test_data["duration_seconds"]
+            elif "duration" in test_data:
                 duration = test_data["duration"]
-                if duration < 15:  # Less than 15 seconds
+            elif "metadata" in test_data and "duration" in test_data["metadata"]:
+                duration = test_data["metadata"]["duration"]
+
+            if duration is not None:
+                if duration < 60:  # Less than 1 minute
                     efficiency_scores["execution_time"]["score"] = 5
                     efficiency_scores["execution_time"]["explanation"] = f"Completed in {duration:.2f} seconds (excellent)"
-                elif duration < 30:  # Less than 30 seconds
+                elif duration < 90:  # Less than 1.5 minutes
                     efficiency_scores["execution_time"]["score"] = 4
                     efficiency_scores["execution_time"]["explanation"] = f"Completed in {duration:.2f} seconds (very good)"
-                elif duration < 45:  # Less than 45 seconds
+                elif duration < 180:  # Less than 3 minutes
                     efficiency_scores["execution_time"]["score"] = 3
                     efficiency_scores["execution_time"]["explanation"] = f"Completed in {duration:.2f} seconds (good)"
-                elif duration < 60:  # Less than 60 seconds
+                elif duration < 240:  # Less than 4 minutes
                     efficiency_scores["execution_time"]["score"] = 2
                     efficiency_scores["execution_time"]["explanation"] = f"Completed in {duration:.2f} seconds (acceptable)"
-                elif duration < 75:  # Less than 75 seconds
+                elif duration < 300:  # Less than 5 minutes
                     efficiency_scores["execution_time"]["score"] = 1
                     efficiency_scores["execution_time"]["explanation"] = f"Completed in {duration:.2f} seconds (slow)"
                 else:
@@ -164,28 +176,58 @@ class SciVisEvaluator(ABC):
                     efficiency_scores["execution_time"]["explanation"] = f"Completed in {duration:.2f} seconds (very slow)"
 
             # Evaluate token usage (use real token data if available)
-            if "token_usage" in test_data:
-                token_usage = test_data["token_usage"]
-                total_tokens = token_usage.get("total_tokens", 0)
-                input_tokens = token_usage.get("input_tokens", 0)
-                output_tokens = token_usage.get("output_tokens", 0)
+            # Check multiple possible locations for token info
+            token_info = None
+            input_tokens = 0
+            output_tokens = 0
+            total_tokens = 0
 
+            # Try multiple locations for token information
+            if "token_usage" in test_data:
+                token_info = test_data["token_usage"]
+                input_tokens = token_info.get("input_tokens", 0)
+                output_tokens = token_info.get("output_tokens", 0)
+                total_tokens = token_info.get("total_tokens", 0)
+
+            # If token_usage is zero or missing, try metadata._token_info
+            if total_tokens == 0:
+                if "full_result" in test_data and "metadata" in test_data["full_result"]:
+                    metadata = test_data["full_result"]["metadata"]
+                    if "_token_info" in metadata:
+                        token_info = metadata["_token_info"]
+                        input_tokens = token_info.get("input_tokens", 0)
+                        output_tokens = token_info.get("output_tokens", 0)
+                        total_tokens = token_info.get("total_tokens", 0)
+                elif "metadata" in test_data and "_token_info" in test_data["metadata"]:
+                    token_info = test_data["metadata"]["_token_info"]
+                    input_tokens = token_info.get("input_tokens", 0)
+                    output_tokens = token_info.get("output_tokens", 0)
+                    total_tokens = token_info.get("total_tokens", 0)
+
+            # Calculate total_tokens if not present
+            if total_tokens == 0 and (input_tokens > 0 or output_tokens > 0):
+                total_tokens = input_tokens + output_tokens
+
+            if total_tokens > 0:
                 # Score based on total token usage
-                if total_tokens < 500:
+                if total_tokens < 100000:
                     efficiency_scores["token_usage"]["score"] = 5
-                    efficiency_scores["token_usage"]["explanation"] = f"Total {total_tokens} tokens (very efficient)"
-                elif total_tokens < 1000:
+                    efficiency_scores["token_usage"]["explanation"] = f"Total {total_tokens:,} tokens (very efficient)"
+                elif total_tokens < 200000:
                     efficiency_scores["token_usage"]["score"] = 4
-                    efficiency_scores["token_usage"]["explanation"] = f"Total {total_tokens} tokens (efficient)"
-                elif total_tokens < 2000:
+                    efficiency_scores["token_usage"]["explanation"] = f"Total {total_tokens:,} tokens (efficient)"
+                elif total_tokens < 300000:
                     efficiency_scores["token_usage"]["score"] = 3
-                    efficiency_scores["token_usage"]["explanation"] = f"Total {total_tokens} tokens (moderate)"
-                elif total_tokens < 3000:
+                    efficiency_scores["token_usage"]["explanation"] = f"Total {total_tokens:,} tokens (moderate)"
+                elif total_tokens < 400000:
                     efficiency_scores["token_usage"]["score"] = 2
-                    efficiency_scores["token_usage"]["explanation"] = f"Total {total_tokens} tokens (high usage)"
-                else:
+                    efficiency_scores["token_usage"]["explanation"] = f"Total {total_tokens:,} tokens (high usage)"
+                elif total_tokens < 500000:
                     efficiency_scores["token_usage"]["score"] = 1
-                    efficiency_scores["token_usage"]["explanation"] = f"Total {total_tokens} tokens (very high usage)"
+                    efficiency_scores["token_usage"]["explanation"] = f"Total {total_tokens:,} tokens (very high usage)"
+                else:
+                    efficiency_scores["token_usage"]["score"] = 0
+                    efficiency_scores["token_usage"]["explanation"] = f"Total {total_tokens:,} tokens (excessive usage)"
             elif "response" in test_data:
                 # Fallback to old estimation method if token_usage not available
                 response_length = len(test_data["response"])

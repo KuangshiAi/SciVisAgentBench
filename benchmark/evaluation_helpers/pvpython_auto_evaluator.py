@@ -46,9 +46,9 @@ class PVPythonAutoEvaluator(SciVisEvaluator):
             agent_mode (str): Full agent mode string (e.g., "chatvis_gpt-4o_exp1") for finding result files. If None, defaults to "pvpython"
             openai_base_url (str): Optional custom OpenAI-compatible API endpoint
         """
-        super().__init__(case_dir, case_name, eval_mode="pvpython")
-        self.static_screenshot = static_screenshot
         self.agent_mode = agent_mode if agent_mode else "pvpython"  # Use agent_mode for results path, default to "pvpython"
+        super().__init__(case_dir, case_name, eval_mode="pvpython", agent_mode=self.agent_mode)
+        self.static_screenshot = static_screenshot
 
         # Initialize LLM evaluator
         self.llm_evaluator = LLMEvaluator(api_key=openai_api_key, model=model, base_url=openai_base_url)
