@@ -28,7 +28,11 @@ Get started with testing Claude Code on SciVisAgentBench in 5 minutes.
 4. **OpenAI API key** for evaluation (optional but recommended)
    ```bash
    export OPENAI_API_KEY="your-key-here"
+
+   # Optional: Use custom OpenAI-compatible endpoint
+   export OPENAI_BASE_URL="https://your-custom-endpoint.example.com"
    ```
+   See [CUSTOM_OPENAI_ENDPOINT.md](CUSTOM_OPENAI_ENDPOINT.md) for details on using custom endpoints.
 
 ## Quick Test
 
@@ -44,8 +48,10 @@ python benchmark/test_claude_code_agent.py
 # Run a single simple task
 python benchmark/run_claude_code_eval.py \
     --config benchmark/configs/claude_code/config.json \
-    --test_file benchmark/eval_cases/paraview/main_cases.yaml \
-    --case_name engine
+    --agent claude_code \
+    --yaml benchmark/eval_cases/paraview/main_cases.yaml \
+    --cases SciVisAgentBench-tasks/main \
+    --case engine
 ```
 
 Expected output:
@@ -64,7 +70,9 @@ Claude Code Agent Evaluation Runner
 # Run all main ParaView cases
 python benchmark/run_claude_code_eval.py \
     --config benchmark/configs/claude_code/config.json \
-    --test_file benchmark/eval_cases/paraview/main_cases.yaml \
+    --agent claude_code \
+    --yaml benchmark/eval_cases/paraview/main_cases.yaml \
+    --cases SciVisAgentBench-tasks/main \
     --eval-model gpt-4o
 ```
 
@@ -119,15 +127,19 @@ SciVisAgentBench-tasks/main/engine/
 ```bash
 python benchmark/run_claude_code_eval.py \
     --config benchmark/configs/claude_code/config.json \
-    --test_file benchmark/eval_cases/paraview/main_cases.yaml \
-    --case_name bonsai
+    --agent claude_code \
+    --yaml benchmark/eval_cases/paraview/main_cases.yaml \
+    --cases SciVisAgentBench-tasks/main \
+    --case bonsai
 ```
 
 ### Skip execution, only evaluate existing results
 ```bash
 python benchmark/run_claude_code_eval.py \
     --config benchmark/configs/claude_code/config.json \
-    --test_file benchmark/eval_cases/paraview/main_cases.yaml \
+    --agent claude_code \
+    --yaml benchmark/eval_cases/paraview/main_cases.yaml \
+    --cases SciVisAgentBench-tasks/main \
     --eval-only \
     --eval-model gpt-4o
 ```
@@ -136,7 +148,9 @@ python benchmark/run_claude_code_eval.py \
 ```bash
 python benchmark/run_claude_code_eval.py \
     --config benchmark/configs/claude_code/config.json \
-    --test_file benchmark/eval_cases/paraview/main_cases.yaml \
+    --agent claude_code \
+    --yaml benchmark/eval_cases/paraview/main_cases.yaml \
+    --cases SciVisAgentBench-tasks/main \
     --clear-results
 ```
 
@@ -202,8 +216,10 @@ EOF
 # Run with new config
 python benchmark/run_claude_code_eval.py \
     --config benchmark/configs/claude_code/config_opus.json \
-    --test_file benchmark/eval_cases/paraview/main_cases.yaml \
-    --case_name engine
+    --agent claude_code \
+    --yaml benchmark/eval_cases/paraview/main_cases.yaml \
+    --cases SciVisAgentBench-tasks/main \
+    --case engine
 ```
 
 ## Security & Sandboxing
@@ -360,3 +376,32 @@ User → run_claude_code_eval.py
 
 - Claude Code: https://github.com/anthropics/claude-code
 - SciVisAgentBench: Check repository documentation
+
+## Generate HTML Report
+
+After running evaluations, generate an interactive HTML report:
+
+```bash
+python benchmark/evaluation_reporter/run_reporter.py \
+    --agent claude_code \
+    --config benchmark/configs/claude_code/config.json \
+    --yaml benchmark/eval_cases/paraview/main_cases.yaml \
+    --cases SciVisAgentBench-tasks/main \
+    --test-results test_results/main/claude_code \
+    --output eval_reports/claude_code_report
+```
+
+This creates an interactive webpage with:
+- Summary statistics (success rate, costs, duration)
+- Per-case results with screenshots
+- Generated code with syntax highlighting
+- Evaluation scores and image metrics
+- Sortable/filterable table
+
+The report will automatically open in your browser at `http://localhost:8080/report.html`
+
+See [CLAUDE_CODE_OUTPUT_AND_REPORTS.md](CLAUDE_CODE_OUTPUT_AND_REPORTS.md) for details on:
+- Where generated code is stored
+- Where output files are located
+- How to find logs and results
+- Advanced report customization

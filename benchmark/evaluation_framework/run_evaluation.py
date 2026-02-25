@@ -140,6 +140,11 @@ def parse_args():
         help="OpenAI API key (can also use OPENAI_API_KEY env var)"
     )
 
+    parser.add_argument(
+        "--openai-base-url",
+        help="Custom OpenAI-compatible API endpoint. Can also use OPENAI_BASE_URL env var."
+    )
+
     # Specific case
     parser.add_argument(
         "--case",
@@ -367,7 +372,8 @@ async def main():
             openai_api_key=openai_api_key,
             eval_model=args.eval_model,
             static_screenshot=args.static_screenshot,
-            config=config
+            config=config,
+            openai_base_url=args.openai_base_url
         )
 
         # Load test cases

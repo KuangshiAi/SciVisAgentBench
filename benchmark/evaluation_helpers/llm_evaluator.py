@@ -89,29 +89,38 @@ class LLMEvaluator:
     "gpt-4-turbo": {"input": 10.00, "cached_input": None, "output": 30.00},
     }
     
-    def __init__(self, api_key=None, model="gpt-4o", max_tokens=1000, temperature=0.1):
+    def __init__(self, api_key=None, model="gpt-4o", max_tokens=1000, temperature=0.1, base_url=None):
         """
         Initialize the LLM evaluator
-        
+
         Args:
             api_key (str): OpenAI API key. If None, will try to get from environment
             model (str): OpenAI model to use
             max_tokens (int): Maximum tokens for response
             temperature (float): Temperature for response generation
+            base_url (str): Optional custom API endpoint for OpenAI-compatible APIs.
+                          Can be set via OPENAI_BASE_URL environment variable.
         """
         api_key = api_key or os.getenv('OPENAI_API_KEY')
         if not api_key:
             raise ValueError("OpenAI API key not found. Please set OPENAI_API_KEY environment variable or pass api_key parameter.")
-        
+
         # Validate model
         if model not in self.MODEL_PRICING:
             available_models = list(self.MODEL_PRICING.keys())
             raise ValueError(f"Unsupported model '{model}'. Supported models: {', '.join(available_models)}")
-        
-        self.client = OpenAI(api_key=api_key)
+
+        # Create OpenAI client with optional custom base_url
+        client_kwargs = {"api_key": api_key}
+        if base_url:
+            client_kwargs["base_url"] = base_url
+            print(f"Using custom OpenAI endpoint: {base_url}")
+
+        self.client = OpenAI(**client_kwargs)
         self.model = model
         self.max_tokens = max_tokens
         self.temperature = temperature
+        self.base_url = base_url
     
     def get_evaluator_info(self) -> Dict[str, Any]:
         """

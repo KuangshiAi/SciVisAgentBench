@@ -185,7 +185,8 @@ class UnifiedTestRunner:
         openai_api_key: Optional[str] = None,
         eval_model: str = "gpt-4o",
         static_screenshot: bool = False,
-        config: Optional[Dict[str, Any]] = None
+        config: Optional[Dict[str, Any]] = None,
+        openai_base_url: Optional[str] = None
     ):
         """
         Initialize the unified test runner.
@@ -200,6 +201,7 @@ class UnifiedTestRunner:
             eval_model: Model to use for LLM evaluation
             static_screenshot: If True, use pre-generated screenshots for evaluation
             config: Optional config dictionary for rate limiting (passed from agent)
+            openai_base_url: Optional custom OpenAI-compatible API endpoint
         """
         self.agent = agent
         self.yaml_path = Path(yaml_path)
@@ -235,6 +237,7 @@ class UnifiedTestRunner:
         self.yaml_filename = self.yaml_path.stem
 
         self.openai_api_key = openai_api_key or os.getenv('OPENAI_API_KEY')
+        self.openai_base_url = openai_base_url or os.getenv('OPENAI_BASE_URL')
         self.eval_model = eval_model
 
         # Initialize rate limiter from config if available
@@ -253,7 +256,8 @@ class UnifiedTestRunner:
             openai_api_key=self.openai_api_key,
             eval_model=eval_model,
             static_screenshot=static_screenshot,
-            agent_mode=agent.agent_mode  # For finding result files
+            agent_mode=agent.agent_mode,  # For finding result files
+            openai_base_url=self.openai_base_url  # Custom API endpoint
         )
 
         # Initialize token counter

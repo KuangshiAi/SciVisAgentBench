@@ -34,7 +34,8 @@ class EvaluationManager:
         openai_api_key: Optional[str] = None,
         eval_model: str = "gpt-4o",
         static_screenshot: bool = False,
-        agent_mode: Optional[str] = None
+        agent_mode: Optional[str] = None,
+        openai_base_url: Optional[str] = None
     ):
         """
         Initialize the evaluation manager.
@@ -45,12 +46,14 @@ class EvaluationManager:
             eval_model: Model to use for LLM evaluation
             static_screenshot: If True, use pre-generated screenshots instead of generating from state files
             agent_mode: Full agent mode string (e.g., "paraview_mcp_gpt-4o_exp1") for finding result files. If None, uses eval_mode
+            openai_base_url: Optional custom OpenAI-compatible API endpoint
         """
         self.eval_mode = eval_mode
         self.agent_mode = agent_mode if agent_mode else eval_mode  # Use agent_mode for results, default to eval_mode
         self.openai_api_key = openai_api_key or os.getenv("OPENAI_API_KEY")
         self.eval_model = eval_model
         self.static_screenshot = static_screenshot
+        self.openai_base_url = openai_base_url or os.getenv("OPENAI_BASE_URL")
 
     def get_evaluator_for_case(
         self,
@@ -70,7 +73,9 @@ class EvaluationManager:
             Evaluator instance (MCPAutoEvaluator or PVPythonAutoEvaluator)
         """
         # Lazy import to avoid loading paraview at module import time
-        if self.eval_mode == "mcp":
+        if self.eval_mode == "mcp" or self.eval_mode == "generic":
+            # Use MCP evaluator for both MCP agents and generic agents (like Claude Code)
+            # that generate ParaView state files and screenshots
             from mcp_auto_evaluator import MCPAutoEvaluator
             return MCPAutoEvaluator(
                 case_dir=case_dir,
@@ -78,7 +83,8 @@ class EvaluationManager:
                 openai_api_key=self.openai_api_key,
                 model=self.eval_model,
                 static_screenshot=self.static_screenshot,
-                agent_mode=self.agent_mode  # Pass agent_mode for finding result files
+                agent_mode=self.agent_mode,  # Pass agent_mode for finding result files
+                openai_base_url=self.openai_base_url  # Pass custom API endpoint
             )
         elif self.eval_mode == "pvpython":
             from pvpython_auto_evaluator import PVPythonAutoEvaluator
@@ -88,7 +94,8 @@ class EvaluationManager:
                 openai_api_key=self.openai_api_key,
                 model=self.eval_model,
                 static_screenshot=self.static_screenshot,
-                agent_mode=self.agent_mode  # Pass agent_mode for finding result files
+                agent_mode=self.agent_mode,  # Pass agent_mode for finding result files
+                openai_base_url=self.openai_base_url  # Pass custom API endpoint
             )
         else:
             raise ValueError(f"Unsupported eval_mode: {self.eval_mode}")
@@ -320,7 +327,10 @@ Respond with a JSON object in the following format:
 Be specific about what aspects of the answers meet or don't meet the criteria."""
 
             # Use OpenAI to evaluate
-            client = OpenAI(api_key=self.openai_api_key)
+            client_kwargs = {"api_key": self.openai_api_key}
+            if self.openai_base_url:
+                client_kwargs["base_url"] = self.openai_base_url
+            client = OpenAI(**client_kwargs)
 
             response = client.chat.completions.create(
                 model=self.eval_model,
