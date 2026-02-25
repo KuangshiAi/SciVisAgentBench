@@ -49,6 +49,7 @@ class ClaudeCodeAgent(BaseAgent):
                 - environment: Environment specification (optional)
                 - price: Pricing information for cost calculation
                 - custom_system_prompt: Optional additional instructions to prepend to all tasks
+                - verbose: Show Claude Code output in real-time (default: False)
         """
         # Set defaults for BaseAgent
         config["eval_mode"] = config.get("eval_mode", "generic")
@@ -61,6 +62,7 @@ class ClaudeCodeAgent(BaseAgent):
         self.preserve_workdir = config.get("preserve_workdir", False)
         self.auto_approve = config.get("auto_approve", True)  # Default to auto-approve for benchmarking
         self.custom_system_prompt = config.get("custom_system_prompt", "")
+        self.verbose = config.get("verbose", False)
 
         print(f"ClaudeCodeAgent initialized:")
         print(f"  - Model: {config.get('model', 'default')}")
@@ -68,6 +70,7 @@ class ClaudeCodeAgent(BaseAgent):
         print(f"  - Timeout: {self.timeout}s")
         print(f"  - Claude path: {self.claude_path}")
         print(f"  - Auto-approve: {self.auto_approve}")
+        print(f"  - Verbose output: {self.verbose}")
         if self.custom_system_prompt:
             print(f"  - Custom prompt: {len(self.custom_system_prompt)} chars")
 
@@ -275,39 +278,89 @@ IMPORTANT: Make sure to save all output files (state files, screenshots, text fi
             # 2. Network access can be restricted via settings.json "deny": ["WebFetch", "WebSearch"]
             # 3. Run in isolated conda environment
             # 4. Monitor file system changes
-            if self.auto_approve:
-                cmd = [self.claude_path, "--dangerously-skip-permissions", prompt]
+
+            # In verbose mode: interactive session (shows output) + auto-exit via stdin
+            # In non-verbose mode: --print flag (non-interactive, captures output)
+            if self.verbose:
+                # Verbose: interactive mode for real-time output
+                if self.auto_approve:
+                    cmd = [self.claude_path, "--dangerously-skip-permissions", prompt]
+                else:
+                    cmd = [self.claude_path, prompt]
             else:
-                cmd = [self.claude_path, prompt]
+                # Non-verbose: --print mode for automatic exit
+                if self.auto_approve:
+                    cmd = [self.claude_path, "--print", "--dangerously-skip-permissions", prompt]
+                else:
+                    cmd = [self.claude_path, "--print", prompt]
 
             print(f"Invoking Claude Code...")
             print(f"Command: {' '.join(cmd[:3] if len(cmd) > 2 else cmd[:2])}...")  # Don't print full prompt
 
             start_time = time.time()
 
-            # Run Claude Code
-            result = subprocess.run(
-                cmd,
-                cwd=str(working_dir),
-                capture_output=True,
-                text=True,
-                timeout=timeout,
-                encoding='utf-8',
-                errors='replace'
-            )
+            # Run Claude Code with or without real-time output
+            if self.verbose:
+                # Verbose mode: Currently requires manual /exit
+                # Note: This is a limitation - we show real-time output but can't auto-exit cleanly
+                # The user needs to type /exit when Claude finishes
+                print("\n" + "="*60)
+                print("CLAUDE CODE OUTPUT (real-time):")
+                print("="*60)
+                print("NOTE: You'll need to type /exit when Claude finishes")
+                print("="*60 + "\n")
+                sys.stdout.flush()
+
+                # Run interactively - output goes to terminal
+                process = subprocess.Popen(
+                    cmd,
+                    cwd=str(working_dir),
+                    # No redirection - fully interactive
+                )
+
+                try:
+                    # Wait for process with timeout
+                    process.wait(timeout=timeout)
+                    success = process.returncode == 0
+
+                    # We can't capture output in real-time mode
+                    output = "(Output displayed above in real-time - not captured)"
+
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    process.wait()
+                    output = f"Task timed out after {timeout} seconds"
+                    print(f"\n✗ Task timed out")
+                    return False, output, timeout
+
+                print("\n" + "="*60)
+                print("END OF CLAUDE CODE OUTPUT")
+                print("="*60 + "\n")
+            else:
+                # Capture output without displaying
+                result = subprocess.run(
+                    cmd,
+                    cwd=str(working_dir),
+                    stdin=subprocess.DEVNULL,  # Don't wait for user input
+                    capture_output=True,
+                    text=True,
+                    timeout=timeout,
+                    encoding='utf-8',
+                    errors='replace'
+                )
+
+                # Combine stdout and stderr for complete output
+                output = result.stdout + "\n" + result.stderr
+                success = result.returncode == 0
 
             duration = time.time() - start_time
-
-            # Combine stdout and stderr for complete output
-            output = result.stdout + "\n" + result.stderr
-
-            success = result.returncode == 0
 
             if success:
                 print(f"✓ Task completed in {duration:.2f}s")
             else:
-                print(f"✗ Task failed with return code {result.returncode}")
-                print(f"Output preview: {output[:200]}...")
+                print(f"✗ Task failed with return code {result.returncode if not self.verbose else process.returncode}")
+                if not self.verbose:
+                    print(f"Output preview: {output[:200]}...")
 
             return success, output, duration
 
