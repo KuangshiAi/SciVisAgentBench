@@ -1,10 +1,10 @@
 {
   "provider": "anthropic",
-  "model": "claude-sonnet-4-6",
+  "model": "claude-sonnet-4-5",
   "base_url": "https://api.anthropic.com",
   "price": {
-    "input_per_1m_tokens": "$0.80",
-    "output_per_1m_tokens": "$4.00"
+    "input_per_1m_tokens": "$3.00",
+    "output_per_1m_tokens": "$15.00"
   },
   "servers": [
     {

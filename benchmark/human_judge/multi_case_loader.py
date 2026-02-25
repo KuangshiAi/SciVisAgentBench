@@ -237,7 +237,7 @@ class MultiCaseLoader:
         """Get result images/videos for a case."""
         if benchmark_type == "chatvis_bench":
             # ChatVis: prefer MP4 video for temporal cases
-            # Try agent_mode directories first (e.g., chatvis_claude-sonnet-4-6_exp1), then fall back to pvpython
+            # Try agent_mode directories first (e.g., chatvis_claude-sonnet-4-5_exp1), then fall back to pvpython
             result_dirs = []
             results_base = case_dir / "results"
             if results_base.exists():
