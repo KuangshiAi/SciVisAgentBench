@@ -473,7 +473,7 @@ class UnifiedTestRunner:
         latest_file = max(result_files, key=get_timestamp)
 
         try:
-            with open(latest_file, 'r') as f:
+            with open(latest_file, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except Exception as e:
             print(f"⚠️  Error loading previous result from {latest_file}: {e}")

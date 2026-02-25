@@ -412,23 +412,23 @@ class BaseAgent(ABC):
         if output_path is None:
             output_path = dirs["test_results_dir"] / f"test_result_{int(time.time())}.json"
 
-        # Extract token usage info
-        token_usage = result.metadata.get("token_usage", {
-            "input_tokens": 0,
-            "output_tokens": 0,
-            "total_tokens": 0
-        })
-
-        # Get token source from _token_info if available
-        token_source = "unknown"
+        # Extract token usage info - prioritize _token_info over token_usage
         if "_token_info" in result.metadata:
-            token_source = result.metadata["_token_info"].get("source", "unknown")
-        elif "token_source" in result.metadata:
-            token_source = result.metadata["token_source"]
+            token_info = result.metadata["_token_info"]
+            input_tokens = token_info.get("input_tokens", 0)
+            output_tokens = token_info.get("output_tokens", 0)
+            token_source = token_info.get("source", "unknown")
+        elif "token_usage" in result.metadata:
+            token_usage = result.metadata["token_usage"]
+            input_tokens = token_usage.get("input_tokens", 0)
+            output_tokens = token_usage.get("output_tokens", 0)
+            token_source = result.metadata.get("token_source", "unknown")
+        else:
+            input_tokens = 0
+            output_tokens = 0
+            token_source = "unknown"
 
         # Calculate monetary cost
-        input_tokens = token_usage.get("input_tokens", 0)
-        output_tokens = token_usage.get("output_tokens", 0)
         cost_info = self.calculate_cost(input_tokens, output_tokens)
 
         # Format in the expected structure for SciVisEvaluator
@@ -441,7 +441,7 @@ class BaseAgent(ABC):
             "token_usage": {
                 "input_tokens": input_tokens,
                 "output_tokens": output_tokens,
-                "total_tokens": token_usage.get("total_tokens", input_tokens + output_tokens),
+                "total_tokens": input_tokens + output_tokens,
                 "source": token_source
             },
             "cost": cost_info,

@@ -70,7 +70,7 @@ def upload_images(cases_json_path: str, service_account_path: str, workspace_roo
     print(f"Connected to Firebase Storage bucket: {bucket.name}\n")
 
     # Load cases.json
-    with open(cases_json_path, 'r') as f:
+    with open(cases_json_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
 
     cases = data.get('cases', [])
@@ -117,7 +117,7 @@ def upload_images(cases_json_path: str, service_account_path: str, workspace_roo
 def update_cases_with_storage_urls(cases_json_path: str, bucket):
     """Update cases.json to use Firebase Storage URLs instead of local paths."""
 
-    with open(cases_json_path, 'r') as f:
+    with open(cases_json_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
 
     # For each case, convert paths to Firebase Storage URLs
