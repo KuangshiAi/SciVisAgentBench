@@ -154,6 +154,33 @@ python benchmark/run_claude_code_eval.py \
     --clear-results
 ```
 
+### Run with verbose output (see Claude's reasoning in real-time)
+```bash
+python benchmark/run_claude_code_eval.py \
+    --config benchmark/configs/claude_code/config.json \
+    --agent claude_code \
+    --yaml benchmark/eval_cases/paraview/main_cases.yaml \
+    --cases SciVisAgentBench-tasks/main \
+    --case bonsai \
+    --verbose
+
+# Short form:
+python benchmark/run_claude_code_eval.py ... --verbose
+# or
+python benchmark/run_claude_code_eval.py ... -v
+```
+
+This will display Claude Code's output in real-time, showing:
+- Tool calls (Read, Write, Edit, Bash)
+- Reasoning and explanations
+- Error messages and retries
+- File operations
+
+Useful for:
+- Debugging failed tasks
+- Understanding Claude's approach
+- Monitoring progress on long-running tasks
+
 ## Configuration
 
 ### Basic Config (`benchmark/configs/claude_code/config.json`)
@@ -169,6 +196,7 @@ python benchmark/run_claude_code_eval.py \
   "claude_code_path": "claude",
   "preserve_workdir": false,
   "auto_approve": true,
+  "verbose": false,
   "custom_system_prompt": "",
   "environment": {
     "type": "conda",
@@ -187,6 +215,7 @@ python benchmark/run_claude_code_eval.py \
 - **`model`**: Claude model to use (`claude-sonnet-4-5`, `claude-opus-4-6`, etc.)
 - **`timeout_per_task`**: Maximum seconds per task (default: 600)
 - **`auto_approve`**: Enable `--dangerously-skip-permissions` for non-interactive execution (required for benchmarking)
+- **`verbose`**: Show Claude Code output in real-time (default: false, can be overridden with --verbose flag)
 - **`custom_system_prompt`**: Optional global instructions prepended to all tasks
 - **`experiment_number`**: Track different runs (results saved to `results/claude_code_*_{experiment_number}/`)
 - **`preserve_workdir`**: Keep temporary files for debugging (default: false)
@@ -260,6 +289,16 @@ This is **acceptable for benchmarking** given the security measures in place.
 
 ## Recent Fixes
 
+### Non-Interactive Mode (Feb 2026)
+**Problem**: Claude Code would stay in an interactive session after completing tasks, requiring manual `/exit` commands.
+
+**Fix**: Added `--print` flag to make Claude Code exit automatically after completing each task:
+```python
+cmd = [self.claude_path, "--print", "--dangerously-skip-permissions", prompt]
+```
+
+**Result**: Evaluation runs continuously without manual intervention. Claude Code completes the task and exits automatically.
+
 ### Screenshot Generation (Feb 2026)
 **Problem**: Vision evaluations failed because screenshots weren't generated.
 
@@ -314,6 +353,18 @@ Enable debug mode to inspect working directory:
 ```
 
 Then check: `SciVisAgentBench-tasks/main/{case_name}/`
+
+### Want to see what Claude is doing
+Use verbose mode to watch Claude Code's reasoning in real-time:
+```bash
+python benchmark/run_claude_code_eval.py --verbose ...
+```
+
+This shows:
+- Tool calls (Read, Write, Edit, Bash)
+- Claude's thinking process
+- Error messages immediately as they occur
+- Progress on file operations
 
 ### Agent not found error
 Make sure you're using the Claude Code runner:

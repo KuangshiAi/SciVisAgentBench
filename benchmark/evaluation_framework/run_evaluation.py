@@ -170,6 +170,12 @@ def parse_args():
         help="For eval-only mode: specify the full agent_mode string (e.g., 'paraview_mcp_claude-sonnet-4-5_exp1'). If not provided, will be constructed from agent name, model, and experiment number."
     )
 
+    parser.add_argument(
+        "--verbose", "-v",
+        action="store_true",
+        help="Show agent output in real-time (useful for debugging, currently supported by Claude Code agent)"
+    )
+
     return parser.parse_args()
 
 
@@ -355,6 +361,10 @@ async def main():
 
         # Add experiment_number to config
         config["experiment_number"] = args.experiment_number
+
+        # Add verbose flag to config (from command line)
+        if args.verbose:
+            config["verbose"] = True
 
         # Create agent instance
         print(f"\nCreating agent: {args.agent}")
