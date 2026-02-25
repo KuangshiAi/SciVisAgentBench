@@ -52,9 +52,9 @@ class PVPythonAutoEvaluator(SciVisEvaluator):
 
         # Initialize LLM evaluator
         self.llm_evaluator = LLMEvaluator(api_key=openai_api_key, model=model, base_url=openai_base_url)
-        
-        # Initialize image metrics calculator
-        self.image_metrics_calculator = CaseImageMetrics(case_dir, case_name, eval_mode="pvpython")
+
+        # Initialize image metrics calculator (pass agent_mode for correct result paths)
+        self.image_metrics_calculator = CaseImageMetrics(case_dir, case_name, eval_mode="pvpython", agent_mode=self.agent_mode)
         
         # Set paths for pvpython evaluation
         self.gs_state_path = os.path.join(case_dir, "GS", f"{case_name}_gs.pvsm")
@@ -728,22 +728,25 @@ class PVPythonBatchEvaluator:
     """
     Batch evaluator for all pvpython test cases
     """
-    
-    def __init__(self, cases_dir: str, openai_api_key: str = None, output_dir: str = None, model: str = "gpt-4o", static_screenshot: bool = False):
+
+    def __init__(self, cases_dir: str, openai_api_key: str = None, output_dir: str = None, model: str = "gpt-4o", static_screenshot: bool = False, agent_mode: str = None):
         """
         Initialize the batch evaluator
-        
+
         Args:
             cases_dir (str): Path to the cases directory
             openai_api_key (str): OpenAI API key for LLM evaluation
             output_dir (str): Output directory for batch results
             model (str): OpenAI model to use for evaluation
             static_screenshot (bool): If True, use pre-generated screenshots/videos instead of generating from state files
+            agent_mode (str): Full agent mode string (e.g., "paraview_mcp_claude-sonnet-4-5_trial") for finding result files.
+                            If None, defaults to "pvpython".
         """
         self.cases_dir = Path(cases_dir)
         self.openai_api_key = openai_api_key
         self.model = model
         self.static_screenshot = static_screenshot
+        self.agent_mode = agent_mode if agent_mode else "pvpython"
         self.output_dir = Path(output_dir) if output_dir else self.cases_dir.parent / "evaluation_results" / "pvpython_auto"
         self.output_dir.mkdir(parents=True, exist_ok=True)
     
@@ -804,7 +807,7 @@ class PVPythonBatchEvaluator:
             
             try:
                 case_dir = str(self.cases_dir / case_name)
-                evaluator = PVPythonAutoEvaluator(case_dir, case_name, self.openai_api_key, self.model, self.static_screenshot)
+                evaluator = PVPythonAutoEvaluator(case_dir, case_name, self.openai_api_key, self.model, self.static_screenshot, agent_mode=self.agent_mode)
                 result = evaluator.run_evaluation()
                 
                 batch_results["results"][case_name] = result
@@ -824,7 +827,7 @@ class PVPythonBatchEvaluator:
         print(f"\nCalculating batch image metrics...")
         try:
             from image_metrics_helper import BatchImageMetrics
-            batch_image_calculator = BatchImageMetrics(str(self.cases_dir), eval_mode="pvpython", output_dir=str(self.output_dir))
+            batch_image_calculator = BatchImageMetrics(str(self.cases_dir), eval_mode="pvpython", output_dir=str(self.output_dir), agent_mode=self.agent_mode)
             batch_image_results = batch_image_calculator.calculate_batch_metrics()
             batch_results["batch_image_metrics"] = batch_image_results
         except Exception as e:

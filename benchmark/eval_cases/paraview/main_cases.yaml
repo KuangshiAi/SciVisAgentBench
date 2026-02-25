@@ -2,7 +2,101 @@
 # This test evaluates the ability to complete specific visualization tasks
 # with detailed requirements and evaluation criteria
 
-# 1. Bonsai Dataset
+# Case 1: ABC
+- vars:
+    question: |
+        Load the ABC (Arnold-Beltrami-Childress) flow vector field from "ABC/data/ABC_128x128x128_float32_scalar3.raw", the information about this dataset:
+        ABC Flow (Vector)
+        Data Scalar Type: float
+        Data Byte Order: Little Endian
+        Data Extent: 128x128x128
+        Number of Scalar Components: 3
+        Data loading is very important, make sure you correctly load the dataset according to their features.
+
+        Create streamlines using a "Stream Tracer" filter with "Point Cloud" seed type. Set the seed center to [73.77, 63.25, 71.65], with 150 seed points and a radius of 75.0. Set integration direction to "BOTH" and maximum streamline length to 150.0.
+
+        Add a "Tube" filter on the stream tracer to enhance visualization. Set tube radius to 0.57 with 12 sides.
+
+        Color the tubes by Vorticity magnitude using the 'Cool to Warm (Diverging)' colormap.
+
+        Show the dataset bounding box as an outline.
+
+        Use a white background. Render at 1024x1024.
+
+        Save the visualization image as "ABC/results/{agent_mode}/ABC.png".
+        (Optional, but must save if use paraview) Save the paraview state as "ABC/results/{agent_mode}/ABC.pvsm".
+        (Optional, but must save if use python script) Save the python script as "ABC/results/{agent_mode}/ABC.py".
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Streamline Density: Are the streamline tubes densely distributed throughout the volume, similar to the ground truth?
+          2. Color Mapping: Are the tubes colored by vorticity magnitude using a blue-white-red diverging colormap, with a similar color distribution as the ground truth?
+          3. Tube Appearance: Do the streamline tubes have a similar thickness and smooth appearance as the ground truth?
+
+# Case 2: argon-bubble
+- vars:
+    question: |
+        Task:
+        Load the Argon Bubble dataset from "argon-bubble/data/argon-bubble_128x128x256_float32.vtk".
+        Generate a visualization image of the Argon Bubble scalar field dataset with the following visualization settings:
+        1) Create volume rendering
+        2) Set the opacity transfer function as a ramp function across values of the volumetric data, assigning opacity 0 to value 0 and assigning opacity 1 to value 1.
+        3) Set the color transfer function to assign a warm red color [0.71, 0.02, 0.15] to the highest value, a cool color [0.23, 0.29, 0.75] to the lowest value, and a grey color[0.87, 0.87, 0.87] to the midrange value
+        4) Set the viewpoint parameters as: [0, 450, 0] to position; [0, 0, -15] to focal point; [0, 0, -1] to camera up direction
+        5) Visualization image resolution is 1024x1024. White background. Shade turned off. Volume rendering ray casting sample distance is 0.1
+        6) Don't show color/scalar bar or coordinate axes.
+
+        Save the visualization image as "argon-bubble/results/{agent_mode}/argon-bubble.png".
+        (Optional, but must save if use paraview) Save the paraview state as "argon-bubble/results/{agent_mode}/argon-bubble.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "argon-bubble/results/{agent_mode}/argon-bubble.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "argon-bubble/results/{agent_mode}/argon-bubble.cxx"
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Does the visualization image clearly show the regions of cool, warm, and mild regions?
+
+          2. Does the blueish region show areas with low opacity?
+
+          3. Does the reddish region show areas with high opacity?
+
+# Case 3: Bernard
+- vars:
+    question: |
+        Load the Rayleigh-Benard convection vector field from "Bernard/data/Bernard_128x32x64_float32_scalar3.raw", the information about this dataset:
+        Rayleigh-Benard Convection (Vector)
+        Data Scalar Type: float
+        Data Byte Order: Little Endian
+        Data Extent: 128x32x64
+        Number of Scalar Components: 3
+        Data loading is very important, make sure you correctly load the dataset according to their features.
+
+        Create four streamline sets using "Stream Tracer" filters with "Point Cloud" seed type, each with 100 seed points and radius 12.7:
+        - Streamline 1: Seed center at [30.69, 14.61, 47.99]. Apply a "Tube" filter (radius 0.3, 12 sides). Color with solid blue (RGB: 0.0, 0.67, 1.0).
+        - Streamline 2: Seed center at [91.10, 14.65, 45.70]. Apply a "Tube" filter (radius 0.3, 12 sides). Color with solid orange (RGB: 1.0, 0.33, 0.0).
+        - Streamline 3: Seed center at [31.87, 12.76, 15.89]. Apply a "Tube" filter (radius 0.3, 12 sides). Color by velocity magnitude using the 'Cool to Warm (Diverging)' colormap.
+        - Streamline 4: Seed center at [92.09, 10.50, 15.32]. Apply a "Tube" filter (radius 0.3, 12 sides). Color with solid green (RGB: 0.33, 0.67, 0.0).
+
+        In the pipeline browser panel, hide all stream tracers and only show the tube filters.
+
+        Use a gray-blue background (RGB: 0.329, 0.349, 0.427). Render at 1280x1280. Do not show a color bar.
+
+        Save the visualization image as "Bernard/results/{agent_mode}/Bernard.png".
+        (Optional, but must save if use paraview) Save the paraview state as "Bernard/results/{agent_mode}/Bernard.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "Bernard/results/{agent_mode}/Bernard.py".
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Streamline Grouping: Are there four visually separate streamline clusters arranged in a 2x2 grid pattern, similar to the ground truth?
+          2. Color Assignment: Are the four streamline groups colored in distinct colors (blue, orange, magnitude-mapped, and green), matching the ground truth color scheme?
+          3. Convection Cell Structure: Do the streamlines within each group show circular or helical looping patterns characteristic of convection cells?
+
+# Case 4: bonsai
 - vars:
     question: |
         Task:
@@ -18,18 +112,25 @@
 
         Please think step by step and make sure to fulfill all the visualization goals mentioned above.
 
-        Finally, save the paraview state as "bonsai/results/{agent_mode}/bonsai.pvsm"
+        Use a white background. Render at 1280x1280. Do not show a color bar or coordinate axes.
+
+        Save the visualization image as "bonsai/results/{agent_mode}/bonsai.png".
+        (Optional, but must save if use paraview) Save the paraview state as "bonsai/results/{agent_mode}/bonsai.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "bonsai/results/{agent_mode}/bonsai.py".
+        Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Brown Pot Visualization: Does the result show the pot portion in brown color?
+          1. Overall Visualization Goal: How well does the result achieve the overall goal of showing a potted tree with the specified colors?
 
-          2. Silver Branch Visualization: Does the result show the branch/trunk portion in silver color?
+          2. Brown Pot Visualization: Does the result show the pot portion in brown color?
 
-          3. Golden Leaves Visualization: Does the result show the leaves portion in golden color?
+          3. Silver Branch Visualization: Does the result show the branch/trunk portion in silver color?
 
-# 2. Carp Dataset
+          4. Golden Leaves Visualization: Does the result show the leaves portion in golden color?
+
+# Case 5: carp
 - vars:
     question: |
         Task:
@@ -65,9 +166,15 @@
         C. ~30%
         D. ~40%
 
-        6. Save your work:
-        Save the ParaView state as "carp/results/{agent_mode}/carp.pvsm".
+        6. Use a white background. Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.
+
+        7. Save your work:
+        Save the visualization image as "carp/results/{agent_mode}/carp.png".
         Save the answers to the analysis questions in plain text as "carp/results/{agent_mode}/answers.txt".
+        (Optional, but must save if use paraview) Save the paraview state as "carp/results/{agent_mode}/carp.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "carp/results/{agent_mode}/carp.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "carp/results/{agent_mode}/carp.cxx"
+        Do not save any other files, and always save the visualization image and the text file.
   assert:
     - type: llm-rubric
       subtype: vision
@@ -86,41 +193,73 @@
 
           2. Q2 correct answer: B. ~22%
 
-# 3. Chameleon Dataset (VolVis)
+# Case 6: chameleon_isosurface
 - vars:
     question: |
         Task:
+        Load the chameleon dataset from "chameleon_isosurface/data/chameleon_isosurface_256x256x256_float32.vtk".
+        Generate a visualization image of 2 isosurfaces of the Chameleon scalar field dataset with the following visualization settings:
+        1) Create isosurfaces of Iso_1 with a value of 0.12 and Iso_2 with a value of 0.45
+        2) Assign RGB color of [0.0, 1.0, 0.0] to Iso_1, and color of [1.0, 1.0, 1.0] to Iso_2
+        3) Assign opacity of 0.1 to Iso_1, and opacity of 0.99 to Iso_2
+        4) Set the lighting parameter as: 0.1 to Ambient; 0.7 to Diffuse; 0.6 to Specular
+        5) Set the viewpoint parameters as: [600, 0, 0] to position; [0, 0, 0] to focal point; [0, -1, 0] to camera up direction
+        6) White background
+        7) Visualization image resolution is 1024x1024
+        8) Don't show color/scalar bar or coordinate axes.
 
-        Load the chameleon dataset from "chameleon_volvis/data/chameleon_volvis_256x256x270_float32.raw", the information about this dataset:
-        chameleon (Scalar)
-        Data Scalar Type: float
-        Data Byte Order: little Endian
-        Data Extent: 256x256x270
-        Number of Scalar Components: 1
-        Data loading is very important, make sure you correctly load the dataset according to their features.
-
-        Apply the volume rendering to visualize the chameleon dataset
-
-        Adjust the transfer function to highlight the bony structures and skin in an X-ray style.
-
-        Adjust the camera position and focus on the head part of the chameleon
-
-        Please think step by step and make sure to fulfill all the visualization goals mentioned above.
-
-        Finally, save the paraview state as "chameleon_volvis/results/{agent_mode}/chameleon_volvis.pvsm"
+        Save the visualization image as "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.png".
+        (Optional, but must save if use paraview) Save the paraview state as "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.cxx"
+        Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: Does the result match the ground truth X-ray-style volume rendering of the chameleon?
+          1. Does the result present 2 isosurfaces, one showing the inner part of the chameleon and one showing the outer part of the chameleon?
 
-          2. Bone Structure Visibility: Are the chameleon's bony structures clearly visible and similar to the ground truth, with the skull, jaw, and spine clearly distinguishable?
+          2. Is the skin of the Chameleon object of green color?
 
-          3. Soft Tissue Rendering: Is the soft tissue faintly visible and transparent, similar to the ground truth appearance?
+          3. Is the bone of the Chameleon object of white color?
 
-          4. Depth and Contrast: Does the visualization show similar depth cues and contrast between bones and soft tissue as the ground truth?
+# Case 7: crayfish_streamline
+- vars:
+    question: |
+        Load the Crayfish flow vector field from "crayfish_streamline/data/crayfish_streamline_322x162x119_float32_scalar3.raw", the information about this dataset:
+        Crayfish Flow (Vector)
+        Data Scalar Type: float
+        Data Byte Order: Little Endian
+        Data Extent: 322x162x119
+        Number of Scalar Components: 3
+        Data loading is very important, make sure you correctly load the dataset according to their features.
 
-# 4. Engine Dataset
+        Create two streamline sets using "Stream Tracer" filters with "Point Cloud" seed type, each with 100 seed points and radius 32.2:
+        - Streamline 1: Seed center at [107.33, 81.0, 59.5]. Apply a "Tube" filter (radius 0.5, 12 sides). Color by Vorticity magnitude using a diverging colormap with the following RGB control points:
+          - Value 0.0 -> RGB(0.231, 0.298, 0.753) (blue)
+          - Value 0.02 -> RGB(0.865, 0.865, 0.865) (white)
+          - Value 0.15 -> RGB(0.706, 0.016, 0.149) (red)
+        - Streamline 2: Seed center at [214.67, 81.0, 59.5]. Apply a "Tube" filter (radius 0.5, 12 sides). Color by Vorticity magnitude using the same colormap.
+
+        Show the dataset bounding box as an outline (black).
+
+        In the pipeline browser panel, hide all stream tracers and only show the tube filters and the outline.
+
+        Use a white background. Render at 1280x1280.
+
+        Save the paraview state as "crayfish_streamline/results/{agent_mode}/crayfish_streamline.pvsm".
+        Save the visualization image as "crayfish_streamline/results/{agent_mode}/crayfish_streamline.png".
+        (Optional, if use python script) Save the python script as "crayfish_streamline/results/{agent_mode}/crayfish_streamline.py".
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Overall Visualization Goal: Does the result show streamline tubes colored by vorticity magnitude within a rectangular bounding box, similar to the ground truth?
+          2. Streamline Clusters: Are there two distinct clusters matches the ground truth layout?
+          3. Color Mapping: Are the tubes colored by vorticity magnitude using a blue-white-red diverging colormap, with a similar distribution as the ground truth?
+
+# Case 8: engine
 - vars:
     question: |
         Task:
@@ -140,8 +279,14 @@
 
         3. Adjust the transfer function, let the outer part more transparent and the inner part more solid. Use light blue for the outer part and orange for the inner part.
 
-        4. Save your work:
-        Save the ParaView state as "engine/results/{agent_mode}/engine.pvsm".
+        4. Use a white background. Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.
+
+        5. Save your work:
+        Save the visualization image as "engine/results/{agent_mode}/engine.png".
+        (Optional, but must save if use paraview) Save the paraview state as "engine/results/{agent_mode}/engine.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "engine/results/{agent_mode}/engine.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "engine/results/{agent_mode}/engine.cxx"
+        Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
@@ -154,174 +299,7 @@
 
           4. Transfer Function Color Mapping: Are colors correctly assigned so that the outer part is light blue and the inner part is orange, enhancing structural contrast?
 
-# 5. Solar Plume Dataset
-- vars:
-    question: |
-        Task:
-
-        Load the tornado dataset from "solar-plume/data/solar-plume_126x126x512_float32_scalar3.raw", the information about this dataset:
-        solar-plume (Vector)
-        Data Scalar Type: float
-        Data Byte Order: little Endian
-        Data Extent: 126x126x512
-        Number of Scalar Components: 3
-        Data loading is very important, make sure you correctly load the dataset according to their features.
-
-        Add a "stream tracer" filter under the tornado data to display streamline, set the "Seed type" to "Point Cloud" and set the center of point cloud to 3D position [50, 50, 320] with a radius 30, then hide the point cloud sphere.
-
-        Add a "tube" filter under the "stream tracer" filter to enhance the streamline visualization. Set the radius to 0.5. In the pipeline browser panel, hide everything except the "tube" filter. 
-
-
-        Please think step by step and make sure to fulfill all the visualization goals mentioned above.
-
-        Finally, save the paraview state as "solar-plume/results/{agent_mode}/solar-plume.pvsm"
-  assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          1. Overall Visualization Goal: Does the result match the ground truth streamline visualization of solar-plume flow structures?
-
-          2. Streamline Patterns: Do the streamlines show similar flow patterns and structures as the ground truth, particularly in the plume region?
-
-          3. Streamline Coverage: Is the spatial distribution and density of streamlines similar to the ground truth?
-
-          4. Visual Appearance: Do the streamline tubes appear similar in thickness and visibility to the ground truth?
-
-# 6. Supernova Dataset
-- vars:
-    question: |
-        Task:
-
-        Load the supernova dataset from "supernova/data/supernova_256x256x256_float32.raw", the information about this dataset:
-        Supernova (Scalar)
-        Data Scalar Type: float
-        Data Byte Order: little Endian
-        Data Spacing: 1x1x1
-        Data Extent: 256x256x256
-        Data loading is very important, make sure you correctly load the dataset according to their features.
-
-        Then visualize it and extract two isosurfaces. One of them use color red, showing areas with low density (isovalue 40 and opacity 0.4), while the other use color blue, showing areas with high density (isovalue 150 and opacity 0.8).
-
-        Please think step by step and make sure to fulfill all the visualization goals mentioned above. Only make the two isosurfaces visible.
-
-        Finally, save the paraview state as "supernova/results/{agent_mode}/supernova.pvsm"
-  assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          1. Overall Visualization Goal: How well does the result achieve the overall goal of showing the supernova structure with two distinct isosurfaces representing different density regions?
-
-          2. Does the red isosurface show low density areas (outside regions) with lower opacity?
-
-          3. Does the blue isosurface show high density areas (inside regions) with higher opacity?
-
-# 7. Tangaroa Dataset
-- vars:
-    question: |
-        Task:
-
-        Load the tangaroa dataset from "tangaroa_300x180x120_float32_scalar3.raw", the information about this dataset:
-        tangaroa (Vector)
-        Data Scalar Type: float
-        Data Byte Order: little Endian
-        Data Extent: 300x180x120
-        Number of Scalar Components: 3
-        Data loading is very important, make sure you correctly load the dataset according to their features.
-
-        Apply "streamline tracer" filter, set the "Seed Type" to point cloud, turn off the "show sphere", set the center to [81.6814, 80.708, 23.5093], and radius to 29.9
-
-        Add "Ribbon" filter to the streamline tracer results and set width to 0.3, set the Display representation to Surface.
-
-        In pipeline browser panel, hide everything except the ribbon filter results.
-
-        Please think step by step and make sure to fulfill all the visualization goals mentioned above.
-
-        Finally, save the paraview state as "tangaroa/results/{agent_mode}/tangaroa.pvsm"
-  assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          1. Overall Visualization Goal: Does the result match the ground truth visualization of tangaroa flow structures using ribbon surfaces?
-
-          2. Flow Surface Patterns: Do the ribbon surfaces show similar flow patterns and structures as the ground truth?
-
-          3. Surface Coverage: Is the spatial distribution and coverage of the flow surfaces similar to the ground truth?
-
-          4. Visual Appearance: Do the ribbon surfaces appear similar in width and structure to the ground truth?
-
-# 8. Tornado Dataset
-- vars:
-    question: |
-        Task:
-
-        Load the tornado dataset from "tornado/data/tornado_64x64x64_float32_scalar3.raw", the information about this dataset:
-        Tornado (Vector)
-        Data Scalar Type: float
-        Data Byte Order: little Endian
-        Data Extent: 64x64x64
-        Number of Scalar Components: 3
-        Data loading is very important, make sure you correctly load the dataset according to their features.
-
-        Add a "glyph" filter under the tornado data to display velocity glyph, set an appropriate "Scale Factor" so the glyphs are visible.
-
-        Then add a "stream tracer" filter under the tornado data to generate streamlines. Choose "Point Cloud" as "Seed Type", and do not show sphere.
-
-        Add a "tube" filter under the stream tracer you just created to generate tubes for visualizing the streamlines. Set an appropriate radius. Make the stream tracer invisible and the tube visible. At last, render the streamlines as tubes.
-
-        Please think step by step and make sure to fulfill all the visualization goals mentioned above.
-
-        Finally, save the paraview state as "tornado/results/{agent_mode}/tornado.pvsm"
-  assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          1. Overall Visualization Goal: How well does the result achieve the overall goal of showing tornado flow patterns with glyphs and streamlines?
-
-          2. Glyph Visualization: Does the result show velocity glyphs that are appropriately sized and visible?
-
-          3. Streamline Visualization: Does the result show streamlines that follow the flow patterns effectively?
-
-          4. Tube Rendering: Are the streamlines rendered as tubes with appropriate thickness?
-
-# 9. Vortex Dataset
-- vars:
-    question: |
-        Task:
-
-        Load the vortex dataset from "vortex/data/vortex_128x128x128_float32.raw", the information about this dataset:
-        vortex (Scalar)
-        Data Scalar Type: float
-        Data Byte Order: little Endian
-        Data Extent: 128x128x128
-        Number of Scalar Components: 1
-
-        Instructions:
-
-        1. Load the dataset into ParaView.
-
-        2. Leverage "contour" filter to achieve iso-surface rendering. In pipeline browser panel, hide everything except the "contour" fileter.
-
-        3. In properties panel of "contour" filter, set isosurface value to -0.2, use Solid Color and set the color as beige.
-
-        4. Enable Ambient occlusion by toggle the "Use Ambient Occlusion" button in the Render Passes.
-
-        5. Add head light with light inspector, set "Coords" as Camera, "Intentsity" to 0.2, Type to "Directional".
-
-        6. Save your work:
-        Save the ParaView state as "vortex/results/{agent_mode}/vortex.pvsm".
-  assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          1. Overall Visualization Goal: Does the result match the ground truth isosurface rendering of the vortex scalar field?
-
-          2. Isosurface Structure: Does the isosurface show the same vortex structure and topology as the ground truth?
-
-          3. Surface Appearance: Does the surface color and shading appear similar to the ground truth?
-
-          4. Visualization Clarity: Are the vortex features clearly visible and comparable to the ground truth?
-
-# 10. Foot Dataset
+# Case 9: foot
 - vars:
     question: |
         Task:
@@ -346,9 +324,15 @@
         C. The metatarsals are fully visible, but the phalanges are only partially visible
         D. Neither the phalanges nor the metatarsals are clearly visible
 
-        3. Save your work:
-        Save the ParaView state as "foot/results/{agent_mode}/foot.pvsm".
+        3. Use a white background. Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.
+
+        4. Save your work:
+        Save the visualization image as "foot/results/{agent_mode}/foot.png".
         Save the answers to the analysis questions in plain text as "foot/results/{agent_mode}/answers.txt".
+        (Optional, but must save if use paraview) Save the paraview state as "foot/results/{agent_mode}/foot.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "foot/results/{agent_mode}/foot.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "foot/results/{agent_mode}/foot.cxx"
+        Do not save any other files, and always save the visualization image and the text file.
   assert:
     - type: llm-rubric
       subtype: vision
@@ -356,13 +340,12 @@
           1. Overall Goal: Does the visualization effectively distinguish between different tissue types in the foot dataset?
 
           2. X-ray Appearance: Does the visualization resemble an X-ray (monochrome or grayscale, transparent look, consistent lighting)?
-
     - type: llm-rubric
       subtype: text
       value: |
           1. Q1 correct answer: B. The phalanges are fully visible, but the metatarsals are only partially visible
 
-# 11. Lobster Dataset
+# Case 10: lobster
 - vars:
     question: |
         Task:
@@ -389,9 +372,15 @@
         C. 8 walking legs
         D. 10 walking legs
 
-        4. Save your work:
-        Save the ParaView state as "lobster/results/{agent_mode}/lobster.pvsm".
+        4. Use a white background. Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.
+
+        5. Save your work:
+        Save the visualization image as "lobster/results/{agent_mode}/lobster.png".
         Save the answers to the analysis questions in plain text as "lobster/results/{agent_mode}/answers.txt".
+        (Optional, but must save if use paraview) Save the paraview state as "lobster/results/{agent_mode}/lobster.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "lobster/results/{agent_mode}/lobster.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "lobster/results/{agent_mode}/lobster.cxx"
+        Do not save any other files, and always save the visualization image and the text file.
   assert:
     - type: llm-rubric
       subtype: vision
@@ -401,270 +390,97 @@
           2. Boundary Clearity: Are surface details and boundaries of the lobster well-defined?
 
           3. Correct Color: Is the color of the lobster mimic a real one? (red-orange)
-
     - type: llm-rubric
       subtype: text
       value: |
           1. Q1 correct answer: B. 7 walking legs
 
-# 12. Chameleon Dataset (IsoSurface)
+# Case 11: mhd-magfield_streamribbon
 - vars:
     question: |
-        Task:
-        Load the chameleon dataset from "chameleon_isosurface/data/chameleon_isosurface_256x256x256_float32.vtk".
-        Generate a visualization image of 2 isosurfaces of the Chameleon scalar field dataset with the following visualization settings:
-        1) Create isosurfaces of Iso_1 with a value of 0.12 and Iso_2 with a value of 0.45
-        2) Assign RGB color of [0.0, 1.0, 0.0] to Iso_1, and color of [1.0, 1.0, 1.0] to Iso_2
-        3) Assign opacity of 0.1 to Iso_1, and opacity of 0.99 to Iso_2
-        4) Set the lighting parameter as: 0.1 to Ambient; 0.7 to Diffuse; 0.6 to Specular
-        5) Set the viewpoint parameters as: [600, 0, 0] to position; [0, 0, 0] to focal point; [0, -1, 0] to camera up direction
-        6) White background
-        7) Visualization image resolution is 1024x1024
-        8) Don't show color/scalar bar or coordinate axes.
-        9) Save the visualization image as a png file "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.png"
-        10) (Option 1) Save the paraview state as "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.pvsm" if you are using ParaView as the visualization tool
-        11) (Option 2) Save the cxx code script as "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.cxx" if you are using VTK as the visualization tool
-        You should only choose one of Option 1 or Option 2 to save your work. Do not save any other files, and always save the visualization image.
-  assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          1. Does the result present 2 isosurfaces, one showing the inner part of the chameleon and one showing the outer part of the chameleon?
-
-          2. Is the skin of the Chameleon object of green color?
-
-          3. Is the bone of the Chameleon object of white color?
-
-
-# 13. Argon Bubble
-# A CFD simulation of a bubble of argon gas immersed in air and being hit by a shockwave. 
-# This dataset is a time-varying volume dataset created by the Center for Computational Sciences and Engineering (CCSE) at Lawrence Berkeley National Laboratory.
-# The volumetric used for the SciVis benchmark is one frame of the time sequence.
-- vars:
-    question: |
-        Task:
-        Load the Argon Bubble dataset from "argon-bubble/data/argon-bubble_128x128x256_float32.vtk".
-        Generate a visualization image of the Argon Bubble scalar field dataset with the following visualization settings:
-        1) Create volume rendering
-        2) Set the opacity transfer function as a ramp function across values of the volumetric data, assigning opacity 0 to value 0 and assigning opacity 1 to value 1.
-        3) Set the color transfer function to assign a warm red color [0.71, 0.02, 0.15] to the highest value, a cool color [0.23, 0.29, 0.75] to the lowest value, and a grey color[0.87, 0.87, 0.87] to the midrange value
-        4) Set the viewpoint parameters as: [0, 450, 0] to position; [0, 0, -15] to focal point; [0, 0, -1] to camera up direction
-        5) Visualization image resolution is 1024x1024. White background. Shade turned off. Volume rendering ray casting sample distance is 0.1
-        6) Don't show color/scalar bar or coordinate axes.
-        7) Save the visualization image as a png file "argon-bubble/results/{agent_mode}/argon-bubble.png"
-        8) (Option 1) Save the paraview state as "argon-bubble/results/{agent_mode}/argon-bubble.pvsm" if you are using ParaView as the visualization tool
-        9) (Option 2) Save the cxx code script as "argon-bubble/results/{agent_mode}/argon-bubble.cxx" if you are using VTK as the visualization tool
-        You should only choose one of Option 1 or Option 2 to save your work. Do not save any other files, and always save the visualization image.
-  assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          1. Does the visualization image clearly show the regions of cool, warm, and mild regions?
-
-          2. Does the blueish region show areas with low opacity?
-
-          3. Does the reddish region show areas with high opacity?
-
-
-# 14. Richtmyer-Meshkov Instability Simulation
-# Entropy field (timestep 160) of Richtmyer-Meshkov instability simulation
-- vars:
-    question: |
-        Task:
-        Load the Richtmyer dataset from "richtmyer/data/richtmyer_256x256x240_float32.vtk".
-        Generate a visualization image of the Richtmyer dataset, Entropy field (timestep 160) of Richtmyer-Meshkov instability simulation, with the following visualization settings: 
-        1) Create volume rendering
-        2) Set the opacity transfer function as a ramp function from value 0.05 to 1 of the volumetric data, assigning opacity 0 to value less than 0.05 and assigning opacity 1 to value 1.
-        3) Set the color transfer function following the 7 rainbow colors and assign a red color [1.0, 0.0, 0.0] to the highest value, a purple color [0.5, 0.0, 1.0] to the lowest value.
-        4) Visualization image resolution is 1024x1024
-        5) Set the viewpoint parameters as: [420, 420, -550] to position; [128, 128, 150] to focal point; [-1, -1, 1] to camera up direction
-        6) Turn on the shade and set the ambient, diffuse and specular as 1.0
-        7) White background. Volume rendering ray casting sample distance is 0.1
-        8) Don't show color/scalar bar or coordinate axes.
-        9) Save the visualization image as a png file "richtmyer/results/{agent_mode}/richtmyer.png"
-        10) (Option 1) Save the paraview state as "richtmyer/results/{agent_mode}/richtmyer.pvsm" if you are using ParaView as the visualization tool
-        11) (Option 2) Save the cxx code script as "richtmyer/results/{agent_mode}/richtmyer.cxx" if you are using VTK as the visualization tool
-        You should only choose one of Option 1 or Option 2 to save your work. Do not save any other files, and always save the visualization image.
-  assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          1. Does the visualization show a clear surface with peaks and valleys?
-
-          2. Are the peaks highlighted with the reddish color?
-
-          3. Are the valleys highlighted with the bluish color?
-
-
-# 15. Rayleigh-Taylor Instability (Miranda)
-# A time step of a density field in a simulation of the mixing transition in Rayleigh-Taylor instability
-- vars:
-    question: |
-        Task:
-        Load the Rayleigh-Taylor Instability dataset from "miranda/data/miranda_256x256x256_float32.vtk".
-        Generate a visualization image of the Rayleigh-Taylor Instability dataset, a time step of a density field in a simulation of the mixing transition in Rayleigh-Taylor instability, with the following visualization settings:
-        1) Create volume rendering
-        2) Set the opacity transfer function as a ramp function from value 0 to 1 of the volumetric data, assigning opacity 0 to value 0 and assigning opacity 1 to value 1.
-        3) Set the color transfer function following the 7 rainbow colors and assign a red color [1.0, 0.0, 0.0] to the highest value, a purple color [0.5, 0.0, 1.0] to the lowest value.
-        4) Set the viewpoint parameters as: [650, 650, 650] to position; [128, 128, 128] to focal point; [1, 0, 0] to camera up direction
-        5) Volume rendering ray casting sample distance is 0.1
-        6) White background
-        7) Visualization image resolution is 1024x1024
-        8) Don't show color/scalar bar or coordinate axes.
-        9) Save the visualization image as a png file "miranda/results/{agent_mode}/miranda.png"
-        10) (Option 1) Save the paraview state as "miranda/results/{agent_mode}/miranda.pvsm" if you are using ParaView as the visualization tool
-        11) (Option 2) Save the cxx code script as "miranda/results/{agent_mode}/miranda.cxx" if you are using VTK as the visualization tool
-        You should only choose one of Option 1 or Option 2 to save your work. Do not save any other files, and always save the visualization image.
-  assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          1. Does the visualization image clearly show the regions from low to high intensity?
-
-          2. Does the purple region show areas with low opacity?
-
-          3. Does the red region show areas with high opacity?
-
-
-# 16. Rotstrat
-# Temperature field of a direct numerical simulation of rotating stratified turbulence
-- vars:
-    question: |
-        Task:
-        Load the rotstrat dataset from "rotstrat/data/rotstrat_256x256x256_float32.vtk".
-        Generate a visualization image of the Rotstrat dataset, temperature field of a direct numerical simulation of rotating stratified turbulence, with the following visualization settings: 
-        1) Create volume rendering
-        2) Set the opacity transfer function as a step function jumping from 0 to 1 at value 0.12
-        3) Set the color transfer function to assign a warm red color [0.71, 0.02, 0.15] to the highest value, a cool color [0.23, 0.29, 0.75] to the lowest value, and a grey color[0.87, 0.87, 0.87] to the midrange value
-        4) Set the viewpoint parameters as: [800, 128, 128] to position; [0, 128, 128] to focal point; [0, 1, 0] to camera up direction
-        5) Volume rendering ray casting sample distance is 0.1
-        6) White background
-        7) Visualization image resolution is 1024x1024
-        8) Don't show color/scalar bar or coordinate axes.
-        9) Save the visualization image as a png file "rotstrat/results/{agent_mode}/rotstrat.png"
-        10) (Option 1) Save the paraview state as "rotstrat/results/{agent_mode}/rotstrat.pvsm" if you are using ParaView as the visualization tool
-        11) (Option 2) Save the cxx code script as "rotstrat/results/{agent_mode}/rotstrat.cxx" if you are using VTK as the visualization tool
-        You should only choose one of Option 1 or Option 2 to save your work. Do not save any other files, and always save the visualization image.
-  assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          1. Does the visualization image clearly show the shape of turbulence compared to ground truth?
-
-          2. Does the visualization show the shape of a vortex in the upper right part of the image?
-
-          3. Does the visualization show the shape of a vortex in the bottom left corner of the image?
-
-
-# Vector Field Cases
-# 17. MHD Turbulence Velocity Field (t=10) (mhd-turbulence_glyph)
-# Isothermal magnetohydrodynamic (MHD) simulations capturing compressible turbulence phenomena relevant to astrophysical systems. 
-# MHD turbulence is an essential component of the solar wind, galaxy formation, and interstellar medium (ISM) dynamics. 
-# The simulations model fluid dynamics governed by conservation equations for mass, momentum, and magnetic fields, exploring MHD flows across multiple regimes—subsonic and supersonic velocities, as well as sub-Alfvénic and super-Alfvénic magnetic conditions.
-# Three field types are captured: density (scalar), velocity (vector), and magnetic field (vector). Data source: The Well (Polymathic AI).
-- vars:
-    question: |
-        Load the MHD turbulence velocity field dataset from "mhd-turbulence_glyph/data/mhd-turbulence_glyph.vti" (VTI format, 128x128x128 grid).
-        Create a slice at z=64 through the volume. On this slice, place arrow glyphs oriented by the velocity vector field and scaled by velocity magnitude. 
-        Color the arrows using the 'Cool to Warm' colormap mapped to velocity magnitude. 
-        Use a sampling stride of 4 to avoid overcrowding. Set the glyph scale factor to 5.0. 
-        Add a color bar labeled 'Velocity Magnitude'. 
-        Use a dark background (RGB: 0.1, 0.1, 0.15). 
-        Set the camera to a top-down view looking along the negative z-axis. Render at 1024x1024 resolution.
-        Save the paraview state as "mhd-turbulence_glyph/results/{agent_mode}/mhd-turbulence_glyph.pvsm".
-        Save the visualization image as "mhd-turbulence_glyph/results/{agent_mode}/mhd-turbulence_glyph.png".
-        (Optional, if use python script) Save the python script as "mhd-turbulence_glyph/results/{agent_mode}/mhd-turbulence_glyph.py".
+        Load the MHD magnetic field dataset from "mhd-magfield_streamribbon/data/mhd-magfield_streamribbon.vti" (VTI format, 128x128x128 grid with components bx, by, bz).
+        Generate a stream ribbon seeded from a line source along the y-axis at x=64, z=64 (from y=20 to y=108), with 30 seed points.
+        The stream ribbon should be traced along the magnetic field lines.
+        Color the stream ribbon by magnetic field magnitude using the 'Cool to Warm' colormap. Enable surface lighting with specular reflection for better 3D perception.
+        Add a color bar labeled 'Magnetic Field Magnitude'.
+        Use a white background. Set an isometric camera view. Render at 1024x1024 resolution.
+        Save the visualization image as "mhd-magfield_streamribbon/results/{agent_mode}/mhd-magfield_streamribbon.png".
+        (Optional, but must save if use paraview) Save the paraview state as "mhd-magfield_streamribbon/results/{agent_mode}/mhd-magfield_streamribbon.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "mhd-magfield_streamribbon/results/{agent_mode}/mhd-magfield_streamribbon.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "mhd-magfield_streamribbon/results/{agent_mode}/mhd-magfield_streamribbon.cxx"
         Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: Does the result match the ground truth glyph visualization of the MHD turbulence velocity field?
+          1. Overall Visualization Goal: Does the result match the ground truth stream ribbon visualization of the MHD magnetic field?
 
-          2. Glyph Patterns: Do the arrow glyphs show similar orientation and spatial patterns as the ground truth?
+          2. Surface Patterns: Does the stream ribbon show similar flow patterns and structures as the ground truth?
 
-          3. Glyph Scaling: Do the glyphs show similar size variations as the ground truth, reflecting the velocity magnitude patterns?
+          3. Surface Coverage: Is the spatial extent and shape of the stream ribbon similar to the ground truth?
 
-          4. Color Mapping: Is the color distribution across glyphs visually similar to the ground truth?
+          4. Color Mapping: Is the color distribution across the surface visually similar to the ground truth?
 
-
-# 18. Rayleigh-Taylor Instability Velocity Field (t=50) (rti-velocity_glyph)
-# Rayleigh-Taylor instability simulations examining how varying spectral characteristics and random phase components influence the development of turbulent mixing. 
-# The simulations investigate three key physical aspects: the impact of coherence on randomized initial conditions, how initial energy spectrum shapes affect resulting flow structures, and the transition from Boussinesq to non-Boussinesq regimes where mixing becomes asymmetric.
-# The dataset captures the self-similar growth of the turbulent mixing zone, enabling validation of the dimensionless mixing parameter and observation of the characteristic energy cascade. 
-# Data source: The Well (Polymathic AI)
+# Case 12: mhd-turbulence_pathline
 - vars:
     question: |
-        Load the Rayleigh-Taylor instability velocity field dataset from "rti-velocity_glyph/data/rti-velocity_glyph.vti" (VTI format, 128x128x128 grid). 
-        Create a slice at y=64 through the volume. 
-        Place arrow glyphs on the slice, oriented by the velocity vector. Use uniform arrow size (no magnitude scaling, scale factor 3.0).
-        Color the arrows by velocity magnitude using the 'Viridis (matplotlib)' colormap. Use a sampling stride of 3. 
-        Add a color bar labeled 'Velocity Magnitude'.
-        Use a black background. 
-        Set the camera to view along the negative y-axis. Render at 1024x1024.
-        Save the paraview state as "rti-velocity_glyph/results/{agent_mode}/rti-velocity_glyph.pvsm".
-        Save the visualization image as "rti-velocity_glyph/results/{agent_mode}/rti-velocity_glyph.png".
-        (Optional, if use python script) Save the python script as "rti-velocity_glyph/results/{agent_mode}/rti-velocity_glyph.py".
+        Load the MHD turbulence velocity field time series "mhd-turbulence_pathline/data/mhd-turbulence_pathline_{timestep}.vti", where "timestep" in {0000, 0010, 0020, 0030, 0040} (5 timesteps, VTI format, 128x128x128 grid each).
+        Compute true pathlines by tracking particles through the time-varying velocity field using the ParticlePath filter. Apply TemporalShiftScale (scale=20) and TemporalInterpolator (interval=0.5) to extend particle travel and smooth trajectories.
+        Seed 26 points along a line on the z-axis at x=64, y=64 (from z=20 to z=108). Use static seeds with termination time 80.
+        Render pathlines as tubes with radius 0.3. Color by velocity magnitude using the 'Viridis (matplotlib)' colormap.
+        Add a color bar for velocity magnitude. Use a white background. Set an isometric camera view. Render at 1024x1024.
+        Save the visualization image as "mhd-turbulence_pathline/results/{agent_mode}/mhd-turbulence_pathline.png".
+        (Optional, but must save if use paraview) Save the paraview state as "mhd-turbulence_pathline/results/{agent_mode}/mhd-turbulence_pathline.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "mhd-turbulence_pathline/results/{agent_mode}/mhd-turbulence_pathline.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "mhd-turbulence_pathline/results/{agent_mode}/mhd-turbulence_pathline.cxx"
         Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: Does the result match the ground truth glyph visualization of the RTI velocity field?
+          1. Overall Visualization Goal: Does the result match the ground truth pathline visualization of the MHD turbulence velocity field?
 
-          2. Glyph Patterns: Do the arrow glyphs show similar orientation and spatial patterns as the ground truth?
+          2. Pathline Patterns: Do the pathlines show similar particle trajectories and flow structures as the ground truth?
 
-          3. Glyph Appearance: Do the glyphs appear with similar uniform sizing as the ground truth?
+          3. Pathline Coverage: Is the spatial extent and distribution of pathlines similar to the ground truth?
 
-          4. Color Mapping: Is the color distribution across glyphs visually similar to the ground truth?
+          4. Color Mapping: Is the color distribution along pathlines visually similar to the ground truth?
 
-
-# 19. MHD Magnetic Field (t=10) (mhd-magfield_glyph)
-# Isothermal magnetohydrodynamic (MHD) simulations capturing compressible turbulence phenomena relevant to astrophysical systems.
-# MHD turbulence is an essential component of the solar wind, galaxy formation, and interstellar medium (ISM) dynamics. 
-# The simulations model fluid dynamics governed by conservation equations for mass, momentum, and magnetic fields, exploring MHD flows across multiple regimes—subsonic and supersonic velocities, as well as sub-Alfvénic and super-Alfvénic magnetic conditions. 
-# Three field types are captured: density (scalar), velocity (vector), and magnetic field (vector). 
-# Data source: The Well (Polymathic AI)
+# Case 13: mhd-turbulence_pathribbon
 - vars:
     question: |
-        Load the MHD magnetic field dataset from "mhd-magfield_glyph/data/mhd-magfield_glyph.vti" (VTI format, 128x128x128 grid with components bx, by, bz). 
-        Create a slice at x=64 through the volume. 
-        Place arrow glyphs oriented by the magnetic field vector and scaled by field magnitude (scale factor 5.0). 
-        Color the arrows using the 'Plasma (matplotlib)' colormap mapped to magnitude. Use stride of 4. 
-        Add a color bar labeled 'Magnetic Field Magnitude'. 
-        Use a dark navy background (RGB: 0.0, 0.0, 0.15). Set camera to view along the negative x-axis. Render at 1024x1024.
-        Save the paraview state as "mhd-magfield_glyph/results/{agent_mode}/mhd-magfield_glyph.pvsm".
-        Save the visualization image as "mhd-magfield_glyph/results/{agent_mode}/mhd-magfield_glyph.png".
-        (Optional, if use python script) Save the python script as "mhd-magfield_glyph/results/{agent_mode}/mhd-magfield_glyph.py".
+        Load the MHD turbulence velocity field time series "mhd-turbulence_pathribbon/data/mhd-turbulence_pathribbon_{timestep}.vti", where "timestep" in {0000, 0010, 0020, 0030, 0040} (5 timesteps, VTI format, 128x128x128 grid each).
+        Compute true pathlines by tracking particles through the time-varying velocity field using the ParticlePath filter. Apply TemporalShiftScale (scale=20) and TemporalInterpolator (interval=0.1) for dense, smooth trajectories.
+        Seed 26 points along a line on the z-axis at x=64, y=64 (from z=20 to z=108). Use static seeds with termination time 80.
+        Create ribbon surfaces from the pathlines using the Ribbon filter with width 1.5 and a fixed default normal to prevent twisting. Apply Smooth filter (500 iterations) and generate surface normals for smooth shading.
+        Set surface opacity to 0.85. Color by velocity magnitude using the 'Cool to Warm' colormap (range 0.1-0.8). Add specular highlights (0.5).
+        Add a color bar for velocity magnitude. Use a white background. Set an isometric camera view. Render at 1024x1024.
+        Save the visualization image as "mhd-turbulence_pathribbon/results/{agent_mode}/mhd-turbulence_pathribbon.png".
+        (Optional, but must save if use paraview) Save the paraview state as "mhd-turbulence_pathribbon/results/{agent_mode}/mhd-turbulence_pathribbon.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "mhd-turbulence_pathribbon/results/{agent_mode}/mhd-turbulence_pathribbon.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "mhd-turbulence_pathribbon/results/{agent_mode}/mhd-turbulence_pathribbon.cxx"
         Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: Does the result match the ground truth glyph visualization of the MHD magnetic field?
+          1. Surface Patterns: Does the path ribbon show similar flow patterns and structures as the ground truth?
 
-          2. Glyph Patterns: Do the arrow glyphs show similar orientation and spatial patterns as the ground truth?
+          2. Surface Coverage: Is the spatial extent and shape of the path ribbon similar to the ground truth?
 
-          3. Glyph Scaling: Do the glyphs show similar size variations as the ground truth, reflecting the field magnitude patterns?
+          3. Color Mapping: Is the color distribution across the surface visually similar to the ground truth?
 
-          4. Color Mapping: Is the color distribution across glyphs visually similar to the ground truth?
-
-
-# 20. MHD Turbulence Velocity Field (t=30) (mhd-turbulence_streamline)
-# Isothermal magnetohydrodynamic (MHD) simulations capturing compressible turbulence phenomena relevant to astrophysical systems.
-# MHD turbulence is an essential component of the solar wind, galaxy formation, and interstellar medium (ISM) dynamics.
-# The simulations model fluid dynamics governed by conservation equations for mass, momentum, and magnetic fields, exploring MHD flows across multiple regimes—subsonic and supersonic velocities, as well as sub-Alfvénic and super-Alfvénic magnetic conditions.
-# Three field types are captured: density (scalar), velocity (vector), and magnetic field (vector). 
-# Data source: The Well (Polymathic AI)
+# Case 14: mhd-turbulence_streamline
 - vars:
     question: |
-        Load the MHD turbulence velocity field dataset "mhd-turbulence_streamline/data/mhd-turbulence_streamline.vti" (VTI format, 128x128x128 grid). 
-        Generate 3D streamlines seeded from a line source along the z-axis at x=64, y=64 (from z=0 to z=127), with 50 seed points. 
-        Color the streamlines by velocity magnitude using the 'Turbo' colormap. Set streamline tube radius to 0.3 using the Tube filter. 
-        Add a color bar labeled 'Velocity Magnitude'. Use a dark background (RGB: 0.05, 0.05, 0.1). Set an isometric camera view. Render at 1024x1024.
-        Save the paraview state as "mhd-turbulence_streamline/results/{agent_mode}/mhd-turbulence_streamline.pvsm".
+        Load the MHD turbulence velocity field dataset "mhd-turbulence_streamline/data/mhd-turbulence_streamline.vti" (VTI format, 128x128x128 grid).
+        Generate 3D streamlines seeded from a line source along the z-axis at x=64, y=64 (from z=0 to z=127), with 50 seed points.
+        Color the streamlines by velocity magnitude using the 'Turbo' colormap. Set streamline tube radius to 0.3 using the Tube filter.
+        Add a color bar labeled 'Velocity Magnitude'. Use a white background. Set an isometric camera view. Render at 1024x1024.
         Save the visualization image as "mhd-turbulence_streamline/results/{agent_mode}/mhd-turbulence_streamline.png".
-        (Optional, if use python script) Save the python script as "mhd-turbulence_streamline/results/{agent_mode}/mhd-turbulence_streamline.py".
+        (Optional, but must save if use paraview) Save the paraview state as "mhd-turbulence_streamline/results/{agent_mode}/mhd-turbulence_streamline.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "mhd-turbulence_streamline/results/{agent_mode}/mhd-turbulence_streamline.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "mhd-turbulence_streamline/results/{agent_mode}/mhd-turbulence_streamline.cxx"
         Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
@@ -678,312 +494,328 @@
 
           4. Color Mapping: Is the color distribution along streamlines visually similar to the ground truth?
 
-
-# 21. Rayleigh-Taylor Instability Velocity Field (t=70) (rti-velocity_streamline)
-# Rayleigh-Taylor instability simulations examining how varying spectral characteristics and random phase components influence the development of turbulent mixing. 
-# The simulations investigate three key physical aspects: the impact of coherence on randomized initial conditions, how initial energy spectrum shapes affect resulting flow structures, and the transition from Boussinesq to non-Boussinesq regimes where mixing becomes asymmetric.
-# The dataset captures the self-similar growth of the turbulent mixing zone, enabling validation of the dimensionless mixing parameter and observation of the characteristic energy cascade. 
-# Data source: The Well (Polymathic AI)
+# Case 15: miranda
 - vars:
     question: |
-        Load the Rayleigh-Taylor instability velocity field dataset from "rti-velocity_streamline/data/rti-velocity_streamline.vti" (VTI format, 128x128x128 grid). 
-        Generate streamlines seeded from a plane at y=64 (using a Point Cloud seed with 200 points distributed on the xz-plane at y=64). 
-        Color the streamlines by the vz component using a 'Cool to Warm (Extended)' diverging colormap. Render streamlines as tubes with radius 0.4. 
-        Add a color bar labeled 'Vz Component'. 
-        Dark background (RGB: 0.02, 0.02, 0.05). Use an isometric camera view. Render at 1024x1024.
-        Save the paraview state as "rti-velocity_streamline/results/{agent_mode}/rti-velocity_streamline.pvsm".
-        Save the visualization image as "rti-velocity_streamline/results/{agent_mode}/rti-velocity_streamline.png".
-        (Optional, if use python script) Save the python script as "rti-velocity_streamline/results/{agent_mode}/rti-velocity_streamline.py".
+        Task:
+        Load the Rayleigh-Taylor Instability dataset from "miranda/data/miranda_256x256x256_float32.vtk".
+        Generate a visualization image of the Rayleigh-Taylor Instability dataset, a time step of a density field in a simulation of the mixing transition in Rayleigh-Taylor instability, with the following visualization settings:
+        1) Create volume rendering
+        2) Set the opacity transfer function as a ramp function from value 0 to 1 of the volumetric data, assigning opacity 0 to value 0 and assigning opacity 1 to value 1.
+        3) Set the color transfer function following the 7 rainbow colors and assign a red color [1.0, 0.0, 0.0] to the highest value, a purple color [0.5, 0.0, 1.0] to the lowest value.
+        4) Set the viewpoint parameters as: [650, 650, 650] to position; [128, 128, 128] to focal point; [1, 0, 0] to camera up direction
+        5) Volume rendering ray casting sample distance is 0.1
+        6) White background
+        7) Visualization image resolution is 1024x1024
+        8) Don't show color/scalar bar or coordinate axes.
+        Save the visualization image as "miranda/results/{agent_mode}/miranda.png".
+        (Optional, but must save if use paraview) Save the paraview state as "miranda/results/{agent_mode}/miranda.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "miranda/results/{agent_mode}/miranda.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "miranda/results/{agent_mode}/miranda.cxx"
         Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
       value: |
-          1) Streamlines seeded from y=64 plane region, with similar pattern compared to groundtruth
-          2) Streamlines rendered as tubes
-          3) Color by vz with Cool to Warm diverging colormap
-          4) Color bar labeled 'Vz Component'
-          5) Dark background, Isometric camera view, Output resolution 1024x1024
+          1. Does the visualization image clearly show the regions from low to high intensity?
 
+          2. Does the purple region show areas with low opacity?
 
-# 22. Turbulent Radiative Layer Velocity Field (tcool=0.10, t=50) (trl-velocity_streamline)
-# Turbulent Radiative Layer simulations of astrophysical mixing processes where cold, dense gas interfaces with hot, dilute gas moving at subsonic velocities. 
-# The cold dense gas on the bottom and hot dilute gas on the top becomes unstable to the Kelvin-Helmholtz instability. 
-# When turbulence causes mixing, intermediate-temperature gas forms and rapidly cools, creating a net mass transfer from the hot phase to the cold phase—a process relevant to interstellar and circumgalactic environments. 
-# Generated using Athena++. Data source: The Well (Polymathic AI)
+          3. Does the red region show areas with high opacity?
+
+# Case 16: richtmyer
 - vars:
     question: |
-        Load the turbulent radiative layer velocity field dataset from "trl-velocity_streamline/data/trl-velocity_streamline.vti" (VTI format, 256x128x128 grid). 
-        Generate streamlines seeded from a line along the x-axis at y=64, z=64 (from x=0 to x=255), with 100 seed points. 
-        Color streamlines by velocity magnitude using the 'Inferno (matplotlib)' colormap. Render as tubes with radius 0.5. 
-        Add a color bar labeled 'Velocity Magnitude'. 
-        Dark background (RGB: 0.0, 0.0, 0.0). Set an isometric camera view. Render at 1024x1024."
-        Save the paraview state as "trl-velocity_streamline/results/{agent_mode}/trl-velocity_streamline.pvsm".
-        Save the visualization image as "trl-velocity_streamline/results/{agent_mode}/trl-velocity_streamline.png".
-        (Optional, if use python script) Save the python script as "trl-velocity_streamline/results/{agent_mode}/trl-velocity_streamline.py".
+        Task:
+        Load the Richtmyer dataset from "richtmyer/data/richtmyer_256x256x240_float32.vtk".
+        Generate a visualization image of the Richtmyer dataset, Entropy field (timestep 160) of Richtmyer-Meshkov instability simulation, with the following visualization settings:
+        1) Create volume rendering
+        2) Set the opacity transfer function as a ramp function from value 0.05 to 1 of the volumetric data, assigning opacity 0 to value less than 0.05 and assigning opacity 1 to value 1.
+        3) Set the color transfer function following the 7 rainbow colors and assign a red color [1.0, 0.0, 0.0] to the highest value, a purple color [0.5, 0.0, 1.0] to the lowest value.
+        4) Visualization image resolution is 1024x1024
+        5) Set the viewpoint parameters as: [420, 420, -550] to position; [128, 128, 150] to focal point; [-1, -1, 1] to camera up direction
+        6) Turn on the shade and set the ambient, diffuse and specular as 1.0
+        7) White background. Volume rendering ray casting sample distance is 0.1
+        8) Don't show color/scalar bar or coordinate axes.
+        Save the visualization image as "richtmyer/results/{agent_mode}/richtmyer.png".
+        (Optional, but must save if use paraview) Save the paraview state as "richtmyer/results/{agent_mode}/richtmyer.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "richtmyer/results/{agent_mode}/richtmyer.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "richtmyer/results/{agent_mode}/richtmyer.cxx"
         Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
       value: |
-          1) Streamlines seeded along x-axis line, with similar pattern compared to groundtruth
-          2) Streamlines rendered as tubes
-          3) Color by magnitude with Inferno colormap
-          4) Color bar labeled 'Velocity Magnitude'
-          5) Black background, Isometric camera view, Output resolution 1024x1024
+          1. Does the visualization show a clear surface with peaks and valleys?
 
+          2. Are the peaks highlighted with the reddish color?
 
-# 23. MHD Magnetic Field (t=40) (mhd-magfield_volvis)
-# Isothermal magnetohydrodynamic (MHD) simulations capturing compressible turbulence phenomena relevant to astrophysical systems.
-# MHD turbulence is an essential component of the solar wind, galaxy formation, and interstellar medium (ISM) dynamics. 
-# The simulations model fluid dynamics governed by conservation equations for mass, momentum, and magnetic fields, exploring MHD flows across multiple regimes—subsonic and supersonic velocities, as well as sub-Alfvénic and super-Alfvénic magnetic conditions. 
-# Three field types are captured: density (scalar), velocity (vector), and magnetic field (vector). 
-# Data source: The Well (Polymathic AI)
+          3. Are the valleys highlighted with the bluish color?
+
+# Case 17: rotstrat
 - vars:
     question: |
-        Load the MHD magnetic field dataset from "mhd-magfield_volvis/data/mhd-magfield_volvis.vti" (VTI format, 128x128x128 grid). 
-        Compute the magnetic field magnitude from components (bx, by, bz). Perform volume rendering of the magnitude field. 
-        Use the 'Cool to Warm' colormap with an opacity transfer function that makes low-magnitude regions transparent and high-magnitude regions opaque. 
-        Add a color bar labeled 'B Magnitude'. 
-        Use a dark background (RGB: 0.0, 0.0, 0.05). Set an isometric camera view. Render at 1024x1024.
-        Save the paraview state as "mhd-magfield_volvis/results/{agent_mode}/mhd-magfield_volvis.pvsm".
-        Save the visualization image as "mhd-magfield_volvis/results/{agent_mode}/mhd-magfield_volvis.png".
-        (Optional, if use python script) Save the python script as "mhd-magfield_volvis/results/{agent_mode}/mhd-magfield_volvis.py".
+        Task:
+        Load the rotstrat dataset from "rotstrat/data/rotstrat_256x256x256_float32.vtk".
+        Generate a visualization image of the Rotstrat dataset, temperature field of a direct numerical simulation of rotating stratified turbulence, with the following visualization settings:
+        1) Create volume rendering
+        2) Set the opacity transfer function as a step function jumping from 0 to 1 at value 0.12
+        3) Set the color transfer function to assign a warm red color [0.71, 0.02, 0.15] to the highest value, a cool color [0.23, 0.29, 0.75] to the lowest value, and a grey color[0.87, 0.87, 0.87] to the midrange value
+        4) Set the viewpoint parameters as: [800, 128, 128] to position; [0, 128, 128] to focal point; [0, 1, 0] to camera up direction
+        5) Volume rendering ray casting sample distance is 0.1
+        6) White background
+        7) Visualization image resolution is 1024x1024
+        8) Don't show color/scalar bar or coordinate axes.
+        Save the visualization image as "rotstrat/results/{agent_mode}/rotstrat.png".
+        (Optional, but must save if use paraview) Save the paraview state as "rotstrat/results/{agent_mode}/rotstrat.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "rotstrat/results/{agent_mode}/rotstrat.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "rotstrat/results/{agent_mode}/rotstrat.cxx"
         Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: Does the result match the ground truth volume rendering of the MHD magnetic field magnitude?
+          1. Does the visualization image clearly show the shape of turbulence compared to ground truth?
 
-          2. Volume Structure: Are the internal structures and features visible in the volume rendering similar to the ground truth?
+          2. Does the visualization show the shape of a vortex in the upper right part of the image?
 
-          3. Opacity Distribution: Does the transparency/opacity distribution appear similar to the ground truth, showing the same depth and internal features?
+          3. Does the visualization show the shape of a vortex in the bottom left corner of the image?
 
-          4. Color Mapping: Is the color distribution throughout the volume visually similar to the ground truth?
-
-
-# 24. Turbulence Gravity Cooling Velocity (temp=1000K, dens=4.45, metal=0.1Z, t=20) (tgc-velocity_volvis)
-# Turbulence-gravity-cooling simulations modeling turbulent fluid with gravity representing the interstellar medium in galaxies. 
-# These simulations capture the formation of dense filaments that seed star formation, with filament frequency and timescales varying based on cooling strength.
-# The dataset encompasses three density regimes with systematically varied initial temperatures and metallicity levels representing different cosmic epochs, 
-# governed by coupled equations for pressure, density, momentum, and internal energy incorporating gravitational forces, viscosity, and radiative heating/cooling. 
-# Data source: The Well (Polymathic AI).
+# Case 18: rti-velocity_glyph
 - vars:
     question: |
-        Load the turbulence-gravity-cooling velocity field dataset from "tgc-velocity_volvis/data/tgc-velocity_volvis.vti" (VTI format, 64x64x64 grid). 
-        Perform volume rendering of velocity magnitude. Use the 'Viridis (matplotlib)' colormap. 
-        Set opacity transfer function to gradually increase from 0 at minimum to 0.8 at maximum. 
-        Add a color bar labeled 'Velocity Magnitude'. 
-        Dark gray background (RGB: 0.1, 0.1, 0.1). Isometric camera view. Render at 1024x1024.
-        Save the paraview state as "tgc-velocity_volvis/results/{agent_mode}/tgc-velocity_volvis.pvsm".
-        Save the visualization image as "tgc-velocity_volvis/results/{agent_mode}/tgc-velocity_volvis.png".
-        (Optional, if use python script) Save the python script as "tgc-velocity_volvis/results/{agent_mode}/tgc-velocity_volvis.py".
+        Load the Rayleigh-Taylor instability velocity field dataset from "rti-velocity_glyph/data/rti-velocity_glyph.vti" (VTI format, 128x128x128 grid).
+        Create a slice at y=64 through the volume.
+        Place arrow glyphs on the slice, oriented by the velocity vector. Use uniform arrow size (no magnitude scaling, scale factor 3.0).
+        Color the arrows by velocity magnitude using the 'Viridis (matplotlib)' colormap. Use a sampling stride of 3.
+        Add a color bar labeled 'Velocity Magnitude'.
+        Use a white background. Set the camera to view along the negative y-axis. Render at 1024x1024.
+        Save the visualization image as "rti-velocity_glyph/results/{agent_mode}/rti-velocity_glyph.png".
+        (Optional, but must save if use paraview) Save the paraview state as "rti-velocity_glyph/results/{agent_mode}/rti-velocity_glyph.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "rti-velocity_glyph/results/{agent_mode}/rti-velocity_glyph.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "rti-velocity_glyph/results/{agent_mode}/rti-velocity_glyph.cxx"
         Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: Does the result match the ground truth volume rendering of the TGC velocity field magnitude?
+          1. Overall Visualization Goal: Does the result match the ground truth glyph visualization of the RTI velocity field?
 
-          2. Volume Structure: Are the internal structures and features visible in the volume rendering similar to the ground truth?
+          2. Glyph Patterns: Do the arrow glyphs show similar orientation and spatial patterns as the ground truth?
 
-          3. Opacity Distribution: Does the transparency/opacity distribution appear similar to the ground truth, showing the same depth and internal features?
+          3. Glyph Appearance: Do the glyphs appear with similar uniform sizing as the ground truth?
 
-          4. Color Mapping: Is the color distribution throughout the volume visually similar to the ground truth?
+          4. Color Mapping: Is the color distribution across glyphs visually similar to the ground truth?
 
-
-# 25. Rayleigh-Taylor Instability Velocity Field (t=40) (rti-velocity_divergence)
-# Rayleigh-Taylor instability simulations examining how varying spectral characteristics and random phase components influence the development of turbulent mixing. 
-# The simulations investigate three key physical aspects: the impact of coherence on randomized initial conditions, how initial energy spectrum shapes affect resulting flow structures, and the transition from Boussinesq to non-Boussinesq regimes where mixing becomes asymmetric.
-# The dataset captures the self-similar growth of the turbulent mixing zone, enabling validation of the dimensionless mixing parameter and observation of the characteristic energy cascade. 
-# Data source: The Well (Polymathic AI)
+# Case 19: rti-velocity_slices
 - vars:
     question: |
-        Load the Rayleigh-Taylor instability velocity field from "rti-velocity_divergence/data/rti-velocity_divergence.vti" (VTI format, 128x128x128). 
-        Compute the divergence of the velocity field using the Gradient filter with 'Compute Divergence' enabled. 
-        Extract a slice at z=64 and color it by divergence using the 'Cool to Warm' diverging colormap (centered at 0). 
-        Add a color bar labeled 'Velocity Divergence'. 
-        White background. Top-down camera view along negative z-axis. Render at 1024x1024.
-        Save the paraview state as "rti-velocity_divergence/results/{agent_mode}/rti-velocity_divergence.pvsm".
-        Save the visualization image as "rti-velocity_divergence/results/{agent_mode}/rti-velocity_divergence.png".
-        (Optional, if use python script) Save the python script as "rti-velocity_divergence/results/{agent_mode}/rti-velocity_divergence.py".
-        Do not save any other files, and always save the visualization image
-  assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          1. Overall Visualization Goal: Does the result match the ground truth visualization of the RTI velocity divergence field?
-
-          2. Divergence Patterns: Are the divergence patterns and structures visible in the result similar to the ground truth?
-
-          3. Spatial Distribution: Does the spatial distribution of positive and negative divergence regions match the ground truth?
-
-          4. Color Mapping: Is the color distribution visually similar to the ground truth, showing similar divergence values?
-
-
-# 26. Turbulent Radiative Layer Velocity Field (tcool=1.00, t=30) (trl-velocity_isosurface)
-# Turbulent Radiative Layer simulations of astrophysical mixing processes where cold, dense gas interfaces with hot, dilute gas moving at subsonic velocities. 
-# The cold dense gas on the bottom and hot dilute gas on the top becomes unstable to the Kelvin-Helmholtz instability. 
-# When turbulence causes mixing, intermediate-temperature gas forms and rapidly cools, creating a net mass transfer from the hot phase to the cold phase—a process relevant to interstellar and circumgalactic environments. 
-# Generated using Athena++. Data source: The Well (Polymathic AI)
-- vars:
-    question: |
-        Load the turbulent radiative layer velocity field dataset from "trl-velocity_isosurface/data/trl-velocity_isosurface.vti" (VTI format, 256x128x128). 
-        Extract an isosurface of velocity magnitude at the value 0.8. Color the isosurface by the vx component using the 'Cool to Warm' colormap. 
-        Add a color bar labeled 'Vx Component'. 
-        Dark background (RGB: 0.05, 0.05, 0.1). Isometric camera view. Render at 1024x1024.
-        Save the paraview state as "trl-velocity_isosurface/results/{agent_mode}/trl-velocity_isosurface.pvsm".
-        Save the visualization image as "trl-velocity_isosurface/results/{agent_mode}/trl-velocity_isosurface.png".
-        (Optional, if use python script) Save the python script as "trl-velocity_isosurface/results/{agent_mode}/trl-velocity_isosurface.py".
+        Load the Rayleigh-Taylor instability velocity field from "rti-velocity_slices/data/rti-velocity_slices.vti" (VTI format, 128x128x128).
+        Create three orthogonal slices: at x=64 (YZ-plane), y=64 (XZ-plane), and z=64 (XY-plane).
+        Color all three slices by velocity magnitude using the 'Turbo' colormap.
+        Add a color bar labeled 'Velocity Magnitude'.
+        Use a white background. Set an isometric camera view that shows all three slices. Render at 1024x1024.
+        Save the visualization image as "rti-velocity_slices/results/{agent_mode}/rti-velocity_slices.png".
+        (Optional, but must save if use paraview) Save the paraview state as "rti-velocity_slices/results/{agent_mode}/rti-velocity_slices.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "rti-velocity_slices/results/{agent_mode}/rti-velocity_slices.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "rti-velocity_slices/results/{agent_mode}/rti-velocity_slices.cxx"
         Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: Does the result match the ground truth isosurface visualization of the TRL velocity field?
+          1. Slice Count and Orientation: Are there exactly three perpendicular slices (one horizontal XY-plane and two vertical XZ and YZ planes), matching the ground truth arrangement?
+          2. Color Mapping: Are the slices colored using a Turbo-like colormap (blue to green to yellow to red) mapped to velocity magnitude, with a similar color distribution as the ground truth?
+          3. Mixing Zone Pattern: Does the horizontal (XY) slice show a chaotic, high-velocity-magnitude mixing pattern in its center region, similar to the ground truth?
 
-          2. Isosurface Structure: Does the isosurface show similar topology and shape as the ground truth?
-
-          3. Surface Features: Are key features and structures on the isosurface similar to the ground truth?
-
-          4. Color Mapping: Is the color distribution across the isosurface visually similar to the ground truth?
-
-
-# 27. Supernova Explosion Velocity Field (t=30) (supernova-velocity_streamline)
-# Supernova explosion simulations capturing the physical dynamics of a stellar explosion propagating through a dense interstellar medium.
-# The simulations inject thermal energy of 10^51 ergs at the center of a computational domain, generating a blastwave that sweeps through ambient gas and creates supernova feedback structures—an explosion inside a compression of a monatomic ideal gas modeling conditions in the Milky Way Galaxy interstellar medium. 
-# The simulations employ sophisticated physics including radiative cooling and heating. 
-# Data source: The Well (Polymathic AI).
+# Case 20: rti-velocity_streakline
 - vars:
     question: |
-        Load the supernova explosion velocity field dataset from "supernova-velocity_streamline/data/supernova-velocity_streamline.vti" (VTI format, 128x128x128 grid). 
-        Generate streamlines seeded from a line source along the diagonal from (20,20,20) to (108,108,108) with 80 seed points. 
-        Color streamlines by velocity magnitude using the 'Magma (matplotlib)' colormap. 
-        Render as tubes with radius 0.4. 
-        Add a color bar labeled 'Velocity Magnitude'. 
-        Dark background (RGB: 0.02, 0.0, 0.05). Isometric camera view. Render at 1024x1024.
-        Save the paraview state as "supernova-velocity_streamline/results/{agent_mode}/supernova-velocity_streamline.pvsm".
-        Save the visualization image as "supernova-velocity_streamline/results/{agent_mode}/supernova-velocity_streamline.png".
-        (Optional, if use python script) Save the python script as "supernova-velocity_streamline/results/{agent_mode}/supernova-velocity_streamline.py".
+        Load the Rayleigh–Taylor instability velocity field time series from "rti-velocity_streakline/data/rti-velocity_streakline_{timestep}.nc", where "timestep" in {0030, 0031, 0032, 0033, 0034, 0035, 0036, 0037, 0038, 0039, 0040} (11 timesteps, NetCDF format, 128×128×128 grid each, with separate vx, vy, vz arrays).
+        Construct the time-varying velocity field u(x,t) by merging vx, vy, vz into a single vector field named "velocity", and compute the velocity magnitude "magnitude" = |velocity| for coloring.
+        Compute streaklines as a discrete approximation of continuous particle injection: continuously release particles from fixed seed points at every sub-timestep into the time-varying velocity field using the StreakLine filter. Apply TemporalShiftScale (scale=20) to extend particle travel time, and apply TemporalInterpolator with a sub-timestep interval of 0.25 (or smaller) to approximate continuous injection over time.
+        Seed 26 static points along a line on the z-axis at x=64, y=64 (from z=20 to z=108). Use StaticSeeds=True, ForceReinjectionEveryNSteps=1 (reinjection at every sub-timestep), and set TerminationTime=200.
+        Render the resulting streaklines as tubes with radius 0.3. Color the tubes by velocity magnitude ("magnitude") using the 'Cool to Warm (Extended)' colormap. Add a color bar for velocity magnitude.
+        Use a white background. Set an isometric camera view and render at 1024×1024.
+        Save the visualization image as "rti-velocity_streakline/results/{agent_mode}/rti-velocity_streakline.png".
+        (Optional, but must save if use paraview) Save the paraview state as "rti-velocity_streakline/results/{agent_mode}/rti-velocity_streakline.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "rti-velocity_streakline/results/{agent_mode}/rti-velocity_streakline.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "rti-velocity_streakline/results/{agent_mode}/rti-velocity_streakline.cxx"
         Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: Does the result match the ground truth streamline visualization of the supernova velocity field?
+          1. Streak Line Patterns: Do the streak lines show similar flow patterns and structures as the ground truth?
 
-          2. Streamline Patterns: Do the streamlines show similar flow patterns and structures as the ground truth?
+          2. Streak Line Coverage: Is the spatial extent and distribution of streak lines similar to the ground truth?
+
+          3. Color Mapping: Is the color distribution along streak lines visually similar to the ground truth?
+
+# Case 21: solar-plume
+- vars:
+    question: |
+        Task:
+
+        Load the tornado dataset from "solar-plume/data/solar-plume_126x126x512_float32_scalar3.raw", the information about this dataset:
+        solar-plume (Vector)
+        Data Scalar Type: float
+        Data Byte Order: little Endian
+        Data Extent: 126x126x512
+        Number of Scalar Components: 3
+        Data loading is very important, make sure you correctly load the dataset according to their features.
+
+        Add a "stream tracer" filter under the tornado data to display streamline, set the "Seed type" to "Point Cloud" and set the center of point cloud to 3D position [50, 50, 320] with a radius 30, then hide the point cloud sphere.
+
+        Add a "tube" filter under the "stream tracer" filter to enhance the streamline visualization. Set the radius to 0.5. In the pipeline browser panel, hide everything except the "tube" filter.
+
+
+        Please think step by step and make sure to fulfill all the visualization goals mentioned above.
+
+        Use a white background. Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.
+
+        Save the visualization image as "solar-plume/results/{agent_mode}/solar-plume.png".
+        (Optional, but must save if use paraview) Save the paraview state as "solar-plume/results/{agent_mode}/solar-plume.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "solar-plume/results/{agent_mode}/solar-plume.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "solar-plume/results/{agent_mode}/solar-plume.cxx"
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Overall Visualization Goal: Does the result match the ground truth streamline visualization of solar-plume flow structures?
+
+          2. Streamline Patterns: Do the streamlines show similar flow patterns and structures as the ground truth, particularly in the plume region?
 
           3. Streamline Coverage: Is the spatial distribution and density of streamlines similar to the ground truth?
 
-          4. Color Mapping: Is the color distribution along streamlines visually similar to the ground truth?
+          4. Visual Appearance: Do the streamline tubes appear similar in thickness and visibility to the ground truth?
 
-
-# 28. MHD Turbulence Velocity Field (t=50) (mhd-turbulence_vorticity)
-# Isothermal magnetohydrodynamic (MHD) simulations capturing compressible turbulence phenomena relevant to astrophysical systems.
-# MHD turbulence is an essential component of the solar wind, galaxy formation, and interstellar medium (ISM) dynamics.
-# The simulations model fluid dynamics governed by conservation equations for mass, momentum, and magnetic fields, exploring MHD flows across multiple regimes—subsonic and supersonic velocities, as well as sub-Alfvénic and super-Alfvénic magnetic conditions.
-# Three field types are captured: density (scalar), velocity (vector), and magnetic field (vector). 
-# Data source: The Well (Polymathic AI)
+# Case 22: supernova_isosurface
 - vars:
     question: |
-        Load the MHD turbulence velocity field dataset "mhd-turbulence_vorticity/data/mhd-turbulence_vorticity.vti" (VTI format, 128x128x128 grid).
-        Compute the vorticity field (curl of velocity) using the Gradient filter with 'Compute Vorticity' enabled.
-        Then compute vorticity magnitude. Perform volume rendering of vorticity magnitude using the 'Plasma (matplotlib)' colormap. 
-        Set opacity to highlight high-vorticity regions. 
-        Add a color bar labeled 'Vorticity Magnitude'. 
-        Black background. Isometric camera. Render at 1024x1024.
-        Save the paraview state as "mhd-turbulence_vorticity/results/{agent_mode}/mhd-turbulence_vorticity.pvsm".
-        Save the visualization image as "mhd-turbulence_vorticity/results/{agent_mode}/mhd-turbulence_vorticity.png".
-        (Optional, if use python script) Save the python script as "mhd-turbulence_vorticity/results/{agent_mode}/mhd-turbulence_vorticity.py".
+        Task:
+
+        Load the supernova dataset from "supernova_isosurface/data/supernova_isosurface_256x256x256_float32.raw", the information about this dataset:
+        supernova (Scalar)
+        Data Scalar Type: float
+        Data Byte Order: little Endian
+        Data Spacing: 1x1x1
+        Data Extent: 256x256x256
+        Data loading is very important, make sure you correctly load the dataset according to their features.
+
+        Then visualize it and extract two isosurfaces. One of them use color red, showing areas with low density (isovalue 40 and opacity 0.2), while the other use color light blue, showing areas with high density (isovalue 150 and opacity 0.4).
+
+        Please think step by step and make sure to fulfill all the visualization goals mentioned above. Only make the two isosurfaces visible.
+
+        Use a white background. Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.
+
+        Save the visualization image as "supernova_isosurface/results/{agent_mode}/supernova_isosurface.png".
+        (Optional, but must save if use paraview) Save the paraview state as "supernova_isosurface/results/{agent_mode}/supernova_isosurface.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "supernova_isosurface/results/{agent_mode}/supernova_isosurface.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "supernova_isosurface/results/{agent_mode}/supernova_isosurface.cxx"
         Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: Does the result match the ground truth volume rendering of the MHD turbulence vorticity field?
+          1. Overall Visualization Goal: How well does the result achieve the overall goal of showing the supernova structure with two distinct isosurfaces representing different density regions?
 
-          2. Vorticity Patterns: Are the vorticity structures and patterns visible in the result similar to the ground truth?
+          2. Does the red isosurface show low density areas (outside regions) with lower opacity?
 
-          3. Volume Features: Are high-vorticity regions highlighted with similar opacity and visibility as the ground truth?
+          3. Does the blue isosurface show high density areas (inside regions) with higher opacity?
 
-          4. Color Mapping: Is the color distribution throughout the volume visually similar to the ground truth?
-
-
-# 29. Supernova Explosion Velocity Field (t=40) (supernova-velocity_isosurface)
-# Supernova explosion simulations capturing the physical dynamics of a stellar explosion propagating through a dense interstellar medium.
-# The simulations inject thermal energy of 10^51 ergs at the center of a computational domain, generating a blastwave that sweeps through ambient gas and creates supernova feedback structures—an explosion inside a compression of a monatomic ideal gas modeling conditions in the Milky Way Galaxy interstellar medium. 
-# The simulations employ sophisticated physics including radiative cooling and heating. 
-# Data source: The Well (Polymathic AI).
+# Case 23: supernova_streamline
 - vars:
     question: |
-        Load the supernova explosion velocity field from "supernova-velocity_isosurface/data/supernova-velocity_isosurface.vti" (VTI format, 128x128x128).
-        Extract an isosurface of velocity magnitude at threshold 0.7. Color the isosurface by the vz component using 'Blue to Red Rainbow' colormap. 
-        Add a color bar labeled 'Vz Component'. 
-        Dark background (RGB: 0.0, 0.0, 0.0). Isometric camera view. Render at 1024x1024.
-        Save the paraview state as "supernova-velocity_isosurface/results/{agent_mode}/supernova-velocity_isosurface.pvsm".
-        Save the visualization image as "supernova-velocity_isosurface/results/{agent_mode}/supernova-velocity_isosurface.png".
-        (Optional, if use python script) Save the python script as "supernova-velocity_isosurface/results/{agent_mode}/supernova-velocity_isosurface.py".
+        Load the Supernova velocity vector field from "supernova_streamline/data/supernova_streamline_100x100x100_float32_scalar3.raw", the information about this dataset:
+        Supernova Velocity (Vector)
+        Data Scalar Type: float
+        Data Byte Order: Little Endian
+        Data Extent: 100x100x100
+        Number of Scalar Components: 3
+        Data loading is very important, make sure you correctly load the dataset according to their features.
+
+        Create streamlines using a "Stream Tracer" filter with "Point Cloud" seed type. Set the seed center to [50, 50, 50], with 200 seed points and a radius of 45.0. Set maximum streamline length to 100.0.
+
+        Add a "Tube" filter on the stream tracer. Set tube radius to 0.3 with 12 sides.
+
+        Color the tubes by Vorticity magnitude using a diverging colormap with the following RGB control points:
+        - Value 0.0 -> RGB(0.231, 0.298, 0.753) (blue)
+        - Value 0.05 -> RGB(0.865, 0.865, 0.865) (white)
+        - Value 0.5 -> RGB(0.706, 0.016, 0.149) (red)
+
+        Show the dataset bounding box as an outline (black).
+
+        In the pipeline browser panel, hide the stream tracer and only show the tube filter and the outline.
+
+        Use a white background. Render at 1280x1280.
+
+        Save the visualization image as "supernova_streamline/results/{agent_mode}/supernova_streamline.png".
+        (Optional, but must save if use paraview) Save the paraview state as "supernova_streamline/results/{agent_mode}/supernova_streamline.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "supernova_streamline/results/{agent_mode}/supernova_streamline.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "supernova_streamline/results/{agent_mode}/supernova_streamline.cxx"
         Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: Does the result match the ground truth isosurface visualization of the supernova velocity field?
+          1. Central Structure: Is there a dense, chaotic cluster of streamlines near the center of the volume, matching the ground truth?
+          2. Radial Extensions: Are there long, straight streamline tubes extending radially outward from the central region, similar to the ground truth?
+          3. Color Mapping: Are the tubes colored by vorticity magnitude using a blue-white-red diverging colormap, with warm colors concentrated near the center and cool colors on the extended lines?
 
-          2. Isosurface Structure: Does the isosurface show similar topology and shape as the ground truth?
-
-          3. Surface Features: Are key features and structures on the isosurface similar to the ground truth?
-
-          4. Color Mapping: Is the color distribution across the isosurface visually similar to the ground truth?
-
-
-# 30. MHD Magnetic Field (t=60) (mhd-magfield_isosurface)
-# Isothermal magnetohydrodynamic (MHD) simulations capturing compressible turbulence phenomena relevant to astrophysical systems.
-# MHD turbulence is an essential component of the solar wind, galaxy formation, and interstellar medium (ISM) dynamics. 
-# The simulations model fluid dynamics governed by conservation equations for mass, momentum, and magnetic fields, exploring MHD flows across multiple regimes—subsonic and supersonic velocities, as well as sub-Alfvénic and super-Alfvénic magnetic conditions. 
-# Three field types are captured: density (scalar), velocity (vector), and magnetic field (vector). 
-# Data source: The Well (Polymathic AI)
+# Case 24: tangaroa_streamribbon
 - vars:
     question: |
-        Load the MHD magnetic field dataset from "mhd-magfield_isosurface/data/mhd-magfield_isosurface.vti" (VTI format, 128x128x128). 
-        Extract an isosurface of magnetic field magnitude at threshold 0.8. Color the isosurface by the bx component using 'Turbo' colormap. 
-        Add a color bar labeled 'Bx Component'. 
-        Dark navy background (RGB: 0.0, 0.0, 0.1). Isometric camera view. Render at 1024x1024.  
-        Save the paraview state as "mhd-magfield_isosurface/results/{agent_mode}/mhd-magfield_isosurface.pvsm".
-        Save the visualization image as "mhd-magfield_isosurface/results/{agent_mode}/mhd-magfield_isosurface.png".
-        (Optional, if use python script) Save the python script as "mhd-magfield_isosurface/results/{agent_mode}/mhd-magfield_isosurface.py".
+        Task:
+
+        Load the tangaroa dataset from "tangaroa_streamribbon_300x180x120_float32_scalar3.raw", the information about this dataset:
+        tangaroa (Vector)
+        Data Scalar Type: float
+        Data Byte Order: little Endian
+        Data Extent: 300x180x120
+        Number of Scalar Components: 3
+        Data loading is very important, make sure you correctly load the dataset according to their features.
+
+        Apply "streamline tracer" filter, set the "Seed Type" to point cloud, turn off the "show sphere", set the center to [81.6814, 80.708, 23.5093], and radius to 29.9
+
+        Add "Ribbon" filter to the streamline tracer results and set width to 0.3, set the Display representation to Surface.
+
+        In pipeline browser panel, hide everything except the ribbon filter results.
+
+        Please think step by step and make sure to fulfill all the visualization goals mentioned above.
+
+        Use a white background. Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.
+
+        Save the visualization image as "tangaroa_streamribbon/results/{agent_mode}/tangaroa_streamribbon.png".
+        (Optional, but must save if use paraview) Save the paraview state as "tangaroa_streamribbon/results/{agent_mode}/tangaroa_streamribbon.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "tangaroa_streamribbon/results/{agent_mode}/tangaroa_streamribbon.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "tangaroa_streamribbon/results/{agent_mode}/tangaroa_streamribbon.cxx"
         Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: Does the result match the ground truth isosurface visualization of the MHD magnetic field?
+          1. Overall Visualization Goal: Does the result match the ground truth visualization of tangaroa flow structures using ribbon surfaces?
 
-          2. Isosurface Structure: Does the isosurface show similar topology and shape as the ground truth?
+          2. Flow Surface Patterns: Do the ribbon surfaces show similar flow patterns and structures as the ground truth?
 
-          3. Surface Features: Are key features and structures on the isosurface similar to the ground truth?
+          3. Surface Coverage: Is the spatial distribution and coverage of the flow surfaces similar to the ground truth?
 
-          4. Color Mapping: Is the color distribution across the isosurface visually similar to the ground truth?
+          4. Visual Appearance: Do the ribbon surfaces appear similar in width and structure to the ground truth?
 
-
-# 31. Turbulence Gravity Cooling Velocity (temp=100K, dens=0.445, metal=Z, t=10) (tgc-velocity_contour)
-# Turbulence-gravity-cooling simulations modeling turbulent fluid with gravity representing the interstellar medium in galaxies. 
-# These simulations capture the formation of dense filaments that seed star formation, with filament frequency and timescales varying based on cooling strength.
-# The dataset encompasses three density regimes with systematically varied initial temperatures and metallicity levels representing different cosmic epochs, 
-# governed by coupled equations for pressure, density, momentum, and internal energy incorporating gravitational forces, viscosity, and radiative heating/cooling. 
-# Data source: The Well (Polymathic AI).
+# Case 25: tgc-velocity_contour
 - vars:
     question: |
-        Load the turbulence-gravity-cooling velocity field dataset from "tgc-velocity_contour/data/tgc-velocity_contour.vti" (VTI format, 64x64x64). 
-        Extract a slice at z=32 and color it by velocity magnitude using 'Viridis (matplotlib)' colormap. 
-        Also add contour lines of velocity magnitude on the same slice at values [0.3, 0.6, 0.9, 1.2] using the Contour filter on the slice output. 
-        Display contour lines in white. Add a color bar labeled 'Velocity Magnitude'. 
+        Load the turbulence-gravity-cooling velocity field dataset from "tgc-velocity_contour/data/tgc-velocity_contour.vti" (VTI format, 64x64x64).
+        Extract a slice at z=32 and color it by velocity magnitude using 'Viridis (matplotlib)' colormap.
+        Also add contour lines of velocity magnitude on the same slice at values [0.3, 0.6, 0.9, 1.2] using the Contour filter on the slice output.
+        Display contour lines in white. Add a color bar labeled 'Velocity Magnitude'.
         Light gray background (RGB: 0.9, 0.9, 0.9). Top-down camera. Render at 1024x1024.
-        Save the paraview state as "tgc-velocity_contour/results/{agent_mode}/tgc-velocity_contour.pvsm".
         Save the visualization image as "tgc-velocity_contour/results/{agent_mode}/tgc-velocity_contour.png".
-        (Optional, if use python script) Save the python script as "tgc-velocity_contour/results/{agent_mode}/tgc-velocity_contour.py".
+        (Optional, but must save if use paraview) Save the paraview state as "tgc-velocity_contour/results/{agent_mode}/tgc-velocity_contour.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "tgc-velocity_contour/results/{agent_mode}/tgc-velocity_contour.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "tgc-velocity_contour/results/{agent_mode}/tgc-velocity_contour.cxx"
         Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
@@ -997,216 +829,111 @@
 
           4. Color Mapping: Is the color distribution on the slice visually similar to the ground truth?
 
-
-# 32. Rayleigh-Taylor Instability Velocity Field (t=80) (rti-velocity_slices)
-# Rayleigh-Taylor instability simulations examining how varying spectral characteristics and random phase components influence the development of turbulent mixing. 
-# The simulations investigate three key physical aspects: the impact of coherence on randomized initial conditions, how initial energy spectrum shapes affect resulting flow structures, and the transition from Boussinesq to non-Boussinesq regimes where mixing becomes asymmetric.
-# The dataset captures the self-similar growth of the turbulent mixing zone, enabling validation of the dimensionless mixing parameter and observation of the characteristic energy cascade. 
-# Data source: The Well (Polymathic AI)
+# Case 26: tornado
 - vars:
     question: |
-        Load the Rayleigh-Taylor instability velocity field from "rti-velocity_slices/data/rti-velocity_slices.vti" (VTI format, 128x128x128). 
-        Create three orthogonal slices: at x=64 (YZ-plane), y=64 (XZ-plane), and z=64 (XY-plane). 
-        Color all three slices by velocity magnitude using the 'Turbo' colormap. 
-        Add a color bar labeled 'Velocity Magnitude'. 
-        Dark background (RGB: 0.05, 0.05, 0.05). Set an isometric camera view that shows all three slices. Render at 1024x1024.
-        Save the paraview state as "rti-velocity_slices/results/{agent_mode}/rti-velocity_slices.pvsm".
-        Save the visualization image as "rti-velocity_slices/results/{agent_mode}/rti-velocity_slices.png".
-        (Optional, if use python script) Save the python script as "rti-velocity_slices/results/{agent_mode}/rti-velocity_slices.py".
-        Do not save any other files, and always save the visualization image
-  assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          1. Overall Visualization Goal: Does the result match the ground truth three-orthogonal-slice visualization of the RTI velocity field?
+        Load the Tornado vector field from "tornado/data/tornado_64x64x64_float32_scalar3.raw", the information about this dataset:
+        Tornado (Vector)
+        Data Scalar Type: float
+        Data Byte Order: Little Endian
+        Data Extent: 64x64x64
+        Number of Scalar Components: 3
+        Data loading is very important, make sure you correctly load the dataset according to their features.
 
-          2. Slice Patterns: Do all three slices show similar patterns and structures as the ground truth?
+        Create a streamline visualization using a "Stream Tracer" filter with "Point Cloud" seed type. Set the seed center to [31.5, 31.5, 47.25], radius 12.6, and maximum streamline length to 512.0. Add a "Tube" filter (radius 0.25) on the stream tracer. Color the tubes by Velocity magnitude using the 'Cool to Warm (Diverging)' colormap. Also display the stream tracer directly with line width 5.0 and "Render Lines As Tubes" enabled.
 
-          3. Slice Positioning: Are the three orthogonal slices positioned and oriented similarly to the ground truth?
+        Add a "Glyph" filter on the original data using Arrow glyph type. Orient arrows by the Velocity vector and scale by Velocity magnitude with a scale factor of 25.0. Set maximum number of sample points to 2500. Color glyphs by Velocity magnitude using the same colormap.
 
-          4. Color Mapping: Is the color distribution across all slices visually similar to the ground truth?
+        Add an "Outline" filter to display the dataset bounding box (black).
 
-# 33. MHD Magnetic Field Stream Surface (t=20) (mhd-magfield_streamsurface)
-# Isothermal magnetohydrodynamic (MHD) simulations capturing compressible turbulence phenomena relevant to astrophysical systems.
-# MHD turbulence is an essential component of the solar wind, galaxy formation, and interstellar medium (ISM) dynamics. 
-# The simulations model fluid dynamics governed by conservation equations for mass, momentum, and magnetic fields, exploring MHD flows across multiple regimes—subsonic and supersonic velocities, as well as sub-Alfvénic and super-Alfvénic magnetic conditions. 
-# Three field types are captured: density (scalar), velocity (vector), and magnetic field (vector). 
-# Data source: The Well (Polymathic AI)
-- vars:
-    question: |
-        Load the MHD magnetic field dataset from "mhd-magfield_streamsurface/data/mhd-magfield_streamsurface.vti" (VTI format, 128x128x128 grid with components bx, by, bz). 
-        Generate a stream surface seeded from a line source along the y-axis at x=64, z=64 (from y=20 to y=108), with 30 seed points. 
-        The stream surface should be traced in both forward and backward directions along the magnetic field lines. 
-        Color the stream surface by magnetic field magnitude using the 'Cool to Warm' colormap. Enable surface lighting with specular reflection for better 3D perception. 
-        Add a color bar labeled 'Magnetic Field Magnitude'. 
-        Use a dark navy background (RGB: 0.0, 0.0, 0.12). Set an isometric camera view. Render at 1024x1024 resolution.
-        Save the paraview state as "mhd-magfield_streamsurface/results/{agent_mode}/mhd-magfield_streamsurface.pvsm".
-        Save the visualization image as "mhd-magfield_streamsurface/results/{agent_mode}/mhd-magfield_streamsurface.png".
-        (Optional, if use python script) Save the python script as "mhd-magfield_streamsurface/results/{agent_mode}/mhd-magfield_streamsurface.py".
+        Use a white background (RGB: 1.0, 1.0, 1.0). Find an optimal view. Render at 1280x1280. Show both color bar and coordinate axes.
+        Save the visualization image as "tornado/results/{agent_mode}/tornado.png".
+        (Optional, but must save if use paraview) Save the paraview state as "tornado/results/{agent_mode}/tornado.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "tornado/results/{agent_mode}/tornado.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "tornado/results/{agent_mode}/tornado.cxx"
         Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: Does the result match the ground truth stream surface visualization of the MHD magnetic field?
+          1. Vortex Structure: Is a funnel-shaped vortex core visible with streamlines spiraling around a central vertical axis, matching the ground truth?
+          2. Glyph Presence: Are arrow glyphs distributed throughout the volume showing velocity direction, similar to the ground truth?
+          3. Color Mapping: Are both the streamline tubes and arrow glyphs colored by velocity magnitude using a blue-to-red diverging colormap, matching the ground truth color distribution?
 
-          2. Surface Patterns: Does the stream surface show similar flow patterns and structures as the ground truth?
-
-          3. Surface Coverage: Is the spatial extent and shape of the stream surface similar to the ground truth?
-
-          4. Color Mapping: Is the color distribution across the surface visually similar to the ground truth?
-
-
-# 34. Rayleigh-Taylor Instability Stream Surface (t=60) (rti-velocity_streamsurface)
-# Rayleigh-Taylor instability simulations examining how varying spectral characteristics and random phase components influence the development of turbulent mixing. 
-# The simulations investigate three key physical aspects: the impact of coherence on randomized initial conditions, how initial energy spectrum shapes affect resulting flow structures, and the transition from Boussinesq to non-Boussinesq regimes where mixing becomes asymmetric.
-# The dataset captures the self-similar growth of the turbulent mixing zone, enabling validation of the dimensionless mixing parameter and observation of the characteristic energy cascade. 
-# Data source: The Well (Polymathic AI)
+# Case 27: twoswirls_streamribbon
 - vars:
     question: |
-        Load the Rayleigh-Taylor instability velocity field dataset from "rti-velocity_streamsurface/data/rti-velocity_streamsurface.vti" (VTI format, 128x128x128 grid). 
-        Generate a stream surface seeded from a circular ring at y=64 (the mixing interface), centered at x=64, z=64 with radius 30, using 40 seed points distributed around the circle. 
-        Trace the stream surface in both directions along the velocity field. Color the stream surface by the vy (vertical velocity) component using the 'Cool to Warm (Extended)' diverging colormap centered at zero. 
-        Set surface opacity to 0.85 for slight transparency. Add a color bar labeled 'Vertical Velocity (vy)'. 
-        Use a black background (RGB: 0.0, 0.0, 0.0). 
-        Set camera to view at 45 degrees elevation to show the mushroom-shaped instability structures. Render at 1024x1024 resolution.
-        Save the paraview state as "rti-velocity_streamsurface/results/{agent_mode}/rti-velocity_streamsurface.pvsm".
-        Save the visualization image as "rti-velocity_streamsurface/results/{agent_mode}/rti-velocity_streamsurface.png".
-        (Optional, if use python script) Save the python script as "rti-velocity_streamsurface/results/{agent_mode}/rti-velocity_streamsurface.py".
-        Do not save any other files, and always save the visualization image
-  assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          1. Overall Visualization Goal: Does the result match the ground truth stream surface visualization of the RTI velocity field?
+        Load the Two Swirls vector field from "twoswirls_streamribbon/data/twoswirls_streamribbon_64x64x64_float32_scalar3.raw", the information about this dataset:
+        Two Swirls (Vector)
+        Data Scalar Type: float
+        Data Byte Order: Little Endian
+        Data Extent: 64x64x64
+        Number of Scalar Components: 3
+        Data loading is very important, make sure you correctly load the dataset according to their features.
 
-          2. Surface Patterns: Does the stream surface show similar flow patterns and structures as the ground truth?
-
-          3. Surface Coverage: Is the spatial extent and shape of the stream surface similar to the ground truth?
-
-          4. Color Mapping: Is the color distribution across the surface visually similar to the ground truth?
+        Create two stream ribbons using "Stream Tracer" filters with "Line" seed type (resolution 25 points each), and apply a "Ribbon" filter (width 2.5) to each:
+        - Stream Ribbon 1: Line seed from [16, 10, 32] to [16, 54, 32]. Ribbon colored solid green (RGB: 0.2, 0.7, 0.3) with opacity 0.35.
+        - Stream Ribbon 2: Line seed from [48, 10, 32] to [48, 54, 32]. Ribbon colored solid blue (RGB: 0.2, 0.4, 0.85) with opacity 0.35.
 
 
-# 35. Supernova Explosion Pathlines (Multi-timestep) (supernova-velocity_pathline)
-# Supernova explosion simulations capturing the physical dynamics of a stellar explosion propagating through a dense interstellar medium.
-# The simulations inject thermal energy of 10^51 ergs at the center of a computational domain, generating a blastwave that sweeps through ambient gas and creates supernova feedback structures—an explosion inside a compression of a monatomic ideal gas modeling conditions in the Milky Way Galaxy interstellar medium. 
-# The simulations employ sophisticated physics including radiative cooling and heating. 
-# Data source: The Well (Polymathic AI).
-- vars:
-    question: |
-        Load the supernova explosion velocity field time series from "supernova-velocity_pathline/data/supernova-velocity_pathline_{timestep}.vti", where "timestep" in {0000, 0005, 0010, 0015, 0020} (5 timesteps, VTI format, 128x128x128 grid each). 
-        Visualize the temporal evolution of flow patterns by generating streamlines from each timestep and overlaying them. 
-        Seed 50 particles from a spherical shell centered at (64, 64, 64) with radius 20 (near the explosion center). 
-        For each timestep, trace streamlines in the forward direction with maximum length 80. 
-        Render streamlines as tubes with radius 0.25. Color each timestep differently to show temporal progression (blue for t=0 through red for t=20). 
-        Also include a magnitude-colored version using the 'Turbo' colormap for the final timestep. 
-        Add a color bar labeled 'Velocity Magnitude'. Use a dark background (RGB: 0.02, 0.0, 0.04). Set an isometric camera view. Render at 1024x1024 resolution.
-        Save the paraview state as "supernova-velocity_pathline/results/{agent_mode}/supernova-velocity_pathline.pvsm".
-        Save the visualization image as "supernova-velocity_pathline/results/{agent_mode}/supernova-velocity_pathline.png".
-        (Optional, if use python script) Save the python script as "supernova-velocity_pathline/results/{agent_mode}/supernova-velocity_pathline.py".
+        Show the dataset bounding box as an outline (black, opacity 0.3).
+
+        In the pipeline browser panel, hide all stream tracers and only show the ribbon filters and the outline.
+
+        Use a white background (RGB: 1.0, 1.0, 1.0). Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.
+        Save the visualization image as "twoswirls_streamribbon/results/{agent_mode}/twoswirls_streamribbon.png".
+        (Optional, but must save if use paraview) Save the paraview state as "twoswirls_streamribbon/results/{agent_mode}/twoswirls_streamribbon.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "twoswirls_streamribbon/results/{agent_mode}/twoswirls_streamribbon.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "twoswirls_streamribbon/results/{agent_mode}/twoswirls_streamribbon.cxx"
         Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: Does the result match the ground truth pathline visualization of the supernova velocity field?
+          1. Swirl Separation: Are there two visually distinct swirl structures (one on the left and one on the right), matching the spatial arrangement in the ground truth?
+          2. Stream Ribbon Shape: Do the ribbon surfaces show wrapped, swirling sheet-like structures similar to the ground truth?
+          3. Color and Transparency: Are the stream ribbons rendered with distinct colors (green and blue) and semi-transparency, similar to the ground truth?
 
-          2. Pathline Patterns: Do the pathlines show similar trajectories and flow structures as the ground truth?
-
-          3. Pathline Coverage: Is the spatial distribution and density of pathlines similar to the ground truth?
-
-          4. Color Mapping: Is the color distribution along pathlines visually similar to the ground truth?
-
-
-# 36. MHD Turbulence Path Surface (Multi-timestep) (mhd-turbulence_pathsurface)
-# Isothermal magnetohydrodynamic (MHD) simulations capturing compressible turbulence phenomena relevant to astrophysical systems.
-# MHD turbulence is an essential component of the solar wind, galaxy formation, and interstellar medium (ISM) dynamics.
-# The simulations model fluid dynamics governed by conservation equations for mass, momentum, and magnetic fields, exploring MHD flows across multiple regimes—subsonic and supersonic velocities, as well as sub-Alfvénic and super-Alfvénic magnetic conditions.
-# Three field types are captured: density (scalar), velocity (vector), and magnetic field (vector). 
-# Data source: The Well (Polymathic AI)
+# Case 28: vortex
 - vars:
     question: |
-        Load the MHD turbulence velocity field time series from "mhd-turbulence_pathsurface/data/mhd-turbulence_pathsurface_{timestep}.vti", where "timestep" in {0000, 0010, 0020, 0030, 0040} (5 timesteps, VTI format, 128x128x128 grid each). 
-        Visualize the temporal evolution by generating stream surfaces (ribbons) from each timestep with varying opacity. 
-        Use a line seed along the z-axis at x=64, y=64 (from z=40 to z=88) with 20 seed points. 
-        Trace streamlines bidirectionally with maximum length 150. Create ribbon surfaces from the streamlines with width 0.8. 
-        Apply progressive opacity (0.3 for t=0, increasing to 0.9 for t=40) to show temporal layering. Color all surfaces by velocity magnitude using the 'Viridis (matplotlib)' colormap. 
-        Add a color bar labeled 'Velocity Magnitude'. Use a dark gray background (RGB: 0.08, 0.08, 0.1). Set an isometric camera view. Render at 1024x1024.
-        Save the paraview state as "mhd-turbulence_pathsurface/results/{agent_mode}/mhd-turbulence_pathsurface.pvsm".
-        Save the visualization image as "mhd-turbulence_pathsurface/results/{agent_mode}/mhd-turbulence_pathsurface.png".
-        (Optional, if use python script) Save the python script as "mhd-turbulence_pathsurface/results/{agent_mode}/mhd-turbulence_pathsurface.py".
+        Task:
+
+        Load the vortex dataset from "vortex/data/vortex_128x128x128_float32.raw", the information about this dataset:
+        vortex (Scalar)
+        Data Scalar Type: float
+        Data Byte Order: little Endian
+        Data Extent: 128x128x128
+        Number of Scalar Components: 1
+
+        Instructions:
+
+        1. Load the dataset into ParaView.
+
+        2. Leverage "contour" filter to achieve iso-surface rendering. In pipeline browser panel, hide everything except the "contour" fileter.
+
+        3. In properties panel of "contour" filter, set isosurface value to -0.2, use Solid Color and set the color as beige.
+
+        4. Enable Ambient occlusion by toggle the "Use Ambient Occlusion" button in the Render Passes.
+
+        5. Add head light with light inspector, set "Coords" as Camera, "Intentsity" to 0.2, Type to "Directional".
+
+        6. Use a white background. Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.
+
+        7. Save your work:
+        Save the visualization image as "vortex/results/{agent_mode}/vortex.png".
+        (Optional, but must save if use paraview) Save the paraview state as "vortex/results/{agent_mode}/vortex.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "vortex/results/{agent_mode}/vortex.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "vortex/results/{agent_mode}/vortex.cxx"
         Do not save any other files, and always save the visualization image.
   assert:
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: Does the result match the ground truth path surface visualization of the MHD turbulence velocity field?
+          1. Overall Visualization Goal: Does the result match the ground truth isosurface rendering of the vortex scalar field?
 
-          2. Surface Patterns: Does the path surface show similar flow patterns and structures as the ground truth?
+          2. Isosurface Structure: Does the isosurface show the same vortex structure and topology as the ground truth?
 
-          3. Surface Coverage: Is the spatial extent and shape of the path surface similar to the ground truth?
+          3. Surface Appearance: Does the surface color and shading appear similar to the ground truth?
 
-          4. Color Mapping: Is the color distribution across the surface visually similar to the ground truth?
-
-
-# 37. Rayleigh-Taylor Instability Streaklines (Multi-timestep) (rti-velocity_streakline)
-# Rayleigh-Taylor instability simulations examining how varying spectral characteristics and random phase components influence the development of turbulent mixing. 
-# The simulations investigate three key physical aspects: the impact of coherence on randomized initial conditions, how initial energy spectrum shapes affect resulting flow structures, and the transition from Boussinesq to non-Boussinesq regimes where mixing becomes asymmetric.
-# The dataset captures the self-similar growth of the turbulent mixing zone, enabling validation of the dimensionless mixing parameter and observation of the characteristic energy cascade. 
-# Data source: The Well (Polymathic AI)
-- vars:
-    question: |
-        Load the Rayleigh-Taylor instability velocity field time series from "rti-velocity_streakline/data/rti-velocity_streakline_{timestep}.vti", where "timestep" in {0030, 0040, 0050, 0060, 0070} (5 timesteps, VTI format, 128x128x128 grid each). 
-        Visualize temporal flow evolution by generating streamlines from 4 fixed injection points at each timestep. 
-        Place injection points at y=64 (the mixing interface): at (32, 64, 64), (64, 64, 32), (96, 64, 64), and (64, 64, 96). 
-        For each timestep, trace streamlines bidirectionally with maximum length 100. 
-        Render as tubes with radius 0.4. Color each timestep differently (blue for t=30 through red for t=70) with increasing opacity for later times. 
-        Add a final layer colored by vy (vertical velocity) using the 'Cool to Warm' diverging colormap. 
-        Add a color bar labeled 'Vertical Velocity (vy)'. 
-        Use a black background. Set camera to view from an elevated angle (elevation 35 degrees). Render at 1024x1024 resolution.
-        Save the paraview state as "rti-velocity_streakline/results/{agent_mode}/rti-velocity_streakline.pvsm".
-        Save the visualization image as "rti-velocity_streakline/results/{agent_mode}/rti-velocity_streakline.png".
-        (Optional, if use python script) Save the python script as "rti-velocity_streakline/results/{agent_mode}/rti-velocity_streakline.py".
-        Do not save any other files, and always save the visualization image
-  assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          1. Overall Visualization Goal: Does the result match the ground truth streakline visualization of the RTI velocity field?
-
-          2. Streakline Patterns: Do the streaklines show similar trajectories and flow structures as the ground truth?
-
-          3. Streakline Coverage: Is the spatial distribution of streaklines from the injection points similar to the ground truth?
-
-          4. Color Mapping: Is the color distribution along streaklines visually similar to the ground truth?
-
-
-# 38. Turbulent Radiative Layer Timelines (Multi-timestep) (trl-velocity_timeline)
-# Turbulent Radiative Layer simulations of astrophysical mixing processes where cold, dense gas interfaces with hot, dilute gas moving at subsonic velocities. 
-# The cold dense gas on the bottom and hot dilute gas on the top becomes unstable to the Kelvin-Helmholtz instability. 
-# When turbulence causes mixing, intermediate-temperature gas forms and rapidly cools, creating a net mass transfer from the hot phase to the cold phase—a process relevant to interstellar and circumgalactic environments. 
-# Generated using Athena++. Data source: The Well (Polymathic AI)
-- vars:
-    question: |
-        Load the turbulent radiative layer velocity field time series from "trl-velocity_timeline/data/trl-velocity_timeline_{timestep}.vti", where "timestep" in {0020, 0030, 0040, 0050, 0060} (5 timesteps, VTI format, 256x128x128 grid each). 
-        Visualize temporal evolution by generating streamlines from a line seed at each timestep. 
-        Seed 50 points along the z-axis at x=128, y=64 (from z=20 to z=108). For each timestep, trace streamlines bidirectionally with maximum length 150. 
-        Render as tubes with radius 0.5. Color each timestep using Spectral-like colors (blue for t=20, cyan for t=30, green for t=40, yellow for t=50, red for t=60) with increasing opacity for later times. 
-        Add a magnitude-colored layer using the 'Spectral' colormap for reference. 
-        Add a color bar labeled 'Velocity Magnitude'. 
-        Use a dark background (RGB: 0.0, 0.0, 0.02). Set camera to an oblique view (azimuth 45, elevation 20) for the elongated domain. Render at 1024x1024 resolution.
-        Save the paraview state as "trl-velocity_timeline/results/{agent_mode}/trl-velocity_timeline.pvsm".
-        Save the visualization image as "trl-velocity_timeline/results/{agent_mode}/trl-velocity_timeline.png".
-        (Optional, if use python script) Save the python script as "trl-velocity_timeline/results/{agent_mode}/trl-velocity_timeline.py".
-        Do not save any other files, and always save the visualization image.
-  assert:
-    - type: llm-rubric
-      subtype: vision
-      value: |
-          1. Overall Visualization Goal: Does the result match the ground truth timeline visualization of the TRL velocity field?
-
-          2. Timeline Patterns: Do the timelines show similar trajectories and temporal evolution as the ground truth?
-
-          3. Timeline Coverage: Is the spatial distribution and density of timelines similar to the ground truth?
-
-          4. Color Mapping: Is the color distribution along timelines visually similar to the ground truth?
+          4. Visualization Clarity: Are the vortex features clearly visible and comparable to the ground truth?

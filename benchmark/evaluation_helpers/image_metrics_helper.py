@@ -276,7 +276,7 @@ class CaseImageMetrics:
     Calculate image metrics for a single test case across multiple viewpoints
     """
     
-    def __init__(self, case_dir: str, case_name: str, eval_mode: str = "mcp"):
+    def __init__(self, case_dir: str, case_name: str, eval_mode: str = "mcp", agent_mode: str = None):
         """
         Initialize case metrics calculator
 
@@ -284,15 +284,19 @@ class CaseImageMetrics:
             case_dir (str): Path to the test case directory
             case_name (str): Name of the test case
             eval_mode (str): Evaluation mode ("mcp" or "pvpython")
+            agent_mode (str): Full agent mode string (e.g., "paraview_mcp_claude-sonnet-4-5_trial").
+                            If None, defaults to eval_mode for backward compatibility.
         """
         self.case_dir = case_dir
         self.case_name = case_name
         self.eval_mode = eval_mode
+        self.agent_mode = agent_mode if agent_mode else eval_mode
 
         # Set up paths
         self.gs_dir = os.path.join(case_dir, "GS")
-        self.screenshot_dir = os.path.join(case_dir, "evaluation_results", eval_mode, "screenshots")
-        self.results_dir = os.path.join(case_dir, "results", eval_mode)
+        # Use agent_mode for result paths (e.g., "paraview_mcp_claude-sonnet-4-5_trial")
+        self.screenshot_dir = os.path.join(case_dir, "evaluation_results", self.agent_mode, "screenshots")
+        self.results_dir = os.path.join(case_dir, "results", self.agent_mode)
 
         # Initialize metrics calculator
         self.calculator = ImageMetricsCalculator()
@@ -389,54 +393,122 @@ class CaseImageMetrics:
         """
         Calculate metrics for all viewpoints and compute averages
 
+        NEW LOGIC: Only calculate metrics when both ParaView state files exist.
+        This ensures resolution and camera view remain the same, making metrics meaningful.
+
         Returns:
             Dict[str, Any]: Complete metrics for this case
         """
         print(f"Calculating image metrics for {self.case_name} ({self.eval_mode} mode)...")
 
-        # Check if we're in single-image mode
-        single_gt_path = os.path.join(self.gs_dir, f"{self.case_name}_gs.png")
-        single_result_path = os.path.join(self.results_dir, f"{self.case_name}.png")
-        is_single_image_mode = os.path.exists(single_gt_path) and os.path.exists(single_result_path)
+        # Check for ParaView state files (new requirement)
+        gs_state_path = os.path.join(self.case_dir, "GS", f"{self.case_name}_gs.pvsm")
+        result_state_path = os.path.join(self.results_dir, f"{self.case_name}.pvsm")
+
+        has_gs_state = os.path.exists(gs_state_path)
+        has_result_state = os.path.exists(result_state_path)
 
         # Calculate metrics for each viewpoint
         viewpoint_metrics = {}
         valid_viewpoints = []
+        skip_reason = None
 
-        if is_single_image_mode:
-            # Single-image mode: calculate once and use for all viewpoints
-            print(f"Single-image mode: using {single_result_path}")
+        # NEW LOGIC: Only calculate metrics if both PV state files exist
+        if has_gs_state and has_result_state:
+            print(f"Found both ParaView state files:")
+            print(f"  GS state: {gs_state_path}")
+            print(f"  Result state: {result_state_path}")
+            print(f"Generating screenshots to ensure matching camera views and resolution...")
+
             try:
-                metrics = self.calculator.calculate_all_metrics(single_gt_path, single_result_path)
-                # Use the same metrics for all viewpoints
+                # Import screenshot helper (requires ParaView)
+                try:
+                    from screenshot_helper import compare_states_screenshots
+                except ImportError:
+                    try:
+                        from .screenshot_helper import compare_states_screenshots
+                    except ImportError:
+                        print("  Warning: screenshot_helper not available. Cannot generate screenshots from state files.")
+                        skip_reason = "screenshot_helper not available (ParaView required)"
+                        # Fall back to empty metrics
+                        for viewpoint in self.viewpoints:
+                            viewpoint_metrics[viewpoint] = {'psnr': None, 'ssim': None, 'lpips': None}
+                        raise ImportError("screenshot_helper not available")
+
+                # Generate screenshots from both state files
+                screenshot_dir = os.path.join(self.case_dir, "evaluation_results", self.eval_mode, "screenshots")
+                os.makedirs(screenshot_dir, exist_ok=True)
+
+                # Get data directory if available
+                data_dir = os.path.join(self.case_dir, "data")
+                if not os.path.exists(data_dir):
+                    data_dir = None
+
+                screenshots = compare_states_screenshots(
+                    gs_state_path,
+                    result_state_path,
+                    screenshot_dir,
+                    data_directory=data_dir
+                )
+
+                # Calculate metrics for each viewpoint
                 for viewpoint in self.viewpoints:
-                    viewpoint_metrics[viewpoint] = metrics
-                    valid_viewpoints.append(viewpoint)
-                print(f"  PSNR: {metrics.get('psnr', 'N/A')}, SSIM: {metrics.get('ssim', 'N/A')}, LPIPS: {metrics.get('lpips', 'N/A')}")
+                    # Map viewpoint names to screenshot filenames
+                    # screenshots['ground_truth'] and screenshots['result'] are lists of paths
+                    # e.g., ['gs_front_view.png', 'gs_side_view.png', 'gs_diagonal_view.png']
+
+                    # Find matching screenshot for this viewpoint
+                    gt_screenshot = None
+                    result_screenshot = None
+
+                    for gt_path in screenshots['ground_truth']:
+                        if f"_{viewpoint}_view.png" in gt_path or f"{viewpoint}_view.png" in gt_path:
+                            gt_screenshot = gt_path
+                            break
+
+                    for result_path in screenshots['result']:
+                        if f"_{viewpoint}_view.png" in result_path or f"{viewpoint}_view.png" in result_path:
+                            result_screenshot = result_path
+                            break
+
+                    if gt_screenshot and result_screenshot:
+                        try:
+                            metrics = self.calculator.calculate_all_metrics(gt_screenshot, result_screenshot)
+                            viewpoint_metrics[viewpoint] = metrics
+                            valid_viewpoints.append(viewpoint)
+                            print(f"  {viewpoint} view - PSNR: {metrics.get('psnr', 'N/A')}, SSIM: {metrics.get('ssim', 'N/A')}, LPIPS: {metrics.get('lpips', 'N/A')}")
+                        except Exception as e:
+                            print(f"  Error calculating {viewpoint} view metrics: {e}")
+                            viewpoint_metrics[viewpoint] = {'psnr': None, 'ssim': None, 'lpips': None}
+                    else:
+                        print(f"  Warning: Could not find {viewpoint} view screenshots")
+                        viewpoint_metrics[viewpoint] = {'psnr': None, 'ssim': None, 'lpips': None}
+
             except Exception as e:
-                print(f"  Error calculating single-image metrics: {e}")
+                print(f"  Error generating screenshots from state files: {e}")
+                if skip_reason is None:
+                    skip_reason = f"Failed to generate screenshots: {str(e)}"
                 for viewpoint in self.viewpoints:
                     viewpoint_metrics[viewpoint] = {'psnr': None, 'ssim': None, 'lpips': None}
         else:
-            # Multi-viewpoint mode: calculate for each viewpoint
-            existence = self.check_images_exist()
+            # Skip metrics calculation if either state file is missing
+            if not has_gs_state and not has_result_state:
+                skip_reason = f"Both ParaView state files missing (GS: {gs_state_path}, Result: {result_state_path})"
+            elif not has_gs_state:
+                skip_reason = f"Ground truth ParaView state file missing: {gs_state_path}"
+            else:
+                skip_reason = f"Result ParaView state file missing: {result_state_path}"
 
+            print(f"  Skipping image metrics: {skip_reason}")
+            print(f"  Image metrics require both PV state files to ensure matching camera views and resolution.")
+
+            # Set all metrics to None
             for viewpoint in self.viewpoints:
-                if existence[viewpoint]:
-                    try:
-                        metrics = self.calculate_viewpoint_metrics(viewpoint)
-                        viewpoint_metrics[viewpoint] = metrics
-                        valid_viewpoints.append(viewpoint)
-                        print(f"  {viewpoint} view - PSNR: {metrics.get('psnr', 'N/A')}, SSIM: {metrics.get('ssim', 'N/A')}, LPIPS: {metrics.get('lpips', 'N/A')}")
-                    except Exception as e:
-                        print(f"  Error calculating {viewpoint} view metrics: {e}")
-                        viewpoint_metrics[viewpoint] = {'psnr': None, 'ssim': None, 'lpips': None}
-                else:
-                    viewpoint_metrics[viewpoint] = {'psnr': None, 'ssim': None, 'lpips': None}
-        
+                viewpoint_metrics[viewpoint] = {'psnr': None, 'ssim': None, 'lpips': None}
+
         # Calculate averages across valid viewpoints
         averages = self._calculate_averages(viewpoint_metrics, valid_viewpoints)
-        
+
         # Prepare result
         result = {
             "case_name": self.case_name,
@@ -446,9 +518,11 @@ class CaseImageMetrics:
             "averaged_metrics": averages,
             "valid_viewpoints": valid_viewpoints,
             "valid_viewpoint_count": len(valid_viewpoints),
-            "total_viewpoints": len(self.viewpoints)
+            "total_viewpoints": len(self.viewpoints),
+            "pv_state_based": has_gs_state and has_result_state,  # Flag indicating if metrics are from PV states
+            "skip_reason": skip_reason  # Reason for skipping if applicable
         }
-        
+
         return result
     
     def _calculate_averages(self, viewpoint_metrics: Dict[str, Dict[str, float]], 
@@ -487,19 +561,22 @@ class BatchImageMetrics:
     """
     Calculate image metrics across all test cases and provide batch statistics
     """
-    
-    def __init__(self, cases_dir: str, eval_mode: str = "mcp", output_dir: str = None):
+
+    def __init__(self, cases_dir: str, eval_mode: str = "mcp", output_dir: str = None, agent_mode: str = None):
         """
         Initialize batch metrics calculator
-        
+
         Args:
             cases_dir (str): Path to the cases directory
             eval_mode (str): Evaluation mode ("mcp" or "pvpython")
             output_dir (str): Output directory for results
+            agent_mode (str): Full agent mode string (e.g., "paraview_mcp_claude-sonnet-4-5_trial").
+                            If None, defaults to eval_mode for backward compatibility.
         """
         self.cases_dir = Path(cases_dir)
         self.eval_mode = eval_mode
-        self.output_dir = Path(output_dir) if output_dir else self.cases_dir.parent / "evaluation_results" / f"{eval_mode}_image_metrics"
+        self.agent_mode = agent_mode if agent_mode else eval_mode
+        self.output_dir = Path(output_dir) if output_dir else self.cases_dir.parent / "evaluation_results" / f"{self.agent_mode}_image_metrics"
         self.output_dir.mkdir(parents=True, exist_ok=True)
     
     def discover_test_cases(self) -> List[str]:
@@ -545,7 +622,7 @@ class BatchImageMetrics:
             case_dir = self.cases_dir / case_name
             
             try:
-                case_calculator = CaseImageMetrics(str(case_dir), case_name, self.eval_mode)
+                case_calculator = CaseImageMetrics(str(case_dir), case_name, self.eval_mode, agent_mode=self.agent_mode)
                 case_metrics = case_calculator.calculate_case_metrics()
                 case_results[case_name] = case_metrics
                 

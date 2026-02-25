@@ -103,3 +103,14 @@ python -m benchmark.evaluation_reporter.run_reporter \
     --test-results /Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench/test_results/bioimage_data/napari_mcp/eval_figure_recreation \
     --output eval_reports/bioimage-napari_mcp/eval_figure_recreation \
     --port 8081
+
+
+python -m benchmark.evaluation_framework.run_evaluation `
+    --agent paraview_mcp `
+    --config benchmark/configs/paraview_mcp/config_anthropic.json `
+    --yaml benchmark/eval_cases/paraview/main_cases.yaml `
+    --cases SciVisAgentBench-tasks/main `
+    --eval-model gpt-5.2 `
+    --experiment-number trial `
+    --case engine `
+    --eval-only
