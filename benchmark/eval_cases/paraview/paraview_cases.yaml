@@ -148,7 +148,7 @@
 
         2. Apply volume rendering to visualize the carp skeleton.
 
-        3. Adjust the transfer function to highlight only the bony structures in an X-ray style (suppressing soft tissue).
+        3. Adjust the transfer function to highlight only the bony structures with the original bone color.
 
         4. Optimize the viewpoint to display the full skeleton, ensuring the head, spine, and fins are all clearly visible in a single frame.
 
@@ -179,13 +179,11 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: Does the result match the ground truth X-ray visualization of the carp skeleton?
+        1. Overall Visualization Goal: Does the result match the ground truth visualization of the carp skeleton?
 
-          2. Bone Visibility: Are the bones clearly visible with soft tissue and background suppressed, similar to the ground truth? Are thin fin rays distinguishable?
+        2. Bone Visibility: Are the bones clearly visible, similar to the ground truth? Are thin fin rays distinguishable?
 
-          3. Skeletal Structure: Is the entire carp skeleton (head, spine, ribs, fins, tail) visible and similar in appearance to the ground truth?
-
-          4. X-ray Appearance: Does the visualization have a monochrome/grayscale X-ray appearance similar to the ground truth?
+        3. Skeletal Structure: Is the entire carp skeleton (head, spine, ribs, fins, tail) visible and similar in appearance to the ground truth?
     - type: llm-rubric
       subtype: text
       value: |

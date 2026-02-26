@@ -802,12 +802,16 @@ def generate_case_section(result: Dict[str, Any], yaml_data: Dict[str, Any], tok
 
     percentage = scores.get('percentage', 0)
 
-    # Determine status
+    # Determine status - check both top-level and evaluation status
+    top_status = result.get('status', 'unknown')
     eval_status = eval_data.get('status', 'unknown')
+    # Use top-level status if evaluation status is unknown
+    final_status = eval_status if eval_status != 'unknown' else top_status
+
     status_badge = ''
-    if eval_status == 'failed':
+    if final_status == 'failed':
         status_badge = '<span class="status-badge status-failed">❌ FAILED</span>'
-    elif eval_status == 'completed' and percentage < 50:
+    elif final_status == 'completed' and percentage < 50:
         status_badge = '<span class="status-badge status-warning">⚠️ LOW SCORE</span>'
 
     # Get task description - try YAML first, then fall back to result JSON
@@ -829,7 +833,7 @@ def generate_case_section(result: Dict[str, Any], yaml_data: Dict[str, Any], tok
     images_html = generate_image_section(case_name)
 
     # Add failed class if case is failed
-    section_class = "case-section case-section-failed" if eval_status == 'failed' else "case-section"
+    section_class = "case-section case-section-failed" if final_status == 'failed' else "case-section"
 
     return f"""
         <section class="{section_class}" id="{case_name}">
