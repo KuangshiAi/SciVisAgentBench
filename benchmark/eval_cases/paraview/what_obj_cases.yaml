@@ -6,7 +6,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/aneurism/data/aneurism_256x256x256_uint8.raw".
-        Use visualization tools to determine what object or structure is contained in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/aneurism/results/{agent_mode}/aneurism.pvsm"
+        Use visualization tools to determine what object or structure is contained in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/aneurism/results/{agent_mode}/aneurism.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/aneurism/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -22,7 +22,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/backpack/data/backpack_512x512x373_uint16.raw".
-        Use visualization tools to determine what object is contained in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/backpack/results/{agent_mode}/backpack.pvsm"
+        Use visualization tools to determine what object is contained in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/backpack/results/{agent_mode}/backpack.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/backpack/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -38,7 +38,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/blunt_fin/data/blunt_fin_256x128x64_uint8.raw".
-        Use visualization tools to determine what object or structure is in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/blunt_fin/results/{agent_mode}/blunt_fin.pvsm"
+        Use visualization tools to determine what object or structure is in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/blunt_fin/results/{agent_mode}/blunt_fin.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/blunt_fin/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -54,7 +54,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/bonsai/data/bonsai_256x256x256_uint8.raw".
-        Use visualization tools to determine what object is contained in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/bonsai/results/{agent_mode}/bonsai.pvsm"
+        Use visualization tools to determine what object is contained in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/bonsai/results/{agent_mode}/bonsai.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/bonsai/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -70,7 +70,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/boston_teapot/data/boston_teapot_256x256x178_uint8.raw".
-        Use visualization tools to determine what object is in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/boston_teapot/results/{agent_mode}/boston_teapot.pvsm"
+        Use visualization tools to determine what object is in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/boston_teapot/results/{agent_mode}/boston_teapot.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/boston_teapot/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -86,7 +86,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/bunny/data/bunny_512x512x361_uint16.raw".
-        Use visualization tools to determine what object is in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/bunny/results/{agent_mode}/bunny.pvsm"
+        Use visualization tools to determine what object is in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/bunny/results/{agent_mode}/bunny.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/bunny/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -102,7 +102,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/carp/data/carp_256x256x512_uint16.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/carp/results/{agent_mode}/carp.pvsm"
+        Use visualization tools to examine what is shown in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/carp/results/{agent_mode}/carp.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/carp/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -118,7 +118,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/engine/data/engine_256x256x128_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/engine/results/{agent_mode}/engine.pvsm"
+        Use visualization tools to examine what is shown in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/engine/results/{agent_mode}/engine.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/engine/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -134,7 +134,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/foot/data/foot_256x256x256_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/foot/results/{agent_mode}/foot.pvsm"
+        Use visualization tools to examine what is shown in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/foot/results/{agent_mode}/foot.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/foot/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -150,7 +150,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/frog/data/frog_256x256x44_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/frog/results/{agent_mode}/frog.pvsm"
+        Use visualization tools to examine what is shown in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/frog/results/{agent_mode}/frog.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/frog/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -166,7 +166,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/fuel/data/fuel_64x64x64_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/fuel/results/{agent_mode}/fuel.pvsm"
+        Use visualization tools to examine what is shown in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/fuel/results/{agent_mode}/fuel.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/fuel/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -182,7 +182,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/hydrogen_atom/data/hydrogen_atom_128x128x128_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/hydrogen_atom/results/{agent_mode}/hydrogen_atom.pvsm"
+        Use visualization tools to examine what is shown in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/hydrogen_atom/results/{agent_mode}/hydrogen_atom.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/hydrogen_atom/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -198,7 +198,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/lobster/data/lobster_301x324x56_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/lobster/results/{agent_mode}/lobster.pvsm"
+        Use visualization tools to examine what is shown in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/lobster/results/{agent_mode}/lobster.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/lobster/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -214,7 +214,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/mri_ventricles/data/mri_ventricles_256x256x124_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/mri_ventricles/results/{agent_mode}/mri_ventricles.pvsm"
+        Use visualization tools to examine what is shown in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/mri_ventricles/results/{agent_mode}/mri_ventricles.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/mri_ventricles/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -230,7 +230,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/mri_woman/data/mri_woman_256x256x109_uint16.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/mri_woman/results/{agent_mode}/mri_woman.pvsm"
+        Use visualization tools to examine what is shown in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/mri_woman/results/{agent_mode}/mri_woman.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/mri_woman/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -246,7 +246,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/mrt_angio/data/mrt_angio_416x512x112_uint16.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/mrt_angio/results/{agent_mode}/mrt_angio.pvsm"
+        Use visualization tools to examine what is shown in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/mrt_angio/results/{agent_mode}/mrt_angio.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/mrt_angio/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -262,7 +262,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/neocortical_layer_1_axons/data/neocortical_layer_1_axons_1464x1033x76_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/neocortical_layer_1_axons/results/{agent_mode}/neocortical_layer_1_axons.pvsm"
+        Use visualization tools to examine what is shown in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/neocortical_layer_1_axons/results/{agent_mode}/neocortical_layer_1_axons.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/neocortical_layer_1_axons/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -278,7 +278,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/nucleon/data/nucleon_41x41x41_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/nucleon/results/{agent_mode}/nucleon.pvsm"
+        Use visualization tools to examine what is shown in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/nucleon/results/{agent_mode}/nucleon.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/nucleon/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -294,7 +294,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/pancreas/data/pancreas_240x512x512_int16.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/pancreas/results/{agent_mode}/pancreas.pvsm"
+        Use visualization tools to examine what is shown in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/pancreas/results/{agent_mode}/pancreas.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/pancreas/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -310,7 +310,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/silicium/data/silicium_98x34x34_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/silicium/results/{agent_mode}/silicium.pvsm"
+        Use visualization tools to examine what is shown in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/silicium/results/{agent_mode}/silicium.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/silicium/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -326,7 +326,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/skull/data/skull_256x256x256_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/skull/results/{agent_mode}/skull.pvsm"
+        Use visualization tools to examine what is shown in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/skull/results/{agent_mode}/skull.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/skull/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -342,7 +342,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/statue_leg/data/statue_leg_341x341x93_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/statue_leg/results/{agent_mode}/statue_leg.pvsm"
+        Use visualization tools to examine what is shown in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/statue_leg/results/{agent_mode}/statue_leg.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/statue_leg/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -358,7 +358,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/stent/data/stent_512x512x174_uint16.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/stent/results/{agent_mode}/stent.pvsm"
+        Use visualization tools to examine what is shown in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/stent/results/{agent_mode}/stent.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/stent/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -369,7 +369,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/supernova/data/supernova_256x256x256_float32.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/supernova/results/{agent_mode}/supernova.pvsm"
+        Use visualization tools to examine what is shown in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/supernova/results/{agent_mode}/supernova.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/supernova/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -385,7 +385,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/tooth/data/tooth_103x94x161_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/tooth/results/{agent_mode}/tooth.pvsm"
+        Use visualization tools to examine what is shown in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/tooth/results/{agent_mode}/tooth.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/tooth/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -401,7 +401,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/tornado/data/tornado_64x64x64_float32_scalar3.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/tornado/results/{agent_mode}/tornado.pvsm"
+        Use visualization tools to examine what is shown in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/tornado/results/{agent_mode}/tornado.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/tornado/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric
@@ -417,7 +417,7 @@
 - vars:
     question: |
         Clear the ParaView pipeline and load the data file "../SciVisAgentBench-tasks/sci_volume_data/vis_male/data/vis_male_128x256x256_uint8.raw".
-        Use visualization tools to examine what is shown in this dataset. Save the paraview state as "../SciVisAgentBench-tasks/sci_volume_data/vis_male/results/{agent_mode}/vis_male.pvsm"
+        Use visualization tools to examine what is shown in this dataset. Save the 1280*1280 visualization image as "../SciVisAgentBench-tasks/sci_volume_data/vis_male/results/{agent_mode}/vis_male.png"
         Provide a textual report identifying what you observe and save it to "../SciVisAgentBench-tasks/sci_volume_data/vis_male/results/{agent_mode}/answers.txt"
   assert:
     - type: llm-rubric

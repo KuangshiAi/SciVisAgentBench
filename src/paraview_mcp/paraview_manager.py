@@ -348,61 +348,61 @@ class ParaViewManager:
             self.logger.error(error_msg)
             return False, error_msg
 
-    def execute_python_code(self, code: str):
-        """
-        Execute arbitrary Python code in the ParaView Python environment.
-        This allows access to any ParaView API not covered by existing functions.
+    # def execute_python_code(self, code: str):
+    #     """
+    #     Execute arbitrary Python code in the ParaView Python environment.
+    #     This allows access to any ParaView API not covered by existing functions.
 
-        IMPORTANT: This function provides full access to the ParaView Python API.
-        The code is executed with access to:
-        - All paraview.simple functions (already imported with 'from paraview.simple import *')
-        - The ParaViewManager instance as 'pv_manager'
-        - Standard Python libraries
+    #     IMPORTANT: This function provides full access to the ParaView Python API.
+    #     The code is executed with access to:
+    #     - All paraview.simple functions (already imported with 'from paraview.simple import *')
+    #     - The ParaViewManager instance as 'pv_manager'
+    #     - Standard Python libraries
 
-        Args:
-            code (str): Python code to execute
+    #     Args:
+    #         code (str): Python code to execute
 
-        Returns:
-            Tuple of (bool, str, Any): (success, message, result)
-                - success: True if execution succeeded
-                - message: Status message or error description
-                - result: Return value from the code execution (if any)
-        """
-        try:
-            # Create execution context with access to paraview.simple and this manager
-            exec_globals = {
-                '__builtins__': __builtins__,
-                'pv_manager': self,
-                'logger': self.logger,
-            }
+    #     Returns:
+    #         Tuple of (bool, str, Any): (success, message, result)
+    #             - success: True if execution succeeded
+    #             - message: Status message or error description
+    #             - result: Return value from the code execution (if any)
+    #     """
+    #     try:
+    #         # Create execution context with access to paraview.simple and this manager
+    #         exec_globals = {
+    #             '__builtins__': __builtins__,
+    #             'pv_manager': self,
+    #             'logger': self.logger,
+    #         }
 
-            # Import all paraview.simple functions into the execution context
-            from paraview import simple
-            for name in dir(simple):
-                if not name.startswith('_'):
-                    exec_globals[name] = getattr(simple, name)
+    #         # Import all paraview.simple functions into the execution context
+    #         from paraview import simple
+    #         for name in dir(simple):
+    #             if not name.startswith('_'):
+    #                 exec_globals[name] = getattr(simple, name)
 
-            # Execute the code
-            exec_locals = {}
-            exec(code, exec_globals, exec_locals)
+    #         # Execute the code
+    #         exec_locals = {}
+    #         exec(code, exec_globals, exec_locals)
 
-            # Get the result if there's a 'result' variable defined
-            result = exec_locals.get('result', None)
+    #         # Get the result if there's a 'result' variable defined
+    #         result = exec_locals.get('result', None)
 
-            # If code defines a return message, use it
-            if 'message' in exec_locals:
-                message = exec_locals['message']
-            else:
-                message = "Code executed successfully"
+    #         # If code defines a return message, use it
+    #         if 'message' in exec_locals:
+    #             message = exec_locals['message']
+    #         else:
+    #             message = "Code executed successfully"
 
-            self.logger.info(f"Successfully executed Python code: {code[:100]}...")
-            return True, message, result
+    #         self.logger.info(f"Successfully executed Python code: {code[:100]}...")
+    #         return True, message, result
 
-        except Exception as e:
-            import traceback
-            error_msg = f"Error executing Python code: {str(e)}\n{traceback.format_exc()}"
-            self.logger.error(error_msg)
-            return False, error_msg, None
+    #     except Exception as e:
+    #         import traceback
+    #         error_msg = f"Error executing Python code: {str(e)}\n{traceback.format_exc()}"
+    #         self.logger.error(error_msg)
+    #         return False, error_msg, None
 
     def set_background_color(self, red=0.32, green=0.34, blue=0.43):
         """

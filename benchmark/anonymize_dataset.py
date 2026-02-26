@@ -89,8 +89,8 @@ class DatasetAnonymizer:
             anon_filename = filename
 
         # Create the anonymous path (relative path for YAML)
-        output_dir_name = self.output_dir.name if isinstance(self.output_dir, Path) else Path(self.output_dir).name
-        anon_path_relative = f"{output_dir_name}/{anon_dataset}/data/{anon_filename}"
+        # Path is relative to the cases directory (not including output_dir name)
+        anon_path_relative = f"{anon_dataset}/data/{anon_filename}"
 
         # Also store full path for file copying
         anon_path_full = str(self.output_dir / anon_dataset / "data" / anon_filename)
@@ -184,8 +184,8 @@ class DatasetAnonymizer:
         else:
             anon_filename = filename
 
-        # Build anonymous output path
-        anon_path = f"anonymized_datasets/{anon_dataset}/results/{{agent_mode}}/{anon_filename}"
+        # Build anonymous output path (relative to cases directory)
+        anon_path = f"{anon_dataset}/results/{{agent_mode}}/{anon_filename}"
         self.output_path_mapping[original_path] = anon_path
         
         return anon_path

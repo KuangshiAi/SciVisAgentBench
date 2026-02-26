@@ -21,7 +21,8 @@ class EvaluationReporter:
         cases_dir: Path,
         yaml_path: Path,
         config: Dict[str, Any],
-        output_dir: Path
+        output_dir: Path,
+        agent_mode: Optional[str] = None
     ):
         """
         Initialize the reporter.
@@ -33,8 +34,10 @@ class EvaluationReporter:
             yaml_path: Path to YAML file with test definitions
             config: Agent configuration dictionary
             output_dir: Directory to output the report
+            agent_mode: Full agent mode string for locating result images (e.g., 'chatvis_claude-sonnet-4-5_exp1')
         """
         self.agent_name = agent_name
+        self.agent_mode = agent_mode  # Use provided agent_mode if available
         self.test_results_dir = test_results_dir
         self.cases_dir = cases_dir
         self.yaml_path = yaml_path
@@ -84,8 +87,16 @@ class EvaluationReporter:
     def load_yaml_cases(self) -> Dict[str, Dict[str, Any]]:
         """Load test case definitions from YAML."""
         try:
+            if not self.yaml_path.exists():
+                print(f"   ⚠️  YAML file not found: {self.yaml_path}")
+                return {}
+
             with open(self.yaml_path, 'r', encoding='utf-8') as f:
                 yaml_data = yaml.safe_load(f)
+
+            if not yaml_data:
+                print(f"   ⚠️  YAML file is empty or could not be parsed: {self.yaml_path}")
+                return {}
 
             cases = {}
             import re
@@ -110,8 +121,17 @@ class EvaluationReporter:
                         cases[case_name] = item
 
             return cases
+        except yaml.YAMLError as e:
+            print(f"   ⚠️  YAML parsing error in {self.yaml_path}: {e}")
+            print(f"   ⚠️  Report will be generated without YAML case definitions")
+            return {}
+        except KeyboardInterrupt:
+            print(f"   ⚠️  YAML parsing interrupted (file might be malformed)")
+            print(f"   ⚠️  Report will be generated without YAML case definitions")
+            return {}
         except Exception as e:
             print(f"   ⚠️  Error loading YAML: {e}")
+            print(f"   ⚠️  Report will be generated without YAML case definitions")
             return {}
 
     def compute_summary_stats(self, results: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -131,10 +151,18 @@ class EvaluationReporter:
 
         for result in results:
             eval_data = result.get('evaluation', {})
+            scores = eval_data.get('scores', {})
+
+            # Include ALL cases in max_score calculation (both completed and failed)
+            # This gives a true overall percentage across all test cases
+            case_max_score = scores.get('max_possible_score', 0) if scores else 0
+            max_score += case_max_score
+
+            # For completed cases, add their earned scores and collect metrics
             if eval_data.get('status') == 'completed':
-                scores = eval_data.get('scores', {})
-                total_score += scores.get('total_score', 0)
-                max_score += scores.get('max_possible_score', 0)
+                total_score += scores.get('total_score', 0) if scores else 0
+            # For failed cases, total_score should already be 0 (or we don't add anything)
+            # This ensures failed cases contribute 0/{max_possible_score} to the overall score
 
                 # Vision scores
                 subtype_results = eval_data.get('subtype_results', {})
@@ -241,7 +269,7 @@ class EvaluationReporter:
         return token_usage_map
 
     def copy_images(self, results: List[Dict[str, Any]]):
-        """Copy result images and ground truth images to output directory."""
+        """Copy result images and ground truth images to output directory. Mark cases as failures if images not found."""
         images_dir = self.output_dir / "images"
         images_dir.mkdir(exist_ok=True)
 
@@ -252,25 +280,34 @@ class EvaluationReporter:
             if not case_dir.exists():
                 continue
 
-            # Detect agent mode from result data
-            agent_mode = self._detect_agent_mode(result)
+            # Use provided agent_mode if available, otherwise detect from result data
+            if self.agent_mode:
+                agent_mode = self.agent_mode
+            else:
+                agent_mode = self._detect_agent_mode(result)
 
             # Try to find and copy result images
             result_img_found = False
 
-            # Pattern 1: results/{agent_mode}/{case_name}.png
-            for mode in [agent_mode, 'pvpython', 'mcp', 'generic']:
-                if result_img_found:
-                    break
-                result_img = case_dir / "results" / mode / f"{case_name}.png"
-                if result_img.exists():
-                    shutil.copy(result_img, images_dir / f"{case_name}_result.png")
-                    result_img_found = True
-                    break
+            # Pattern 1: results/{agent_mode}/{case_name}.png (use agent_mode first)
+            result_img = case_dir / "results" / agent_mode / f"{case_name}.png"
+            if result_img.exists():
+                shutil.copy(result_img, images_dir / f"{case_name}_result.png")
+                result_img_found = True
 
-            # Pattern 2: evaluation_results/{agent_mode}/screenshots/result_*.png
+            # Pattern 2: Fallback to other modes if agent_mode not specified
+            if not result_img_found and not self.agent_mode:
+                for mode in ['pvpython', 'mcp', 'generic']:
+                    result_img = case_dir / "results" / mode / f"{case_name}.png"
+                    if result_img.exists():
+                        shutil.copy(result_img, images_dir / f"{case_name}_result.png")
+                        result_img_found = True
+                        break
+
+            # Pattern 3: evaluation_results/{agent_mode}/screenshots/result_*.png
             if not result_img_found:
-                for mode in [agent_mode, 'pvpython', 'mcp', 'generic']:
+                modes_to_try = [agent_mode] if self.agent_mode else [agent_mode, 'pvpython', 'mcp', 'generic']
+                for mode in modes_to_try:
                     eval_results_dir = case_dir / "evaluation_results" / mode / "screenshots"
                     if eval_results_dir.exists():
                         # Look for any result_*.png files
@@ -285,6 +322,23 @@ class EvaluationReporter:
                             shutil.copy(img_to_copy, images_dir / f"{case_name}_result.png")
                             result_img_found = True
                             break
+
+            # Mark case as failure if result image not found
+            if not result_img_found:
+                print(f"   ⚠️  Result image not found for {case_name}, marking as failure")
+                result['image_missing'] = True
+                # Set scores to 0 if not already failed
+                if result.get('status') == 'completed':
+                    result['status'] = 'failed'
+                    result['error'] = f'Result image not found at: results/{agent_mode}/{case_name}.png'
+
+                    # Set scores to 0 in evaluation data
+                    if 'evaluation' in result and 'scores' in result['evaluation'] and result['evaluation']['scores']:
+                        result['evaluation']['scores']['total_score'] = 0
+                        result['evaluation']['scores']['percentage'] = 0.0
+                    # Also mark evaluation status as failed
+                    if 'evaluation' in result:
+                        result['evaluation']['status'] = 'failed'
 
             # Try to find and copy ground truth images
             gt_img_found = False
@@ -325,6 +379,57 @@ class EvaluationReporter:
         # Fallback to agent name
         return self.agent_name
 
+    def mark_no_visualization_as_failure(self, results: List[Dict[str, Any]], yaml_cases: Dict[str, Any]):
+        """Mark cases with no visualization output (missing image/text files) as failures."""
+        import os
+
+        for result in results:
+            case_name = result.get('case_name', 'unknown')
+            eval_data = result.get('evaluation', {})
+
+            # Skip if already failed (check both top-level and evaluation status)
+            if result.get('status') == 'failed' or eval_data.get('status') == 'failed':
+                continue
+
+            # Determine the results directory path
+            # Format: {cases_dir}/{case_name}/results/{agent_mode}/
+            if not self.agent_mode:
+                # Skip checking if agent_mode is not set
+                continue
+
+            results_dir = self.cases_dir / case_name / "results" / self.agent_mode
+
+            # Check if visualization image exists
+            # Format: {cases_dir}/{case_name}/results/{agent_mode}/{case_name}.png
+            viz_image_path = results_dir / f"{case_name}.png"
+            has_visualization = viz_image_path.exists()
+
+            # Mark as failure if visualization image is missing
+            if not has_visualization:
+                print(f"   ⚠️  {case_name}: no visualization image at {viz_image_path}, marking as failure")
+                result['no_visualization'] = True
+
+                # Update both top-level and evaluation-level status for consistency
+                result['status'] = 'failed'
+
+                # Ensure 'evaluation' key exists
+                if 'evaluation' not in result:
+                    result['evaluation'] = {}
+
+                result['evaluation']['status'] = 'failed'
+
+                # Set error message
+                error_msg = f"No visualization image found at {viz_image_path}"
+                if not result.get('error'):
+                    result['error'] = error_msg
+                else:
+                    result['error'] = f"{result['error']}; {error_msg}"
+
+                # Set total score and percentage to 0 (ensure scores structure exists)
+                if 'evaluation' in result and 'scores' in result['evaluation'] and result['evaluation']['scores']:
+                    result['evaluation']['scores']['total_score'] = 0
+                    result['evaluation']['scores']['percentage'] = 0.0
+
     def generate_report(self) -> Path:
         """Generate the HTML report."""
         # Load all data
@@ -345,6 +450,13 @@ class EvaluationReporter:
 
         print("   Copying images...")
         self.copy_images(results)
+
+        print("   Checking for cases with no visualization output...")
+        self.mark_no_visualization_as_failure(results, yaml_cases)
+
+        # Recompute summary statistics after marking failures
+        print("   Recomputing summary statistics with updated scores...")
+        summary = self.compute_summary_stats(results)
 
         # Sort results by case name
         results = sorted(results, key=lambda x: x.get('case_name', ''))

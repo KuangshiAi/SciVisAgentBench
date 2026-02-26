@@ -261,6 +261,18 @@ def get_css_styles() -> str:
             transform: translateY(-2px);
         }
 
+        .case-link-failed {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+        }
+
+        .case-link-failed:hover {
+            background: #dc2626;
+            color: white;
+            border-color: #dc2626;
+        }
+
         .case-section {
             padding: 40px;
             border-bottom: 3px solid #f3f4f6;
@@ -268,6 +280,12 @@ def get_css_styles() -> str:
 
         .case-section:last-child {
             border-bottom: none;
+        }
+
+        .case-section-failed {
+            background: #fef2f2;
+            border-left: 5px solid #dc2626;
+            border-bottom: 3px solid #fca5a5;
         }
 
         .case-header {
@@ -642,16 +660,6 @@ def generate_summary_section(
                 </div>
 
                 <div class="summary-card">
-                    <h3>Avg Code Similarity</h3>
-                    <div class="value">
-                        {summary['avg_code_score']:.1f}%
-                    </div>
-                    <div class="sub-value">
-                        Code Quality Match
-                    </div>
-                </div>
-
-                <div class="summary-card">
                     <h3>PSNR (Scaled)</h3>
                     <div class="value">
                         {psnr_scaled_text}
@@ -737,7 +745,13 @@ def generate_case_links(results: List[Dict[str, Any]]) -> str:
     links = []
     for result in results:
         case_name = result.get('case_name', 'unknown')
-        links.append(f'<a href="#{case_name}" class="case-link">{case_name}</a>')
+        # Check if case is failed
+        eval_data = result.get('evaluation', {})
+        is_failed = result.get('status') == 'failed' or eval_data.get('status') == 'failed'
+
+        # Add failed class for styling
+        link_class = 'case-link case-link-failed' if is_failed else 'case-link'
+        links.append(f'<a href="#{case_name}" class="{link_class}">{case_name}</a>')
     return '\n'.join(links)
 
 
@@ -814,8 +828,11 @@ def generate_case_section(result: Dict[str, Any], yaml_data: Dict[str, Any], tok
     # Generate image comparison
     images_html = generate_image_section(case_name)
 
+    # Add failed class if case is failed
+    section_class = "case-section case-section-failed" if eval_status == 'failed' else "case-section"
+
     return f"""
-        <section class="case-section" id="{case_name}">
+        <section class="{section_class}" id="{case_name}">
             <div class="case-header">
                 <div class="case-title-group">
                     <h2 class="case-title">📝 {case_name}</h2>
@@ -1170,34 +1187,24 @@ def generate_metrics_section(eval_data: Dict[str, Any], result: Dict[str, Any], 
             </div>
         """)
 
+    # Monetary cost
+    cost = result.get('cost', {})
+    if cost and cost.get('total_cost_usd') is not None:
+        metrics.append(f"""
+            <div class="metric-box">
+                <div class="metric-label">Total Cost</div>
+                <div class="metric-value">${cost.get('total_cost_usd', 0):.4f}</div>
+            </div>
+        """)
+
     metrics_grid = f'<div class="metrics-grid">{"".join(metrics)}</div>'
 
-    # Code similarity section
-    code_html = ""
-    if 'code' in subtype_results:
-        code_data = subtype_results['code']
-        code_scores = code_data.get('scores', {})
-        code_details = code_data.get('detailed_scores', {}).get('code_similarity', {})
-
-        code_html = f"""
-            <div class="code-similarity">
-                <h4>💻 Code Similarity</h4>
-                <div class="code-sim-score">{code_scores.get('code_similarity', 0)}/10</div>
-                <div class="code-sim-details">
-                    {code_details.get('explanation', '')}
-                </div>
-                <div style="margin-top: 15px; font-size: 0.85em; color: #999;">
-                    <div>Ground Truth: {code_data.get('gs_file', 'N/A')}</div>
-                    <div>Result File: {code_data.get('rs_file', 'N/A')}</div>
-                </div>
-            </div>
-        """
+    # Code similarity section removed as requested
 
     return f"""
         <div class="section-box">
             <h3>📊 Detailed Metrics</h3>
             {metrics_grid}
-            {code_html}
         </div>
     """
 

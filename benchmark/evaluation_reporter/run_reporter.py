@@ -35,6 +35,13 @@ def parse_args():
     )
 
     parser.add_argument(
+        "--agent-mode",
+        type=str,
+        default=None,
+        help="Full agent mode string (e.g., 'chatvis_claude-sonnet-4-5_exp1') for locating result images"
+    )
+
+    parser.add_argument(
         "--config",
         type=str,
         required=True,
@@ -111,6 +118,8 @@ def main():
     print(f"\n📊 SciVisAgentBench Evaluation Reporter")
     print(f"{'='*60}")
     print(f"Agent: {args.agent}")
+    if args.agent_mode:
+        print(f"Agent Mode: {args.agent_mode}")
     print(f"Test Results: {test_results_dir}")
     print(f"Cases Directory: {cases_dir}")
     print(f"YAML File: {yaml_path}")
@@ -134,6 +143,7 @@ def main():
     # Create reporter
     reporter = EvaluationReporter(
         agent_name=args.agent,
+        agent_mode=args.agent_mode,
         test_results_dir=test_results_dir,
         cases_dir=cases_dir,
         yaml_path=yaml_path,
