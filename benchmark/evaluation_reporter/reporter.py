@@ -327,18 +327,19 @@ class EvaluationReporter:
             if not result_img_found:
                 print(f"   ⚠️  Result image not found for {case_name}, marking as failure")
                 result['image_missing'] = True
-                # Set scores to 0 if not already failed
-                if result.get('status') == 'completed':
-                    result['status'] = 'failed'
+
+                # Always mark as failed (remove the status == 'completed' check)
+                result['status'] = 'failed'
+                if not result.get('error'):
                     result['error'] = f'Result image not found at: results/{agent_mode}/{case_name}.png'
 
-                    # Set scores to 0 in evaluation data
-                    if 'evaluation' in result and 'scores' in result['evaluation'] and result['evaluation']['scores']:
-                        result['evaluation']['scores']['total_score'] = 0
-                        result['evaluation']['scores']['percentage'] = 0.0
-                    # Also mark evaluation status as failed
-                    if 'evaluation' in result:
-                        result['evaluation']['status'] = 'failed'
+                # Set scores to 0 in evaluation data
+                if 'evaluation' in result and 'scores' in result['evaluation'] and result['evaluation']['scores']:
+                    result['evaluation']['scores']['total_score'] = 0
+                    result['evaluation']['scores']['percentage'] = 0.0
+                # Also mark evaluation status as failed
+                if 'evaluation' in result:
+                    result['evaluation']['status'] = 'failed'
 
             # Try to find and copy ground truth images
             gt_img_found = False

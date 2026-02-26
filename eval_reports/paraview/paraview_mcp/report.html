@@ -532,7 +532,7 @@
             <h1>🎯 SciVisAgentBench Evaluation Report</h1>
             <div class="header-meta">
                 <span class="agent-name">paraview_mcp</span>
-                <span class="timestamp">Generated: 2026-02-26T17:26:41.863279</span>
+                <span class="timestamp">Generated: 2026-02-26T18:09:57.198465</span>
             </div>
         </header>
 
@@ -544,10 +544,10 @@
                 <div class="summary-card">
                     <h3>Overall Score</h3>
                     <div class="value score-poor">
-                        44.7%
+                        44.6%
                     </div>
                     <div class="sub-value">
-                        1091/2440 Points
+                        1083/2430 Points
                     </div>
                 </div>
 
@@ -564,7 +564,7 @@
                 <div class="summary-card">
                     <h3>Avg Vision Score</h3>
                     <div class="value">
-                        49.8%
+                        49.7%
                     </div>
                     <div class="sub-value">
                         Visualization Quality
@@ -1466,7 +1466,7 @@ Do not save any other files, and always save the visualization image.
                     <h2 class="case-title">📝 carp</h2>
                     
                 </div>
-                <div class="case-score">46/75 (61.3%)</div>
+                <div class="case-score">38/65 (58.5%)</div>
             </div>
 
             <div class="case-content">
@@ -1487,7 +1487,7 @@ Instructions:
 
 2. Apply volume rendering to visualize the carp skeleton.
 
-3. Adjust the transfer function to highlight only the bony structures in an X-ray style (suppressing soft tissue).
+3. Adjust the transfer function to highlight only the bony structures with the original bone color.
 
 4. Optimize the viewpoint to display the full skeleton, ensuring the head, spine, and fins are all clearly visible in a single frame.
 
@@ -1543,11 +1543,11 @@ Do not save any other files, and always save the visualization image and the tex
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">18/40</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">10/30</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">4</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">3</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Points/Goal</div>
@@ -1561,26 +1561,26 @@ Do not save any other files, and always save the visualization image and the tex
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 1</div>
-                    <div class="rubric-score">4/10</div>
+                    <div class="rubric-score">3/10</div>
                 </div>
                 <div class="rubric-criterion">
-                    <strong>Criterion:</strong> Overall Visualization Goal: Does the result match the ground truth X-ray visualization of the carp skeleton?
+                    <strong>Criterion:</strong> Overall Visualization Goal: Does the result match the ground truth visualization of the carp skeleton?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The ground truth shows a clear side-view full carp skeleton (head-left to tail-right) rendered in an X-ray/bone-only style on a white background. The result image instead shows a largely vertical, partial/zoomed view centered on the spine and rib rays, with the head and tail not visible in-frame. This does not match the expected overall visualization/composition.
+                    <strong>Judge's Assessment:</strong> Ground truth shows a clean volume-rendered carp skeleton in lateral view (head left, tail right) with bone-like pale/yellow coloration and the full fish framed in a single image. The result image instead shows a mostly grayscale, semi-transparent rendering with substantial soft-tissue/low-density fog and a very different camera: the fish is oriented vertically and the full skeleton is not presented in the same clear lateral overview. Overall the result does not match the intended skeleton-focused volume rendering style or viewpoint of the ground truth.
                 </div>
             </div>
          
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 2</div>
-                    <div class="rubric-score">5/10</div>
+                    <div class="rubric-score">4/10</div>
                 </div>
                 <div class="rubric-criterion">
-                    <strong>Criterion:</strong> Bone Visibility: Are the bones clearly visible with soft tissue and background suppressed, similar to the ground truth? Are thin fin rays distinguishable?
+                    <strong>Criterion:</strong> Bone Visibility: Are the bones clearly visible, similar to the ground truth? Are thin fin rays distinguishable?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> In the ground truth, bony elements (skull, vertebrae, ribs, fin rays) are distinctly visible with minimal soft tissue. In the result, the spine and many rib-like rays are visible, but there is substantial translucent soft-tissue/low-density haze throughout the body silhouette and some bones (especially fine fin rays) are not clearly isolated or are out of frame. Bone suppression/selection is only partially successful.
+                    <strong>Judge's Assessment:</strong> In the ground truth, bones are isolated strongly by the transfer function: skull, vertebrae, ribs, and fine fin rays are crisp and bright with minimal surrounding haze. In the result, the spine and many rib-like rays are visible, but they are faint/washed out due to excess transparency and remaining volumetric fog; thin fin rays are not clearly distinguishable, and contrast is much lower than in the ground truth.
                 </div>
             </div>
          
@@ -1593,27 +1593,14 @@ Do not save any other files, and always save the visualization image and the tex
                     <strong>Criterion:</strong> Skeletal Structure: Is the entire carp skeleton (head, spine, ribs, fins, tail) visible and similar in appearance to the ground truth?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The ground truth includes the complete skeletal structure: skull, spine, ribs, dorsal/pectoral/pelvic/anal region, and caudal fin rays. The result misses the full skeleton context: the skull is mostly absent/cropped, the caudal fin/tail region is not shown, and fins are not fully visible simultaneously. Therefore the full-structure requirement is largely not met.
-                </div>
-            </div>
-         
-            <div class="rubric-item">
-                <div class="rubric-header">
-                    <div class="rubric-title">Goal 4</div>
-                    <div class="rubric-score">6/10</div>
-                </div>
-                <div class="rubric-criterion">
-                    <strong>Criterion:</strong> X-ray Appearance: Does the visualization have a monochrome/grayscale X-ray appearance similar to the ground truth?
-                </div>
-                <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The result has a monochrome grayscale, radiograph-like appearance on a white background, similar in spirit to an X-ray. However, compared to the ground truth it is more like a soft-tissue radiograph with diffuse opacity rather than a bone-emphasized volume rendering; contrast and bone isolation are weaker.
+                    <strong>Judge's Assessment:</strong> Ground truth clearly shows the entire skeletal structure (skull, spine, ribs, dorsal/pectoral/pelvic/anal/caudal fin elements) in one frame with the tail and fins well resolved. The result is cropped/poorly framed (parts of the fish extend beyond the view), and the head region is not cleanly presented; fins and tail structures are not as clearly resolved as in the ground truth. The overall skeletal completeness and similarity in appearance are significantly lower.
                 </div>
             </div>
         
                 </div>
                 <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
-                    <p style="color: #666;">While the result uses a grayscale X-ray-like rendering on a white background and shows the spine/rib rays, it does not match the ground truth’s key requirements: a bone-only transfer function and an optimized viewpoint capturing the entire carp skeleton (head through tail with fins) in a single clear frame. The main issues are incorrect framing/orientation (cropped body) and insufficient suppression of soft tissue.</p>
+                    <p style="color: #666;">The result deviates substantially from the ground truth in both rendering setup and camera framing: it appears more like an X-ray style grayscale volume with significant residual soft tissue and an incorrect/less informative viewpoint. While the central spine and some rib structures are visible, bone isolation and fin-ray clarity are markedly worse, and the full skeleton is not cleanly shown in a single lateral view.</p>
                 </div>
             </div>
         </div>
@@ -1654,9 +1641,9 @@ Answer: B. ~22%
 Explanation: Measuring from the visualization, the skull extends from the anterior tip of the head to approximately the region where the pectoral fins attach. The total body length extends from the anterior tip to the end of the caudal fin. The skull represents approximately one-fifth to one-quarter of the total body length, which corresponds to roughly 22% of the total length.</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 fins identification): 10/10. The provided answer selects option C and correctly enumerates all seven fins (1 dorsal, 2 pectoral, 2 pelvic, 1 anal, 1 caudal), matching the required correct answer exactly. The accompanying anatomical descriptions (locations and pairing) are consistent with standard fish anatomy and align with the criterion.
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 fins identification): 10/10. The provided answer selects option C and correctly enumerates all seven fins (1 dorsal, 2 pectoral, 2 pelvic, 1 anal, 1 caudal), matching the required correct answer exactly. The accompanying anatomical descriptions (paired vs. unpaired fins and their approximate locations) are consistent with standard carp anatomy and align with the criterion.
 
-Criterion 2 (Q2 skull-to-body ratio): 10/10. The provided answer selects option B (~22%), which matches the required correct answer exactly. The explanation is plausible and consistent with how such a ratio would be estimated from a visualization (skull extent vs. total length including caudal fin), and it stays within the stated ~22% target.</div>
+Criterion 2 (Q2 skull-to-body length ratio): 10/10. The provided answer selects option B (~22%), which matches the required correct answer exactly. The explanation is plausible and consistent with the criterion (skull roughly one-fifth to one-quarter of total length), supporting the ~22% estimate.</div>
             </div>
         </div>
     
@@ -1667,7 +1654,7 @@ Criterion 2 (Q2 skull-to-body ratio): 10/10. The provided answer selects option 
             <div class="metrics-grid">
             <div class="metric-box">
                 <div class="metric-label">Visualization Quality</div>
-                <div class="metric-value">18/40</div>
+                <div class="metric-value">10/30</div>
             </div>
         
             <div class="metric-box">
@@ -9575,7 +9562,7 @@ Do not save any other files, and always save the visualization image.
 
         <footer class="footer">
             <p>Generated by SciVisAgentBench Evaluation Reporter</p>
-            <p>Timestamp: 2026-02-26T17:26:41.863279</p>
+            <p>Timestamp: 2026-02-26T18:09:57.198465</p>
         </footer>
     </div>
 

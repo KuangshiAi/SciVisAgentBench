@@ -532,7 +532,7 @@
             <h1>🎯 SciVisAgentBench Evaluation Report</h1>
             <div class="header-meta">
                 <span class="agent-name">chatvis</span>
-                <span class="timestamp">Generated: 2026-02-26T17:27:09.808034</span>
+                <span class="timestamp">Generated: 2026-02-26T18:09:16.306344</span>
             </div>
         </header>
 
@@ -544,10 +544,10 @@
                 <div class="summary-card">
                     <h3>Overall Score</h3>
                     <div class="value score-poor">
-                        58.9%
+                        57.4%
                     </div>
                     <div class="sub-value">
-                        1196/2030 Points
+                        1159/2020 Points
                     </div>
                 </div>
 
@@ -564,7 +564,7 @@
                 <div class="summary-card">
                     <h3>Avg Vision Score</h3>
                     <div class="value">
-                        59.7%
+                        58.2%
                     </div>
                     <div class="sub-value">
                         Visualization Quality
@@ -1464,9 +1464,9 @@ Do not save any other files, and always save the visualization image.
             <div class="case-header">
                 <div class="case-title-group">
                     <h2 class="case-title">📝 carp</h2>
-                    
+                    <span class="status-badge status-warning">⚠️ LOW SCORE</span>
                 </div>
-                <div class="case-score">63/75 (84.0%)</div>
+                <div class="case-score">26/65 (40.0%)</div>
             </div>
 
             <div class="case-content">
@@ -1487,7 +1487,7 @@ Instructions:
 
 2. Apply volume rendering to visualize the carp skeleton.
 
-3. Adjust the transfer function to highlight only the bony structures in an X-ray style (suppressing soft tissue).
+3. Adjust the transfer function to highlight only the bony structures with the original bone color.
 
 4. Optimize the viewpoint to display the full skeleton, ensuring the head, spine, and fins are all clearly visible in a single frame.
 
@@ -1543,11 +1543,11 @@ Do not save any other files, and always save the visualization image and the tex
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">38/40</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">1/30</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">4</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">3</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Points/Goal</div>
@@ -1561,59 +1561,46 @@ Do not save any other files, and always save the visualization image and the tex
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 1</div>
-                    <div class="rubric-score">10/10</div>
+                    <div class="rubric-score">1/10</div>
                 </div>
                 <div class="rubric-criterion">
-                    <strong>Criterion:</strong> Overall Visualization Goal: Does the result match the ground truth X-ray visualization of the carp skeleton?
+                    <strong>Criterion:</strong> Overall Visualization Goal: Does the result match the ground truth visualization of the carp skeleton?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The result image matches the ground-truth visualization intent: a full-body carp skeleton shown via volume-rendered, X-ray-like rendering on a white background. The overall framing (side view with head left, tail right) and the displayed anatomical content are essentially identical.
+                    <strong>Judge's Assessment:</strong> The ground truth shows a clear volume-rendered carp skeleton spanning the frame (head at left, tail at right) on a white background. The result image appears essentially blank/solid white with no visible skeleton or volume-rendered structures. Therefore, it does not match the intended visualization outcome at all.
                 </div>
             </div>
          
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 2</div>
-                    <div class="rubric-score">9/10</div>
+                    <div class="rubric-score">0/10</div>
                 </div>
                 <div class="rubric-criterion">
-                    <strong>Criterion:</strong> Bone Visibility: Are the bones clearly visible with soft tissue and background suppressed, similar to the ground truth? Are thin fin rays distinguishable?
+                    <strong>Criterion:</strong> Bone Visibility: Are the bones clearly visible, similar to the ground truth? Are thin fin rays distinguishable?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> Bones are clearly visible and soft tissue is largely suppressed, consistent with the ground truth. Thin structures (fin rays and rib-like elements) are well resolved. The only minor difference is a slightly lighter/washed appearance in places (especially around the skull/pectoral region), but it does not significantly reduce bone discernibility.
+                    <strong>Judge's Assessment:</strong> In the ground truth, bones (including fine fin rays) are visible with a pale bone-like coloration and sufficient contrast against the white background. In the result, no bony structures are visible whatsoever, so bone visibility and fin-ray distinguishability are not achieved.
                 </div>
             </div>
          
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 3</div>
-                    <div class="rubric-score">10/10</div>
+                    <div class="rubric-score">0/10</div>
                 </div>
                 <div class="rubric-criterion">
                     <strong>Criterion:</strong> Skeletal Structure: Is the entire carp skeleton (head, spine, ribs, fins, tail) visible and similar in appearance to the ground truth?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The entire skeleton is visible in one frame: skull/jaw, vertebral column, ribs/spines, dorsal fin rays, paired fins, and caudal fin rays are all present and comparably represented to the ground truth. No major anatomical region appears missing or clipped.
-                </div>
-            </div>
-         
-            <div class="rubric-item">
-                <div class="rubric-header">
-                    <div class="rubric-title">Goal 4</div>
-                    <div class="rubric-score">9/10</div>
-                </div>
-                <div class="rubric-criterion">
-                    <strong>Criterion:</strong> X-ray Appearance: Does the visualization have a monochrome/grayscale X-ray appearance similar to the ground truth?
-                </div>
-                <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The rendering has a monochrome X-ray style on white, similar to the ground truth. The primary difference is a mild beige/yellow tint rather than a purely neutral grayscale, but the overall X-ray aesthetic (high attenuation bones, low visibility background/soft tissue) is maintained.
+                    <strong>Judge's Assessment:</strong> The ground truth contains the full skeletal anatomy (skull, spine, ribs, fins, caudal fin) in a single coherent view. The result contains no visible anatomy, so none of the required skeletal structures are shown.
                 </div>
             </div>
         
                 </div>
                 <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
-                    <p style="color: #666;">The agent-generated result is an excellent match to the ground truth: correct X-ray-style volume rendering of the full carp skeleton with clear fin rays and minimal soft tissue. Minor deviation is a slightly warm tint and marginally lighter contrast in some regions, but overall the visualization goal is fully achieved.</p>
+                    <p style="color: #666;">The submitted result fails to display the carp skeleton (image is effectively empty/white). Consequently, it does not meet the overall volume-rendering goal, does not show bones or fin rays, and does not present the full skeleton anatomy comparable to the ground truth.</p>
                 </div>
             </div>
         </div>
@@ -1645,9 +1632,9 @@ Answer: A. ~15%
 Explanation: In the carp skeleton visualization, measuring from the anterior tip of the skull to the posterior edge of the operculum (gill cover) and comparing it to the total body length from head to caudal peduncle, the skull comprises approximately 15% of the total body length. This is consistent with typical carp cranial proportions, where the head region is relatively compact compared to the elongated body.</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1, /10): 10/10. The provided answer selects option C and states the correct fin count and breakdown (7 fins total: 1 dorsal, 2 pectoral, 2 pelvic, 1 anal, 1 caudal), which exactly matches the evaluation criterion.
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1): 10/10. The provided answer selects option C and correctly states there are 7 fins (1 dorsal, 2 pectoral, 2 pelvic, 1 anal, 1 caudal), matching the required correct answer exactly.
 
-Criterion 2 (Q2, /10): 0/10. The provided answer selects option A (~15%) and justifies it, but the evaluation criterion specifies option B (~22%). Since the selected ratio does not match the required correct answer, it does not meet the criterion.</div>
+Criterion 2 (Q2): 0/10. The provided answer selects option A (~15%) and justifies it, but the evaluation criterion specifies the correct answer is option B (~22%). Since the selected option and numeric estimate do not match the required correct answer, it does not meet the criterion.</div>
             </div>
         </div>
     
@@ -1658,7 +1645,7 @@ Criterion 2 (Q2, /10): 0/10. The provided answer selects option A (~15%) and jus
             <div class="metrics-grid">
             <div class="metric-box">
                 <div class="metric-label">Visualization Quality</div>
-                <div class="metric-value">38/40</div>
+                <div class="metric-value">1/30</div>
             </div>
         
             <div class="metric-box">
@@ -2068,11 +2055,11 @@ Do not save any other files, and always save the visualization image.
         </section>
     
 
-        <section class="case-section" id="climate">
+        <section class="case-section case-section-failed" id="climate">
             <div class="case-header">
                 <div class="case-title-group">
                     <h2 class="case-title">📝 climate</h2>
-                    
+                    <span class="status-badge status-failed">❌ FAILED</span>
                 </div>
                 <div class="case-score">0/55 (0.0%)</div>
             </div>
@@ -2219,11 +2206,11 @@ Do not save any other files, and always save the visualization image.
         </section>
     
 
-        <section class="case-section" id="color-blocks">
+        <section class="case-section case-section-failed" id="color-blocks">
             <div class="case-header">
                 <div class="case-title-group">
                     <h2 class="case-title">📝 color-blocks</h2>
-                    
+                    <span class="status-badge status-failed">❌ FAILED</span>
                 </div>
                 <div class="case-score">0/65 (0.0%)</div>
             </div>
@@ -3928,11 +3915,11 @@ Explanation: Lobsters typically have 8 walking legs (4 pairs of pereopods). The 
         </section>
     
 
-        <section class="case-section" id="materials">
+        <section class="case-section case-section-failed" id="materials">
             <div class="case-header">
                 <div class="case-title-group">
                     <h2 class="case-title">📝 materials</h2>
-                    
+                    <span class="status-badge status-failed">❌ FAILED</span>
                 </div>
                 <div class="case-score">0/65 (0.0%)</div>
             </div>
@@ -4088,11 +4075,11 @@ Do not save any other files, and always save the visualization image.
         </section>
     
 
-        <section class="case-section" id="mhd-magfield_streamribbon">
+        <section class="case-section case-section-failed" id="mhd-magfield_streamribbon">
             <div class="case-header">
                 <div class="case-title-group">
                     <h2 class="case-title">📝 mhd-magfield_streamribbon</h2>
-                    
+                    <span class="status-badge status-failed">❌ FAILED</span>
                 </div>
                 <div class="case-score">0/65 (0.0%)</div>
             </div>
@@ -4248,11 +4235,11 @@ Do not save any other files, and always save the visualization image.
         </section>
     
 
-        <section class="case-section" id="mhd-turbulence_pathline">
+        <section class="case-section case-section-failed" id="mhd-turbulence_pathline">
             <div class="case-header">
                 <div class="case-title-group">
                     <h2 class="case-title">📝 mhd-turbulence_pathline</h2>
-                    
+                    <span class="status-badge status-failed">❌ FAILED</span>
                 </div>
                 <div class="case-score">0/65 (0.0%)</div>
             </div>
@@ -4407,11 +4394,11 @@ Do not save any other files, and always save the visualization image.
         </section>
     
 
-        <section class="case-section" id="mhd-turbulence_pathribbon">
+        <section class="case-section case-section-failed" id="mhd-turbulence_pathribbon">
             <div class="case-header">
                 <div class="case-title-group">
                     <h2 class="case-title">📝 mhd-turbulence_pathribbon</h2>
-                    
+                    <span class="status-badge status-failed">❌ FAILED</span>
                 </div>
                 <div class="case-score">0/55 (0.0%)</div>
             </div>
@@ -6679,11 +6666,11 @@ Do not save any other files, and always save the visualization image.
         </section>
     
 
-        <section class="case-section" id="rti-velocity_streakline">
+        <section class="case-section case-section-failed" id="rti-velocity_streakline">
             <div class="case-header">
                 <div class="case-title-group">
                     <h2 class="case-title">📝 rti-velocity_streakline</h2>
-                    
+                    <span class="status-badge status-failed">❌ FAILED</span>
                 </div>
                 <div class="case-score">0/55 (0.0%)</div>
             </div>
@@ -8266,11 +8253,11 @@ Do not save any other files, and always save the visualization image.
         </section>
     
 
-        <section class="case-section" id="tgc-velocity_contour">
+        <section class="case-section case-section-failed" id="tgc-velocity_contour">
             <div class="case-header">
                 <div class="case-title-group">
                     <h2 class="case-title">📝 tgc-velocity_contour</h2>
-                    
+                    <span class="status-badge status-failed">❌ FAILED</span>
                 </div>
                 <div class="case-score">0/65 (0.0%)</div>
             </div>
@@ -9346,7 +9333,7 @@ Do not save any other files, and always save the visualization image.
 
         <footer class="footer">
             <p>Generated by SciVisAgentBench Evaluation Reporter</p>
-            <p>Timestamp: 2026-02-26T17:27:09.808034</p>
+            <p>Timestamp: 2026-02-26T18:09:16.306344</p>
         </footer>
     </div>
 
