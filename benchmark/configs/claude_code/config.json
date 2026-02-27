@@ -11,7 +11,7 @@
   "custom_system_prompt": "",
   "environment": {
     "type": "conda",
-    "name": "paraview_mcp",
+    "name": "scivis_bench",
     "packages": [
       "paraview",
       "napari",
