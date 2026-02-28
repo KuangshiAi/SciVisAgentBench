@@ -10,6 +10,7 @@ specialized MCP servers or pre-built tools.
 """
 
 import asyncio
+import json
 import subprocess
 import tempfile
 import time
@@ -61,6 +62,7 @@ class ClaudeCodeAgent(BaseAgent):
         self.preserve_workdir = config.get("preserve_workdir", False)
         self.auto_approve = config.get("auto_approve", True)  # Default to auto-approve for benchmarking
         self.custom_system_prompt = config.get("custom_system_prompt", "")
+        self.verbose = config.get("verbose", False)  # Enable real-time output streaming
 
         print(f"ClaudeCodeAgent initialized:")
         print(f"  - Model: {config.get('model', 'default')}")
@@ -68,6 +70,7 @@ class ClaudeCodeAgent(BaseAgent):
         print(f"  - Timeout: {self.timeout}s")
         print(f"  - Claude path: {self.claude_path}")
         print(f"  - Auto-approve: {self.auto_approve}")
+        print(f"  - Verbose: {self.verbose}")
         if self.custom_system_prompt:
             print(f"  - Custom prompt: {len(self.custom_system_prompt)} chars")
 
@@ -208,7 +211,7 @@ class ClaudeCodeAgent(BaseAgent):
         context = f"""{custom_prefix}You are a general-purpose coding agent with access to scientific visualization tools.
 
 Environment:
-- Python environment with packages: paraview.simple, napari, numpy, scipy, matplotlib, ttk (topology tool-kit), GROMACS - gmx (non python CLI tool)
+- Python environment with packages: paraview.simple, napari, numpy, scipy, matplotlib, vmd-python, ttk (topology tool-kit), GROMACS - gmx (non python CLI tool)
 - You can install additional packages if needed using pip
 - Working directory: {task_config.get('working_dir', 'current directory')}
 - Data directory: {task_config.get('data_dir', 'same as working directory')}
@@ -275,39 +278,198 @@ IMPORTANT: Make sure to save all output files (state files, screenshots, text fi
             # 2. Network access can be restricted via settings.json "deny": ["WebFetch", "WebSearch"]
             # 3. Run in isolated conda environment
             # 4. Monitor file system changes
-            if self.auto_approve:
-                cmd = [self.claude_path, "--dangerously-skip-permissions", prompt]
+
+            # Build command with --print flag to prevent interactive session
+            # --print makes Claude Code "print response and exit" instead of staying in interactive mode
+            # In verbose mode, use stream-json for real-time streaming output
+            if self.verbose:
+                if self.auto_approve:
+                    cmd = [self.claude_path, "--print", "--verbose", "--output-format", "stream-json",
+                           "--dangerously-skip-permissions", prompt]
+                else:
+                    cmd = [self.claude_path, "--print", "--verbose", "--output-format", "stream-json", prompt]
             else:
-                cmd = [self.claude_path, prompt]
+                if self.auto_approve:
+                    cmd = [self.claude_path, "--print", "--dangerously-skip-permissions", prompt]
+                else:
+                    cmd = [self.claude_path, "--print", prompt]
 
             print(f"Invoking Claude Code...")
             print(f"Command: {' '.join(cmd[:3] if len(cmd) > 2 else cmd[:2])}...")  # Don't print full prompt
 
             start_time = time.time()
 
-            # Run Claude Code
-            result = subprocess.run(
-                cmd,
-                cwd=str(working_dir),
-                capture_output=True,
-                text=True,
-                timeout=timeout,
-                encoding='utf-8',
-                errors='replace'
-            )
+            # Verbose mode: stream output in real-time with JSON event parsing
+            if self.verbose:
+                # Create verbose log file in working directory
+                verbose_log_path = working_dir / f"claude_code_verbose_{int(time.time())}.log"
 
-            duration = time.time() - start_time
+                print(f"\n{'='*60}")
+                print(f"CLAUDE CODE OUTPUT (streaming):")
+                print(f"Verbose log: {verbose_log_path}")
+                print(f"{'='*60}\n")
 
-            # Combine stdout and stderr for complete output
-            output = result.stdout + "\n" + result.stderr
+                output_lines = []
+                parsed_output_lines = []  # Human-readable parsed output
 
-            success = result.returncode == 0
+                process = subprocess.Popen(
+                    cmd,
+                    cwd=str(working_dir),
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                    bufsize=0,  # Unbuffered for real-time streaming
+                    encoding='utf-8',
+                    errors='replace'
+                )
+
+                # Open log file for writing
+                with open(verbose_log_path, 'w', encoding='utf-8') as log_file:
+                    log_file.write(f"Claude Code Verbose Output Log\n")
+                    log_file.write(f"Started: {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+                    log_file.write(f"Working Directory: {working_dir}\n")
+                    log_file.write(f"{'='*80}\n\n")
+
+                    # Parse and display JSON events line by line
+                    for line in process.stdout:
+                        output_lines.append(line)
+
+                        # Write raw JSON to log file
+                        log_file.write(line)
+                        log_file.flush()  # Ensure immediate write
+
+                        try:
+                            event = json.loads(line.strip())
+                            event_type = event.get("type")
+
+                            if event_type == "system":
+                                # Skip system init messages (not user-facing)
+                                parsed_output_lines.append("[System initialization]\n")
+                                continue
+
+                            elif event_type == "assistant":
+                                message = event.get("message", {})
+                                content = message.get("content", [])
+
+                                for item in content:
+                                    if item.get("type") == "text":
+                                        # Display text content
+                                        text = item.get("text", "")
+                                        if text:
+                                            print(text, flush=True)
+                                            parsed_output_lines.append(f"{text}\n")
+
+                                    elif item.get("type") == "tool_use":
+                                        # Display tool use
+                                        tool_name = item.get("name", "unknown")
+                                        tool_input = item.get("input", {})
+
+                                        # Format tool display
+                                        output_line = f"\n→ Using tool: {tool_name}\n"
+                                        print(output_line.strip(), flush=True)
+                                        parsed_output_lines.append(output_line)
+
+                                        # Show key parameters (not all, to avoid clutter)
+                                        if "command" in tool_input:
+                                            param_line = f"  Command: {tool_input['command'][:80]}\n"
+                                            print(param_line.strip(), flush=True)
+                                            parsed_output_lines.append(param_line)
+                                        elif "file_path" in tool_input:
+                                            param_line = f"  File: {tool_input['file_path']}\n"
+                                            print(param_line.strip(), flush=True)
+                                            parsed_output_lines.append(param_line)
+                                        elif "pattern" in tool_input:
+                                            param_line = f"  Pattern: {tool_input['pattern']}\n"
+                                            print(param_line.strip(), flush=True)
+                                            parsed_output_lines.append(param_line)
+
+                            elif event_type == "user":
+                                # Tool result - show abbreviated output
+                                tool_result = event.get("tool_use_result", {})
+                                stdout = tool_result.get("stdout", "")
+                                stderr = tool_result.get("stderr", "")
+
+                                if stdout:
+                                    preview = stdout[:200] + ("..." if len(stdout) > 200 else "")
+                                    output_line = f"  Output: {preview}\n"
+                                    print(output_line.strip(), flush=True)
+                                    parsed_output_lines.append(output_line)
+                                if stderr:
+                                    preview = stderr[:200] + ("..." if len(stderr) > 200 else "")
+                                    error_line = f"  Error: {preview}\n"
+                                    print(error_line.strip(), flush=True)
+                                    parsed_output_lines.append(error_line)
+
+                            elif event_type == "result":
+                                # Final result
+                                subtype = event.get("subtype", "unknown")
+                                duration_ms = event.get("duration_ms", 0)
+                                num_turns = event.get("num_turns", 0)
+
+                                result_line = f"\n{'='*60}\nCompleted: {subtype} in {duration_ms/1000:.2f}s ({num_turns} turns)\n{'='*60}\n"
+                                print(f"\n{'='*60}", flush=True)
+                                print(f"Completed: {subtype} in {duration_ms/1000:.2f}s ({num_turns} turns)", flush=True)
+                                print(f"{'='*60}\n", flush=True)
+                                parsed_output_lines.append(result_line)
+
+                        except json.JSONDecodeError:
+                            # Not valid JSON - could be stderr or error message
+                            # Print raw line
+                            if line.strip():
+                                raw_line = f"[raw] {line}"
+                                print(raw_line, end='', flush=True)
+                                parsed_output_lines.append(raw_line)
+                        except Exception as e:
+                            # Unexpected error parsing event
+                            error_msg = f"[parse error: {e}]\n"
+                            print(error_msg.strip(), flush=True)
+                            parsed_output_lines.append(error_msg)
+
+                    # Wait for process to complete
+                    process.wait(timeout=timeout)
+
+                    # Write parsed output summary to log file
+                    log_file.write(f"\n\n{'='*80}\n")
+                    log_file.write(f"PARSED OUTPUT (Human-Readable)\n")
+                    log_file.write(f"{'='*80}\n\n")
+                    log_file.writelines(parsed_output_lines)
+
+                    # Write footer
+                    log_file.write(f"\n\n{'='*80}\n")
+                    log_file.write(f"Ended: {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+                    log_file.write(f"Return Code: {process.returncode}\n")
+
+                duration = time.time() - start_time
+                output = ''.join(output_lines)  # Keep full JSON output for debugging
+                success = process.returncode == 0
+
+                print(f"\n✓ Verbose log saved to: {verbose_log_path}")
+                print(f"  Log contains both raw JSON events and parsed output")
+
+            # Non-verbose mode: capture output silently
+            else:
+                result = subprocess.run(
+                    cmd,
+                    cwd=str(working_dir),
+                    capture_output=True,
+                    text=True,
+                    timeout=timeout,
+                    encoding='utf-8',
+                    errors='replace'
+                )
+
+                duration = time.time() - start_time
+
+                # Combine stdout and stderr for complete output
+                output = result.stdout + "\n" + result.stderr
+                success = result.returncode == 0
 
             if success:
                 print(f"✓ Task completed in {duration:.2f}s")
             else:
-                print(f"✗ Task failed with return code {result.returncode}")
-                print(f"Output preview: {output[:200]}...")
+                print(f"✗ Task failed with return code {result.returncode if not self.verbose else process.returncode}")
+                if not self.verbose:
+                    print(f"Output preview: {output[:200]}...")
 
             return success, output, duration
 
