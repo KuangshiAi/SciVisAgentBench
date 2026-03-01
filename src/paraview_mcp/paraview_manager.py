@@ -1657,7 +1657,65 @@ class ParaViewManager:
         except Exception as e:
             self.logger.error(f"Error resetting camera: {str(e)}")
             return False, f"Error resetting camera: {str(e)}"
-    
+
+    def set_camera(self, position=None, focal_point=None, view_up=None):
+        """
+        Set the camera position, focal point, and view up direction.
+
+        Args:
+            position (list): Camera position as [x, y, z]. If None, position is not changed.
+            focal_point (list): Camera focal point as [x, y, z]. If None, focal point is not changed.
+            view_up (list): Camera view up direction as [x, y, z]. If None, view up is not changed.
+
+        Returns:
+            tuple: (success, message)
+        """
+        try:
+            from paraview.simple import GetActiveView, Render
+            view = GetActiveView()
+            if not view:
+                return False, "Error: No active view."
+
+            camera = view.GetActiveCamera()
+            if not camera:
+                return False, "Error: No active camera."
+
+            # Set camera position if provided
+            if position is not None:
+                if len(position) != 3:
+                    return False, "Error: Position must be a list of 3 values [x, y, z]."
+                camera.SetPosition(position[0], position[1], position[2])
+
+            # Set focal point if provided
+            if focal_point is not None:
+                if len(focal_point) != 3:
+                    return False, "Error: Focal point must be a list of 3 values [x, y, z]."
+                camera.SetFocalPoint(focal_point[0], focal_point[1], focal_point[2])
+
+            # Set view up direction if provided
+            if view_up is not None:
+                if len(view_up) != 3:
+                    return False, "Error: View up must be a list of 3 values [x, y, z]."
+                camera.SetViewUp(view_up[0], view_up[1], view_up[2])
+
+            # Render the view to apply changes
+            Render(view)
+
+            # Build success message
+            message_parts = []
+            if position is not None:
+                message_parts.append(f"position: {position}")
+            if focal_point is not None:
+                message_parts.append(f"focal point: {focal_point}")
+            if view_up is not None:
+                message_parts.append(f"view up: {view_up}")
+
+            message = "Camera set with " + ", ".join(message_parts)
+            return True, message
+
+        except Exception as e:
+            self.logger.error(f"Error setting camera: {str(e)}")
+            return False, f"Error setting camera: {str(e)}"
 
     def plot_over_line(self, point1=None, point2=None, resolution=100):
         """

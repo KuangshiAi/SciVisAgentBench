@@ -575,6 +575,33 @@ def reset_camera(padding_factor: float = 1.5) -> str:
     return message
 
 @mcp.tool()
+def set_camera(position: list[float] = None, focal_point: list[float] = None, view_up: list[float] = None) -> str:
+    """
+    Set the camera position, focal point, and view up direction.
+
+    This allows precise control over the camera viewpoint. All parameters are optional,
+    so you can set only the parameters you want to change.
+
+    Args:
+        position: Camera position as [x, y, z] coordinates. Example: [-765.09, 413.55, 487.84]
+        focal_point: Camera focal point as [x, y, z] coordinates. Example: [-22.76, 153.30, 157.32]
+        view_up: Camera view up direction as [x, y, z]. Example: [0.30, 0.95, -0.07]
+
+    Example:
+        To set all camera parameters:
+        set_camera(
+            position=[-765.09, 413.55, 487.84],
+            focal_point=[-22.76, 153.30, 157.32],
+            view_up=[0.30, 0.95, -0.07]
+        )
+
+    Returns:
+        Status message
+    """
+    success, message = pv_manager.set_camera(position, focal_point, view_up)
+    return message
+
+@mcp.tool()
 def plot_over_line(point1: list[float] = None, point2: list[float] = None, resolution: int = 100) -> str:
     """
     Create a 'Plot Over Line' filter to sample data along a line between two points.
@@ -950,6 +977,7 @@ def list_commands() -> str:
         "save_screenshot: Save a screenshot to a specified file path",
         "rotate_camera: Rotate the camera view",
         "reset_camera: Reset the camera to show all data",
+        "set_camera: Set camera position, focal point, and view up direction",
         "plot_over_line: Create a plot over line filter",
         "warp_by_vector: Warp the active source by a vector field",
         "save_paraview_state: Save the current ParaView state to a file",
