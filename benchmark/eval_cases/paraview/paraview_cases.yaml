@@ -23,6 +23,8 @@
 
         Use a white background. Render at 1024x1024.
 
+        Set the viewpoint parameters as: [-150.99, 391.75, 219.64] to position; [32.38, 120.41, 81.63] to focal point; [0.23, -0.31, 0.92] to camera up direction.
+
         Save the visualization image as "ABC/results/{agent_mode}/ABC.png".
         (Optional, but must save if use paraview) Save the paraview state as "ABC/results/{agent_mode}/ABC.pvsm".
         (Optional, but must save if use python script) Save the python script as "ABC/results/{agent_mode}/ABC.py".
@@ -84,6 +86,8 @@
 
         Use a gray-blue background (RGB: 0.329, 0.349, 0.427). Render at 1280x1280. Do not show a color bar.
 
+        Set the viewpoint parameters as: [-81.99, -141.45, 89.86] to position; [65.58, 26.29, 28.48] to focal point; [0.18, 0.20, 0.96] to camera up direction.
+
         Save the visualization image as "Bernard/results/{agent_mode}/Bernard.png".
         (Optional, but must save if use paraview) Save the paraview state as "Bernard/results/{agent_mode}/Bernard.pvsm".
         (Optional, but must save if use pvpython script) Save the python script as "Bernard/results/{agent_mode}/Bernard.py".
@@ -113,6 +117,8 @@
         Please think step by step and make sure to fulfill all the visualization goals mentioned above.
 
         Use a white background. Render at 1280x1280. Do not show a color bar or coordinate axes.
+
+        Set the viewpoint parameters as: [-765.09, 413.55, 487.84] to position; [-22.76, 153.30, 157.32] to focal point; [0.30, 0.95, -0.07] to camera up direction.
 
         Save the visualization image as "bonsai/results/{agent_mode}/bonsai.png".
         (Optional, but must save if use paraview) Save the paraview state as "bonsai/results/{agent_mode}/bonsai.pvsm".
@@ -168,7 +174,9 @@
 
         6. Use a white background. Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.
 
-        7. Save your work:
+        7. Set the viewpoint parameters as: [265.81, 1024.69, 131.23] to position; [141.24, 216.61, 243.16] to focal point; [0.99, -0.14, 0.07] to camera up direction.
+
+        8. Save your work:
         Save the visualization image as "carp/results/{agent_mode}/carp.png".
         Save the answers to the analysis questions in plain text as "carp/results/{agent_mode}/answers.txt".
         (Optional, but must save if use paraview) Save the paraview state as "carp/results/{agent_mode}/carp.pvsm".
@@ -245,6 +253,8 @@
 
         Use a white background. Render at 1280x1280.
 
+        Set the viewpoint parameters as: [435.04, -325.38, 567.82] to position; [111.64, 202.81, -21.96] to focal point; [-0.099, 0.714, 0.693] to camera up direction.
+
         Save the paraview state as "crayfish_streamline/results/{agent_mode}/crayfish_streamline.pvsm".
         Save the visualization image as "crayfish_streamline/results/{agent_mode}/crayfish_streamline.png".
         (Optional, if use python script) Save the python script as "crayfish_streamline/results/{agent_mode}/crayfish_streamline.py".
@@ -279,7 +289,9 @@
 
         4. Use a white background. Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.
 
-        5. Save your work:
+        5. Set the viewpoint parameters as: [-184.58, 109.48, -431.72] to position; [134.05, 105.62, 88.92] to focal point; [0.01, 1.0, -0.001] to camera up direction.
+
+        6. Save your work:
         Save the visualization image as "engine/results/{agent_mode}/engine.png".
         (Optional, but must save if use paraview) Save the paraview state as "engine/results/{agent_mode}/engine.pvsm".
         (Optional, but must save if use pvpython script) Save the python script as "engine/results/{agent_mode}/engine.py".
@@ -324,7 +336,9 @@
 
         3. Use a white background. Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.
 
-        4. Save your work:
+        4. Set the viewpoint parameters as: [-576.41, -264.41, -153.48] to position; [127.5, 127.5, 127.5] to focal point; [-0.52, 0.38, 0.76] to camera up direction.
+
+        5. Save your work:
         Save the visualization image as "foot/results/{agent_mode}/foot.png".
         Save the answers to the analysis questions in plain text as "foot/results/{agent_mode}/answers.txt".
         (Optional, but must save if use paraview) Save the paraview state as "foot/results/{agent_mode}/foot.pvsm".
@@ -372,7 +386,9 @@
 
         4. Use a white background. Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.
 
-        5. Save your work:
+        5. Set the viewpoint parameters as: [543.52, -957.0, 1007.87] to position; [150.0, 161.5, 38.5] to focal point; [-0.15, 0.62, 0.77] to camera up direction.
+
+        6. Save your work:
         Save the visualization image as "lobster/results/{agent_mode}/lobster.png".
         Save the answers to the analysis questions in plain text as "lobster/results/{agent_mode}/answers.txt".
         (Optional, but must save if use paraview) Save the paraview state as "lobster/results/{agent_mode}/lobster.pvsm".
@@ -402,6 +418,7 @@
         Color the stream ribbon by magnetic field magnitude using the 'Cool to Warm' colormap. Enable surface lighting with specular reflection for better 3D perception.
         Add a color bar labeled 'Magnetic Field Magnitude'.
         Use a white background. Set an isometric camera view. Render at 1024x1024 resolution.
+        Set the viewpoint parameters as: [200.0, 200.0, 200.0] to position; [63.5, 63.5, 63.5] to focal point; [0.0, 0.0, 1.0] to camera up direction.
         Save the visualization image as "mhd-magfield_streamribbon/results/{agent_mode}/mhd-magfield_streamribbon.png".
         (Optional, but must save if use paraview) Save the paraview state as "mhd-magfield_streamribbon/results/{agent_mode}/mhd-magfield_streamribbon.pvsm".
         (Optional, but must save if use pvpython script) Save the python script as "mhd-magfield_streamribbon/results/{agent_mode}/mhd-magfield_streamribbon.py".
@@ -426,7 +443,8 @@
         Compute true pathlines by tracking particles through the time-varying velocity field using the ParticlePath filter. Apply TemporalShiftScale (scale=20) and TemporalInterpolator (interval=0.5) to extend particle travel and smooth trajectories.
         Seed 26 points along a line on the z-axis at x=64, y=64 (from z=20 to z=108). Use static seeds with termination time 80.
         Render pathlines as tubes with radius 0.3. Color by velocity magnitude using the 'Viridis (matplotlib)' colormap.
-        Add a color bar for velocity magnitude. Use a white background. Set an isometric camera view. Render at 1024x1024.
+        Add a color bar for velocity magnitude. Set the viewpoint parameters as: [200.0, 200.0, 200.0] to position; [63.5, 63.5, 63.5] to focal point; [0.0, 0.0, 1.0] to camera up direction.
+        Use a white background. Set an isometric camera view. Render at 1024x1024.
         Save the visualization image as "mhd-turbulence_pathline/results/{agent_mode}/mhd-turbulence_pathline.png".
         (Optional, but must save if use paraview) Save the paraview state as "mhd-turbulence_pathline/results/{agent_mode}/mhd-turbulence_pathline.pvsm".
         (Optional, but must save if use pvpython script) Save the python script as "mhd-turbulence_pathline/results/{agent_mode}/mhd-turbulence_pathline.py".
@@ -453,6 +471,7 @@
         Create ribbon surfaces from the pathlines using the Ribbon filter with width 1.5 and a fixed default normal to prevent twisting. Apply Smooth filter (500 iterations) and generate surface normals for smooth shading.
         Set surface opacity to 0.85. Color by velocity magnitude using the 'Cool to Warm' colormap (range 0.1-0.8). Add specular highlights (0.5).
         Add a color bar for velocity magnitude. Use a white background. Set an isometric camera view. Render at 1024x1024.
+        Set the viewpoint parameters as: [200.0, 200.0, 200.0] to position; [63.5, 63.5, 63.5] to focal point; [0.0, 0.0, 1.0] to camera up direction.
         Save the visualization image as "mhd-turbulence_pathribbon/results/{agent_mode}/mhd-turbulence_pathribbon.png".
         (Optional, but must save if use paraview) Save the paraview state as "mhd-turbulence_pathribbon/results/{agent_mode}/mhd-turbulence_pathribbon.pvsm".
         (Optional, but must save if use pvpython script) Save the python script as "mhd-turbulence_pathribbon/results/{agent_mode}/mhd-turbulence_pathribbon.py".
@@ -475,6 +494,7 @@
         Generate 3D streamlines seeded from a line source along the z-axis at x=64, y=64 (from z=0 to z=127), with 50 seed points.
         Color the streamlines by velocity magnitude using the 'Turbo' colormap. Set streamline tube radius to 0.3 using the Tube filter.
         Add a color bar labeled 'Velocity Magnitude'. Use a white background. Set an isometric camera view. Render at 1024x1024.
+        Set the viewpoint parameters as: [200.0, 200.0, 200.0] to position; [63.5, 63.5, 63.5] to focal point; [0.0, 0.0, 1.0] to camera up direction.
         Save the visualization image as "mhd-turbulence_streamline/results/{agent_mode}/mhd-turbulence_streamline.png".
         (Optional, but must save if use paraview) Save the paraview state as "mhd-turbulence_streamline/results/{agent_mode}/mhd-turbulence_streamline.pvsm".
         (Optional, but must save if use pvpython script) Save the python script as "mhd-turbulence_streamline/results/{agent_mode}/mhd-turbulence_streamline.py".
@@ -588,6 +608,7 @@
         Color the arrows by velocity magnitude using the 'Viridis (matplotlib)' colormap. Use a sampling stride of 3.
         Add a color bar labeled 'Velocity Magnitude'.
         Use a white background. Set the camera to view along the negative y-axis. Render at 1024x1024.
+        Set the viewpoint parameters as: [63.5, 250.0, 63.5] to position; [63.5, 64.0, 63.5] to focal point; [0.0, 0.0, 1.0] to camera up direction.
         Save the visualization image as "rti-velocity_glyph/results/{agent_mode}/rti-velocity_glyph.png".
         (Optional, but must save if use paraview) Save the paraview state as "rti-velocity_glyph/results/{agent_mode}/rti-velocity_glyph.pvsm".
         (Optional, but must save if use pvpython script) Save the python script as "rti-velocity_glyph/results/{agent_mode}/rti-velocity_glyph.py".
@@ -613,6 +634,7 @@
         Color all three slices by velocity magnitude using the 'Turbo' colormap.
         Add a color bar labeled 'Velocity Magnitude'.
         Use a white background. Set an isometric camera view that shows all three slices. Render at 1024x1024.
+        Set the viewpoint parameters as: [200.0, 200.0, 200.0] to position; [63.5, 63.5, 63.5] to focal point; [0.0, 0.0, 1.0] to camera up direction.
         Save the visualization image as "rti-velocity_slices/results/{agent_mode}/rti-velocity_slices.png".
         (Optional, but must save if use paraview) Save the paraview state as "rti-velocity_slices/results/{agent_mode}/rti-velocity_slices.pvsm".
         (Optional, but must save if use pvpython script) Save the python script as "rti-velocity_slices/results/{agent_mode}/rti-velocity_slices.py".
@@ -635,6 +657,7 @@
         Seed 26 static points along a line on the z-axis at x=64, y=64 (from z=20 to z=108). Use StaticSeeds=True, ForceReinjectionEveryNSteps=1 (reinjection at every sub-timestep), and set TerminationTime=200.
         Render the resulting streaklines as tubes with radius 0.3. Color the tubes by velocity magnitude ("magnitude") using the 'Cool to Warm (Extended)' colormap. Add a color bar for velocity magnitude.
         Use a white background. Set an isometric camera view and render at 1024×1024.
+        Set the viewpoint parameters as: [200.0, 200.0, 200.0] to position; [63.5, 63.5, 63.5] to focal point; [0.0, 0.0, 1.0] to camera up direction.
         Save the visualization image as "rti-velocity_streakline/results/{agent_mode}/rti-velocity_streakline.png".
         (Optional, but must save if use paraview) Save the paraview state as "rti-velocity_streakline/results/{agent_mode}/rti-velocity_streakline.pvsm".
         (Optional, but must save if use pvpython script) Save the python script as "rti-velocity_streakline/results/{agent_mode}/rti-velocity_streakline.py".
@@ -655,7 +678,7 @@
     question: |
         Task:
 
-        Load the tornado dataset from "solar-plume/data/solar-plume_126x126x512_float32_scalar3.raw", the information about this dataset:
+        Load the solar plume dataset from "solar-plume/data/solar-plume_126x126x512_float32_scalar3.raw", the information about this dataset:
         solar-plume (Vector)
         Data Scalar Type: float
         Data Byte Order: little Endian
@@ -663,12 +686,14 @@
         Number of Scalar Components: 3
         Data loading is very important, make sure you correctly load the dataset according to their features.
 
-        Add a "stream tracer" filter under the tornado data to display streamline, set the "Seed type" to "Point Cloud" and set the center of point cloud to 3D position [50, 50, 320] with a radius 30, then hide the point cloud sphere.
+        Add a "stream tracer" filter under the solar plume data to display streamline, set the "Seed type" to "Point Cloud" and set the center of point cloud to 3D position [50, 50, 320] with a radius 30, then hide the point cloud sphere.
 
         Add a "tube" filter under the "stream tracer" filter to enhance the streamline visualization. Set the radius to 0.5. In the pipeline browser panel, hide everything except the "tube" filter.
 
 
         Please think step by step and make sure to fulfill all the visualization goals mentioned above.
+
+        Set the viewpoint parameters as: [62.51, -984.78, 255.45] to position; [62.51, 62.46, 255.45] to focal point; [0, 0, 1] to camera up direction.
 
         Use a white background. Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.
 
@@ -707,6 +732,8 @@
         Please think step by step and make sure to fulfill all the visualization goals mentioned above. Only make the two isosurfaces visible.
 
         Use a white background. Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.
+
+        Set the viewpoint parameters as: [567.97, 80.17, 167.28] to position; [125.09, 108.83, 121.01] to focal point; [-0.11, -0.86, 0.50] to camera up direction.
 
         Save the visualization image as "supernova_isosurface/results/{agent_mode}/supernova_isosurface.png".
         (Optional, but must save if use paraview) Save the paraview state as "supernova_isosurface/results/{agent_mode}/supernova_isosurface.pvsm".
@@ -749,6 +776,8 @@
 
         Use a white background. Render at 1280x1280.
 
+        Set the viewpoint parameters as: [41.38, 73.91, -282.0] to position; [49.45, 49.50, 49.49] to focal point; [0.01, 1.0, 0.07] to camera up direction.
+
         Save the visualization image as "supernova_streamline/results/{agent_mode}/supernova_streamline.png".
         (Optional, but must save if use paraview) Save the paraview state as "supernova_streamline/results/{agent_mode}/supernova_streamline.pvsm".
         (Optional, but must save if use pvpython script) Save the python script as "supernova_streamline/results/{agent_mode}/supernova_streamline.py".
@@ -785,6 +814,8 @@
 
         Use a white background. Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.
 
+        Set the viewpoint parameters as: [372.27, 278.87, 214.44] to position; [169.85, 76.46, 12.02] to focal point; [-0.41, 0.82, -0.41] to camera up direction.
+
         Save the visualization image as "tangaroa_streamribbon/results/{agent_mode}/tangaroa_streamribbon.png".
         (Optional, but must save if use paraview) Save the paraview state as "tangaroa_streamribbon/results/{agent_mode}/tangaroa_streamribbon.pvsm".
         (Optional, but must save if use pvpython script) Save the python script as "tangaroa_streamribbon/results/{agent_mode}/tangaroa_streamribbon.py".
@@ -810,6 +841,7 @@
         Also add contour lines of velocity magnitude on the same slice at values [0.3, 0.6, 0.9, 1.2] using the Contour filter on the slice output.
         Display contour lines in white. Add a color bar labeled 'Velocity Magnitude'.
         Light gray background (RGB: 0.9, 0.9, 0.9). Top-down camera. Render at 1024x1024.
+        Set the viewpoint parameters as: [31.5, 31.5, 100.0] to position; [31.5, 31.5, 32.0] to focal point; [0.0, 1.0, 0.0] to camera up direction.
         Save the visualization image as "tgc-velocity_contour/results/{agent_mode}/tgc-velocity_contour.png".
         (Optional, but must save if use paraview) Save the paraview state as "tgc-velocity_contour/results/{agent_mode}/tgc-velocity_contour.pvsm".
         (Optional, but must save if use pvpython script) Save the python script as "tgc-velocity_contour/results/{agent_mode}/tgc-velocity_contour.py".
@@ -845,6 +877,7 @@
         Add an "Outline" filter to display the dataset bounding box (black).
 
         Use a white background (RGB: 1.0, 1.0, 1.0). Find an optimal view. Render at 1280x1280. Show both color bar and coordinate axes.
+        Set the viewpoint parameters as: [142.01, -36.46, 93.96] to position; [31.5, 31.5, 31.5] to focal point; [-0.35, 0.25, 0.90] to camera up direction.
         Save the visualization image as "tornado/results/{agent_mode}/tornado.png".
         (Optional, but must save if use paraview) Save the paraview state as "tornado/results/{agent_mode}/tornado.pvsm".
         (Optional, but must save if use pvpython script) Save the python script as "tornado/results/{agent_mode}/tornado.py".
@@ -879,6 +912,7 @@
         In the pipeline browser panel, hide all stream tracers and only show the ribbon filters and the outline.
 
         Use a white background (RGB: 1.0, 1.0, 1.0). Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.
+        Set the viewpoint parameters as: [30.51, -154.18, 144.99] to position; [30.51, 31.5, 30.91] to focal point; [0.0, 0.53, 0.85] to camera up direction.
         Save the visualization image as "twoswirls_streamribbon/results/{agent_mode}/twoswirls_streamribbon.png".
         (Optional, but must save if use paraview) Save the paraview state as "twoswirls_streamribbon/results/{agent_mode}/twoswirls_streamribbon.pvsm".
         (Optional, but must save if use pvpython script) Save the python script as "twoswirls_streamribbon/results/{agent_mode}/twoswirls_streamribbon.py".
@@ -918,7 +952,9 @@
 
         6. Use a white background. Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.
 
-        7. Save your work:
+        7. Set the viewpoint parameters as: [308.85, 308.85, 308.85] to position; [63.5, 63.5, 63.5] to focal point; [-0.41, 0.82, -0.41] to camera up direction.
+
+        8. Save your work:
         Save the visualization image as "vortex/results/{agent_mode}/vortex.png".
         (Optional, but must save if use paraview) Save the paraview state as "vortex/results/{agent_mode}/vortex.pvsm".
         (Optional, but must save if use pvpython script) Save the python script as "vortex/results/{agent_mode}/vortex.py".

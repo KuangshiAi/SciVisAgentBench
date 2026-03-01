@@ -148,6 +148,8 @@ class EvaluationReporter:
         psnr_values = []
         ssim_values = []
         lpips_values = []
+        total_vision_score = 0
+        total_vision_max_score = 0
 
         for result in results:
             eval_data = result.get('evaluation', {})
@@ -158,18 +160,38 @@ class EvaluationReporter:
             case_max_score = scores.get('max_possible_score', 0) if scores else 0
             max_score += case_max_score
 
-            # For completed cases, add their earned scores and collect metrics
+            # Collect vision scores from ALL cases (including failed ones with 0 score)
+            # This ensures the average accounts for failures
+            subtype_results = eval_data.get('subtype_results', {})
+            if 'vision' in subtype_results:
+                vision_data = subtype_results['vision']
+
+                # Get visualization_quality score (the actual vision score, not including output/efficiency)
+                detailed_scores = vision_data.get('detailed_scores', {})
+                viz_quality = detailed_scores.get('visualization_quality', {})
+                viz_score = viz_quality.get('score', 0)
+                viz_max = viz_quality.get('max_score', 0)
+
+                # Calculate percentage for this case
+                vision_percentage = (viz_score / viz_max * 100) if viz_max > 0 else 0
+                vision_scores.append(vision_percentage)
+
+                # Accumulate total vision scores for display (visualization_quality only)
+                total_vision_score += viz_score
+                total_vision_max_score += viz_max
+
+            # Code scores from ALL cases
+            if 'code' in subtype_results:
+                code_data = subtype_results['code']
+                code_scores.append(code_data.get('scores', {}).get('percentage', 0))
+
+            # For completed cases, add their earned scores and collect image metrics
             if eval_data.get('status') == 'completed':
                 total_score += scores.get('total_score', 0) if scores else 0
-            # For failed cases, total_score should already be 0 (or we don't add anything)
-            # This ensures failed cases contribute 0/{max_possible_score} to the overall score
 
-                # Vision scores
-                subtype_results = eval_data.get('subtype_results', {})
+                # Image metrics - only from completed cases
                 if 'vision' in subtype_results:
                     vision_data = subtype_results['vision']
-                    vision_scores.append(vision_data.get('scores', {}).get('percentage', 0))
-
                     # Image metrics - exclude infinite PSNR values
                     image_metrics = vision_data.get('image_metrics', {}).get('averaged_metrics', {})
                     if image_metrics.get('psnr') is not None:
@@ -181,11 +203,6 @@ class EvaluationReporter:
                         ssim_values.append(image_metrics['ssim'])
                     if image_metrics.get('lpips') is not None:
                         lpips_values.append(image_metrics['lpips'])
-
-                # Code scores
-                if 'code' in subtype_results:
-                    code_data = subtype_results['code']
-                    code_scores.append(code_data.get('scores', {}).get('percentage', 0))
 
         # Compute average metrics (non-scaled)
         avg_psnr = sum(psnr_values) / len(psnr_values) if psnr_values else None
@@ -208,6 +225,8 @@ class EvaluationReporter:
             'overall_percentage': (total_score / max_score * 100) if max_score > 0 else 0,
             'avg_vision_score': sum(vision_scores) / len(vision_scores) if vision_scores else 0,
             'avg_code_score': sum(code_scores) / len(code_scores) if code_scores else 0,
+            'total_vision_score': total_vision_score,
+            'total_vision_max_score': total_vision_max_score,
             'avg_psnr': avg_psnr,
             'avg_ssim': avg_ssim,
             'avg_lpips': avg_lpips,
@@ -340,6 +359,25 @@ class EvaluationReporter:
                 # Also mark evaluation status as failed
                 if 'evaluation' in result:
                     result['evaluation']['status'] = 'failed'
+                    # Set vision subtype scores to 0 if present
+                    subtype_results = result['evaluation'].get('subtype_results', {})
+                    if 'vision' in subtype_results:
+                        vision_data = subtype_results['vision']
+                        if 'scores' in vision_data and vision_data['scores']:
+                            vision_data['scores']['total_score'] = 0
+                            vision_data['scores']['percentage'] = 0.0
+                        # Set ALL detailed scores to 0
+                        detailed_scores = vision_data.get('detailed_scores', {})
+                        if 'visualization_quality' in detailed_scores:
+                            detailed_scores['visualization_quality']['score'] = 0
+                        if 'output_generation' in detailed_scores:
+                            detailed_scores['output_generation']['score'] = 0
+                        if 'efficiency' in detailed_scores:
+                            efficiency = detailed_scores['efficiency']
+                            if 'execution_time' in efficiency:
+                                efficiency['execution_time']['score'] = 0
+                            if 'token_usage' in efficiency:
+                                efficiency['token_usage']['score'] = 0
 
             # Try to find and copy ground truth images
             gt_img_found = False
@@ -431,6 +469,96 @@ class EvaluationReporter:
                     result['evaluation']['scores']['total_score'] = 0
                     result['evaluation']['scores']['percentage'] = 0.0
 
+                # Set vision subtype scores to 0 if present
+                subtype_results = result['evaluation'].get('subtype_results', {})
+                if 'vision' in subtype_results:
+                    vision_data = subtype_results['vision']
+                    if 'scores' in vision_data and vision_data['scores']:
+                        vision_data['scores']['total_score'] = 0
+                        vision_data['scores']['percentage'] = 0.0
+                    # Set ALL detailed scores to 0
+                    detailed_scores = vision_data.get('detailed_scores', {})
+                    if 'visualization_quality' in detailed_scores:
+                        detailed_scores['visualization_quality']['score'] = 0
+                    if 'output_generation' in detailed_scores:
+                        detailed_scores['output_generation']['score'] = 0
+                    if 'efficiency' in detailed_scores:
+                        efficiency = detailed_scores['efficiency']
+                        if 'execution_time' in efficiency:
+                            efficiency['execution_time']['score'] = 0
+                        if 'token_usage' in efficiency:
+                            efficiency['token_usage']['score'] = 0
+
+    def mark_low_vision_score_as_failure(self, results: List[Dict[str, Any]]):
+        """Mark cases with very low vision evaluation scores (<= 10% of max score) as failures."""
+        for result in results:
+            case_name = result.get('case_name', 'unknown')
+            eval_data = result.get('evaluation', {})
+
+            # Skip if already failed (check both top-level and evaluation status)
+            if result.get('status') == 'failed' or eval_data.get('status') == 'failed':
+                continue
+
+            # Check if this case has vision evaluation
+            subtype_results = eval_data.get('subtype_results', {})
+            if 'vision' not in subtype_results:
+                continue
+
+            vision_data = subtype_results['vision']
+
+            # Get the visualization_quality score from detailed_scores (this is the LLM judge score)
+            detailed_scores = vision_data.get('detailed_scores', {})
+            if 'visualization_quality' not in detailed_scores:
+                continue
+
+            viz_quality = detailed_scores['visualization_quality']
+            viz_score = viz_quality.get('score', 0)
+            viz_max_score = viz_quality.get('max_score', 0)
+
+            # Skip if viz_max_score is 0 to avoid division by zero
+            if viz_max_score == 0:
+                continue
+
+            # Calculate the threshold (10% of max score)
+            threshold = 0.1 * viz_max_score
+
+            # Mark as failure if vision visualization_quality score is <= 10% of max score
+            if viz_score <= threshold:
+                print(f"   ⚠️  {case_name}: vision quality score {viz_score}/{viz_max_score} (<= 10%), marking as failure")
+                result['low_vision_score'] = True
+
+                # Update both top-level and evaluation-level status for consistency
+                result['status'] = 'failed'
+                result['evaluation']['status'] = 'failed'
+
+                # Set error message
+                error_msg = f"Vision evaluation score too low: {viz_score}/{viz_max_score} (<= 10% threshold)"
+                if not result.get('error'):
+                    result['error'] = error_msg
+                else:
+                    result['error'] = f"{result['error']}; {error_msg}"
+
+                # Set total score and percentage to 0 (ensure scores structure exists)
+                if 'evaluation' in result and 'scores' in result['evaluation'] and result['evaluation']['scores']:
+                    result['evaluation']['scores']['total_score'] = 0
+                    result['evaluation']['scores']['percentage'] = 0.0
+
+                # Also set vision subtype scores to 0
+                if 'vision' in subtype_results and 'scores' in vision_data and vision_data['scores']:
+                    vision_data['scores']['total_score'] = 0
+                    vision_data['scores']['percentage'] = 0.0
+                # Set ALL detailed scores to 0
+                if 'visualization_quality' in detailed_scores:
+                    detailed_scores['visualization_quality']['score'] = 0
+                if 'output_generation' in detailed_scores:
+                    detailed_scores['output_generation']['score'] = 0
+                if 'efficiency' in detailed_scores:
+                    efficiency = detailed_scores['efficiency']
+                    if 'execution_time' in efficiency:
+                        efficiency['execution_time']['score'] = 0
+                    if 'token_usage' in efficiency:
+                        efficiency['token_usage']['score'] = 0
+
     def generate_report(self) -> Path:
         """Generate the HTML report."""
         # Load all data
@@ -454,6 +582,9 @@ class EvaluationReporter:
 
         print("   Checking for cases with no visualization output...")
         self.mark_no_visualization_as_failure(results, yaml_cases)
+
+        print("   Checking for cases with very low vision evaluation scores...")
+        self.mark_low_vision_score_as_failure(results)
 
         # Recompute summary statistics after marking failures
         print("   Recomputing summary statistics with updated scores...")

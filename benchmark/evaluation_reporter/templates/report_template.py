@@ -657,6 +657,9 @@ def generate_summary_section(
                     <div class="sub-value">
                         Visualization Quality
                     </div>
+                    <div class="sub-value">
+                        {summary['total_vision_score']:.0f}/{summary['total_vision_max_score']:.0f}
+                    </div>
                 </div>
 
                 <div class="summary-card">
