@@ -44,6 +44,11 @@ class EvaluationReporter:
         self.config = config
         self.output_dir = output_dir
 
+        # Clean up output directory before generating new report
+        if self.output_dir.exists():
+            print(f"   Cleaning up existing output directory: {self.output_dir}")
+            shutil.rmtree(self.output_dir)
+
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
     def load_test_results(self) -> List[Dict[str, Any]]:
