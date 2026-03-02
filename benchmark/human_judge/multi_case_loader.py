@@ -45,7 +45,7 @@ class MultiCaseLoader:
 
     def _load_cases_config(self) -> List[Dict[str, str]]:
         """Load case configurations from YAML file."""
-        with open(self.cases_yaml_path, 'r') as f:
+        with open(self.cases_yaml_path, 'r', encoding='utf-8') as f:
             data = yaml.safe_load(f)
 
         if not isinstance(data, dict) or 'cases' not in data:
@@ -79,7 +79,7 @@ class MultiCaseLoader:
                 print(f"Warning: YAML file not found: {yaml_path}")
                 continue
 
-            with open(full_path, 'r') as f:
+            with open(full_path, 'r', encoding='utf-8') as f:
                 test_cases = yaml.safe_load(f)
 
             if not isinstance(test_cases, list):
@@ -194,47 +194,39 @@ class MultiCaseLoader:
         if not gs_dir.exists():
             return []
 
-        if benchmark_type == "chatvis_bench":
-            # ChatVis: prefer MP4 video for temporal cases
-            # Check for MP4 first (web-friendly video)
-            gs_video_mp4 = gs_dir / f"{case_name}_gs.mp4"
-            if gs_video_mp4.exists():
-                return [gs_video_mp4]
-
-            # Fall back to PNG snapshot
-            gs_images = list(gs_dir.glob("*_gs.png"))
-            if gs_images:
-                return gs_images[:1]
-
-            # Last resort: AVI (likely won't play in browser)
-            gs_video_avi = gs_dir / f"{case_name}_gs.avi"
-            if gs_video_avi.exists():
-                return [gs_video_avi]
-
-            return []
-
-        # Main benchmark: check for 3-view format first
-        gs_patterns = ["gs_front_view.png", "gs_side_view.png", "gs_diagonal_view.png"]
-        gs_images = []
-
-        for pattern in gs_patterns:
-            gs_path = gs_dir / pattern
-            if gs_path.exists():
-                gs_images.append(gs_path)
-
-        # If we have all 3 views, return them
-        if len(gs_images) == 3:
-            return gs_images
-
-        # Otherwise, check for single image format: {case_name}_gs.png
+        # Look for single image format: {case_name}_gs.png
         single_gs_path = gs_dir / f"{case_name}_gs.png"
         if single_gs_path.exists():
             return [single_gs_path]
 
-        return gs_images
+        return []
 
-    def _get_result_images(self, case_dir: Path, case_name: str, benchmark_type: str, gs_images: List[Path]) -> List[Path]:
+    def _get_result_images(self, case_dir: Path, case_name: str, benchmark_type: str, gs_images: List[Path], agent_mode: str = None) -> List[Path]:
         """Get result images/videos for a case."""
+        # If agent_mode is specified, try that directory first
+        if agent_mode:
+            result_dir = case_dir / "results" / agent_mode
+            if result_dir.exists():
+                # Check for PNG first (most common)
+                png_file = result_dir / f"{case_name}.png"
+                if png_file.exists():
+                    return [png_file]
+
+                # Check for MP4 video
+                mp4_file = result_dir / f"{case_name}.mp4"
+                if mp4_file.exists():
+                    return [mp4_file]
+
+                # Check for AVI video
+                avi_file = result_dir / f"{case_name}.avi"
+                if avi_file.exists():
+                    return [avi_file]
+
+                # Check for any PNG files in the directory
+                png_files = list(result_dir.glob("*.png"))
+                if png_files:
+                    return [png_files[0]]
+
         if benchmark_type == "chatvis_bench":
             # ChatVis: prefer MP4 video for temporal cases
             # Try agent_mode directories first (e.g., chatvis_claude-sonnet-4-5_exp1), then fall back to pvpython
@@ -340,6 +332,7 @@ class MultiCaseLoader:
             case_path = case_config['path']
             yaml_path = case_config['yaml']
             description = case_config.get('description', '')
+            agent_mode = case_config.get('agent_mode', None)
 
             # Get case directory
             case_dir = self.workspace_root / case_path
@@ -365,8 +358,8 @@ class MultiCaseLoader:
             # Get ground truth images
             gt_images = self._get_ground_truth_images(case_dir, case_name, benchmark_type)
 
-            # Get result images
-            result_images = self._get_result_images(case_dir, case_name, benchmark_type, gt_images)
+            # Get result images (using agent_mode if specified)
+            result_images = self._get_result_images(case_dir, case_name, benchmark_type, gt_images, agent_mode)
 
             evaluation_data.append({
                 "case_index": i,

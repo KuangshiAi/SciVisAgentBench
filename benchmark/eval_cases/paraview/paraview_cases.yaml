@@ -84,7 +84,7 @@
 
         In the pipeline browser panel, hide all stream tracers and only show the tube filters.
 
-        Use a gray-blue background (RGB: 0.329, 0.349, 0.427). Render at 1280x1280. Do not show a color bar.
+        Use a white background. Render at 1280x1280. Do not show a color bar.
 
         Set the viewpoint parameters as: [-81.99, -141.45, 89.86] to position; [65.58, 26.29, 28.48] to focal point; [0.18, 0.20, 0.96] to camera up direction.
 

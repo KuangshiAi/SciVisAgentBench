@@ -1,0 +1,124 @@
+# Selected 15 Cases for Human Evaluation
+# These cases represent diverse visualization capabilities across the benchmark
+#
+# Each case specifies:
+#   - name: The case directory name
+#   - path: Path to the case directory (relative to workspace root)
+#   - yaml: Path to the YAML file containing evaluation criteria
+#   - description: Brief description of what the case tests
+
+cases:
+  - name: argon-bubble
+    path: SciVisAgentBench-tasks/paraview/argon-bubble
+    yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
+    description: Color & Opacity Mapping, Volume Rendering
+    agent_mode: paraview_mcp_claude-sonnet-4-5_exp1
+
+  - name: richtmyer
+    path: SciVisAgentBench-tasks/paraview/richtmyer
+    yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
+    description: Color & Opacity Mapping, Volume Rendering
+    agent_mode: paraview_mcp_claude-sonnet-4-5_exp1
+
+  - name: foot
+    path: SciVisAgentBench-tasks/paraview/foot
+    yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
+    description: Volume Rendering
+    agent_mode: paraview_mcp_claude-sonnet-4-5_exp1
+
+  - name: crayfish_streamline
+    path: SciVisAgentBench-tasks/paraview/crayfish_streamline
+    yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
+    description: Temporal Processing (Streamline)
+    agent_mode: chatvis_claude-sonnet-4-5_exp1
+
+  - name: twoswirls_streamribbon
+    path: SciVisAgentBench-tasks/paraview/twoswirls_streamribbon
+    yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
+    description: Temporal Processing (Streamribbon)
+    agent_mode: chatvis_claude-sonnet-4-5_exp1
+
+  - name: tornado
+    path: SciVisAgentBench-tasks/paraview/tornado
+    yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
+    description: Glyph & Marker Placement
+    agent_mode: chatvis_claude-sonnet-4-5_exp1
+
+  - name: tgc-velocity_contour
+    path: SciVisAgentBench-tasks/paraview/tgc-velocity_contour
+    yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
+    description: Surface & Contour Extraction
+    agent_mode: paraview_mcp_claude-sonnet-4-5_exp1
+
+  - name: rti-velocity_slices
+    path: SciVisAgentBench-tasks/paraview/rti-velocity_slices
+    yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
+    description: View & Camera Control, Data Subsetting & Extraction
+    agent_mode: paraview_mcp_claude-sonnet-4-5_exp1
+
+  - name: rti-velocity_glyph
+    path: SciVisAgentBench-tasks/paraview/rti-velocity_glyph
+    yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
+    description: xxx
+    agent_mode: chatvis_claude-sonnet-4-5_exp1
+
+  - name: supernova_isosurface
+    path: SciVisAgentBench-tasks/paraview/supernova_isosurface
+    yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
+    description: Surface & Contour Extraction (isosurface)
+    agent_mode: chatvis_claude-sonnet-4-5_exp1
+
+  - name: time-varying
+    path: SciVisAgentBench-tasks/paraview/time-varying
+    yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
+    description: Temporal Processing
+    agent_mode: chatvis_claude-sonnet-4-5_exp1
+
+  - name: chart-opacity
+    path: SciVisAgentBench-tasks/paraview/chart-opacity
+    yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
+    description: Plot & Chart Generation
+    agent_mode: chatvis_claude-sonnet-4-5_exp1
+
+  - name: climate
+    path: SciVisAgentBench-tasks/paraview/climate
+    yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
+    description: Field Computation
+    agent_mode: chatvis_claude-sonnet-4-5_exp1
+
+  - name: subseries-of-time-series
+    path: SciVisAgentBench-tasks/paraview/subseries-of-time-series
+    yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
+    description: Dataset Restructuring
+    agent_mode: chatvis_claude-sonnet-4-5_exp1
+
+  - name: shrink-sphere
+    path: SciVisAgentBench-tasks/paraview/shrink-sphere
+    yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
+    description: Geometric & Topological Transformation
+    agent_mode: chatvis_claude-sonnet-4-5_exp1
+
+  - name: import-gltf
+    path: SciVisAgentBench-tasks/paraview/import-gltf
+    yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
+    description: xxx
+    agent_mode: paraview_mcp_claude-sonnet-4-5_exp1
+  
+  - name: render-histogram
+    path: SciVisAgentBench-tasks/paraview/render-histogram
+    yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
+    description: xxx
+    agent_mode: paraview_mcp_claude-sonnet-4-5_exp1
+
+  # From molecular_vis/workflows (2 cases)
+  - name: curved-membrane
+    path: SciVisAgentBench-tasks/molecular_vis/workflows/curved-membrane
+    yaml: benchmark/eval_cases/molecular_vis/workflows/eval_analysis_workflows.yaml
+    description: Data Subsetting & Extraction
+    agent_mode: chatvis_claude-sonnet-4-5_exp1
+
+  - name: ras-raf-membrane
+    path: SciVisAgentBench-tasks/molecular_vis/workflows/ras-raf-membrane
+    yaml: benchmark/eval_cases/molecular_vis/workflows/eval_analysis_workflows.yaml
+    description: View & Camera Control
+    agent_mode: chatvis_claude-sonnet-4-5_exp1

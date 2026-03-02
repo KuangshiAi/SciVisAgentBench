@@ -33,7 +33,7 @@ Evaluate cases from multiple benchmarks using a single comprehensive YAML file:
 
 ```bash
 python -m benchmark.human_judge.run_human_eval \
-    --cases-yaml benchmark/eval_cases/selected_15_cases.yaml \
+    --cases-yaml benchmark/eval_cases/selected_cases.yaml \
     --port 8081
 ```
 
@@ -98,7 +98,7 @@ For online deployment with multi-user support and real-time data sync:
 ```bash
 # 1. Generate static site
 python -m benchmark.human_judge.generate_static_site \
-    --cases-yaml benchmark/eval_cases/selected_15_cases.yaml \
+    --cases-yaml benchmark/eval_cases/selected_cases.yaml \
     --output-dir benchmark/human_judge/firebase_deploy
 
 # 2. Deploy to Firebase
