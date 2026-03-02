@@ -193,6 +193,18 @@
             transform: translateY(-2px);
         }
 
+        .case-link-failed {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+        }
+
+        .case-link-failed:hover {
+            background: #dc2626;
+            color: white;
+            border-color: #dc2626;
+        }
+
         .case-section {
             padding: 40px;
             border-bottom: 3px solid #f3f4f6;
@@ -200,6 +212,12 @@
 
         .case-section:last-child {
             border-bottom: none;
+        }
+
+        .case-section-failed {
+            background: #fef2f2;
+            border-left: 5px solid #dc2626;
+            border-bottom: 3px solid #fca5a5;
         }
 
         .case-header {
@@ -514,7 +532,7 @@
             <h1>🎯 SciVisAgentBench Evaluation Report</h1>
             <div class="header-meta">
                 <span class="agent-name">bioimage_agent</span>
-                <span class="timestamp">Generated: 2026-02-18T16:58:43.478108</span>
+                <span class="timestamp">Generated: 2026-03-02T11:04:16.179772</span>
             </div>
         </header>
 
@@ -526,10 +544,10 @@
                 <div class="summary-card">
                     <h3>Overall Score</h3>
                     <div class="value score-poor">
-                        40.0%
+                        48.6%
                     </div>
                     <div class="sub-value">
-                        14/35 Points
+                        17/35 Points
                     </div>
                 </div>
 
@@ -546,20 +564,13 @@
                 <div class="summary-card">
                     <h3>Avg Vision Score</h3>
                     <div class="value">
-                        40.0%
+                        30.0%
                     </div>
                     <div class="sub-value">
                         Visualization Quality
                     </div>
-                </div>
-
-                <div class="summary-card">
-                    <h3>Avg Code Similarity</h3>
-                    <div class="value">
-                        0.0%
-                    </div>
                     <div class="sub-value">
-                        Code Quality Match
+                        6/20
                     </div>
                 </div>
 
@@ -632,11 +643,11 @@
                     </div>
                     <div class="config-item">
                         <label>Input Price</label>
-                        <value>$0.80</value>
+                        <value>$3.00</value>
                     </div>
                     <div class="config-item">
                         <label>Output Price</label>
-                        <value>$4.00</value>
+                        <value>$15.00</value>
                     </div>
                 </div>
             </div>
@@ -657,7 +668,7 @@
                     <h2 class="case-title">📝 operation_1</h2>
                     <span class="status-badge status-warning">⚠️ LOW SCORE</span>
                 </div>
-                <div class="case-score">14/35 (40.0%)</div>
+                <div class="case-score">17/35 (48.6%)</div>
             </div>
 
             <div class="case-content">
@@ -700,7 +711,7 @@
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">0/20</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">6/20</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
@@ -718,33 +729,33 @@
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 1</div>
-                    <div class="rubric-score">0/10</div>
+                    <div class="rubric-score">2/10</div>
                 </div>
                 <div class="rubric-criterion">
                     <strong>Criterion:</strong> Does the result rendering look similar to ground truth?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The ground truth shows a clearly identifiable 3D tooth-like surface rendering centered on a black background, with smooth shading and specular highlights. The result image instead shows a flat, noisy/pebbled texture filling the frame (no discernible tooth geometry, silhouette, or comparable lighting). Overall composition, subject, and rendering style do not match at all.
+                    <strong>Judge's Assessment:</strong> The ground truth shows a centered, upright tooth-like structure (crown on top, two roots downward) with a mostly vertical orientation and full object visible. The result image shows the object rotated to a near-horizontal, extreme close-up perspective where the crown fills most of the frame and the roots are largely not visible. Because the viewpoint, framing, and overall composition differ strongly, the rendering does not look similar to the ground truth.
                 </div>
             </div>
          
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 2</div>
-                    <div class="rubric-score">0/10</div>
+                    <div class="rubric-score">4/10</div>
                 </div>
                 <div class="rubric-criterion">
                     <strong>Criterion:</strong> Does the visualization show the target structure clearly?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> In the ground truth, the target structure (tooth) is clearly visible with a distinct outline and recognizable features (crown and roots). In the result, there is no clear target structure—only a granular texture pattern—so the intended anatomical/3D structure is not shown or is completely obscured.
+                    <strong>Judge's Assessment:</strong> In the ground truth, the entire tooth including both roots is clearly visible and distinguishable, making the target structure easy to interpret. In the result, surface shading is reasonable and the crown morphology is visible, but the zoomed-in, sideways view truncates/obscures the overall tooth form (especially the roots), reducing structural clarity compared to the ground truth.
                 </div>
             </div>
         
                 </div>
                 <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
-                    <p style="color: #666;">The result visualization does not resemble the ground truth and fails to display the target 3D structure. Both visual similarity and structural clarity are not achieved.</p>
+                    <p style="color: #666;">The result uses a similar grayscale, glossy rendering style on a black background, but the camera pose and scale are significantly different from the ground truth. The target anatomy is only partially clear because the rendering is too close and oriented differently, hiding key parts of the structure.</p>
                 </div>
             </div>
         </div>
@@ -758,7 +769,7 @@
             <div class="metrics-grid">
             <div class="metric-box">
                 <div class="metric-label">Visualization Quality</div>
-                <div class="metric-value">0/20</div>
+                <div class="metric-value">6/20</div>
             </div>
         
             <div class="metric-box">
@@ -768,28 +779,32 @@
         
             <div class="metric-box">
                 <div class="metric-label">Efficiency</div>
-                <div class="metric-value">9/10</div>
+                <div class="metric-value">6/10</div>
                 <div class="metric-subvalue">
-                    Completed in 21.19 seconds (very good)
+                    Completed in 80.97 seconds (very good)
                 </div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">7,435</div>
+                <div class="metric-value">369,786</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">39</div>
+                <div class="metric-value">3,196</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">7,474</div>
+                <div class="metric-value">372,982</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Cost</div>
+                <div class="metric-value">$1.1573</div>
             </div>
         </div>
-            
         </div>
     
             </div>
@@ -798,7 +813,7 @@
 
         <footer class="footer">
             <p>Generated by SciVisAgentBench Evaluation Reporter</p>
-            <p>Timestamp: 2026-02-18T16:58:43.478108</p>
+            <p>Timestamp: 2026-03-02T11:04:16.179772</p>
         </footer>
     </div>
 

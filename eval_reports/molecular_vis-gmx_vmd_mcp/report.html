@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evaluation Report - gmx_vmd_mcp</title>
+    <title>Evaluation Report - gmx_vmd_mcp_agent</title>
     <style>
         
         * {
@@ -193,6 +193,18 @@
             transform: translateY(-2px);
         }
 
+        .case-link-failed {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+        }
+
+        .case-link-failed:hover {
+            background: #dc2626;
+            color: white;
+            border-color: #dc2626;
+        }
+
         .case-section {
             padding: 40px;
             border-bottom: 3px solid #f3f4f6;
@@ -200,6 +212,12 @@
 
         .case-section:last-child {
             border-bottom: none;
+        }
+
+        .case-section-failed {
+            background: #fef2f2;
+            border-left: 5px solid #dc2626;
+            border-bottom: 3px solid #fca5a5;
         }
 
         .case-header {
@@ -513,8 +531,8 @@
         <header class="header">
             <h1>🎯 SciVisAgentBench Evaluation Report</h1>
             <div class="header-meta">
-                <span class="agent-name">gmx_vmd_mcp</span>
-                <span class="timestamp">Generated: 2026-02-16T16:33:41.967274</span>
+                <span class="agent-name">gmx_vmd_mcp_agent</span>
+                <span class="timestamp">Generated: 2026-03-02T11:37:12.700711</span>
             </div>
         </header>
 
@@ -525,11 +543,11 @@
             <div class="summary-grid">
                 <div class="summary-card">
                     <h3>Overall Score</h3>
-                    <div class="value score-fair">
-                        60.0%
+                    <div class="value score-poor">
+                        38.2%
                     </div>
                     <div class="sub-value">
-                        66/110 Points
+                        42/110 Points
                     </div>
                 </div>
 
@@ -546,20 +564,13 @@
                 <div class="summary-card">
                     <h3>Avg Vision Score</h3>
                     <div class="value">
-                        55.2%
+                        19.2%
                     </div>
                     <div class="sub-value">
                         Visualization Quality
                     </div>
-                </div>
-
-                <div class="summary-card">
-                    <h3>Avg Code Similarity</h3>
-                    <div class="value">
-                        0.0%
-                    </div>
                     <div class="sub-value">
-                        Code Quality Match
+                        9/50
                     </div>
                 </div>
 
@@ -599,7 +610,7 @@
                         100.0%
                     </div>
                     <div class="sub-value">
-                        Tasks completed
+                        Tasks Completed
                     </div>
                 </div>
             </div>
@@ -611,7 +622,7 @@
                     Formula: <em>PSNR<sub>scaled</sub> = (completed_cases / total_cases) × avg(PSNR)</em>,
                     <em>SSIM<sub>scaled</sub> = (completed_cases / total_cases) × avg(SSIM)</em>,
                     <em>LPIPS<sub>scaled</sub> = 1.0 - (completed_cases / total_cases) × (1.0 - avg(LPIPS))</em>.
-                    Cases with infinite PSNR (perfect match) are excluded from PSNR calculation.
+                    Cases with infinite PSNR (perfect match) are excluded from the PSNR calculation.
                 </p>
             </div>
 
@@ -658,13 +669,13 @@
                     <h2 class="case-title">📝 curved-membrane</h2>
                     
                 </div>
-                <div class="case-score">23/45 (51.1%)</div>
+                <div class="case-score">28/45 (62.2%)</div>
             </div>
 
             <div class="case-content">
                 <div class="section-box">
                     <h3>📋 Task Description</h3>
-                    <div class="task-description">1. Please load the Martini coarse-grained simulation file from "curved-membrane/data/curved-membrane." into VMD.
+                    <div class="task-description">1. Please load the Martini coarse-grained simulation file from "curved-membrane/data/curved-membrane.gro" into VMD.
 
 2. Use VMD to show a zoomed in view of the membrane side coloring the water blue and the lipid phosphate (PO4 beads) red, and take a screenshot.
 
@@ -704,7 +715,7 @@ Save the answers to the analysis questions in plain text as "curved-membrane/res
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">3/20</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">5/20</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
@@ -722,33 +733,33 @@ Save the answers to the analysis questions in plain text as "curved-membrane/res
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 1</div>
-                    <div class="rubric-score">2/10</div>
+                    <div class="rubric-score">3/10</div>
                 </div>
                 <div class="rubric-criterion">
-                    <strong>Criterion:</strong> 1. Does the visualization show a side view of a bilayer rather than a top-down or oblique view?
+                    <strong>Criterion:</strong> Does the visualization show a side view of a bilayer rather than a top-down or oblique view?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> Ground truth shows a clear side view of a curved bilayer: two opposing leaflets with red PO4 bands and blue water regions above/below. The result image does not show a discernible membrane side profile; it appears as a sparse cloud of tiny points with no clear bilayer geometry or leaflet structure. Orientation (side vs top/oblique) cannot be confirmed from the result, and it does not visually match the ground truth side-view presentation.
+                    <strong>Judge's Assessment:</strong> Ground truth shows a clear side-on (cross-sectional) view of a curved bilayer: two water slabs (blue) separated by a large white gap, with a red PO4 layer outlining the membrane surfaces. The result image instead looks like a largely top-down/through-plane view: a rectangular blue field on left and right with an orange central region, not a bilayer cross-section. The membrane surfaces are not presented as two opposing leaflets in side view, so the required side view is mostly not met.
                 </div>
             </div>
          
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 2</div>
-                    <div class="rubric-score">1/10</div>
+                    <div class="rubric-score">2/10</div>
                 </div>
                 <div class="rubric-criterion">
                     <strong>Criterion:</strong> Is water present above and below the bilayer, with a mostly empty region in the middle corresponding to the bilayer core?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> In the ground truth, water (blue) clearly occupies bulk regions on both sides of the membrane, with a relatively empty/low-water bilayer core between the red PO4 layers. In the result, there is no clear separation into water-above/water-below regions and no obvious empty membrane core; the distribution looks uniform/noisy and the expected bilayer interior void is not apparent. Thus the key spatial organization is not reproduced.
+                    <strong>Judge's Assessment:</strong> In the ground truth, water is clearly above and below the membrane with an empty membrane-core region (white) between the two leaflets, making it easy to assess water penetration. In the result, water (blue) is predominantly on the sides rather than above/below, and the central region is filled with orange material with no clear empty hydrophobic core region. The spatial organization (water–membrane–water) does not match the ground truth and the bilayer core is not visible as mostly empty.
                 </div>
             </div>
         
                 </div>
                 <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
-                    <p style="color: #666;">Compared to the ground truth, the result fails to depict a recognizable side-view lipid bilayer and does not show the expected water–membrane–water layering with an empty hydrophobic core. The rendering style (tiny scattered points) prevents assessing membrane penetration and does not meet the visualization goals.</p>
+                    <p style="color: #666;">The result visualization does not match the ground-truth side-view bilayer presentation. It appears oriented incorrectly (more top-down/planar) and does not show the characteristic water-above/water-below arrangement with a mostly empty bilayer core. This substantially limits its usefulness for assessing water penetration into the membrane phase.</p>
                 </div>
             </div>
         </div>
@@ -767,18 +778,30 @@ Save the answers to the analysis questions in plain text as "curved-membrane/res
                 <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Q1 correct answer: Yes</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Analysis of Curved Membrane Martini Coarse-Grained Simulation
-================================================================
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Analysis of Curved Membrane Visualization
+==========================================
 
-Q1: Is there any water that penetrates into the membrane phase?
+Agent Mode: gmx_vmd_mcp_claude-sonnet-4-5_exp1
+
+Visualization Details:
+- Structure file: curved-membrane.gro (Martini coarse-grained model)
+- Total atoms: 16,041
+- Representation: VDW spheres with color coding
+  - Water (W beads): Blue (ColorID 0)
+  - Phosphate groups (PO4 beads): Red (ColorID 1)
+  - Other lipid components: Orange/Tan (ColorID 3)
+- View: Side view of membrane with orthographic projection
+- Zoom level: 1.5x magnification
+
+Question 1: Is there any water that penetrates into the membrane phase?
 
 Answer: yes
 
 Explanation:
-Based on the visualization showing water beads (blue, W beads) and lipid phosphate beads (red, PO4 beads), water penetration into the membrane phase is observable. The membrane structure shows two distinct phosphate layers (red) forming the inner and outer leaflets of the bilayer. While the majority of water beads are located in the bulk aqueous phases on both sides of the curved membrane, some blue water beads can be seen within the membrane interior (the hydrophobic core region between the two phosphate layers). This indicates that water molecules do penetrate into the membrane phase, which is a known phenomenon in molecular dynamics simulations, particularly in curved or stressed membrane systems where defects or transient pores may allow water penetration.</div>
+Upon careful examination of the side view visualization showing the curved membrane structure, water beads (blue) can be observed penetrating into the membrane phase. While the majority of water beads are located in the bulk aqueous regions outside the membrane boundaries (defined by the red PO4 phosphate headgroups), some blue water beads are present within or very close to the hydrophobic membrane core. This penetration is particularly noticeable in regions where the membrane exhibits high curvature, which is consistent with the physical expectation that curved membranes can have defects and increased water accessibility due to the geometric constraints and lipid packing irregularities.</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided answer is exactly "yes," which matches the required correct answer. The accompanying explanation is consistent with the claim (water beads observed within the membrane interior between phosphate layers) and does not contradict the criterion. Therefore it fully meets the evaluation criterion.</div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided answer is explicitly "yes," which matches the required correct answer. The accompanying explanation is consistent with the claim (blue water beads observed within/near the membrane core, especially in high-curvature regions) and does not contradict the criterion. Since the evaluation criterion only checks correctness of the yes/no response, the answer fully satisfies it.</div>
             </div>
         </div>
     
@@ -789,7 +812,7 @@ Based on the visualization showing water beads (blue, W beads) and lipid phospha
             <div class="metrics-grid">
             <div class="metric-box">
                 <div class="metric-label">Visualization Quality</div>
-                <div class="metric-value">3/20</div>
+                <div class="metric-value">5/20</div>
             </div>
         
             <div class="metric-box">
@@ -799,9 +822,9 @@ Based on the visualization showing water beads (blue, W beads) and lipid phospha
         
             <div class="metric-box">
                 <div class="metric-label">Efficiency</div>
-                <div class="metric-value">5/10</div>
+                <div class="metric-value">8/10</div>
                 <div class="metric-subvalue">
-                    Completed in 389.50 seconds (very slow)
+                    Completed in 84.55 seconds (very good)
                 </div>
             </div>
         
@@ -812,8 +835,22 @@ Based on the visualization showing water beads (blue, W beads) and lipid phospha
                     100.0%
                 </div>
             </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Input Tokens</div>
+                <div class="metric-value">190,346</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Tokens</div>
+                <div class="metric-value">3,430</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Tokens</div>
+                <div class="metric-value">193,776</div>
+            </div>
         </div>
-            
         </div>
     
             </div>
@@ -824,17 +861,15 @@ Based on the visualization showing water beads (blue, W beads) and lipid phospha
             <div class="case-header">
                 <div class="case-title-group">
                     <h2 class="case-title">📝 ras-raf-membrane</h2>
-                    
+                    <span class="status-badge status-warning">⚠️ LOW SCORE</span>
                 </div>
-                <div class="case-score">43/65 (66.2%)</div>
+                <div class="case-score">14/65 (21.5%)</div>
             </div>
 
             <div class="case-content">
                 <div class="section-box">
                     <h3>📋 Task Description</h3>
-                    <div class="task-description">Your agent_mode is "mcp", use it when saving results. Your working directory is "/Users/kuangshiai/Documents/ND-VIS/Code/SciVisAgentBench/SciVisAgentBench-tasks/molecular_vis/workflows", and you should have access to it. In the following prompts, we will use relative path with respect to your working path. But remember, when you load or save any file, always stick to absolute path.
-
-1. Please load the Martini coarse-grained simulation file from "ras-raf-membrane/data/ras-raf-membrane.gro" into VMD. The simulations has a membrane and a RAS-RAF protein complex.
+                    <div class="task-description">1. Please load the Martini coarse-grained simulation file from "ras-raf-membrane/data/ras-raf-membrane.gro" into VMD. The simulations has a membrane and a RAS-RAF protein complex.
 
 2. Use VMD to show a zoomed in side view of the membrane and center on the protein with the protein below the membrane.
 For the bilayer only show the PO4 lipids beads and ROH cholesterol bead and color them gray. 
@@ -853,7 +888,8 @@ Q2: How many lipids are there within 1.5 nm of the RAF protein?
 4. Save your work:
 Save the VMD state as "ras-raf-membrane/results/{agent_mode}/ras-raf-membrane.vmd".
 Save the screenshot of the visualization as "ras-raf-membrane/results/{agent_mode}/ras-raf-membrane.png".
-Save the answers to the analysis questions in plain text as "ras-raf-membrane/results/{agent_mode}/answers.txt".</div>
+Save the answers to the analysis questions in plain text as "ras-raf-membrane/results/{agent_mode}/answers.txt".
+</div>
                 </div>
 
                 
@@ -882,7 +918,7 @@ Save the answers to the analysis questions in plain text as "ras-raf-membrane/re
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">23/30</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">4/30</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
@@ -900,46 +936,46 @@ Save the answers to the analysis questions in plain text as "ras-raf-membrane/re
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 1</div>
-                    <div class="rubric-score">7/10</div>
+                    <div class="rubric-score">1/10</div>
                 </div>
                 <div class="rubric-criterion">
-                    <strong>Criterion:</strong> 1. Camera Position: Is the image centered on a protein complex composed of clearly distinguishable half red RAS and half blue RAF components?
+                    <strong>Criterion:</strong> Camera Position: Is the image centered on a protein complex composed of clearly distinguishable half red RAS and half blue RAF components?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> Ground truth shows a centered side view with the protein complex clearly visible below the bilayer, with a large red RAS portion and smaller blue RAF portion (distinct halves). The result image shows the same red/blue protein below the membrane and the colors are distinguishable, but the protein is smaller in the frame and sits lower/left rather than being tightly centered and zoomed like the ground truth. Overall composition matches but with weaker centering/zoom.
+                    <strong>Judge's Assessment:</strong> Ground truth: the camera is centered on a clearly visible protein complex below the membrane, with a large red RAS domain and a distinct blue RAF domain. Result: the view is extremely zoomed out and heavily speckled/noisy; the protein is not clearly visible or distinguishable into red/blue halves, and it is not centered in a comparable way to the ground truth.
                 </div>
             </div>
          
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 2</div>
-                    <div class="rubric-score">8/10</div>
+                    <div class="rubric-score">2/10</div>
                 </div>
                 <div class="rubric-criterion">
                     <strong>Criterion:</strong> Membrane Placement: Is a lipid bilayer clearly visible above the protein?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> In the ground truth, the membrane bilayer is clearly visible as two gray bead layers above the protein. The result also clearly shows a bilayer above the protein with two gray bands spanning the image. Minor issue: the result has a noticeable background artifact/gradient on the right side and the membrane occupies a slightly different vertical placement, but the bilayer-above-protein requirement is met well.
+                    <strong>Judge's Assessment:</strong> Ground truth: a gray lipid bilayer (PO4/ROH beads) is clearly visible as two dense leaflets above the protein. Result: there is a broad horizontal band, but it is not rendered like the ground-truth bilayer (appears as a diffuse/colored strip amid heavy noise). The membrane is only partially discernible and lacks the clear bilayer appearance and composition styling seen in the ground truth.
                 </div>
             </div>
          
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 3</div>
-                    <div class="rubric-score">8/10</div>
+                    <div class="rubric-score">1/10</div>
                 </div>
                 <div class="rubric-criterion">
                     <strong>Criterion:</strong> Correct Leaflet Ordering: Is the inner leaflet of the bilayer closer to the protein and the outer leaflet positioned farther away?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> Ground truth shows correct leaflet ordering: the lower leaflet (inner leaflet) is closest to the protein and the upper leaflet is farther away, with a clear gap between leaflets. The result also shows two separated leaflets with the lower leaflet nearer the protein and the upper leaflet above it. The spacing/relative positioning is very similar, though not as cleanly framed as the ground truth.
+                    <strong>Judge's Assessment:</strong> Ground truth: two distinct membrane leaflets are visible, with the inner leaflet closer to the protein and the outer leaflet farther away. Result: leaflet structure/order cannot be reliably identified due to the noisy rendering and lack of clear separation into two leaflets relative to the protein position.
                 </div>
             </div>
         
                 </div>
                 <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
-                    <p style="color: #666;">The result reproduces the key scientific layout: a side-view bilayer with two leaflets above a red/blue RAS-RAF complex below, with correct leaflet ordering. The main deviations from the ground truth are weaker centering/zoom on the protein and visible background rendering artifacts, but the essential structural relationships match well.</p>
+                    <p style="color: #666;">The result image does not match the ground truth visualization: the camera framing is wrong (too far/obscured), the protein is not clearly shown as red RAS and blue RAF, and the membrane bilayer/leaflet ordering is not clearly rendered or verifiable.</p>
                 </div>
             </div>
         </div>
@@ -951,7 +987,7 @@ Save the answers to the analysis questions in plain text as "ras-raf-membrane/re
             <div class="expandable-content">
                 <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Score</h4>
-                    <div style="font-size: 2em; font-weight: 700; color: #667eea;">10/20 (50.0%)</div>
+                    <div style="font-size: 2em; font-weight: 700; color: #667eea;">0/20 (0.0%)</div>
                 </div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Questions & Correct Answers</h4>
@@ -959,29 +995,16 @@ Save the answers to the analysis questions in plain text as "ras-raf-membrane/re
 2. Q2 correct answer: C. 3-5</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Analysis Results for RAS-RAF Membrane Simulation
-================================================
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Q1: Are there any cholesterol head groups in the bilayer center? no
 
-Q1: Are there any cholesterol head groups in the bilayer center?
-Answer: yes
-
-Explanation: Analysis found 4 ROH (cholesterol head group) beads within 0.5 nm of the bilayer center (z-center at 123.02 nm). The bilayer spans from z = 93.84 nm to z = 152.21 nm.
-
-
-Q2: How many lipids are there within 1.5 nm of the RAF protein?
-Answer: B
-
-Explanation: Analysis found 2 lipid beads (PO4 or ROH) within 1.5 nm (15 Angstroms) of the RAF protein (resid 188-329). This falls in the range of 0-3 lipids, corresponding to option B.
-
-Additional Details:
-- RAF protein contains 135 backbone beads
-- Total lipid beads in system: 3172 (PO4 + ROH)
-- Lipid beads near RAF: 2</div>
+Q2: How many lipids are there within 1.5 nm of the RAF protein? B</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes) — Score: 10/10. The provided answer to Q1 is "yes," which exactly matches the required correct answer. The accompanying explanation (4 ROH beads within 0.5 nm of the bilayer center) is consistent with the claim and supports the correctness.
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1, /10): The provided answer is "no," but the correct answer is "Yes." This directly contradicts the evaluation criterion, so it earns 0/10.
 
-Criterion 2 (Q2 correct answer: C (3–5)) — Score: 0/10. The provided answer to Q2 is option B (0–3), justified by finding 2 lipid beads within 1.5 nm of RAF. However, the evaluation criterion states the correct answer should be C (3–5). Since the selected option does not match the required correct option, it fails the criterion regardless of the internal consistency of the explanation.</div>
+Criterion 2 (Q2, /10): The provided answer is "B," but the correct answer is "C. 3-5." The selected option does not match the required correct option/range, so it earns 0/10.
+
+Total: 0/20. Both answers fail to meet the specified correct responses.</div>
             </div>
         </div>
     
@@ -992,7 +1015,7 @@ Criterion 2 (Q2 correct answer: C (3–5)) — Score: 0/10. The provided answer 
             <div class="metrics-grid">
             <div class="metric-box">
                 <div class="metric-label">Visualization Quality</div>
-                <div class="metric-value">23/30</div>
+                <div class="metric-value">4/30</div>
             </div>
         
             <div class="metric-box">
@@ -1004,34 +1027,18 @@ Criterion 2 (Q2 correct answer: C (3–5)) — Score: 0/10. The provided answer 
                 <div class="metric-label">Efficiency</div>
                 <div class="metric-value">5/10</div>
                 <div class="metric-subvalue">
-                    Completed in 98.45 seconds (very slow)
+                    Completed in 398.95 seconds (very slow)
                 </div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Text Q&A Score</div>
-                <div class="metric-value">10/20</div>
+                <div class="metric-value">0/20</div>
                 <div class="metric-subvalue">
-                    50.0%
+                    0.0%
                 </div>
             </div>
-        
-            <div class="metric-box">
-                <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">23,420</div>
-            </div>
-        
-            <div class="metric-box">
-                <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">581</div>
-            </div>
-        
-            <div class="metric-box">
-                <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">24,001</div>
-            </div>
         </div>
-            
         </div>
     
             </div>
@@ -1040,7 +1047,7 @@ Criterion 2 (Q2 correct answer: C (3–5)) — Score: 0/10. The provided answer 
 
         <footer class="footer">
             <p>Generated by SciVisAgentBench Evaluation Reporter</p>
-            <p>Timestamp: 2026-02-16T16:33:41.967274</p>
+            <p>Timestamp: 2026-03-02T11:37:12.700711</p>
         </footer>
     </div>
 
