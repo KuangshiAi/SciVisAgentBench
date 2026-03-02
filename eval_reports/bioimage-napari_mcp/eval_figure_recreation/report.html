@@ -193,6 +193,18 @@
             transform: translateY(-2px);
         }
 
+        .case-link-failed {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+        }
+
+        .case-link-failed:hover {
+            background: #dc2626;
+            color: white;
+            border-color: #dc2626;
+        }
+
         .case-section {
             padding: 40px;
             border-bottom: 3px solid #f3f4f6;
@@ -200,6 +212,12 @@
 
         .case-section:last-child {
             border-bottom: none;
+        }
+
+        .case-section-failed {
+            background: #fef2f2;
+            border-left: 5px solid #dc2626;
+            border-bottom: 3px solid #fca5a5;
         }
 
         .case-header {
@@ -514,7 +532,7 @@
             <h1>🎯 SciVisAgentBench Evaluation Report</h1>
             <div class="header-meta">
                 <span class="agent-name">bioimage_agent</span>
-                <span class="timestamp">Generated: 2026-02-18T16:54:20.980017</span>
+                <span class="timestamp">Generated: 2026-03-02T11:14:59.264576</span>
             </div>
         </header>
 
@@ -526,10 +544,10 @@
                 <div class="summary-card">
                     <h3>Overall Score</h3>
                     <div class="value score-poor">
-                        37.8%
+                        33.3%
                     </div>
                     <div class="sub-value">
-                        17/45 Points
+                        15/45 Points
                     </div>
                 </div>
 
@@ -546,20 +564,13 @@
                 <div class="summary-card">
                     <h3>Avg Vision Score</h3>
                     <div class="value">
-                        37.8%
+                        16.7%
                     </div>
                     <div class="sub-value">
                         Visualization Quality
                     </div>
-                </div>
-
-                <div class="summary-card">
-                    <h3>Avg Code Similarity</h3>
-                    <div class="value">
-                        0.0%
-                    </div>
                     <div class="sub-value">
-                        Code Quality Match
+                        5/30
                     </div>
                 </div>
 
@@ -632,11 +643,11 @@
                     </div>
                     <div class="config-item">
                         <label>Input Price</label>
-                        <value>$0.80</value>
+                        <value>$3.00</value>
                     </div>
                     <div class="config-item">
                         <label>Output Price</label>
-                        <value>$4.00</value>
+                        <value>$15.00</value>
                     </div>
                 </div>
             </div>
@@ -657,7 +668,7 @@
                     <h2 class="case-title">📝 operation_1</h2>
                     <span class="status-badge status-warning">⚠️ LOW SCORE</span>
                 </div>
-                <div class="case-score">17/45 (37.8%)</div>
+                <div class="case-score">15/45 (33.3%)</div>
             </div>
 
             <div class="case-content">
@@ -701,7 +712,7 @@
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">7/30</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">5/30</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
@@ -719,13 +730,13 @@
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 1</div>
-                    <div class="rubric-score">3/10</div>
+                    <div class="rubric-score">2/10</div>
                 </div>
                 <div class="rubric-criterion">
-                    <strong>Criterion:</strong> 1. Does the result screenshot look similar to the ground truth image?
+                    <strong>Criterion:</strong> Does the result screenshot look similar to the ground truth image?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The result image does not resemble the ground truth in overall appearance. The ground truth shows a dark/black background with clearly visible green neurite-like structures and distinct red nuclei. The result has a strong reddish-brown haze/background, different apparent field content/structure density, and nuclei appear whitish rather than red. Overall composition and visual impression are substantially different.
+                    <strong>Judge's Assessment:</strong> The result image does not look similar to the ground truth. The ground truth shows a dark background with sparse, fine green neurite-like structures and many red/orange nuclei-like blobs, with some faint blue/cyan speckles. The result instead shows a much brighter, brownish background with very bright green structures and prominent blue nuclei; the spatial distribution/density and overall appearance are substantially different.
                 </div>
             </div>
          
@@ -738,27 +749,27 @@
                     <strong>Criterion:</strong> Are the same colormaps and blending modes used as in the target figure?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> Colormap/channel mapping and blending do not match. In the ground truth, the dominant channels are green (processes) and red (nuclei) on black, with subtle blue speckling. In the result, the background is heavily red/brown, nuclei look mostly white/gray, and the green is present but blended into a warm tinted scene, suggesting different channel colors and/or different additive blending/opacity settings.
+                    <strong>Judge's Assessment:</strong> Colormaps/channels do not match. Ground truth uses green + red/orange (dominant) with subtle cyan/blue, whereas the result uses green + strong blue (dominant) and lacks the red/orange channel appearance. The blending also appears different: the ground truth has a darker, more additive-on-black fluorescence look, while the result looks like a brighter composite with elevated background and different channel balance.
                 </div>
             </div>
          
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 3</div>
-                    <div class="rubric-score">2/10</div>
+                    <div class="rubric-score">1/10</div>
                 </div>
                 <div class="rubric-criterion">
                     <strong>Criterion:</strong> Is the contrast and gamma adjusted to match the target figure?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> Contrast and gamma are not matched. The ground truth has high contrast with deep blacks and saturated green/red features. The result is washed out with elevated blacks (hazy red cast), reduced feature contrast, and different intensity scaling (many elements look over-bright/whitened), indicating incorrect gamma/level adjustments.
+                    <strong>Judge's Assessment:</strong> Contrast/gamma are not matched. The ground truth has high contrast against a near-black background and relatively restrained highlights. The result has lifted blacks (brown/gray background), higher overall brightness, and saturated bright greens/blues, indicating very different gamma/levels settings.
                 </div>
             </div>
         
                 </div>
                 <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
-                    <p style="color: #666;">The result significantly diverges from the ground truth: background level/color is wrong (hazy reddish vs black), channel colors/blending appear different (white nuclei vs red; strong warm tint), and intensity/gamma/contrast are not tuned to the high-contrast look of the target.</p>
+                    <p style="color: #666;">Overall, the result diverges strongly from the ground truth in visual composition, channel coloring/blending, and intensity/contrast characteristics. It appears to be a different fluorescence composite (blue nuclei emphasis, brighter background) rather than a matched rendering of the target (dark background with red/orange nuclei and fine green processes).</p>
                 </div>
             </div>
         </div>
@@ -772,7 +783,7 @@
             <div class="metrics-grid">
             <div class="metric-box">
                 <div class="metric-label">Visualization Quality</div>
-                <div class="metric-value">7/30</div>
+                <div class="metric-value">5/30</div>
             </div>
         
             <div class="metric-box">
@@ -784,26 +795,30 @@
                 <div class="metric-label">Efficiency</div>
                 <div class="metric-value">5/10</div>
                 <div class="metric-subvalue">
-                    Completed in 102.16 seconds (very slow)
+                    Completed in 97.78 seconds (good)
                 </div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">12,927</div>
+                <div class="metric-value">370,735</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">34</div>
+                <div class="metric-value">5,134</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">12,961</div>
+                <div class="metric-value">375,869</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Cost</div>
+                <div class="metric-value">$1.1892</div>
             </div>
         </div>
-            
         </div>
     
             </div>
@@ -812,7 +827,7 @@
 
         <footer class="footer">
             <p>Generated by SciVisAgentBench Evaluation Reporter</p>
-            <p>Timestamp: 2026-02-18T16:54:20.980017</p>
+            <p>Timestamp: 2026-03-02T11:14:59.264576</p>
         </footer>
     </div>
 

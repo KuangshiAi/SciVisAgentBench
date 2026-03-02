@@ -193,6 +193,18 @@
             transform: translateY(-2px);
         }
 
+        .case-link-failed {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+        }
+
+        .case-link-failed:hover {
+            background: #dc2626;
+            color: white;
+            border-color: #dc2626;
+        }
+
         .case-section {
             padding: 40px;
             border-bottom: 3px solid #f3f4f6;
@@ -200,6 +212,12 @@
 
         .case-section:last-child {
             border-bottom: none;
+        }
+
+        .case-section-failed {
+            background: #fef2f2;
+            border-left: 5px solid #dc2626;
+            border-bottom: 3px solid #fca5a5;
         }
 
         .case-header {
@@ -514,7 +532,7 @@
             <h1>🎯 SciVisAgentBench Evaluation Report</h1>
             <div class="header-meta">
                 <span class="agent-name">bioimage_agent</span>
-                <span class="timestamp">Generated: 2026-02-16T17:30:44.844403</span>
+                <span class="timestamp">Generated: 2026-03-02T11:15:28.728350</span>
             </div>
         </header>
 
@@ -525,18 +543,18 @@
             <div class="summary-grid">
                 <div class="summary-card">
                     <h3>Overall Score</h3>
-                    <div class="value score-fair">
-                        61.0%
+                    <div class="value score-poor">
+                        59.0%
                     </div>
                     <div class="sub-value">
-                        64/105 Points
+                        62/105 Points
                     </div>
                 </div>
 
                 <div class="summary-card">
                     <h3>Test Cases</h3>
                     <div class="value">
-                        3/3
+                        2/3
                     </div>
                     <div class="sub-value">
                         Completed Successfully
@@ -546,20 +564,13 @@
                 <div class="summary-card">
                     <h3>Avg Vision Score</h3>
                     <div class="value">
-                        66.7%
+                        60.0%
                     </div>
                     <div class="sub-value">
                         Visualization Quality
                     </div>
-                </div>
-
-                <div class="summary-card">
-                    <h3>Avg Code Similarity</h3>
-                    <div class="value">
-                        0.0%
-                    </div>
                     <div class="sub-value">
-                        Code Quality Match
+                        27/50
                     </div>
                 </div>
 
@@ -569,7 +580,7 @@
                         N/A
                     </div>
                     <div class="sub-value">
-                        Peak SNR (0/3 valid)
+                        Peak SNR (0/2 valid)
                     </div>
                 </div>
 
@@ -596,10 +607,10 @@
                 <div class="summary-card">
                     <h3>Completion Rate</h3>
                     <div class="value">
-                        100.0%
+                        66.7%
                     </div>
                     <div class="sub-value">
-                        Tasks completed
+                        Tasks Completed
                     </div>
                 </div>
             </div>
@@ -611,7 +622,7 @@
                     Formula: <em>PSNR<sub>scaled</sub> = (completed_cases / total_cases) × avg(PSNR)</em>,
                     <em>SSIM<sub>scaled</sub> = (completed_cases / total_cases) × avg(SSIM)</em>,
                     <em>LPIPS<sub>scaled</sub> = 1.0 - (completed_cases / total_cases) × (1.0 - avg(LPIPS))</em>.
-                    Cases with infinite PSNR (perfect match) are excluded from PSNR calculation.
+                    Cases with infinite PSNR (perfect match) are excluded from the PSNR calculation.
                 </p>
             </div>
 
@@ -632,11 +643,11 @@
                     </div>
                     <div class="config-item">
                         <label>Input Price</label>
-                        <value>$0.80</value>
+                        <value>$3.00</value>
                     </div>
                     <div class="config-item">
                         <label>Output Price</label>
-                        <value>$4.00</value>
+                        <value>$15.00</value>
                     </div>
                 </div>
             </div>
@@ -648,7 +659,7 @@
             <div class="case-links">
                 <a href="#operation_1" class="case-link">operation_1</a>
 <a href="#operation_2" class="case-link">operation_2</a>
-<a href="#operation_3" class="case-link">operation_3</a>
+<a href="#operation_3" class="case-link case-link-failed">operation_3</a>
             </div>
         </nav>
 
@@ -659,7 +670,7 @@
                     <h2 class="case-title">📝 operation_1</h2>
                     
                 </div>
-                <div class="case-score">30/45 (66.7%)</div>
+                <div class="case-score">39/45 (86.7%)</div>
             </div>
 
             <div class="case-content">
@@ -702,7 +713,7 @@
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">17/20</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">18/20</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
@@ -720,13 +731,13 @@
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 1</div>
-                    <div class="rubric-score">9/10</div>
+                    <div class="rubric-score">10/10</div>
                 </div>
                 <div class="rubric-criterion">
-                    <strong>Criterion:</strong> 1. Does the visualization show a green cell with red blobs on the inside?
+                    <strong>Criterion:</strong> Does the visualization show a green cell with red blobs on the inside?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> In the ground truth, a prominent green cell (with bright green membrane/structure) contains multiple distinct red/orange blobs inside. The result image also clearly shows a green cell with several red blobs within the cell interior in the same region. The red signal is present and localized internally as expected, with only minor differences in apparent intensity/contrast.
+                    <strong>Judge's Assessment:</strong> The result image clearly shows a bright green cell (membrane/cytoplasm signal) with multiple distinct red/orange blobs inside the cell body. This matches the ground truth requirement of a green cell containing red internal puncta/blobs.
                 </div>
             </div>
          
@@ -739,14 +750,14 @@
                     <strong>Criterion:</strong> Does the result rendering look similar to ground truth?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The result rendering is very similar to the ground truth in terms of overall content and spatial arrangement (same cells and internal red puncta). The main noticeable difference is presentation: the result appears scaled down with thick black borders/margins around the image (letterboxing), and slightly different global brightness/contrast. Despite this, the biological structures and coloring closely match.
+                    <strong>Judge's Assessment:</strong> The overall appearance is very similar (same fluorescence style, green spiky-edged cell with internal red puncta on a dark background). However, the framing/cropping differs: the result is zoomed in and centered more tightly on the main cell, while the ground truth shows more surrounding context (additional cells and more of the field). Brightness/contrast also appears slightly different. Despite these differences, the core visual content matches well.
                 </div>
             </div>
         
                 </div>
                 <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
-                    <p style="color: #666;">The result successfully reproduces the key visual goal (green cell with internal red blobs) and closely matches the ground truth scene. Minor deviations are primarily in framing (added black borders/zoom level) and slight intensity/contrast differences rather than content.</p>
+                    <p style="color: #666;">The result successfully reproduces the key visual elements (green cell with red internal blobs) and closely resembles the ground truth, with the main differences being crop/zoom and minor intensity/contrast variations.</p>
                 </div>
             </div>
         </div>
@@ -758,17 +769,17 @@
             <div class="expandable-content">
                 <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Score</h4>
-                    <div style="font-size: 2em; font-weight: 700; color: #667eea;">0/10 (0.0%)</div>
+                    <div style="font-size: 2em; font-weight: 700; color: #667eea;">10/10 (100.0%)</div>
                 </div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Questions & Correct Answers</h4>
                 <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Q1 correct answer: Yes</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">No, the cell does not show protrusions at timestep 14.</div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Yes</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 states the correct answer to Q1 is "Yes" (the cell shows protrusions at timestep 14). The provided task answer says "No, the cell does not show protrusions at timestep 14," which directly contradicts the expected correct response. Therefore, it does not meet the criterion at all and receives 0/10.</div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided task answer is exactly "Yes", which matches the required correct answer. Therefore it fully satisfies the evaluation criterion with no discrepancies.</div>
             </div>
         </div>
     
@@ -779,7 +790,7 @@
             <div class="metrics-grid">
             <div class="metric-box">
                 <div class="metric-label">Visualization Quality</div>
-                <div class="metric-value">17/20</div>
+                <div class="metric-value">18/20</div>
             </div>
         
             <div class="metric-box">
@@ -789,21 +800,40 @@
         
             <div class="metric-box">
                 <div class="metric-label">Efficiency</div>
-                <div class="metric-value">8/10</div>
+                <div class="metric-value">6/10</div>
                 <div class="metric-subvalue">
-                    Completed in 30.84 seconds (good)
+                    Completed in 114.45 seconds (good)
                 </div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Text Q&A Score</div>
-                <div class="metric-value">0/10</div>
+                <div class="metric-value">10/10</div>
                 <div class="metric-subvalue">
-                    0.0%
+                    100.0%
                 </div>
             </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Input Tokens</div>
+                <div class="metric-value">210,786</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Tokens</div>
+                <div class="metric-value">2,107</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Tokens</div>
+                <div class="metric-value">212,893</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Cost</div>
+                <div class="metric-value">$0.6640</div>
+            </div>
         </div>
-            
         </div>
     
             </div>
@@ -816,7 +846,7 @@
                     <h2 class="case-title">📝 operation_2</h2>
                     
                 </div>
-                <div class="case-score">15/25 (60.0%)</div>
+                <div class="case-score">23/25 (92.0%)</div>
             </div>
 
             <div class="case-content">
@@ -853,7 +883,7 @@
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">0/10</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">9/10</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
@@ -871,20 +901,20 @@
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 1</div>
-                    <div class="rubric-score">0/10</div>
+                    <div class="rubric-score">9/10</div>
                 </div>
                 <div class="rubric-criterion">
-                    <strong>Criterion:</strong> 1. Are there only the green cells visible with no red blobs on the inside?
+                    <strong>Criterion:</strong> Are there only the green cells visible with no red blobs on the inside?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The image does not show only green cells. There is no visible green channel/cell structure; instead, the scene is dominated by red signal. Multiple bright red puncta/blobs are clearly present within the central object(s), and a faint red circular structure is also visible on the right. This directly violates the requirement of having only green cells visible with no red blobs on the inside.
+                    <strong>Judge's Assessment:</strong> The image shows only green-stained cellular structures on a dark background, with no visible red channel signal or red “blobs” inside the cells. The green cells are clearly visible and dominant. Minor imperfection: there is some green haze/noise and partial cell fragments at the image edges, but this does not violate the criterion about red blobs.
                 </div>
             </div>
         
                 </div>
                 <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
-                    <p style="color: #666;">Based on visual inspection (without access to ground truth), the result fails the stated goal: red intracellular blobs are prominent and green cells are not visible, so the visualization does not isolate green cells or suppress internal red signal.</p>
+                    <p style="color: #666;">Without ground truth for comparison, the visualization appears to meet the stated goal well: only green cells are visible and there is no apparent red signal within the cells. Some background speckle/edge artifacts are present but are not relevant to the red-blob exclusion criterion.</p>
                 </div>
             </div>
         </div>
@@ -898,7 +928,7 @@
             <div class="metrics-grid">
             <div class="metric-box">
                 <div class="metric-label">Visualization Quality</div>
-                <div class="metric-value">0/10</div>
+                <div class="metric-value">9/10</div>
             </div>
         
             <div class="metric-box">
@@ -908,26 +938,45 @@
         
             <div class="metric-box">
                 <div class="metric-label">Efficiency</div>
-                <div class="metric-value">10/10</div>
+                <div class="metric-value">9/10</div>
                 <div class="metric-subvalue">
-                    Completed in 10.86 seconds (excellent)
+                    Completed in 44.76 seconds (excellent)
                 </div>
             </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Input Tokens</div>
+                <div class="metric-value">123,426</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Tokens</div>
+                <div class="metric-value">1,175</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Tokens</div>
+                <div class="metric-value">124,601</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Cost</div>
+                <div class="metric-value">$0.3879</div>
+            </div>
         </div>
-            
         </div>
     
             </div>
         </section>
     
 
-        <section class="case-section" id="operation_3">
+        <section class="case-section case-section-failed" id="operation_3">
             <div class="case-header">
                 <div class="case-title-group">
                     <h2 class="case-title">📝 operation_3</h2>
-                    
+                    <span class="status-badge status-failed">❌ FAILED</span>
                 </div>
-                <div class="case-score">19/35 (54.3%)</div>
+                <div class="case-score">0/35 (0.0%)</div>
             </div>
 
             <div class="case-content">
@@ -966,7 +1015,7 @@
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">4/20</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">0/20</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
@@ -984,33 +1033,33 @@
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 1</div>
-                    <div class="rubric-score">1/10</div>
+                    <div class="rubric-score">0/10</div>
                 </div>
                 <div class="rubric-criterion">
-                    <strong>Criterion:</strong> 1. Does the visualization show the green cell from the side?
+                    <strong>Criterion:</strong> Does the visualization show the green cell from the side?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The visualization does not show a clearly identifiable green cell, nor a clear side view of such a cell. The dominant visible signal is red, with no evident green structure or membrane outline that would indicate a green-labeled cell viewed from the side.
+                    <strong>Judge's Assessment:</strong> The image does not show a green cell at all. It appears to be a close-up rendering of a smooth, gray, elongated object (possibly a cylinder or rod) on a black background. There is no identifiable cellular geometry, and no side view of a green cell can be confirmed.
                 </div>
             </div>
          
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 2</div>
-                    <div class="rubric-score">3/10</div>
+                    <div class="rubric-score">1/10</div>
                 </div>
                 <div class="rubric-criterion">
                     <strong>Criterion:</strong> Does the result rendering look similar to the ground truth image?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> Without a ground truth image, only general similarity can be judged. The rendering appears very dark with low contrast and limited structural detail; the main visible feature is a red, granular blob-like region. If the intended result was a side view of a green cell, this output likely deviates substantially in both color (missing green) and viewpoint/interpretability (no clear side-on cell geometry).
+                    <strong>Judge's Assessment:</strong> Without a ground truth reference, only general plausibility can be judged. The result looks like an incorrect scene/object for a 'green cell from the side' task: wrong color (not green), wrong subject (no visible cell structure), and an overly zoomed/abstract composition. While the rendering quality (smooth shading) is acceptable, it is very unlikely to resemble the intended ground truth for this operation.
                 </div>
             </div>
         
                 </div>
                 <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
-                    <p style="color: #666;">Evaluation was performed without access to ground truth. The provided image is predominantly dark with a red fluorescent region and does not convincingly depict a green cell from the side. Overall visualization clarity and goal alignment appear weak, suggesting the operation objective was not successfully met.</p>
+                    <p style="color: #666;">Evaluated without ground truth: the visualization fails to depict the requested green cell from a side perspective and instead shows an unrelated gray elongated form. As a result, it likely deviates substantially from the expected rendering.</p>
                 </div>
             </div>
         </div>
@@ -1024,7 +1073,7 @@
             <div class="metrics-grid">
             <div class="metric-box">
                 <div class="metric-label">Visualization Quality</div>
-                <div class="metric-value">4/20</div>
+                <div class="metric-value">1/20</div>
             </div>
         
             <div class="metric-box">
@@ -1034,13 +1083,32 @@
         
             <div class="metric-box">
                 <div class="metric-label">Efficiency</div>
-                <div class="metric-value">10/10</div>
+                <div class="metric-value">5/10</div>
                 <div class="metric-subvalue">
-                    Completed in 11.05 seconds (excellent)
+                    Completed in 98.96 seconds (good)
                 </div>
             </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Input Tokens</div>
+                <div class="metric-value">376,538</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Tokens</div>
+                <div class="metric-value">2,962</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Tokens</div>
+                <div class="metric-value">379,500</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Cost</div>
+                <div class="metric-value">$1.1740</div>
+            </div>
         </div>
-            
         </div>
     
             </div>
@@ -1049,7 +1117,7 @@
 
         <footer class="footer">
             <p>Generated by SciVisAgentBench Evaluation Reporter</p>
-            <p>Timestamp: 2026-02-16T17:30:44.844403</p>
+            <p>Timestamp: 2026-03-02T11:15:28.728350</p>
         </footer>
     </div>
 
