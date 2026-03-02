@@ -37,7 +37,7 @@ def generate_static_site(cases_yaml_path: str, output_dir: str):
     metadata = loader.get_metadata()
     workspace_root = loader.workspace_root
 
-    print(f"✓ Loaded {len(evaluation_data)} cases")
+    print(f"[OK] Loaded {len(evaluation_data)} cases")
 
     # Prepare output directory structure
     (output_path / 'data').mkdir(parents=True, exist_ok=True)
@@ -88,7 +88,7 @@ def generate_static_site(cases_yaml_path: str, output_dir: str):
         dst_path = output_path / 'images' / img_path
 
         if not src_path.exists():
-            print(f"  ⚠️  Not found: {img_path}")
+            print(f"  [WARNING]  Not found: {img_path}")
             failed_count += 1
             continue
 
@@ -102,13 +102,13 @@ def generate_static_site(cases_yaml_path: str, output_dir: str):
         if copied_count % 10 == 0:
             print(f"  Copied {copied_count}/{len(all_images)}...")
 
-    print(f"✓ Copied {copied_count} images ({failed_count} failed)")
+    print(f"[OK] Copied {copied_count} images ({failed_count} failed)")
 
     # Write cases.json
     cases_json_path = output_path / 'data' / 'cases.json'
     with open(cases_json_path, 'w') as f:
         json.dump(cases_json, f, indent=2)
-    print(f"✓ Generated: data/cases.json")
+    print(f"[OK] Generated: data/cases.json")
 
     # Check if Firebase frontend files exist
     required_files = [
@@ -127,13 +127,13 @@ def generate_static_site(cases_yaml_path: str, output_dir: str):
             missing_files.append(file_path)
 
     if missing_files:
-        print(f"⚠️  Missing Firebase frontend files:")
+        print(f"[WARNING]  Missing Firebase frontend files:")
         for file_path in missing_files:
             print(f"    - {file_path}")
         print(f"\nThese should already exist in {output_path}")
         print(f"If not, they were created earlier in firebase_deploy/")
     else:
-        print(f"✓ All required files present")
+        print(f"[OK] All required files present")
 
     # Summary
     print(f"\n{'='*60}")
@@ -172,10 +172,10 @@ def main():
 
     try:
         generate_static_site(args.cases_yaml, args.output_dir)
-        print("✅ Static site generation completed successfully!")
+        print("[SUCCESS] Static site generation completed successfully!")
 
     except Exception as e:
-        print(f"\n❌ Error: {e}")
+        print(f"\n[ERROR] Error: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)

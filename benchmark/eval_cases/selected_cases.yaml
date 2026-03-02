@@ -86,11 +86,11 @@ cases:
     description: Field Computation
     agent_mode: chatvis_claude-sonnet-4-5_exp1
 
-  - name: subseries-of-time-series
-    path: SciVisAgentBench-tasks/paraview/subseries-of-time-series
-    yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
-    description: Dataset Restructuring
-    agent_mode: chatvis_claude-sonnet-4-5_exp1
+  # - name: subseries-of-time-series
+  #   path: SciVisAgentBench-tasks/paraview/subseries-of-time-series
+  #   yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
+  #   description: Dataset Restructuring
+  #   agent_mode: chatvis_claude-sonnet-4-5_exp1
 
   - name: shrink-sphere
     path: SciVisAgentBench-tasks/paraview/shrink-sphere
@@ -108,17 +108,93 @@ cases:
     path: SciVisAgentBench-tasks/paraview/render-histogram
     yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
     description: xxx
-    agent_mode: paraview_mcp_claude-sonnet-4-5_exp1
+    agent_mode: chatvis_claude-sonnet-4-5_exp1
 
   # From molecular_vis/workflows (2 cases)
   - name: curved-membrane
     path: SciVisAgentBench-tasks/molecular_vis/workflows/curved-membrane
     yaml: benchmark/eval_cases/molecular_vis/workflows/eval_analysis_workflows.yaml
     description: Data Subsetting & Extraction
-    agent_mode: chatvis_claude-sonnet-4-5_exp1
+    agent_mode: gmx_vmd_mcp_claude-sonnet-4-5_exp1
 
   - name: ras-raf-membrane
     path: SciVisAgentBench-tasks/molecular_vis/workflows/ras-raf-membrane
     yaml: benchmark/eval_cases/molecular_vis/workflows/eval_analysis_workflows.yaml
     description: View & Camera Control
-    agent_mode: chatvis_claude-sonnet-4-5_exp1
+    agent_mode: gmx_vmd_mcp_claude-sonnet-4-5_exp1
+
+  - name: bio_isosurface-determination
+    path: SciVisAgentBench-tasks\bioimage_data\eval_iso_surface_determination\operation_1
+    yaml: benchmark\eval_cases\napari\1_workflows\eval_iso_surface_determination.yaml
+    description: Surface & Contour Extraction (isosurface)
+    agent_mode: napari_mcp_claude-sonnet-4-5_exp_default
+    task_description:
+      1. Read the file "data/dataset_003/eval_iso_surface_determination_target_1.txt" to get the target iso-surface values for different tooth structures.
+
+      2. Load data/dataset_003/dataset_003.tif into napari. 
+
+      3. Switch to 3D view mode and set the rendering to iso. 
+
+      4. Find the iso surface value that shows the target clearly.
+
+      5. Rotate the camera to several angles and take a screenshot of the result each time to check if the target structure is clearly visible from different angles.
+
+      6. If the target structure is not clearly visible, adjust the iso surface value and take a screenshot again.
+
+      7. Stop when the target structure is clearly visible or you have tried five different iso surface values.
+
+      8. Save the final screenshot to "eval_iso_surface_determination/screenshot.png".
+    vision-rubrics:
+        1. Does the result rendering look similar to ground truth? 
+        2. Does the visualization show the target structure clearly?
+
+  - name: bio_visualization-workflows
+    path: SciVisAgentBench-tasks\bioimage_data\eval_visualization_workflows\operation_1
+    yaml: benchmark\eval_cases\napari\1_workflows\eval_visualization_workflows.yaml
+    description: xxx
+    agent_mode: napari_mcp_claude-sonnet-4-5_exp_default
+    task_description:
+      1. Load the "data/dataset_002/dataset_002.tif" dataset into napari. 
+
+      2. Depending on the number of channels, set the colormap for the first channel 0 to red and channel 1 to green.
+
+      3. Switch to the 3D view. 
+
+      4. Use additive blending for all channels to create an overlay visualization.
+
+      5. Go the timestep 14. 
+        Q1. Does the cell show protrusions? (Yes/No)
+
+      6. Take a screenshot of the result, save it to "eval_visualization_workflows/screenshot_1.png"
+
+      7. Answer Q1 in a plain text file "eval_visualization_workflows/Q1_answer.txt".
+    vision-rubrics:
+        1. Does the visualization show a green cell with red blobs on the inside? 
+        2. Does the result rendering look similar to ground truth?
+
+  - name: bio_figure-recreation
+    path: SciVisAgentBench-tasks\bioimage_data\eval_figure_recreation\operation_1
+    yaml: benchmark\eval_cases\napari\1_workflows\eval_figure_recreation.yaml
+    description: xxx
+    agent_mode: napari_mcp_claude-sonnet-4-5_exp_default
+    task_description:
+      1. Load the dataset into napari "data/dataset_001/dataset_001.tiff"
+
+      2. Read the target figure "data/dataset_001/dataset_001.png" but don't load it into napari.
+
+      3. Read the dataset description "data/dataset_001/dataset_001.yaml".
+
+      4. Set the same colormaps and blending modes as the target figure.
+
+      5. Adjust contrast and gamma as needed to match the target figure.
+
+      6. Take a screenshot of your recreation.
+
+      7. If the recreation does not match the target figure, adjust the visualization settings and take a screenshot again.
+
+      8. Stop when the recreation matches the target figure or you have tried five different visualization settings.
+
+      9. Save the final screenshot to "eval_figure_recreation/screenshot.png".
+    vision-rubrics:
+        1. Does the visualization show a green cell with red blobs on the inside? 
+        2. Does the result rendering look similar to ground truth?
