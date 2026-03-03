@@ -232,7 +232,7 @@
 # Case 7: crayfish_streamline
 - vars:
     question: |
-        Load the Crayfish flow vector field from "crayfish_streamline/data/crayfish_streamline_322x162x119_float32_scalar3.raw", the information about this dataset:
+        Load the Crayfish flow vector field from "crayfish_streamline/data/crayfish_streamline.raw", the information about this dataset:
         Crayfish Flow (Vector)
         Data Scalar Type: float
         Data Byte Order: Little Endian
@@ -241,19 +241,17 @@
         Data loading is very important, make sure you correctly load the dataset according to their features.
 
         Create two streamline sets using "Stream Tracer" filters with "Point Cloud" seed type, each with 100 seed points and radius 32.2:
-        - Streamline 1: Seed center at [107.33, 81.0, 59.5]. Apply a "Tube" filter (radius 0.5, 12 sides). Color by Vorticity magnitude using a diverging colormap with the following RGB control points:
+        - Streamline 1: Seed center at [107.33, 81.0, 59.5]. Apply a "Tube" filter (radius 0.5, 12 sides). Color by Velocity magnitude using a diverging colormap with the following RGB control points:
           - Value 0.0 -> RGB(0.231, 0.298, 0.753) (blue)
           - Value 0.02 -> RGB(0.865, 0.865, 0.865) (white)
           - Value 0.15 -> RGB(0.706, 0.016, 0.149) (red)
-        - Streamline 2: Seed center at [214.67, 81.0, 59.5]. Apply a "Tube" filter (radius 0.5, 12 sides). Color by Vorticity magnitude using the same colormap.
+        - Streamline 2: Seed center at [214.67, 81.0, 59.5]. Apply a "Tube" filter (radius 0.5, 12 sides). Color by Velocity magnitude using the same colormap.
 
         Show the dataset bounding box as an outline (black).
 
         In the pipeline browser panel, hide all stream tracers and only show the tube filters and the outline.
 
-        Use a white background. Render at 1280x1280.
-
-        Set the viewpoint parameters as: [435.04, -325.38, 567.82] to position; [111.64, 202.81, -21.96] to focal point; [-0.099, 0.714, 0.693] to camera up direction.
+        Use a gray-blue background (RGB: 0.329, 0.349, 0.427). Render at 1280x1280.
 
         Save the paraview state as "crayfish_streamline/results/{agent_mode}/crayfish_streamline.pvsm".
         Save the visualization image as "crayfish_streamline/results/{agent_mode}/crayfish_streamline.png".

@@ -194,10 +194,21 @@ class MultiCaseLoader:
         if not gs_dir.exists():
             return []
 
-        # Look for single image format: {case_name}_gs.png
-        single_gs_path = gs_dir / f"{case_name}_gs.png"
-        if single_gs_path.exists():
-            return [single_gs_path]
+        # Get directory name for fallback (for cases like bio_* where directory is operation_1)
+        dir_name = case_dir.name
+
+        # Try different file formats in order: MP4, PNG
+        # Prioritize video format for temporal/animation cases
+        for ext in ['.mp4', '.png']:
+            # Try with case_name first
+            gs_path = gs_dir / f"{case_name}_gs{ext}"
+            if gs_path.exists():
+                return [gs_path]
+
+            # Try with directory name
+            gs_path = gs_dir / f"{dir_name}_gs{ext}"
+            if gs_path.exists():
+                return [gs_path]
 
         return []
 
@@ -207,22 +218,30 @@ class MultiCaseLoader:
         if agent_mode:
             result_dir = case_dir / "results" / agent_mode
             if result_dir.exists():
-                # Check for PNG first (most common)
-                png_file = result_dir / f"{case_name}.png"
-                if png_file.exists():
-                    return [png_file]
+                # Get directory name for fallback (for cases like bio_* where directory is operation_1)
+                dir_name = case_dir.name
 
-                # Check for MP4 video
+                # Try MP4 first (prioritize video for temporal cases)
                 mp4_file = result_dir / f"{case_name}.mp4"
                 if mp4_file.exists():
                     return [mp4_file]
 
-                # Check for AVI video
-                avi_file = result_dir / f"{case_name}.avi"
-                if avi_file.exists():
-                    return [avi_file]
+                # Try MP4 with directory name
+                mp4_file = result_dir / f"{dir_name}.mp4"
+                if mp4_file.exists():
+                    return [mp4_file]
 
-                # Check for any PNG files in the directory
+                # Try PNG with case_name
+                png_file = result_dir / f"{case_name}.png"
+                if png_file.exists():
+                    return [png_file]
+
+                # Try PNG with directory name
+                png_file = result_dir / f"{dir_name}.png"
+                if png_file.exists():
+                    return [png_file]
+
+                # Last resort: check for any PNG files in the directory
                 png_files = list(result_dir.glob("*.png"))
                 if png_files:
                     return [png_files[0]]
@@ -251,11 +270,6 @@ class MultiCaseLoader:
                     png_files = list(result_dir.glob("*.png"))
                     if png_files:
                         return [png_files[0]]
-
-                    # Last resort: AVI (likely won't play in browser)
-                    avi_file = result_dir / f"{case_name}.avi"
-                    if avi_file.exists():
-                        return [avi_file]
 
             return []
 
@@ -344,16 +358,52 @@ class MultiCaseLoader:
             # Detect benchmark type
             benchmark_type = self._detect_benchmark_type(case_path)
 
-            # Get vision metrics from the YAML
-            metrics = self._get_vision_metrics_for_case(case_name, yaml_path)
+            # Get vision metrics - check inline first, then YAML
+            metrics = []
+            if 'vision-rubrics' in case_config:
+                # Use inline vision-rubrics from selected_cases.yaml
+                vision_rubrics = case_config['vision-rubrics']
+                if isinstance(vision_rubrics, list):
+                    metrics = [{"criterion": rubric.strip()} for rubric in vision_rubrics if rubric.strip()]
+                elif isinstance(vision_rubrics, str):
+                    import re
+                    # Split by numbered patterns (1., 2., etc.)
+                    # Pattern: digit(s) followed by a period and optional whitespace
+                    parts = re.split(r'(\d+\.)\s*', vision_rubrics.strip())
+                    # parts will be like ['', '1.', 'text1', '2.', 'text2', ...]
+                    rubrics = []
+                    for i in range(1, len(parts), 2):
+                        if i + 1 < len(parts):
+                            rubric = parts[i + 1].strip()
+                            if rubric:
+                                rubrics.append(rubric)
+
+                    # If no numbered items found, try splitting by newlines
+                    if not rubrics:
+                        rubrics = [r.strip() for r in vision_rubrics.strip().split('\n') if r.strip()]
+
+                    metrics = [{"criterion": rubric} for rubric in rubrics]
+            else:
+                # Get from YAML file
+                metrics = self._get_vision_metrics_for_case(case_name, yaml_path)
 
             # Skip cases without vision metrics
             if not metrics:
                 print(f"Warning: No vision metrics found for case: {case_name}")
                 continue
 
-            # Get task description
-            task_description = self._get_task_description_for_case(case_name, yaml_path)
+            # Get task description - check inline first, then YAML
+            task_description = ""
+            if 'task_description' in case_config:
+                # Use inline task_description from selected_cases.yaml
+                task_desc = case_config['task_description']
+                if isinstance(task_desc, list):
+                    task_description = '\n'.join(str(line) for line in task_desc)
+                elif isinstance(task_desc, str):
+                    task_description = task_desc
+            else:
+                # Get from YAML file
+                task_description = self._get_task_description_for_case(case_name, yaml_path)
 
             # Get ground truth images
             gt_images = self._get_ground_truth_images(case_dir, case_name, benchmark_type)

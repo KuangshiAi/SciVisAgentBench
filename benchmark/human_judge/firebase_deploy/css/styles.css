@@ -445,6 +445,46 @@ body {
     color: #333;
 }
 
+/* Scoring Guidelines */
+.scoring-guidelines {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.scoring-guidelines h4 {
+    color: #856404;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.scoring-guidelines p {
+    margin-bottom: 10px;
+    color: #856404;
+}
+
+.scoring-guidelines ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.scoring-guidelines li {
+    padding: 8px 0;
+    color: #856404;
+    border-bottom: 1px solid #ffeeba;
+}
+
+.scoring-guidelines li:last-child {
+    border-bottom: none;
+}
+
+.scoring-guidelines strong {
+    color: #664d03;
+}
+
 .metric-item {
     background: white;
     padding: 20px;
