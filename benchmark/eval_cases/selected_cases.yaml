@@ -29,19 +29,19 @@ cases:
   - name: crayfish_streamline
     path: SciVisAgentBench-tasks/paraview/crayfish_streamline
     yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
-    description: Temporal Processing (Streamline)
+    description: Surface & Contour Extraction
     agent_mode: chatvis_claude-sonnet-4-5_exp1
 
   - name: twoswirls_streamribbon
     path: SciVisAgentBench-tasks/paraview/twoswirls_streamribbon
     yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
-    description: Temporal Processing (Streamribbon)
+    description: Surface & Contour Extraction
     agent_mode: chatvis_claude-sonnet-4-5_exp1
 
   - name: tornado
     path: SciVisAgentBench-tasks/paraview/tornado
     yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
-    description: Glyph & Marker Placement
+    description: Surface & Contour Extraction, Glyph & Marker Placement
     agent_mode: chatvis_claude-sonnet-4-5_exp1
 
   - name: tgc-velocity_contour
@@ -59,7 +59,7 @@ cases:
   - name: rti-velocity_glyph
     path: SciVisAgentBench-tasks/paraview/rti-velocity_glyph
     yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
-    description: xxx
+    description: Glyph & Marker Placement, Data Subsetting & Extraction
     agent_mode: chatvis_claude-sonnet-4-5_exp1
 
   - name: supernova_isosurface
@@ -101,13 +101,13 @@ cases:
   - name: import-gltf
     path: SciVisAgentBench-tasks/paraview/import-gltf
     yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
-    description: xxx
+    description: Dataset Restructuring, View & Camera Control
     agent_mode: paraview_mcp_claude-sonnet-4-5_exp1
-  
+
   - name: render-histogram
     path: SciVisAgentBench-tasks/paraview/render-histogram
     yaml: benchmark/eval_cases/paraview/paraview_cases.yaml
-    description: xxx
+    description: Plot & Chart Generation, Color & Opacity Mapping
     agent_mode: chatvis_claude-sonnet-4-5_exp1
 
   # From molecular_vis/workflows (2 cases)
@@ -151,7 +151,7 @@ cases:
   - name: bio_visualization-workflows
     path: SciVisAgentBench-tasks\bioimage_data\eval_visualization_workflows\operation_1
     yaml: benchmark\eval_cases\napari\1_workflows\eval_visualization_workflows.yaml
-    description: xxx
+    description: Color & Opacity Mapping, Volume Rendering, Temporal Processing
     agent_mode: napari_mcp_claude-sonnet-4-5_exp_default
     task_description:
       1. Load the "data/dataset_002/dataset_002.tif" dataset into napari. 
@@ -175,7 +175,7 @@ cases:
   - name: bio_figure-recreation
     path: SciVisAgentBench-tasks\bioimage_data\eval_figure_recreation\operation_1
     yaml: benchmark\eval_cases\napari\1_workflows\eval_figure_recreation.yaml
-    description: xxx
+    description: Color & Opacity Mapping, Volume Rendering
     agent_mode: napari_mcp_claude-sonnet-4-5_exp_default
     task_description:
       1. Load the dataset into napari "data/dataset_001/dataset_001.tiff"

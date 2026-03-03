@@ -65,8 +65,8 @@
                     <ol>
                         <li>Fill in your information above</li>
                         <li>Click "Start Evaluation Session" to begin</li>
-                        <li>Compare ground truth with agent results for each case</li>
-                        <li>Rate each metric on a scale of 0-10</li>
+                        <li>Compare ground truth with agent result for each case</li>
+                        <li>Rate each metric on a scale of 0-10 (0 is the worst, 10 is the best)</li>
                         <li>Add optional notes if needed</li>
                         <li><strong>Your evaluations are saved in real-time to Firebase ☁️</strong></li>
                         <li>You can pause and resume anytime - your progress is saved!</li>
@@ -102,9 +102,9 @@
                         <div id="ground-truth-images" class="image-grid"></div>
                     </div>
 
-                    <!-- Agent Results -->
+                    <!-- Agent Result -->
                     <div class="image-section">
-                        <h3>🤖 Agent Results</h3>
+                        <h3>🤖 Agent Result</h3>
                         <div id="result-images" class="image-grid"></div>
                         <div id="no-results-message" class="warning" style="display: none;">
                             ⚠️ No results available for this case
@@ -115,6 +115,20 @@
                 <!-- Evaluation Form -->
                 <div class="evaluation-form">
                     <h3>📊 Evaluation Metrics</h3>
+
+                    <div class="scoring-guidelines">
+                        <h4>Scoring Guidelines:</h4>
+                        <p><strong>ALL scoring must be based on comparing the Result Images with the Ground Truth Images.</strong> For each visualization goal:</p>
+                        <ul>
+                            <li><strong>10 points</strong>: Perfect match - The result and ground truth are visually identical or nearly identical for this criterion</li>
+                            <li><strong>8-9 points</strong>: Excellent match - Minor differences that don't significantly affect the visualization quality</li>
+                            <li><strong>6-7 points</strong>: Good match - Noticeable differences but the core requirement is met</li>
+                            <li><strong>4-5 points</strong>: Partial match - Significant differences, requirement only partially fulfilled</li>
+                            <li><strong>2-3 points</strong>: Poor match - Major differences, requirement mostly not met</li>
+                            <li><strong>0-1 points</strong>: No match - Completely different from ground truth or requirement not addressed at all</li>
+                        </ul>
+                    </div>
+
                     <div id="metrics-list"></div>
 
                     <div class="notes-section">
