@@ -263,9 +263,9 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: Does the result show streamline tubes colored by vorticity magnitude within a rectangular bounding box, similar to the ground truth?
-          2. Streamline Clusters: Are there two distinct clusters matches the ground truth layout?
-          3. Color Mapping: Are the tubes colored by vorticity magnitude using a blue-white-red diverging colormap, with a similar distribution as the ground truth?
+          1. Overall Visualization Goal: Does the result show streamline tubes colored by velocity magnitude within a rectangular bounding box, similar to the ground truth?
+          2. Streamline Clusters: Are there two distinct clusters that matches the ground truth layout?
+          3. Color Mapping: Are the tubes colored by velocity magnitude using a blue-white-red diverging colormap, with a similar distribution as the ground truth?
 
 # Case 8: engine
 - vars:
