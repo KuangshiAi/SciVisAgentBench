@@ -7,6 +7,7 @@ and then uses the standard evaluation framework. No modifications to existing
 files needed!
 
 Usage:
+    # Run all cases
     python benchmark/run_claude_code_eval.py \
         --agent claude_code \
         --config benchmark/configs/claude_code/config.json \
@@ -21,6 +22,15 @@ Usage:
         --yaml benchmark/eval_cases/paraview/main_cases.yaml \
         --cases SciVisAgentBench-tasks/main \
         --case bonsai \
+        --eval-model gpt-4o
+
+    # Resume from a specific case (e.g., after engine case failed)
+    python benchmark/run_claude_code_eval.py \
+        --agent claude_code \
+        --config benchmark/configs/claude_code/config.json \
+        --yaml benchmark/eval_cases/paraview/main_cases.yaml \
+        --cases SciVisAgentBench-tasks/main \
+        --start-from engine \
         --eval-model gpt-4o
 """
 

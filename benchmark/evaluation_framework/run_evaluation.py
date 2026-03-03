@@ -29,7 +29,15 @@ Usage examples:
        --cases SciVisAgentBench-tasks/main \\
        --eval-only
 
-4. List available agents:
+4. Resume evaluation from a specific case (useful after failures):
+   python -m benchmark.evaluation_framework.run_evaluation \\
+       --agent paraview_mcp \\
+       --config benchmark/configs/paraview_mcp/config_openai.json \\
+       --yaml SciVisAgentBench-tasks/main/main_cases.yaml \\
+       --cases SciVisAgentBench-tasks/main \\
+       --start-from engine
+
+5. List available agents:
    python -m benchmark.evaluation_framework.run_evaluation --list-agents
 """
 
@@ -149,6 +157,11 @@ def parse_args():
     parser.add_argument(
         "--case",
         help="Run only a specific test case by name"
+    )
+
+    parser.add_argument(
+        "--start-from",
+        help="Start evaluation from this case and continue with all subsequent cases (cannot be used with --case)"
     )
 
     parser.add_argument(
@@ -400,6 +413,13 @@ async def main():
             print("Error: No valid test cases found in YAML file")
             return 1
 
+        # Validate that --case and --start-from are mutually exclusive
+        if args.case and args.start_from:
+            print("Error: --case and --start-from cannot be used together")
+            print("  Use --case to run a single specific case")
+            print("  Use --start-from to resume from a case and run all subsequent cases")
+            return 1
+
         # Handle --clear-results flag
         if args.clear_results:
             print("\n🗑️  Clearing previous results...")
@@ -541,7 +561,31 @@ async def main():
                 await agent.teardown()
 
         else:
-            # Run all cases
+            # Handle --start-from flag
+            cases_to_run = test_cases
+            if args.start_from:
+                # Find the index of the start case
+                start_index = None
+                for i, case in enumerate(test_cases):
+                    if case.case_name == args.start_from:
+                        start_index = i
+                        break
+
+                if start_index is None:
+                    print(f"Error: Start case '{args.start_from}' not found")
+                    print("Available cases:", [case.case_name for case in test_cases])
+                    return 1
+
+                # Slice the list to start from the specified case
+                cases_to_run = test_cases[start_index:]
+                print(f"\n▶️  Starting from case: {args.start_from}")
+                print(f"   Running {len(cases_to_run)} of {len(test_cases)} total cases")
+                print(f"   Cases to run: {[c.case_name for c in cases_to_run]}")
+
+            # Update runner's test_cases to only include the cases we want to run
+            runner.test_cases = cases_to_run
+
+            # Run all cases (or subset if --start-from was used)
             summary = await runner.run_all_test_cases(run_evaluation=not args.no_eval)
 
             print(f"\nOverall success rate: {summary.get('success_rate', 0):.1%}")
