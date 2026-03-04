@@ -509,9 +509,30 @@ async def main():
                 print(f"\n✓ Evaluation complete for {args.case}")
                 return 0
             else:
-                # Evaluate all cases
-                print(f"Evaluating existing results for {len(test_cases)} test cases...")
-                for test_case in test_cases:
+                # Handle --start-from flag for eval-only mode
+                cases_to_eval = test_cases
+                if args.start_from:
+                    # Find the index of the start case
+                    start_index = None
+                    for i, case in enumerate(test_cases):
+                        if case.case_name == args.start_from:
+                            start_index = i
+                            break
+
+                    if start_index is None:
+                        print(f"Error: Start case '{args.start_from}' not found")
+                        print("Available cases:", [case.case_name for case in test_cases])
+                        return 1
+
+                    # Slice the list to start from the specified case
+                    cases_to_eval = test_cases[start_index:]
+                    print(f"\n▶️  Starting evaluation from case: {args.start_from}")
+                    print(f"   Evaluating {len(cases_to_eval)} of {len(test_cases)} total cases")
+                    print(f"   Cases to evaluate: {[c.case_name for c in cases_to_eval]}")
+
+                # Evaluate all cases (or subset if --start-from was used)
+                print(f"Evaluating existing results for {len(cases_to_eval)} test cases...")
+                for test_case in cases_to_eval:
                     print(f"\n{'='*60}")
                     print(f"Evaluating: {test_case.case_name}")
                     print(f"{'='*60}")
