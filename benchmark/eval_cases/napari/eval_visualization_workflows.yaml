@@ -189,7 +189,7 @@
     cache: false
     runSerially: true
 
-# Test: Advanced Annotation Workflow: Cell Surface Trace
+# Test: Advanced Annotation Workflow: Cell Surface Trace (This will likely fail)
 - vars:
     question: |
       1. Load the image "data/dataset_002/dataset_002.tif" into napari.
