@@ -41,8 +41,7 @@
     - type: llm-rubric
       subtype: text
       value: |
-          1. Check if the points layer has been created.
-          2. Q1 correct answer: Yes
+          1. Q1 correct answer: Yes
       rs-file: eval_visualization_workflows/points_answer.txt
   options:
     cache: false
@@ -59,8 +58,7 @@
     - type: llm-rubric
       subtype: text
       value: |
-          1. Check if the shapes layer has been created.
-          2. Q1 correct answer: Yes
+          1. Q1 correct answer: Yes
       rs-file: eval_visualization_workflows/shapes_answer.txt
   options:
     cache: false
@@ -70,15 +68,14 @@
 - vars:
     question: |
       1. Load the "data/dataset_002/Labels.tif" dataset into napari.
-      2. Check if the labels layer has been created.
-        Q1: Was the labels layer created successfully? (Yes/No)
+      2. Check if a new layer called "Labels" has been created.
+        Q1: Was the layer created successfully? (Yes/No)
       3. Answer Q1 in a plain text file "eval_visualization_workflows/labels_answer.txt".
   assert:
     - type: llm-rubric
       subtype: text
       value: |
-        1. Check if the labels layer has been created.
-        2. Q1 correct answer: Yes
+        1. Q1 correct answer: Yes
       rs-file: eval_visualization_workflows/labels_answer.txt
   options:
     cache: false
@@ -137,10 +134,9 @@
 # Test: Cell Counting and Measurement Analysis
 - vars:
     question: |
-      Load the image "data/dataset_001/dataset_001.tiff" and set it to magenta colormap.
+      Load the image "data/dataset_002/dataset_002.tif" and set channel 1 to a magenta colormap.
+      Switch to a 3D MIP view. 
       Take a screenshot and analyze it to count how many complete cells are visible (not cut off by edges).
-      Add point annotations to mark the center of each counted cell.
-      Measure the distance between the two most distant cells.
       Q1: answer with the number of complete cells you counted, for example "5" if you see 5 complete cells.
       Save the answer of Q1 to the questions in plain text as "eval_analysis_workflows/Q1_answer.txt".
   assert:
@@ -193,7 +189,7 @@
 - vars:
     question: |
       1. Load the image "data/dataset_002/dataset_002.tif" into napari.
-      2. Trace the cell surface on the current slice by adding a polygon shape in a new shapes layer.
+      2. Trace the cell surface on the current slice by adding a polygon shape in a new shape layer.
       3. Use a screenshot to validate whether the polygon correctly traces the cell surface.
       4. If the trace is not accurate, adjust the polygon and take a new screenshot to validate.
       5. Stop when the trace is accurate or you have tried five different attempts.
