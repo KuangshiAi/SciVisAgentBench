@@ -52,8 +52,8 @@ class MyAgent(BaseAgent):
 python -m benchmark.evaluation_framework.run_evaluation \
     --agent my_agent \
     --config config.json \
-    --yaml SciVisAgentBench-tasks/main/main_cases.yaml \
-    --cases SciVisAgentBench-tasks/main
+    --yaml SciVisAgentBench-tasks/paraview/paraview_cases.yaml \
+    --cases SciVisAgentBench-tasks/paraview
 ```
 
 ## Command-Line Options

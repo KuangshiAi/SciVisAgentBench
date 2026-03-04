@@ -29,7 +29,15 @@ Usage examples:
        --cases SciVisAgentBench-tasks/main \\
        --eval-only
 
-4. Resume evaluation from a specific case (useful after failures):
+4. Run agent execution only without evaluation:
+   python -m benchmark.evaluation_framework.run_evaluation \\
+       --agent paraview_mcp \\
+       --config benchmark/configs/paraview_mcp/config_openai.json \\
+       --yaml SciVisAgentBench-tasks/main/main_cases.yaml \\
+       --cases SciVisAgentBench-tasks/main \\
+       --exe-only
+
+6. Resume evaluation from a specific case (useful after failures):
    python -m benchmark.evaluation_framework.run_evaluation \\
        --agent paraview_mcp \\
        --config benchmark/configs/paraview_mcp/config_openai.json \\
@@ -37,7 +45,7 @@ Usage examples:
        --cases SciVisAgentBench-tasks/main \\
        --start-from engine
 
-5. List available agents:
+7. List available agents:
    python -m benchmark.evaluation_framework.run_evaluation --list-agents
 """
 
@@ -140,6 +148,12 @@ def parse_args():
         "--eval-only",
         action="store_true",
         help="Skip agent execution and only run evaluation on existing results"
+    )
+
+    parser.add_argument(
+        "--exe-only",
+        action="store_true",
+        help="Skip evaluation and only run agent execution (execution-only mode)"
     )
 
     # API keys
@@ -358,9 +372,16 @@ async def main():
         print(f"Error: Cases directory not found: {args.cases}")
         return 1
 
+    # Validate that --exe-only and --eval-only are mutually exclusive
+    if args.exe_only and args.eval_only:
+        print("Error: --exe-only and --eval-only cannot be used together")
+        print("  Use --exe-only to run agent execution without evaluation")
+        print("  Use --eval-only to run evaluation without agent execution")
+        return 1
+
     # Get OpenAI API key
     openai_api_key = args.openai_api_key or os.getenv('OPENAI_API_KEY')
-    if not args.no_eval and not openai_api_key:
+    if not args.no_eval and not args.exe_only and not openai_api_key:
         print("Warning: No OpenAI API key provided. Evaluation will be skipped.")
         print("Set OPENAI_API_KEY environment variable or use --openai-api-key to enable evaluation.")
 
@@ -426,8 +447,12 @@ async def main():
             clear_case_results(args.cases, args.case)
             print()
 
+        # Handle --exe-only flag
+        if args.exe_only:
+            print("\n⚙️  Execution-only mode: Skipping evaluation\n")
+
         # Handle --eval-only flag
-        if args.eval_only:
+        elif args.eval_only:
             print("\n📊 Evaluation-only mode: Skipping agent execution\n")
             if not openai_api_key:
                 print("Error: --eval-only requires an OpenAI API key for evaluation")
@@ -546,8 +571,8 @@ async def main():
                 print(f"\nRunning single test case: {args.case}")
                 result = await runner.run_single_test_case(target_case, save_result=False)
 
-                # Run evaluation if requested
-                if not args.no_eval and result.get("status") == "completed" and openai_api_key:
+                # Run evaluation if requested (skip if --exe-only is set)
+                if not args.no_eval and not args.exe_only and result.get("status") == "completed" and openai_api_key:
                     eval_result = await runner.run_evaluation(target_case)
                     result["evaluation"] = eval_result
 
@@ -586,7 +611,8 @@ async def main():
             runner.test_cases = cases_to_run
 
             # Run all cases (or subset if --start-from was used)
-            summary = await runner.run_all_test_cases(run_evaluation=not args.no_eval)
+            # Skip evaluation if --exe-only is set
+            summary = await runner.run_all_test_cases(run_evaluation=not args.no_eval and not args.exe_only)
 
             print(f"\nOverall success rate: {summary.get('success_rate', 0):.1%}")
 
