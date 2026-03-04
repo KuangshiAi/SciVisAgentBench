@@ -292,8 +292,22 @@ class EvaluationReporter:
 
         return token_usage_map
 
-    def copy_images(self, results: List[Dict[str, Any]]):
-        """Copy result images and ground truth images to output directory. Mark cases as failures if images not found."""
+    def has_vision_evaluation(self, case_name: str, yaml_cases: Dict[str, Dict[str, Any]]) -> bool:
+        """Check if a case has vision evaluation defined in YAML."""
+        if case_name not in yaml_cases:
+            return False
+
+        case_def = yaml_cases[case_name]
+        assert_list = case_def.get('assert', [])
+
+        for assertion in assert_list:
+            if assertion.get('type') == 'llm-rubric' and assertion.get('subtype') == 'vision':
+                return True
+
+        return False
+
+    def copy_images(self, results: List[Dict[str, Any]], yaml_cases: Dict[str, Dict[str, Any]]):
+        """Copy result images and ground truth images to output directory. Mark cases as failures if images not found (only for vision cases)."""
         images_dir = self.output_dir / "images"
         images_dir.mkdir(exist_ok=True)
 
@@ -302,6 +316,16 @@ class EvaluationReporter:
             case_dir = self.cases_dir / case_name
 
             if not case_dir.exists():
+                continue
+
+            # Check if this case has vision evaluation
+            has_vision = self.has_vision_evaluation(case_name, yaml_cases)
+
+            # Store this info in the result for later use in HTML generation
+            result['has_vision_evaluation'] = has_vision
+
+            # Only process images if the case has vision evaluation
+            if not has_vision:
                 continue
 
             # Use provided agent_mode if available, otherwise detect from result data
@@ -347,7 +371,7 @@ class EvaluationReporter:
                             result_img_found = True
                             break
 
-            # Mark case as failure if result image not found
+            # Mark case as failure if result image not found (only for vision cases)
             if not result_img_found:
                 print(f"   ⚠️  Result image not found for {case_name}, marking as failure")
                 result['image_missing'] = True
@@ -424,7 +448,7 @@ class EvaluationReporter:
         return self.agent_name
 
     def mark_no_visualization_as_failure(self, results: List[Dict[str, Any]], yaml_cases: Dict[str, Any]):
-        """Mark cases with no visualization output (missing image/text files) as failures."""
+        """Mark cases with no visualization output (missing image files) as failures (only for vision cases)."""
         import os
 
         for result in results:
@@ -433,6 +457,11 @@ class EvaluationReporter:
 
             # Skip if already failed (check both top-level and evaluation status)
             if result.get('status') == 'failed' or eval_data.get('status') == 'failed':
+                continue
+
+            # Skip if case doesn't have vision evaluation
+            has_vision = result.get('has_vision_evaluation', False)
+            if not has_vision:
                 continue
 
             # Determine the results directory path
@@ -564,6 +593,52 @@ class EvaluationReporter:
                     if 'token_usage' in efficiency:
                         efficiency['token_usage']['score'] = 0
 
+    def mark_zero_text_score_as_failure(self, results: List[Dict[str, Any]]):
+        """Mark text-only cases with zero score as failures."""
+        for result in results:
+            case_name = result.get('case_name', 'unknown')
+            eval_data = result.get('evaluation', {})
+
+            # Skip if already failed (check both top-level and evaluation status)
+            if result.get('status') == 'failed' or eval_data.get('status') == 'failed':
+                continue
+
+            # Check if this case has text evaluation but NOT vision evaluation
+            subtype_results = eval_data.get('subtype_results', {})
+
+            # Skip if case has vision evaluation (we handle those separately)
+            if 'vision' in subtype_results:
+                continue
+
+            # Only process text-only cases
+            if 'text' not in subtype_results:
+                continue
+
+            text_data = subtype_results['text']
+            text_scores = text_data.get('scores', {})
+            text_score = text_scores.get('total_score', 0)
+
+            # Mark as failure if text score is exactly 0
+            if text_score == 0:
+                print(f"   ⚠️  {case_name}: text-only case with score 0, marking as failure")
+                result['zero_text_score'] = True
+
+                # Update both top-level and evaluation-level status for consistency
+                result['status'] = 'failed'
+                result['evaluation']['status'] = 'failed'
+
+                # Set error message
+                error_msg = f"Text evaluation score is 0 (text-only case)"
+                if not result.get('error'):
+                    result['error'] = error_msg
+                else:
+                    result['error'] = f"{result['error']}; {error_msg}"
+
+                # Set total score and percentage to 0
+                if 'evaluation' in result and 'scores' in result['evaluation'] and result['evaluation']['scores']:
+                    result['evaluation']['scores']['total_score'] = 0
+                    result['evaluation']['scores']['percentage'] = 0.0
+
     def generate_report(self) -> Path:
         """Generate the HTML report."""
         # Load all data
@@ -583,13 +658,16 @@ class EvaluationReporter:
         print(f"   Loaded token usage for {len(token_usage_map)} cases")
 
         print("   Copying images...")
-        self.copy_images(results)
+        self.copy_images(results, yaml_cases)
 
         print("   Checking for cases with no visualization output...")
         self.mark_no_visualization_as_failure(results, yaml_cases)
 
         print("   Checking for cases with very low vision evaluation scores...")
         self.mark_low_vision_score_as_failure(results)
+
+        print("   Checking for text-only cases with zero score...")
+        self.mark_zero_text_score_as_failure(results)
 
         # Recompute summary statistics after marking failures
         print("   Recomputing summary statistics with updated scores...")
