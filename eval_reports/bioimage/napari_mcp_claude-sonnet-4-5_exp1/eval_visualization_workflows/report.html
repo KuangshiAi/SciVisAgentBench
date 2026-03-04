@@ -532,7 +532,7 @@
             <h1>🎯 SciVisAgentBench Evaluation Report</h1>
             <div class="header-meta">
                 <span class="agent-name">napari_mcp</span>
-                <span class="timestamp">Generated: 2026-03-03T23:22:30.481930</span>
+                <span class="timestamp">Generated: 2026-03-03T23:38:33.258021</span>
             </div>
         </header>
 
@@ -544,10 +544,10 @@
                 <div class="summary-card">
                     <h3>Overall Score</h3>
                     <div class="value score-poor">
-                        36.8%
+                        37.3%
                     </div>
                     <div class="sub-value">
-                        92/250 Points
+                        82/220 Points
                     </div>
                 </div>
 
@@ -744,7 +744,7 @@
                     <strong>Criterion:</strong> Does the visualization show a green cell with red blobs on the inside?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The result image clearly shows green fluorescent cells, including a prominent central green cell that contains multiple distinct red blobs/spots inside it, matching the intended appearance (green cell with internal red puncta).
+                    <strong>Judge's Assessment:</strong> The result clearly shows green fluorescent cells, including a prominent central green cell that contains multiple distinct red punctate blobs inside it (red spots concentrated within the cell body). This matches the requirement of a green cell with red blobs on the inside.
                 </div>
             </div>
          
@@ -757,14 +757,14 @@
                     <strong>Criterion:</strong> Does the result rendering look similar to ground truth?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The cellular structures, green intensity patterns, and red puncta locations look very similar to the ground truth. The main noticeable difference is that the result rendering is shown with a thick black border/matted background (the image is inset within a black frame), slightly altering the overall presentation/cropping compared to the ground truth.
+                    <strong>Judge's Assessment:</strong> The result rendering is very similar in content, colors, and spatial arrangement (same central spiky green cell with internal red puncta, and the same neighboring green cell on the right). However, the result appears to be displayed with additional black borders/margins and slightly different framing/scale compared to the ground truth, making it not an almost pixel-identical match.
                 </div>
             </div>
         
                 </div>
                 <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
-                    <p style="color: #666;">The key biological content (green cells with internal red blobs) matches extremely well. Overall similarity is high, with the primary discrepancy being the added black border/inset framing in the result image rather than differences in the rendered cell content.</p>
+                    <p style="color: #666;">The core biological visualization (green cells with internal red puncta) matches the ground truth very well. Minor presentation differences (notably the added black border and slight framing changes) reduce overall similarity but do not change the essential visual content.</p>
                 </div>
             </div>
         </div>
@@ -990,7 +990,7 @@
                     <h2 class="case-title">📝 operation_2</h2>
                     
                 </div>
-                <div class="case-score">20/20 (100.0%)</div>
+                <div class="case-score">10/10 (100.0%)</div>
             </div>
 
             <div class="case-content">
@@ -1013,23 +1013,18 @@
             <div class="expandable-content">
                 <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Score</h4>
-                    <div style="font-size: 2em; font-weight: 700; color: #667eea;">20/20 (100.0%)</div>
+                    <div style="font-size: 2em; font-weight: 700; color: #667eea;">10/10 (100.0%)</div>
                 </div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Questions & Correct Answers</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Check if the points layer has been created.
-2. Q1 correct answer: Yes</div>
+                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Q1 correct answer: Yes</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
                 <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Q1: Was the points layer created successfully? (Yes/No)
 Yes</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Check if the points layer has been created): 10/10. The provided answer explicitly states that the points layer was created successfully ("Yes"), which directly addresses whether the points layer exists/was created.
-
-Criterion 2 (Q1 correct answer: Yes): 10/10. The answer matches the specified correct answer ("Yes") exactly.
-
-Overall, the response is fully consistent with the evaluation criteria and the known correct answer.</div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided answer to Q1 is "Yes," which exactly matches the expected correct answer. Therefore, it fully satisfies the evaluation criterion with no discrepancies.</div>
             </div>
         </div>
     
@@ -1040,7 +1035,7 @@ Overall, the response is fully consistent with the evaluation criteria and the k
             <div class="metrics-grid">
             <div class="metric-box">
                 <div class="metric-label">Text Q&A Score</div>
-                <div class="metric-value">20/20</div>
+                <div class="metric-value">10/10</div>
                 <div class="metric-subvalue">
                     100.0%
                 </div>
@@ -1073,7 +1068,7 @@ Overall, the response is fully consistent with the evaluation criteria and the k
                     <h2 class="case-title">📝 operation_3</h2>
                     
                 </div>
-                <div class="case-score">10/20 (50.0%)</div>
+                <div class="case-score">10/10 (100.0%)</div>
             </div>
 
             <div class="case-content">
@@ -1096,20 +1091,17 @@ Overall, the response is fully consistent with the evaluation criteria and the k
             <div class="expandable-content">
                 <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Score</h4>
-                    <div style="font-size: 2em; font-weight: 700; color: #667eea;">10/20 (50.0%)</div>
+                    <div style="font-size: 2em; font-weight: 700; color: #667eea;">10/10 (100.0%)</div>
                 </div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Questions & Correct Answers</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Check if the shapes layer has been created.
-2. Q1 correct answer: Yes</div>
+                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Q1 correct answer: Yes</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
                 <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Yes</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Shapes layer created): 0/10. The provided answer is only "Yes" and does not mention or provide any evidence that a shapes layer was created. There is no reference to a shapes layer, how it was created, or confirmation tied to that specific requirement.
-
-Criterion 2 (Q1 correct answer: Yes): 10/10. The answer "Yes" matches the expected correct answer for Q1 exactly.</div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided task answer is exactly "Yes", which matches the expected correct answer. Therefore, it fully satisfies the evaluation criterion with no discrepancies.</div>
             </div>
         </div>
     
@@ -1120,9 +1112,9 @@ Criterion 2 (Q1 correct answer: Yes): 10/10. The answer "Yes" matches the expect
             <div class="metrics-grid">
             <div class="metric-box">
                 <div class="metric-label">Text Q&A Score</div>
-                <div class="metric-value">10/20</div>
+                <div class="metric-value">10/10</div>
                 <div class="metric-subvalue">
-                    50.0%
+                    100.0%
                 </div>
             </div>
         
@@ -1153,7 +1145,7 @@ Criterion 2 (Q1 correct answer: Yes): 10/10. The answer "Yes" matches the expect
                     <h2 class="case-title">📝 operation_4</h2>
                     <span class="status-badge status-failed">❌ FAILED</span>
                 </div>
-                <div class="case-score">0/20 (0.0%)</div>
+                <div class="case-score">0/10 (0.0%)</div>
             </div>
 
             <div class="case-content">
@@ -1176,22 +1168,17 @@ Criterion 2 (Q1 correct answer: Yes): 10/10. The answer "Yes" matches the expect
             <div class="expandable-content">
                 <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Score</h4>
-                    <div style="font-size: 2em; font-weight: 700; color: #667eea;">0/20 (0.0%)</div>
+                    <div style="font-size: 2em; font-weight: 700; color: #667eea;">0/10 (0.0%)</div>
                 </div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Questions & Correct Answers</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Check if the labels layer has been created.
-2. Q1 correct answer: Yes</div>
+                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Q1 correct answer: Yes</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
                 <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">No</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Labels layer created): The provided task answer is "No," which indicates the labels layer has not been created. This does not satisfy the criterion that checks for creation of the labels layer (the expected outcome is that it has been created). Score: 0/10.
-
-Criterion 2 (Q1 correct answer: Yes): The evaluation criterion explicitly states the correct answer to Q1 is "Yes." The provided answer "No" is incorrect and directly contradicts the expected response. Score: 0/10.
-
-Total: 0/20 because the answer fails both the labels-layer requirement and the specified correct response for Q1.</div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 requires the answer to Q1 to be "Yes". The provided task answer is "No", which directly contradicts the specified correct answer. Therefore, it does not meet the evaluation criterion at all and receives 0/10.</div>
             </div>
         </div>
     
@@ -1202,7 +1189,7 @@ Total: 0/20 because the answer fails both the labels-layer requirement and the s
             <div class="metrics-grid">
             <div class="metric-box">
                 <div class="metric-label">Text Q&A Score</div>
-                <div class="metric-value">0/20</div>
+                <div class="metric-value">0/10</div>
                 <div class="metric-subvalue">
                     0.0%
                 </div>
@@ -1303,7 +1290,7 @@ Total: 0/20 because the answer fails both the labels-layer requirement and the s
                     <strong>Criterion:</strong> Does the result screenshot look similar to the ground truth image?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The ground truth shows a multi-channel fluorescence-like microscopy image with many red nuclei and green neurite-like structures over a dark background. The result image is mostly black with only a small magenta/purple rectangular patch in the lower-right; it does not depict the same cellular structures, field of view, or overall composition. Visual similarity is essentially absent.
+                    <strong>Judge's Assessment:</strong> The ground truth shows a dark-field style multichannel fluorescence image with many red nuclei and green/blue neurite-like structures spanning the frame. The result image is mostly black with a small magenta/purple rectangular patch in the lower-right and does not resemble the cellular structures, composition, or full-frame content of the ground truth.
                 </div>
             </div>
          
@@ -1316,7 +1303,7 @@ Total: 0/20 because the answer fails both the labels-layer requirement and the s
                     <strong>Criterion:</strong> Are the same colormaps and blending modes used as in the target figure?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> Ground truth uses distinct red and green channels (with some faint bluish/cyan speckling) blended over black, consistent with an additive/screen-like multi-channel composite. The result uses a single magenta/purple-toned patch with no separate red/green channel appearance and no comparable blending of channels across the full frame.
+                    <strong>Judge's Assessment:</strong> Ground truth uses distinct RGB channels (prominent red nuclei, green processes, faint cyan/blue puncta) blended over a dark background. The result uses a single magenta/purple appearance in a small region, indicating different colormap/channel mapping and no comparable blending of multiple channels across the scene.
                 </div>
             </div>
          
@@ -1329,14 +1316,14 @@ Total: 0/20 because the answer fails both the labels-layer requirement and the s
                     <strong>Criterion:</strong> Is the contrast and gamma adjusted to match the target figure?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> Ground truth has balanced contrast where nuclei and neurites are clearly visible against a dark background, suggesting appropriate gamma/levels. The result is overwhelmingly underexposed/black with only a dim, noisy purple area; contrast and gamma do not match the target at all.
+                    <strong>Judge's Assessment:</strong> Ground truth has balanced contrast with visible dim structures and brighter nuclei on a near-black background. The result is largely underexposed/blank (black) with a noisy magenta patch; gamma/contrast clearly do not match the target’s dynamic range or visibility of structures.
                 </div>
             </div>
         
                 </div>
                 <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
-                    <p style="color: #666;">The result fails to reproduce the ground-truth visualization. It does not match the scene content, does not use the same colormaps/channel blending, and appears to have incorrect intensity scaling (mostly black), yielding a very poor overall correspondence.</p>
+                    <p style="color: #666;">The result does not match the ground truth in content, color/channel mapping, blending, or tone mapping. It appears to be an incorrect or partially rendered image with the wrong colormap and severely mismatched contrast/gamma.</p>
                 </div>
             </div>
         </div>
@@ -1460,7 +1447,7 @@ Total: 0/20 because the answer fails both the labels-layer requirement and the s
                     <strong>Criterion:</strong> Does the result rendering look similar to ground truth?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The ground truth shows a clearly rendered, solid tooth surface (smooth shaded/reflective, centered, filling much of the frame). The result image instead shows a sparse, noisy point-cloud-like slab at an oblique angle with a diagonal colored line/axis element, and does not resemble the tooth geometry, material, lighting, or camera framing. Overall visual similarity is essentially absent.
+                    <strong>Judge's Assessment:</strong> The ground truth shows a smooth, solid, high-quality shaded 3D tooth-like surface centered in the frame on a black background. The result image instead shows a sparse/noisy point-cloud-like slab tilted in space with a colored line/axis segment, and does not resemble the tooth geometry, shading, pose, or rendering style. Overall visual similarity is essentially absent.
                 </div>
             </div>
          
@@ -1473,14 +1460,14 @@ Total: 0/20 because the answer fails both the labels-layer requirement and the s
                     <strong>Criterion:</strong> Does the visualization show the target structure clearly?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The target structure (tooth) is very clear in the ground truth with well-defined cusps and roots. In the result, the structure is not recognizable as a tooth; it appears as a scattered volume/points with no discernible anatomical features, so the target structure is not shown clearly.
+                    <strong>Judge's Assessment:</strong> In the ground truth, the target structure (tooth) is clearly defined with continuous surface shading and visible anatomical features. In the result, the structure is not clearly reconstructed—it's dominated by scattered points/noise forming an indistinct block, with no recognizable tooth morphology or clear surface, so the target structure is not shown clearly.
                 </div>
             </div>
         
                 </div>
                 <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
-                    <p style="color: #666;">The result fails to match the ground truth rendering style and viewpoint and does not depict the tooth structure clearly; it looks like an incorrect/failed render (noisy point cloud with extraneous line/axis).</p>
+                    <p style="color: #666;">The result fails to match the ground truth both in appearance and in effectively displaying the intended tooth structure. It appears to render an incorrect dataset/representation (noisy point cloud and axis/line) rather than the expected solid tooth surface.</p>
                 </div>
             </div>
         </div>
@@ -1572,7 +1559,7 @@ Save the answer of Q1 to the questions in plain text as "eval_analysis_workflows
                 <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">5</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: 2): The provided task answer is "5", but the expected correct answer is "2". This is incorrect and does not meet the criterion. No partial credit is warranted because the response does not match the required value.</div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: 2): The provided task answer is "5", but the expected correct answer is "2". This does not meet the criterion, as the response is incorrect with no partial alignment to the required value. Therefore, the score for this criterion is 0/10, yielding a total score of 0/10.</div>
             </div>
         </div>
     
@@ -1729,7 +1716,7 @@ Save the answer of Q1 to the questions in plain text as "eval_analysis_workflows
                 <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Yes</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided task answer is exactly "Yes", which matches the expected correct answer. Therefore, it fully satisfies the evaluation criterion with no discrepancies.</div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided task answer is exactly "Yes", which matches the expected correct answer. Therefore, it fully satisfies the criterion with no discrepancies.</div>
             </div>
         </div>
     
@@ -1769,7 +1756,7 @@ Save the answer of Q1 to the questions in plain text as "eval_analysis_workflows
 
         <footer class="footer">
             <p>Generated by SciVisAgentBench Evaluation Reporter</p>
-            <p>Timestamp: 2026-03-03T23:22:30.481930</p>
+            <p>Timestamp: 2026-03-03T23:38:33.258021</p>
         </footer>
     </div>
 

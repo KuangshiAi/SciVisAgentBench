@@ -41,8 +41,7 @@
     - type: llm-rubric
       subtype: text
       value: |
-          1. Check if the points layer has been created.
-          2. Q1 correct answer: Yes
+          1. Q1 correct answer: Yes
       rs-file: eval_visualization_workflows/points_answer.txt
   options:
     cache: false
@@ -59,8 +58,7 @@
     - type: llm-rubric
       subtype: text
       value: |
-          1. Check if the shapes layer has been created.
-          2. Q1 correct answer: Yes
+          1. Q1 correct answer: Yes
       rs-file: eval_visualization_workflows/shapes_answer.txt
   options:
     cache: false
@@ -77,8 +75,7 @@
     - type: llm-rubric
       subtype: text
       value: |
-        1. Check if the labels layer has been created.
-        2. Q1 correct answer: Yes
+        1. Q1 correct answer: Yes
       rs-file: eval_visualization_workflows/labels_answer.txt
   options:
     cache: false
