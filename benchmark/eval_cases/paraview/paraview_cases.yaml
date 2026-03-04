@@ -232,7 +232,7 @@
 # Case 7: crayfish_streamline
 - vars:
     question: |
-        Load the Crayfish flow vector field from "crayfish_streamline/data/crayfish_streamline.raw", the information about this dataset:
+        Load the Crayfish flow vector field from "crayfish_streamline/data/crayfish_streamline_322x162x119_float32_scalar3.raw", the information about this dataset:
         Crayfish Flow (Vector)
         Data Scalar Type: float
         Data Byte Order: Little Endian
@@ -251,7 +251,9 @@
 
         In the pipeline browser panel, hide all stream tracers and only show the tube filters and the outline.
 
-        Use a gray-blue background (RGB: 0.329, 0.349, 0.427). Render at 1280x1280.
+        Use a white background. Render at 1280x1280.
+
+        Set the viewpoint parameters as: [436.67, -370.55, 562.71] to position; [160.5, 80.5, 59.07] to focal point; [-0.099, 0.714, 0.693] to camera up direction
 
         Save the paraview state as "crayfish_streamline/results/{agent_mode}/crayfish_streamline.pvsm".
         Save the visualization image as "crayfish_streamline/results/{agent_mode}/crayfish_streamline.png".
@@ -261,9 +263,9 @@
     - type: llm-rubric
       subtype: vision
       value: |
-          1. Overall Visualization Goal: Does the result show streamline tubes colored by velocity magnitude within a rectangular bounding box, similar to the ground truth?
-          2. Streamline Clusters: Are there two distinct clusters that matches the ground truth layout?
-          3. Color Mapping: Are the tubes colored by velocity magnitude using a blue-white-red diverging colormap, with a similar distribution as the ground truth?
+        1. Overall Visualization Goal: Does the result show streamline tubes colored by velocity magnitude within a rectangular bounding box, similar to the ground truth?
+        2. Streamline Clusters: Are there two distinct clusters that matches the ground truth layout?
+        3. Color Mapping: Are the tubes colored by velocity magnitude using a blue-white-red diverging colormap, with a similar distribution as the ground truth?
 
 # Case 8: engine
 - vars:

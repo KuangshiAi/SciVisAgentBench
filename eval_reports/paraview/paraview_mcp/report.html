@@ -532,7 +532,7 @@
             <h1>🎯 SciVisAgentBench Evaluation Report</h1>
             <div class="header-meta">
                 <span class="agent-name">paraview_mcp</span>
-                <span class="timestamp">Generated: 2026-03-01T22:47:56.649545</span>
+                <span class="timestamp">Generated: 2026-03-03T21:19:34.851884</span>
             </div>
         </header>
 
@@ -547,7 +547,7 @@
                         40.7%
                     </div>
                     <div class="sub-value">
-                        989/2430 Points
+                        988/2430 Points
                     </div>
                 </div>
 
@@ -564,20 +564,20 @@
                 <div class="summary-card">
                     <h3>Avg Vision Score</h3>
                     <div class="value">
-                        37.4%
+                        37.3%
                     </div>
                     <div class="sub-value">
                         Visualization Quality
                     </div>
                     <div class="sub-value">
-                        616/1670
+                        615/1670
                     </div>
                 </div>
 
                 <div class="summary-card">
                     <h3>PSNR (Scaled)</h3>
                     <div class="value">
-                        15.41 dB
+                        15.42 dB
                     </div>
                     <div class="sub-value">
                         Peak SNR (17/37 valid)
@@ -2577,7 +2577,7 @@ Do not save any other files, and always save the visualization image.
                     <h2 class="case-title">📝 crayfish_streamline</h2>
                     <span class="status-badge status-warning">⚠️ LOW SCORE</span>
                 </div>
-                <div class="case-score">12/45 (26.7%)</div>
+                <div class="case-score">11/45 (24.4%)</div>
             </div>
 
             <div class="case-content">
@@ -2592,11 +2592,11 @@ Number of Scalar Components: 3
 Data loading is very important, make sure you correctly load the dataset according to their features.
 
 Create two streamline sets using "Stream Tracer" filters with "Point Cloud" seed type, each with 100 seed points and radius 32.2:
-- Streamline 1: Seed center at [107.33, 81.0, 59.5]. Apply a "Tube" filter (radius 0.5, 12 sides). Color by Vorticity magnitude using a diverging colormap with the following RGB control points:
+- Streamline 1: Seed center at [107.33, 81.0, 59.5]. Apply a "Tube" filter (radius 0.5, 12 sides). Color by Velocity magnitude using a diverging colormap with the following RGB control points:
   - Value 0.0 -> RGB(0.231, 0.298, 0.753) (blue)
   - Value 0.02 -> RGB(0.865, 0.865, 0.865) (white)
   - Value 0.15 -> RGB(0.706, 0.016, 0.149) (red)
-- Streamline 2: Seed center at [214.67, 81.0, 59.5]. Apply a "Tube" filter (radius 0.5, 12 sides). Color by Vorticity magnitude using the same colormap.
+- Streamline 2: Seed center at [214.67, 81.0, 59.5]. Apply a "Tube" filter (radius 0.5, 12 sides). Color by Velocity magnitude using the same colormap.
 
 Show the dataset bounding box as an outline (black).
 
@@ -2604,7 +2604,7 @@ In the pipeline browser panel, hide all stream tracers and only show the tube fi
 
 Use a white background. Render at 1280x1280.
 
-Set the viewpoint parameters as: [435.04, -325.38, 567.82] to position; [111.64, 202.81, -21.96] to focal point; [-0.099, 0.714, 0.693] to camera up direction.
+Set the viewpoint parameters as: [436.67, -370.55, 562.71] to position; [160.5, 80.5, 59.07] to focal point; [-0.099, 0.714, 0.693] to camera up direction
 
 Save the paraview state as "crayfish_streamline/results/{agent_mode}/crayfish_streamline.pvsm".
 Save the visualization image as "crayfish_streamline/results/{agent_mode}/crayfish_streamline.png".
@@ -2639,7 +2639,7 @@ Do not save any other files, and always save the visualization image.
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">7/30</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">6/30</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
@@ -2657,13 +2657,13 @@ Do not save any other files, and always save the visualization image.
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 1</div>
-                    <div class="rubric-score">2/10</div>
+                    <div class="rubric-score">3/10</div>
                 </div>
                 <div class="rubric-criterion">
-                    <strong>Criterion:</strong> Overall Visualization Goal: Does the result show streamline tubes colored by vorticity magnitude within a rectangular bounding box, similar to the ground truth?
+                    <strong>Criterion:</strong> Overall Visualization Goal: Does the result show streamline tubes colored by velocity magnitude within a rectangular bounding box, similar to the ground truth?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> Ground truth shows a large rectangular black outline bounding box containing two dense streamline tube bundles that fill much of the volume. The result image shows only a tiny, isolated set of a few tubes near the center of an otherwise empty white canvas, and no dataset bounding box outline is visible. Overall, it does not achieve the intended full-scene streamline-in-box visualization.
+                    <strong>Judge's Assessment:</strong> Ground truth shows a dense set of streamline tubes filling much of the rectangular dataset outline (bounding box), clearly visible in black, with tubes colored by velocity magnitude. The result image shows only a tiny fragment of geometry near the center on a white background, and the dataset bounding box/outline is not visible at all. Overall it does not resemble the intended full-scene streamline-tube-in-box visualization.
                 </div>
             </div>
          
@@ -2673,30 +2673,30 @@ Do not save any other files, and always save the visualization image.
                     <div class="rubric-score">1/10</div>
                 </div>
                 <div class="rubric-criterion">
-                    <strong>Criterion:</strong> Streamline Clusters: Are there two distinct clusters matches the ground truth layout?
+                    <strong>Criterion:</strong> Streamline Clusters: Are there two distinct clusters that matches the ground truth layout?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> Ground truth clearly contains two distinct streamline clusters (left and right) seeded from two different centers. The result shows only one small fragmentary cluster (or a small subset of a cluster) with no clear second group, so the required two-cluster structure is not present.
+                    <strong>Judge's Assessment:</strong> Ground truth contains two large, distinct streamline clusters (left and right) corresponding to the two seed centers. The result shows only a small V-shaped piece of streamline/tube and does not present two separate clusters or anything comparable to the left-right dual structure.
                 </div>
             </div>
          
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 3</div>
-                    <div class="rubric-score">4/10</div>
+                    <div class="rubric-score">2/10</div>
                 </div>
                 <div class="rubric-criterion">
-                    <strong>Criterion:</strong> Color Mapping: Are the tubes colored by vorticity magnitude using a blue-white-red diverging colormap, with a similar distribution as the ground truth?
+                    <strong>Criterion:</strong> Color Mapping: Are the tubes colored by velocity magnitude using a blue-white-red diverging colormap, with a similar distribution as the ground truth?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The visible tubes in the result are predominantly blue with some light/whitish tones, consistent with a blue-white-red diverging scheme, but there is little to no red visible and the distribution/intensity of colors does not resemble the ground truth (which has substantial reds and whites intermixed across both bundles). The limited geometry also makes the colormap match hard to verify.
+                    <strong>Judge's Assessment:</strong> Ground truth uses a diverging blue–white–red colormap with substantial variation (many blue outer tubes and red/white inner regions) and a visible scalar bar. The result appears almost entirely dark blue with minimal variation and no visible red/white distribution, so the velocity-magnitude diverging mapping is not correctly represented (or the range/lookup table is incorrect).
                 </div>
             </div>
         
                 </div>
                 <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
-                    <p style="color: #666;">The result does not match the ground truth composition: it lacks the bounding box, lacks the two distinct streamline tube clusters, and only shows a very small portion of the expected streamline set. While the coloring appears somewhat consistent with a diverging blue-white-red map, the overall visualization goal is largely unmet.</p>
+                    <p style="color: #666;">The result fails to reproduce the main elements of the target visualization: the bounding box is missing, the two-cluster streamline structure is absent, and the color mapping lacks the expected blue–white–red variation. What is shown is only a small, sparse fragment of the expected streamline tubes.</p>
                 </div>
             </div>
         </div>
@@ -2710,7 +2710,7 @@ Do not save any other files, and always save the visualization image.
             <div class="metrics-grid">
             <div class="metric-box">
                 <div class="metric-label">Visualization Quality</div>
-                <div class="metric-value">7/30</div>
+                <div class="metric-value">6/30</div>
             </div>
         
             <div class="metric-box">
@@ -2728,37 +2728,37 @@ Do not save any other files, and always save the visualization image.
         
                 <div class="metric-box">
                     <div class="metric-label">PSNR</div>
-                    <div class="metric-value">15.12 dB</div>
+                    <div class="metric-value">15.28 dB</div>
                 </div>
             
                 <div class="metric-box">
                     <div class="metric-label">SSIM</div>
-                    <div class="metric-value">0.8819</div>
+                    <div class="metric-value">0.8822</div>
                 </div>
             
                 <div class="metric-box">
                     <div class="metric-label">LPIPS</div>
-                    <div class="metric-value">0.2298</div>
+                    <div class="metric-value">0.2293</div>
                 </div>
             
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">1,124,082</div>
+                <div class="metric-value">1,445,407</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">9,025</div>
+                <div class="metric-value">14,792</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">1,133,107</div>
+                <div class="metric-value">1,460,199</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Cost</div>
-                <div class="metric-value">$3.5076</div>
+                <div class="metric-value">$4.5581</div>
             </div>
         </div>
         </div>
@@ -9564,7 +9564,7 @@ Do not save any other files, and always save the visualization image.
 
         <footer class="footer">
             <p>Generated by SciVisAgentBench Evaluation Reporter</p>
-            <p>Timestamp: 2026-03-01T22:47:56.649545</p>
+            <p>Timestamp: 2026-03-03T21:19:34.851884</p>
         </footer>
     </div>
 
