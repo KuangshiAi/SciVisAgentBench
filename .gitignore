@@ -86,4 +86,5 @@ src/session
 
 SciVisAgentBench-tasks_beforeFeb24/
 
-exp.sh
+exp*.sh
+exp*.ps1
