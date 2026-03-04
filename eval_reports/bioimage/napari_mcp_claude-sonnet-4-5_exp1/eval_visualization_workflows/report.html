@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluation Report - napari_mcp</title>
+    <style>
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .header-meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .agent-name {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .timestamp {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .summary {
+            padding: 40px;
+            background: #f8f9fa;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .summary h2 {
+            color: #667eea;
+            margin-bottom: 25px;
+            font-size: 2em;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+
+        .summary-card h3 {
+            color: #667eea;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .summary-card .value {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .summary-card .sub-value {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .score-excellent { color: #10b981; }
+        .score-good { color: #3b82f6; }
+        .score-fair { color: #f59e0b; }
+        .score-poor { color: #ef4444; }
+
+        .config-info {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .config-info h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .config-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .config-item label {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+
+        .config-item value {
+            font-size: 1em;
+            color: #333;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        .case-nav {
+            padding: 30px 40px;
+            background: white;
+            border-bottom: 2px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .case-nav h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .case-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .case-link {
+            padding: 8px 16px;
+            background: #f3f4f6;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 500;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+
+        .case-link:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .case-link-failed {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+        }
+
+        .case-link-failed:hover {
+            background: #dc2626;
+            color: white;
+            border-color: #dc2626;
+        }
+
+        .case-section {
+            padding: 40px;
+            border-bottom: 3px solid #f3f4f6;
+        }
+
+        .case-section:last-child {
+            border-bottom: none;
+        }
+
+        .case-section-failed {
+            background: #fef2f2;
+            border-left: 5px solid #dc2626;
+            border-bottom: 3px solid #fca5a5;
+        }
+
+        .case-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .case-title-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .case-title {
+            font-size: 1.8em;
+            color: #333;
+            font-weight: 700;
+        }
+
+        .status-badge {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.7em;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .status-failed {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .status-warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .case-score {
+            font-size: 1.5em;
+            font-weight: 700;
+            padding: 10px 25px;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .case-content {
+            display: grid;
+            gap: 30px;
+        }
+
+        .section-box {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section-box h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .task-description {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+            border: 1px solid #e5e7eb;
+        }
+
+        .image-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .image-box {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .image-box h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .image-box img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+        }
+
+        .image-box .no-image {
+            width: 100%;
+            height: 300px;
+            background: #f3f4f6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            font-size: 1.1em;
+        }
+
+        .rubric-scores {
+            display: grid;
+            gap: 15px;
+        }
+
+        .rubric-item {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .rubric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .rubric-title {
+            font-weight: 700;
+            color: #333;
+            flex: 1;
+        }
+
+        .rubric-score {
+            font-size: 1.3em;
+            font-weight: 700;
+            padding: 5px 15px;
+            border-radius: 20px;
+            background: #667eea;
+            color: white;
+        }
+
+        .rubric-criterion {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            color: #333;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .rubric-criterion strong {
+            color: #667eea;
+            font-style: normal;
+        }
+
+        .rubric-explanation {
+            color: #666;
+            line-height: 1.6;
+            margin-top: 10px;
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            border-left: 3px solid #667eea;
+        }
+
+        .rubric-explanation strong {
+            color: #764ba2;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .metric-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .metric-label {
+            font-size: 0.85em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .metric-subvalue {
+            font-size: 0.9em;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .code-similarity {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+        }
+
+        .code-similarity h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .code-sim-score {
+            font-size: 2em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .code-sim-details {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .expandable {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .expandable::before {
+            content: '▼ ';
+            display: inline-block;
+            transition: transform 0.3s;
+        }
+
+        .expandable.collapsed::before {
+            transform: rotate(-90deg);
+        }
+
+        .expandable-content {
+            margin-top: 15px;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .expandable-content.collapsed {
+            max-height: 0;
+            margin-top: 0;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .footer p {
+            margin: 5px 0;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .image-comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .case-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .case-title-group {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .case-title {
+                font-size: 1.5em;
+            }
+        }
+    
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🎯 SciVisAgentBench Evaluation Report</h1>
+            <div class="header-meta">
+                <span class="agent-name">napari_mcp</span>
+                <span class="timestamp">Generated: 2026-03-03T23:38:33.258021</span>
+            </div>
+        </header>
+
+        
+        <section class="summary">
+            <h2>📊 Overall Performance</h2>
+
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h3>Overall Score</h3>
+                    <div class="value score-poor">
+                        37.3%
+                    </div>
+                    <div class="sub-value">
+                        82/220 Points
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h3>Test Cases</h3>
+                    <div class="value">
+                        5/10
+                    </div>
+                    <div class="sub-value">
+                        Completed Successfully
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h3>Avg Vision Score</h3>
+                    <div class="value">
+                        22.5%
+                    </div>
+                    <div class="sub-value">
+                        Visualization Quality
+                    </div>
+                    <div class="sub-value">
+                        18/90
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h3>PSNR (Scaled)</h3>
+                    <div class="value">
+                        N/A
+                    </div>
+                    <div class="sub-value">
+                        Peak SNR (0/5 valid)
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h3>SSIM (Scaled)</h3>
+                    <div class="value">
+                        N/A
+                    </div>
+                    <div class="sub-value">
+                        Structural Similarity
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h3>LPIPS (Scaled)</h3>
+                    <div class="value">
+                        N/A
+                    </div>
+                    <div class="sub-value">
+                        Perceptual Distance
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h3>Completion Rate</h3>
+                    <div class="value">
+                        50.0%
+                    </div>
+                    <div class="sub-value">
+                        Tasks Completed
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; padding: 15px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #667eea;">
+                <h4 style="color: #667eea; margin-bottom: 10px;">ℹ️ About Scaled Metrics</h4>
+                <p style="color: #666; line-height: 1.6; margin: 0;">
+                    <strong>Scaled metrics</strong> account for completion rate to enable fair comparison across different evaluation modes.
+                    Formula: <em>PSNR<sub>scaled</sub> = (completed_cases / total_cases) × avg(PSNR)</em>,
+                    <em>SSIM<sub>scaled</sub> = (completed_cases / total_cases) × avg(SSIM)</em>,
+                    <em>LPIPS<sub>scaled</sub> = 1.0 - (completed_cases / total_cases) × (1.0 - avg(LPIPS))</em>.
+                    Cases with infinite PSNR (perfect match) are excluded from the PSNR calculation.
+                </p>
+            </div>
+
+            <div class="config-info">
+                <h3>🔧 Configuration</h3>
+                <div class="config-grid">
+                    <div class="config-item">
+                        <label>Provider</label>
+                        <value>anthropic</value>
+                    </div>
+                    <div class="config-item">
+                        <label>Model</label>
+                        <value>claude-sonnet-4-5</value>
+                    </div>
+                    <div class="config-item">
+                        <label>Base URL</label>
+                        <value>https://api.anthropic.com</value>
+                    </div>
+                    <div class="config-item">
+                        <label>Input Price</label>
+                        <value>$3.00</value>
+                    </div>
+                    <div class="config-item">
+                        <label>Output Price</label>
+                        <value>$15.00</value>
+                    </div>
+                </div>
+            </div>
+        </section>
+    
+
+        <nav class="case-nav">
+            <h3>Jump to Case:</h3>
+            <div class="case-links">
+                <a href="#operation_1" class="case-link">operation_1</a>
+<a href="#operation_10" class="case-link case-link-failed">operation_10</a>
+<a href="#operation_2" class="case-link">operation_2</a>
+<a href="#operation_3" class="case-link">operation_3</a>
+<a href="#operation_4" class="case-link case-link-failed">operation_4</a>
+<a href="#operation_5" class="case-link case-link-failed">operation_5</a>
+<a href="#operation_6" class="case-link case-link-failed">operation_6</a>
+<a href="#operation_7" class="case-link case-link-failed">operation_7</a>
+<a href="#operation_8" class="case-link">operation_8</a>
+<a href="#operation_9" class="case-link">operation_9</a>
+            </div>
+        </nav>
+
+        
+        <section class="case-section" id="operation_1">
+            <div class="case-header">
+                <div class="case-title-group">
+                    <h2 class="case-title">📝 operation_1</h2>
+                    
+                </div>
+                <div class="case-score">42/45 (93.3%)</div>
+            </div>
+
+            <div class="case-content">
+                <div class="section-box">
+                    <h3>📋 Task Description</h3>
+                    <div class="task-description">1. Load the "data/dataset_002/dataset_002.tif" dataset into napari. 
+2. Depending on the number of channels, set the colormap for the first channel 0 to red and channel 1 to green.
+3. Switch to the 3D view. 
+4. Use additive blending for all channels to create an overlay visualization.
+5. Go the timestep 14. 
+  Q1: Does the cell show protrusions? (Yes/No)
+6. Take a screenshot of the result, save it to "eval_visualization_workflows/screenshot_1.png"
+7. Answer Q1 in a plain text file "eval_visualization_workflows/multi_channel_answer.txt".
+</div>
+                </div>
+
+                
+        <div class="section-box">
+            <h3>🖼️ Visualization Comparison</h3>
+            <div class="image-comparison">
+                <div class="image-box">
+                    <h4>Ground Truth</h4>
+                    <img src="images/operation_1_gt.png" alt="Ground Truth" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
+                </div>
+                <div class="image-box">
+                    <h4>Agent Result</h4>
+                    <img src="images/operation_1_result.png" alt="Result" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
+                </div>
+            </div>
+        </div>
+    
+
+                
+        <div class="section-box">
+            <h3 class="expandable">📏 Vision Evaluation Rubrics</h3>
+            <div class="expandable-content">
+                
+        <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+            <h4 style="color: #667eea; margin-bottom: 10px;">Score Summary</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">18/20</div>
+                </div>
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">2</div>
+                </div>
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Points/Goal</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">10</div>
+                </div>
+            </div>
+        </div>
+    
+                <div class="rubric-scores" style="margin-top: 15px;">
+                    
+            <div class="rubric-item">
+                <div class="rubric-header">
+                    <div class="rubric-title">Goal 1</div>
+                    <div class="rubric-score">10/10</div>
+                </div>
+                <div class="rubric-criterion">
+                    <strong>Criterion:</strong> Does the visualization show a green cell with red blobs on the inside?
+                </div>
+                <div class="rubric-explanation">
+                    <strong>Judge's Assessment:</strong> The result clearly shows green fluorescent cells, including a prominent central green cell that contains multiple distinct red punctate blobs inside it (red spots concentrated within the cell body). This matches the requirement of a green cell with red blobs on the inside.
+                </div>
+            </div>
+         
+            <div class="rubric-item">
+                <div class="rubric-header">
+                    <div class="rubric-title">Goal 2</div>
+                    <div class="rubric-score">8/10</div>
+                </div>
+                <div class="rubric-criterion">
+                    <strong>Criterion:</strong> Does the result rendering look similar to ground truth?
+                </div>
+                <div class="rubric-explanation">
+                    <strong>Judge's Assessment:</strong> The result rendering is very similar in content, colors, and spatial arrangement (same central spiky green cell with internal red puncta, and the same neighboring green cell on the right). However, the result appears to be displayed with additional black borders/margins and slightly different framing/scale compared to the ground truth, making it not an almost pixel-identical match.
+                </div>
+            </div>
+        
+                </div>
+                <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
+                    <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
+                    <p style="color: #666;">The core biological visualization (green cells with internal red puncta) matches the ground truth very well. Minor presentation differences (notably the added black border and slight framing changes) reduce overall similarity but do not change the essential visual content.</p>
+                </div>
+            </div>
+        </div>
+    
+
+                
+        <div class="section-box">
+            <h3 class="expandable">📝 Text-Based Q&A Evaluation</h3>
+            <div class="expandable-content">
+                <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <h4 style="color: #667eea; margin-bottom: 10px;">Score</h4>
+                    <div style="font-size: 2em; font-weight: 700; color: #667eea;">10/10 (100.0%)</div>
+                </div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Questions & Correct Answers</h4>
+                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Q1 correct answer: Yes</div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Yes</div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided task answer is exactly "Yes", which matches the expected correct answer. Therefore, it fully satisfies the evaluation criterion with no discrepancies.</div>
+            </div>
+        </div>
+    
+
+                
+        <div class="section-box">
+            <h3>📊 Detailed Metrics</h3>
+            <div class="metrics-grid">
+            <div class="metric-box">
+                <div class="metric-label">Visualization Quality</div>
+                <div class="metric-value">18/20</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Generation</div>
+                <div class="metric-value">5/5</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Efficiency</div>
+                <div class="metric-value">9/10</div>
+                <div class="metric-subvalue">
+                    Completed in 52.14 seconds (excellent)
+                </div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Text Q&A Score</div>
+                <div class="metric-value">10/10</div>
+                <div class="metric-subvalue">
+                    100.0%
+                </div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Input Tokens</div>
+                <div class="metric-value">126,564</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Tokens</div>
+                <div class="metric-value">1,540</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Tokens</div>
+                <div class="metric-value">128,104</div>
+            </div>
+        </div>
+        </div>
+    
+            </div>
+        </section>
+    
+
+        <section class="case-section case-section-failed" id="operation_10">
+            <div class="case-header">
+                <div class="case-title-group">
+                    <h2 class="case-title">📝 operation_10</h2>
+                    <span class="status-badge status-failed">❌ FAILED</span>
+                </div>
+                <div class="case-score">0/35 (0.0%)</div>
+            </div>
+
+            <div class="case-content">
+                <div class="section-box">
+                    <h3>📋 Task Description</h3>
+                    <div class="task-description">1. Load the image "data/dataset_002/dataset_002.tif" into napari.
+2. Trace the cell surface on the current slice by adding a polygon shape in a new shapes layer.
+3. Use a screenshot to validate whether the polygon correctly traces the cell surface.
+4. If the trace is not accurate, adjust the polygon and take a new screenshot to validate.
+5. Stop when the trace is accurate or you have tried five different attempts.
+6. Save the results and the final screenshot to "eval_annotation_workflows/cell_surface_trace.png".
+</div>
+                </div>
+
+                
+        <div class="section-box">
+            <h3>🖼️ Visualization Comparison</h3>
+            <div class="image-comparison">
+                <div class="image-box">
+                    <h4>Ground Truth</h4>
+                    <img src="images/operation_10_gt.png" alt="Ground Truth" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
+                </div>
+                <div class="image-box">
+                    <h4>Agent Result</h4>
+                    <img src="images/operation_10_result.png" alt="Result" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
+                </div>
+            </div>
+        </div>
+    
+
+                
+        <div class="section-box">
+            <h3 class="expandable">📏 Vision Evaluation Rubrics</h3>
+            <div class="expandable-content">
+                
+        <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+            <h4 style="color: #667eea; margin-bottom: 10px;">Score Summary</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">0/20</div>
+                </div>
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">2</div>
+                </div>
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Points/Goal</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">10</div>
+                </div>
+            </div>
+        </div>
+    
+                <div class="rubric-scores" style="margin-top: 15px;">
+                    
+            <div class="rubric-item">
+                <div class="rubric-header">
+                    <div class="rubric-title">Goal 1</div>
+                    <div class="rubric-score">0/10</div>
+                </div>
+                <div class="rubric-criterion">
+                    <strong>Criterion:</strong> Does the final screenshot show a polygon shape that accurately traces the outline of the cell surface?
+                </div>
+                <div class="rubric-explanation">
+                    <strong>Judge's Assessment:</strong> <em style="color: #9ca3af;">Not evaluated</em>
+                </div>
+            </div>
+         
+            <div class="rubric-item">
+                <div class="rubric-header">
+                    <div class="rubric-title">Goal 2</div>
+                    <div class="rubric-score">0/10</div>
+                </div>
+                <div class="rubric-criterion">
+                    <strong>Criterion:</strong> Is the polygon layer correctly overlaid on the image?
+                </div>
+                <div class="rubric-explanation">
+                    <strong>Judge's Assessment:</strong> <em style="color: #9ca3af;">Not evaluated</em>
+                </div>
+            </div>
+        
+                </div>
+                <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
+                    <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
+                    <p style="color: #666;"><em style="color: #9ca3af;">No overall explanation available</em></p>
+                </div>
+            </div>
+        </div>
+    
+
+                
+
+                
+        <div class="section-box">
+            <h3>📊 Detailed Metrics</h3>
+            <div class="metrics-grid">
+            <div class="metric-box">
+                <div class="metric-label">Visualization Quality</div>
+                <div class="metric-value">0/20</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Generation</div>
+                <div class="metric-value">5/5</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Efficiency</div>
+                <div class="metric-value">5/10</div>
+                <div class="metric-subvalue">
+                    Completed in 204.02 seconds (acceptable)
+                </div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Input Tokens</div>
+                <div class="metric-value">223,024</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Tokens</div>
+                <div class="metric-value">2,467</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Tokens</div>
+                <div class="metric-value">225,491</div>
+            </div>
+        </div>
+        </div>
+    
+            </div>
+        </section>
+    
+
+        <section class="case-section" id="operation_2">
+            <div class="case-header">
+                <div class="case-title-group">
+                    <h2 class="case-title">📝 operation_2</h2>
+                    
+                </div>
+                <div class="case-score">10/10 (100.0%)</div>
+            </div>
+
+            <div class="case-content">
+                <div class="section-box">
+                    <h3>📋 Task Description</h3>
+                    <div class="task-description">1. Load the "data/dataset_002/Points.csv" dataset into napari.
+2. Check if the points layer has been created.
+  Q1: Was the points layer created successfully? (Yes/No)
+3. Answer Q1 in a plain text file "eval_visualization_workflows/points_answer.txt".
+</div>
+                </div>
+
+                
+
+                
+
+                
+        <div class="section-box">
+            <h3 class="expandable">📝 Text-Based Q&A Evaluation</h3>
+            <div class="expandable-content">
+                <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <h4 style="color: #667eea; margin-bottom: 10px;">Score</h4>
+                    <div style="font-size: 2em; font-weight: 700; color: #667eea;">10/10 (100.0%)</div>
+                </div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Questions & Correct Answers</h4>
+                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Q1 correct answer: Yes</div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Q1: Was the points layer created successfully? (Yes/No)
+Yes</div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided answer to Q1 is "Yes," which exactly matches the expected correct answer. Therefore, it fully satisfies the evaluation criterion with no discrepancies.</div>
+            </div>
+        </div>
+    
+
+                
+        <div class="section-box">
+            <h3>📊 Detailed Metrics</h3>
+            <div class="metrics-grid">
+            <div class="metric-box">
+                <div class="metric-label">Text Q&A Score</div>
+                <div class="metric-value">10/10</div>
+                <div class="metric-subvalue">
+                    100.0%
+                </div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Input Tokens</div>
+                <div class="metric-value">86,601</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Tokens</div>
+                <div class="metric-value">1,235</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Tokens</div>
+                <div class="metric-value">87,836</div>
+            </div>
+        </div>
+        </div>
+    
+            </div>
+        </section>
+    
+
+        <section class="case-section" id="operation_3">
+            <div class="case-header">
+                <div class="case-title-group">
+                    <h2 class="case-title">📝 operation_3</h2>
+                    
+                </div>
+                <div class="case-score">10/10 (100.0%)</div>
+            </div>
+
+            <div class="case-content">
+                <div class="section-box">
+                    <h3>📋 Task Description</h3>
+                    <div class="task-description">1. Load the "data/dataset_002/Shapes.csv" dataset into napari.
+2. Check if the shapes layer has been created.
+  Q1: Was the shapes layer created successfully? (Yes/No)
+3. Answer Q1 in a plain text file "eval_visualization_workflows/shapes_answer.txt".
+</div>
+                </div>
+
+                
+
+                
+
+                
+        <div class="section-box">
+            <h3 class="expandable">📝 Text-Based Q&A Evaluation</h3>
+            <div class="expandable-content">
+                <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <h4 style="color: #667eea; margin-bottom: 10px;">Score</h4>
+                    <div style="font-size: 2em; font-weight: 700; color: #667eea;">10/10 (100.0%)</div>
+                </div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Questions & Correct Answers</h4>
+                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Q1 correct answer: Yes</div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Yes</div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided task answer is exactly "Yes", which matches the expected correct answer. Therefore, it fully satisfies the evaluation criterion with no discrepancies.</div>
+            </div>
+        </div>
+    
+
+                
+        <div class="section-box">
+            <h3>📊 Detailed Metrics</h3>
+            <div class="metrics-grid">
+            <div class="metric-box">
+                <div class="metric-label">Text Q&A Score</div>
+                <div class="metric-value">10/10</div>
+                <div class="metric-subvalue">
+                    100.0%
+                </div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Input Tokens</div>
+                <div class="metric-value">115,392</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Tokens</div>
+                <div class="metric-value">1,438</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Tokens</div>
+                <div class="metric-value">116,830</div>
+            </div>
+        </div>
+        </div>
+    
+            </div>
+        </section>
+    
+
+        <section class="case-section case-section-failed" id="operation_4">
+            <div class="case-header">
+                <div class="case-title-group">
+                    <h2 class="case-title">📝 operation_4</h2>
+                    <span class="status-badge status-failed">❌ FAILED</span>
+                </div>
+                <div class="case-score">0/10 (0.0%)</div>
+            </div>
+
+            <div class="case-content">
+                <div class="section-box">
+                    <h3>📋 Task Description</h3>
+                    <div class="task-description">1. Load the "data/dataset_002/Labels.tif" dataset into napari.
+2. Check if the labels layer has been created.
+  Q1: Was the labels layer created successfully? (Yes/No)
+3. Answer Q1 in a plain text file "eval_visualization_workflows/labels_answer.txt".
+</div>
+                </div>
+
+                
+
+                
+
+                
+        <div class="section-box">
+            <h3 class="expandable">📝 Text-Based Q&A Evaluation</h3>
+            <div class="expandable-content">
+                <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <h4 style="color: #667eea; margin-bottom: 10px;">Score</h4>
+                    <div style="font-size: 2em; font-weight: 700; color: #667eea;">0/10 (0.0%)</div>
+                </div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Questions & Correct Answers</h4>
+                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Q1 correct answer: Yes</div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">No</div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 requires the answer to Q1 to be "Yes". The provided task answer is "No", which directly contradicts the specified correct answer. Therefore, it does not meet the evaluation criterion at all and receives 0/10.</div>
+            </div>
+        </div>
+    
+
+                
+        <div class="section-box">
+            <h3>📊 Detailed Metrics</h3>
+            <div class="metrics-grid">
+            <div class="metric-box">
+                <div class="metric-label">Text Q&A Score</div>
+                <div class="metric-value">0/10</div>
+                <div class="metric-subvalue">
+                    0.0%
+                </div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Input Tokens</div>
+                <div class="metric-value">85,473</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Tokens</div>
+                <div class="metric-value">1,149</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Tokens</div>
+                <div class="metric-value">86,622</div>
+            </div>
+        </div>
+        </div>
+    
+            </div>
+        </section>
+    
+
+        <section class="case-section case-section-failed" id="operation_5">
+            <div class="case-header">
+                <div class="case-title-group">
+                    <h2 class="case-title">📝 operation_5</h2>
+                    <span class="status-badge status-failed">❌ FAILED</span>
+                </div>
+                <div class="case-score">0/45 (0.0%)</div>
+            </div>
+
+            <div class="case-content">
+                <div class="section-box">
+                    <h3>📋 Task Description</h3>
+                    <div class="task-description">1. Load the dataset into napari: data/dataset_001/dataset_001.tiff
+2. Read the target figure: data/dataset_001/dataset_001.png but don't load it into napari.
+3. Read the dataset description: data/dataset_001/dataset_001.yaml. 
+4. Set the same colormaps and blending modes as the target figure.
+5. Adjust contrast and gamma as needed to match the target figure.
+6. Take a screenshot of your recreation.
+7. If the recreation does not match the target figure, adjust the visualization settings and take a screenshot again.
+8. Stop when the recreation matches the target figure or you have tried five different visualization settings.
+9. Save the final screenshot to "eval_figure_recreation/screenshot.png".
+</div>
+                </div>
+
+                
+        <div class="section-box">
+            <h3>🖼️ Visualization Comparison</h3>
+            <div class="image-comparison">
+                <div class="image-box">
+                    <h4>Ground Truth</h4>
+                    <img src="images/operation_5_gt.png" alt="Ground Truth" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
+                </div>
+                <div class="image-box">
+                    <h4>Agent Result</h4>
+                    <img src="images/operation_5_result.png" alt="Result" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
+                </div>
+            </div>
+        </div>
+    
+
+                
+        <div class="section-box">
+            <h3 class="expandable">📏 Vision Evaluation Rubrics</h3>
+            <div class="expandable-content">
+                
+        <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+            <h4 style="color: #667eea; margin-bottom: 10px;">Score Summary</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">0/30</div>
+                </div>
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">3</div>
+                </div>
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Points/Goal</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">10</div>
+                </div>
+            </div>
+        </div>
+    
+                <div class="rubric-scores" style="margin-top: 15px;">
+                    
+            <div class="rubric-item">
+                <div class="rubric-header">
+                    <div class="rubric-title">Goal 1</div>
+                    <div class="rubric-score">1/10</div>
+                </div>
+                <div class="rubric-criterion">
+                    <strong>Criterion:</strong> Does the result screenshot look similar to the ground truth image?
+                </div>
+                <div class="rubric-explanation">
+                    <strong>Judge's Assessment:</strong> The ground truth shows a dark-field style multichannel fluorescence image with many red nuclei and green/blue neurite-like structures spanning the frame. The result image is mostly black with a small magenta/purple rectangular patch in the lower-right and does not resemble the cellular structures, composition, or full-frame content of the ground truth.
+                </div>
+            </div>
+         
+            <div class="rubric-item">
+                <div class="rubric-header">
+                    <div class="rubric-title">Goal 2</div>
+                    <div class="rubric-score">0/10</div>
+                </div>
+                <div class="rubric-criterion">
+                    <strong>Criterion:</strong> Are the same colormaps and blending modes used as in the target figure?
+                </div>
+                <div class="rubric-explanation">
+                    <strong>Judge's Assessment:</strong> Ground truth uses distinct RGB channels (prominent red nuclei, green processes, faint cyan/blue puncta) blended over a dark background. The result uses a single magenta/purple appearance in a small region, indicating different colormap/channel mapping and no comparable blending of multiple channels across the scene.
+                </div>
+            </div>
+         
+            <div class="rubric-item">
+                <div class="rubric-header">
+                    <div class="rubric-title">Goal 3</div>
+                    <div class="rubric-score">1/10</div>
+                </div>
+                <div class="rubric-criterion">
+                    <strong>Criterion:</strong> Is the contrast and gamma adjusted to match the target figure?
+                </div>
+                <div class="rubric-explanation">
+                    <strong>Judge's Assessment:</strong> Ground truth has balanced contrast with visible dim structures and brighter nuclei on a near-black background. The result is largely underexposed/blank (black) with a noisy magenta patch; gamma/contrast clearly do not match the target’s dynamic range or visibility of structures.
+                </div>
+            </div>
+        
+                </div>
+                <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
+                    <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
+                    <p style="color: #666;">The result does not match the ground truth in content, color/channel mapping, blending, or tone mapping. It appears to be an incorrect or partially rendered image with the wrong colormap and severely mismatched contrast/gamma.</p>
+                </div>
+            </div>
+        </div>
+    
+
+                
+
+                
+        <div class="section-box">
+            <h3>📊 Detailed Metrics</h3>
+            <div class="metrics-grid">
+            <div class="metric-box">
+                <div class="metric-label">Visualization Quality</div>
+                <div class="metric-value">2/30</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Generation</div>
+                <div class="metric-value">5/5</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Efficiency</div>
+                <div class="metric-value">4/10</div>
+                <div class="metric-subvalue">
+                    Completed in 123.43 seconds (good)
+                </div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Input Tokens</div>
+                <div class="metric-value">405,572</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Tokens</div>
+                <div class="metric-value">6,166</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Tokens</div>
+                <div class="metric-value">411,738</div>
+            </div>
+        </div>
+        </div>
+    
+            </div>
+        </section>
+    
+
+        <section class="case-section case-section-failed" id="operation_6">
+            <div class="case-header">
+                <div class="case-title-group">
+                    <h2 class="case-title">📝 operation_6</h2>
+                    <span class="status-badge status-failed">❌ FAILED</span>
+                </div>
+                <div class="case-score">0/35 (0.0%)</div>
+            </div>
+
+            <div class="case-content">
+                <div class="section-box">
+                    <h3>📋 Task Description</h3>
+                    <div class="task-description">1. Read the file "data/dataset_003/eval_iso_surface_determination_target_1.txt" to get the target iso-surface values for different tooth structures.
+2. Load data/dataset_003/dataset_003.tif into napari. 
+3. Switch to 3D view mode and set the rendering to iso. 
+4. Find the iso surface value that shows the target clearly.
+5. Rotate the camera to several angles and take a screenshot of the result each time to check if the target structure is clearly visible from different angles.
+6. If the target structure is not clearly visible, adjust the iso surface value and take a screenshot again.
+7. Stop when the target structure is clearly visible or you have tried five different iso surface values.
+8. Save the final screenshot to "eval_iso_surface_determination/screenshot.png".
+</div>
+                </div>
+
+                
+        <div class="section-box">
+            <h3>🖼️ Visualization Comparison</h3>
+            <div class="image-comparison">
+                <div class="image-box">
+                    <h4>Ground Truth</h4>
+                    <img src="images/operation_6_gt.png" alt="Ground Truth" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
+                </div>
+                <div class="image-box">
+                    <h4>Agent Result</h4>
+                    <img src="images/operation_6_result.png" alt="Result" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
+                </div>
+            </div>
+        </div>
+    
+
+                
+        <div class="section-box">
+            <h3 class="expandable">📏 Vision Evaluation Rubrics</h3>
+            <div class="expandable-content">
+                
+        <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+            <h4 style="color: #667eea; margin-bottom: 10px;">Score Summary</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">0/20</div>
+                </div>
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">2</div>
+                </div>
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Points/Goal</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">10</div>
+                </div>
+            </div>
+        </div>
+    
+                <div class="rubric-scores" style="margin-top: 15px;">
+                    
+            <div class="rubric-item">
+                <div class="rubric-header">
+                    <div class="rubric-title">Goal 1</div>
+                    <div class="rubric-score">1/10</div>
+                </div>
+                <div class="rubric-criterion">
+                    <strong>Criterion:</strong> Does the result rendering look similar to ground truth?
+                </div>
+                <div class="rubric-explanation">
+                    <strong>Judge's Assessment:</strong> The ground truth shows a smooth, solid, high-quality shaded 3D tooth-like surface centered in the frame on a black background. The result image instead shows a sparse/noisy point-cloud-like slab tilted in space with a colored line/axis segment, and does not resemble the tooth geometry, shading, pose, or rendering style. Overall visual similarity is essentially absent.
+                </div>
+            </div>
+         
+            <div class="rubric-item">
+                <div class="rubric-header">
+                    <div class="rubric-title">Goal 2</div>
+                    <div class="rubric-score">1/10</div>
+                </div>
+                <div class="rubric-criterion">
+                    <strong>Criterion:</strong> Does the visualization show the target structure clearly?
+                </div>
+                <div class="rubric-explanation">
+                    <strong>Judge's Assessment:</strong> In the ground truth, the target structure (tooth) is clearly defined with continuous surface shading and visible anatomical features. In the result, the structure is not clearly reconstructed—it's dominated by scattered points/noise forming an indistinct block, with no recognizable tooth morphology or clear surface, so the target structure is not shown clearly.
+                </div>
+            </div>
+        
+                </div>
+                <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
+                    <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
+                    <p style="color: #666;">The result fails to match the ground truth both in appearance and in effectively displaying the intended tooth structure. It appears to render an incorrect dataset/representation (noisy point cloud and axis/line) rather than the expected solid tooth surface.</p>
+                </div>
+            </div>
+        </div>
+    
+
+                
+
+                
+        <div class="section-box">
+            <h3>📊 Detailed Metrics</h3>
+            <div class="metrics-grid">
+            <div class="metric-box">
+                <div class="metric-label">Visualization Quality</div>
+                <div class="metric-value">2/20</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Generation</div>
+                <div class="metric-value">5/5</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Efficiency</div>
+                <div class="metric-value">5/10</div>
+                <div class="metric-subvalue">
+                    Completed in 92.73 seconds (good)
+                </div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Input Tokens</div>
+                <div class="metric-value">329,879</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Tokens</div>
+                <div class="metric-value">3,106</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Tokens</div>
+                <div class="metric-value">332,985</div>
+            </div>
+        </div>
+        </div>
+    
+            </div>
+        </section>
+    
+
+        <section class="case-section case-section-failed" id="operation_7">
+            <div class="case-header">
+                <div class="case-title-group">
+                    <h2 class="case-title">📝 operation_7</h2>
+                    <span class="status-badge status-failed">❌ FAILED</span>
+                </div>
+                <div class="case-score">0/10 (0.0%)</div>
+            </div>
+
+            <div class="case-content">
+                <div class="section-box">
+                    <h3>📋 Task Description</h3>
+                    <div class="task-description">Load the image "data/dataset_001/dataset_001.tiff" and set it to magenta colormap.
+Take a screenshot and analyze it to count how many complete cells are visible (not cut off by edges).
+Add point annotations to mark the center of each counted cell.
+Measure the distance between the two most distant cells.
+Q1: answer with the number of complete cells you counted, for example "5" if you see 5 complete cells.
+Save the answer of Q1 to the questions in plain text as "eval_analysis_workflows/Q1_answer.txt".
+</div>
+                </div>
+
+                
+
+                
+
+                
+        <div class="section-box">
+            <h3 class="expandable">📝 Text-Based Q&A Evaluation</h3>
+            <div class="expandable-content">
+                <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <h4 style="color: #667eea; margin-bottom: 10px;">Score</h4>
+                    <div style="font-size: 2em; font-weight: 700; color: #667eea;">0/10 (0.0%)</div>
+                </div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Questions & Correct Answers</h4>
+                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Q1 correct answer: 2</div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">5</div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: 2): The provided task answer is "5", but the expected correct answer is "2". This does not meet the criterion, as the response is incorrect with no partial alignment to the required value. Therefore, the score for this criterion is 0/10, yielding a total score of 0/10.</div>
+            </div>
+        </div>
+    
+
+                
+        <div class="section-box">
+            <h3>📊 Detailed Metrics</h3>
+            <div class="metrics-grid">
+            <div class="metric-box">
+                <div class="metric-label">Text Q&A Score</div>
+                <div class="metric-value">0/10</div>
+                <div class="metric-subvalue">
+                    0.0%
+                </div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Input Tokens</div>
+                <div class="metric-value">211,917</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Tokens</div>
+                <div class="metric-value">3,072</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Tokens</div>
+                <div class="metric-value">214,989</div>
+            </div>
+        </div>
+        </div>
+    
+            </div>
+        </section>
+    
+
+        <section class="case-section" id="operation_8">
+            <div class="case-header">
+                <div class="case-title-group">
+                    <h2 class="case-title">📝 operation_8</h2>
+                    
+                </div>
+                <div class="case-score">10/10 (100.0%)</div>
+            </div>
+
+            <div class="case-content">
+                <div class="section-box">
+                    <h3>📋 Task Description</h3>
+                    <div class="task-description">1. Load the image "data/dataset_001/dataset_001.tiff". 
+2. Get basic statistics (min, max, mean, std) for the loaded layer.
+3. Extract the raw layer data and examine its properties.
+4. Save the current layer to a file for further analysis.
+ Q1: Was the statistical analysis and data export successful? (Yes/No)
+6. Save the answer of Q1 in plain text as "eval_analysis_workflows/layer_statistics_answer.txt".
+</div>
+                </div>
+
+                
+
+                
+
+                
+        <div class="section-box">
+            <h3 class="expandable">📝 Text-Based Q&A Evaluation</h3>
+            <div class="expandable-content">
+                <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <h4 style="color: #667eea; margin-bottom: 10px;">Score</h4>
+                    <div style="font-size: 2em; font-weight: 700; color: #667eea;">10/10 (100.0%)</div>
+                </div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Questions & Correct Answers</h4>
+                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Q1 correct answer: Yes</div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Yes</div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided task answer is exactly "Yes", which matches the expected correct answer. Therefore, it fully satisfies the evaluation criterion with no discrepancies.</div>
+            </div>
+        </div>
+    
+
+                
+        <div class="section-box">
+            <h3>📊 Detailed Metrics</h3>
+            <div class="metrics-grid">
+            <div class="metric-box">
+                <div class="metric-label">Text Q&A Score</div>
+                <div class="metric-value">10/10</div>
+                <div class="metric-subvalue">
+                    100.0%
+                </div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Input Tokens</div>
+                <div class="metric-value">90,233</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Tokens</div>
+                <div class="metric-value">1,248</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Tokens</div>
+                <div class="metric-value">91,481</div>
+            </div>
+        </div>
+        </div>
+    
+            </div>
+        </section>
+    
+
+        <section class="case-section" id="operation_9">
+            <div class="case-header">
+                <div class="case-title-group">
+                    <h2 class="case-title">📝 operation_9</h2>
+                    
+                </div>
+                <div class="case-score">10/10 (100.0%)</div>
+            </div>
+
+            <div class="case-content">
+                <div class="section-box">
+                    <h3>📋 Task Description</h3>
+                    <div class="task-description">1. Load the image "data/dataset_001/dataset_001.tiff". 
+2. Add point annotations at random locations on the image.
+3. Add shape annotations (rectangles or circles) at random locations on the image.
+ Q1: Check if layers have been generated. (Yes/No)
+4. Save the answer of Q1 in plain text as "eval_analysis_workflows/annotation_answer.txt".
+</div>
+                </div>
+
+                
+
+                
+
+                
+        <div class="section-box">
+            <h3 class="expandable">📝 Text-Based Q&A Evaluation</h3>
+            <div class="expandable-content">
+                <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <h4 style="color: #667eea; margin-bottom: 10px;">Score</h4>
+                    <div style="font-size: 2em; font-weight: 700; color: #667eea;">10/10 (100.0%)</div>
+                </div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Questions & Correct Answers</h4>
+                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Q1 correct answer: Yes</div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Yes</div>
+
+                <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided task answer is exactly "Yes", which matches the expected correct answer. Therefore, it fully satisfies the criterion with no discrepancies.</div>
+            </div>
+        </div>
+    
+
+                
+        <div class="section-box">
+            <h3>📊 Detailed Metrics</h3>
+            <div class="metrics-grid">
+            <div class="metric-box">
+                <div class="metric-label">Text Q&A Score</div>
+                <div class="metric-value">10/10</div>
+                <div class="metric-subvalue">
+                    100.0%
+                </div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Input Tokens</div>
+                <div class="metric-value">133,789</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Tokens</div>
+                <div class="metric-value">1,797</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Tokens</div>
+                <div class="metric-value">135,586</div>
+            </div>
+        </div>
+        </div>
+    
+            </div>
+        </section>
+    
+
+        <footer class="footer">
+            <p>Generated by SciVisAgentBench Evaluation Reporter</p>
+            <p>Timestamp: 2026-03-03T23:38:33.258021</p>
+        </footer>
+    </div>
+
+    <script>
+        
+        // Expandable sections
+        document.querySelectorAll('.expandable').forEach(element => {
+            element.addEventListener('click', function() {
+                this.classList.toggle('collapsed');
+                const content = this.nextElementSibling;
+                if (content && content.classList.contains('expandable-content')) {
+                    content.classList.toggle('collapsed');
+                }
+            });
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Initialize expandable sections as collapsed
+        document.querySelectorAll('.expandable-content').forEach(content => {
+            content.style.maxHeight = content.scrollHeight + 'px';
+        });
+
+        console.log('📊 Evaluation Report Loaded');
+    
+    </script>
+</body>
+</html>

@@ -130,11 +130,7 @@ class NapariManager:  # pylint: disable=too-few-public-methods
         threshold: float | None = None,
     ) -> Tuple[bool, str]:
         """Apply iso-surface (contour) rendering to one or more layers."""
-        args: list[Any] = []
-        if layer_name is not None:
-            args.append(layer_name)
-        if threshold is not None:
-            args.append(float(threshold))
+        args: list[Any] = [layer_name, threshold]
         return self.send_command("napari-socket.iso_contour", args)
     
     def iso_contour_all_layers(self, threshold: float) -> Tuple[bool, str]:
@@ -282,39 +278,27 @@ class NapariManager:  # pylint: disable=too-few-public-methods
     # ------------------------------------------------------------------
     def add_points(self, coordinates: list | np.ndarray, properties: dict | None = None, name: str | None = None) -> Tuple[bool, Any]:
         """Add point markers to the viewer."""
-        args = [coordinates]
-        if properties is not None:
-            args.append(properties)
-        if name is not None:
-            args.append(name)
+        args = [coordinates, properties, name]
         return self.send_command("napari-socket.add_points", args)
 
     def add_shapes(self, shape_data: list | np.ndarray, shape_type: str = 'rectangle', name: str | None = None) -> Tuple[bool, Any]:
         """Add shape overlays (rectangles, circles, etc.)."""
-        args = [shape_data, shape_type]
-        if name is not None:
-            args.append(name)
+        args = [shape_data, shape_type, name]
         return self.send_command("napari-socket.add_shapes", args)
 
     def add_labels(self, label_image: np.ndarray, name: str | None = None) -> Tuple[bool, Any]:
         """Add segmentation masks or labeled regions."""
-        args = [label_image]
-        if name is not None:
-            args.append(name)
+        args = [label_image, name]
         return self.send_command("napari-socket.add_labels", args)
 
     def add_surface(self, vertices: np.ndarray, faces: np.ndarray, name: str | None = None) -> Tuple[bool, Any]:
         """Add 3D mesh surface to the viewer."""
-        args = [vertices, faces]
-        if name is not None:
-            args.append(name)
+        args = [vertices, faces, name]
         return self.send_command("napari-socket.add_surface", args)
 
     def add_vectors(self, vectors: np.ndarray, name: str | None = None) -> Tuple[bool, Any]:
         """Add vector field arrows to the viewer."""
-        args = [vectors]
-        if name is not None:
-            args.append(name)
+        args = [vectors, name]
         return self.send_command("napari-socket.add_vectors", args)
 
     # ------------------------------------------------------------------
@@ -322,9 +306,7 @@ class NapariManager:  # pylint: disable=too-few-public-methods
     # ------------------------------------------------------------------
     def save_layers(self, file_path: str, layer_names: list | None = None) -> Tuple[bool, Any]:
         """Save one or more layers to disk."""
-        args = [file_path]
-        if layer_names is not None:
-            args.append(layer_names)
+        args = [file_path, layer_names]
         return self.send_command("napari-socket.save_layers", args)
 
     def get_layer_data(self, layer_name: str | int) -> Tuple[bool, Any]:
@@ -393,9 +375,7 @@ class NapariManager:  # pylint: disable=too-few-public-methods
 
     def merge_channels(self, layer_names: list, output_name: str = None) -> Tuple[bool, Any]:
         """Merge multiple single-channel layers into one multi-channel layer."""
-        args = [layer_names]
-        if output_name is not None:
-            args.append(output_name)
+        args = [layer_names, output_name]
         return self.send_command("napari-socket.merge_channels", args)
 
 # ---------------------------------------------------------------------------

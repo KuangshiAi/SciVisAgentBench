@@ -415,81 +415,105 @@ class CaseImageMetrics:
 
         # NEW LOGIC: Only calculate metrics if both PV state files exist
         if has_gs_state and has_result_state:
-            print(f"Found both ParaView state files:")
-            print(f"  GS state: {gs_state_path}")
-            print(f"  Result state: {result_state_path}")
-            print(f"Generating screenshots to ensure matching camera views and resolution...")
-
-            try:
-                # Import screenshot helper (requires ParaView)
-                try:
-                    from screenshot_helper import compare_states_screenshots
-                except ImportError:
-                    try:
-                        from .screenshot_helper import compare_states_screenshots
-                    except ImportError:
-                        print("  Warning: screenshot_helper not available. Cannot generate screenshots from state files.")
-                        skip_reason = "screenshot_helper not available (ParaView required)"
-                        # Fall back to empty metrics
-                        for viewpoint in self.viewpoints:
-                            viewpoint_metrics[viewpoint] = {'psnr': None, 'ssim': None, 'lpips': None}
-                        raise ImportError("screenshot_helper not available")
-
-                # Generate screenshots from both state files
-                screenshot_dir = os.path.join(self.case_dir, "evaluation_results", self.eval_mode, "screenshots")
-                os.makedirs(screenshot_dir, exist_ok=True)
-
-                # Get data directory if available
-                data_dir = os.path.join(self.case_dir, "data")
-                if not os.path.exists(data_dir):
-                    data_dir = None
-
-                screenshots = compare_states_screenshots(
-                    gs_state_path,
-                    result_state_path,
-                    screenshot_dir,
-                    data_directory=data_dir
-                )
-
-                # Calculate metrics for each viewpoint
-                for viewpoint in self.viewpoints:
-                    # Map viewpoint names to screenshot filenames
-                    # screenshots['ground_truth'] and screenshots['result'] are lists of paths
-                    # e.g., ['gs_front_view.png', 'gs_side_view.png', 'gs_diagonal_view.png']
-
-                    # Find matching screenshot for this viewpoint
-                    gt_screenshot = None
-                    result_screenshot = None
-
-                    for gt_path in screenshots['ground_truth']:
-                        if f"_{viewpoint}_view.png" in gt_path or f"{viewpoint}_view.png" in gt_path:
-                            gt_screenshot = gt_path
-                            break
-
-                    for result_path in screenshots['result']:
-                        if f"_{viewpoint}_view.png" in result_path or f"{viewpoint}_view.png" in result_path:
-                            result_screenshot = result_path
-                            break
-
-                    if gt_screenshot and result_screenshot:
-                        try:
-                            metrics = self.calculator.calculate_all_metrics(gt_screenshot, result_screenshot)
-                            viewpoint_metrics[viewpoint] = metrics
-                            valid_viewpoints.append(viewpoint)
-                            print(f"  {viewpoint} view - PSNR: {metrics.get('psnr', 'N/A')}, SSIM: {metrics.get('ssim', 'N/A')}, LPIPS: {metrics.get('lpips', 'N/A')}")
-                        except Exception as e:
-                            print(f"  Error calculating {viewpoint} view metrics: {e}")
-                            viewpoint_metrics[viewpoint] = {'psnr': None, 'ssim': None, 'lpips': None}
-                    else:
-                        print(f"  Warning: Could not find {viewpoint} view screenshots")
-                        viewpoint_metrics[viewpoint] = {'psnr': None, 'ssim': None, 'lpips': None}
-
-            except Exception as e:
-                print(f"  Error generating screenshots from state files: {e}")
-                if skip_reason is None:
-                    skip_reason = f"Failed to generate screenshots: {str(e)}"
+            # Check if screenshot generation is disabled
+            skip_screenshots = os.environ.get('SKIP_PARAVIEW_SCREENSHOTS', '').lower() in ('1', 'true', 'yes')
+            if skip_screenshots:
+                print(f"Skipping screenshot generation (SKIP_PARAVIEW_SCREENSHOTS is set)")
+                skip_reason = "Screenshot generation disabled via SKIP_PARAVIEW_SCREENSHOTS"
                 for viewpoint in self.viewpoints:
                     viewpoint_metrics[viewpoint] = {'psnr': None, 'ssim': None, 'lpips': None}
+            else:
+                print(f"Found both ParaView state files:")
+                print(f"  GS state: {gs_state_path}")
+                print(f"  Result state: {result_state_path}")
+                print(f"Generating screenshots to ensure matching camera views and resolution...")
+
+            if not skip_screenshots:
+                try:
+                    # Import screenshot helper (requires ParaView)
+                    # Try to use the safe subprocess version first
+                    compare_func = None
+                    try:
+                        from screenshot_helper import compare_states_screenshots_safe
+                        compare_func = compare_states_screenshots_safe
+                    except ImportError:
+                        try:
+                            from .screenshot_helper import compare_states_screenshots_safe
+                            compare_func = compare_states_screenshots_safe
+                        except ImportError:
+                            # Fall back to direct version if subprocess version not available
+                            try:
+                                from screenshot_helper import compare_states_screenshots
+                                compare_func = compare_states_screenshots
+                                print("  Note: Using direct ParaView rendering (may crash on some systems)")
+                            except ImportError:
+                                try:
+                                    from .screenshot_helper import compare_states_screenshots
+                                    compare_func = compare_states_screenshots
+                                    print("  Note: Using direct ParaView rendering (may crash on some systems)")
+                                except ImportError:
+                                    print("  Warning: screenshot_helper not available. Cannot generate screenshots from state files.")
+                                    skip_reason = "screenshot_helper not available (ParaView required)"
+                                    # Fall back to empty metrics
+                                    for viewpoint in self.viewpoints:
+                                        viewpoint_metrics[viewpoint] = {'psnr': None, 'ssim': None, 'lpips': None}
+                                    raise ImportError("screenshot_helper not available")
+
+                    # Generate screenshots from both state files
+                    screenshot_dir = os.path.join(self.case_dir, "evaluation_results", self.eval_mode, "screenshots")
+                    os.makedirs(screenshot_dir, exist_ok=True)
+
+                    # Get data directory if available
+                    data_dir = os.path.join(self.case_dir, "data")
+                    if not os.path.exists(data_dir):
+                        data_dir = None
+
+                    screenshots = compare_func(
+                        gs_state_path,
+                        result_state_path,
+                        screenshot_dir,
+                        data_directory=data_dir
+                    )
+
+                    # Calculate metrics for each viewpoint
+                    for viewpoint in self.viewpoints:
+                        # Map viewpoint names to screenshot filenames
+                        # screenshots['ground_truth'] and screenshots['result'] are lists of paths
+                        # e.g., ['gs_front_view.png', 'gs_side_view.png', 'gs_diagonal_view.png']
+
+                        # Find matching screenshot for this viewpoint
+                        gt_screenshot = None
+                        result_screenshot = None
+
+                        for gt_path in screenshots['ground_truth']:
+                            if f"_{viewpoint}_view.png" in gt_path or f"{viewpoint}_view.png" in gt_path:
+                                gt_screenshot = gt_path
+                                break
+
+                        for result_path in screenshots['result']:
+                            if f"_{viewpoint}_view.png" in result_path or f"{viewpoint}_view.png" in result_path:
+                                result_screenshot = result_path
+                                break
+
+                        if gt_screenshot and result_screenshot:
+                            try:
+                                metrics = self.calculator.calculate_all_metrics(gt_screenshot, result_screenshot)
+                                viewpoint_metrics[viewpoint] = metrics
+                                valid_viewpoints.append(viewpoint)
+                                print(f"  {viewpoint} view - PSNR: {metrics.get('psnr', 'N/A')}, SSIM: {metrics.get('ssim', 'N/A')}, LPIPS: {metrics.get('lpips', 'N/A')}")
+                            except Exception as e:
+                                print(f"  Error calculating {viewpoint} view metrics: {e}")
+                                viewpoint_metrics[viewpoint] = {'psnr': None, 'ssim': None, 'lpips': None}
+                        else:
+                            print(f"  Warning: Could not find {viewpoint} view screenshots")
+                            viewpoint_metrics[viewpoint] = {'psnr': None, 'ssim': None, 'lpips': None}
+
+                except Exception as e:
+                    print(f"  Error generating screenshots from state files: {e}")
+                    if skip_reason is None:
+                        skip_reason = f"Failed to generate screenshots: {str(e)}"
+                    for viewpoint in self.viewpoints:
+                        viewpoint_metrics[viewpoint] = {'psnr': None, 'ssim': None, 'lpips': None}
         else:
             # Skip metrics calculation if either state file is missing
             if not has_gs_state and not has_result_state:

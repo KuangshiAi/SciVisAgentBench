@@ -832,8 +832,9 @@ def generate_case_section(result: Dict[str, Any], yaml_data: Dict[str, Any], tok
     # Generate metrics section (pass token_usage from test results)
     metrics_html = generate_metrics_section(eval_data, result, token_usage)
 
-    # Generate image comparison
-    images_html = generate_image_section(case_name)
+    # Generate image comparison (only for vision cases)
+    has_vision = result.get('has_vision_evaluation', False)
+    images_html = generate_image_section(case_name, has_vision)
 
     # Add failed class if case is failed
     section_class = "case-section case-section-failed" if final_status == 'failed' else "case-section"
@@ -866,8 +867,11 @@ def generate_case_section(result: Dict[str, Any], yaml_data: Dict[str, Any], tok
     """
 
 
-def generate_image_section(case_name: str) -> str:
-    """Generate image comparison section."""
+def generate_image_section(case_name: str, has_vision: bool = True) -> str:
+    """Generate image comparison section (only for vision cases)."""
+    if not has_vision:
+        return ""  # Don't show image section for text-only cases
+
     return f"""
         <div class="section-box">
             <h3>🖼️ Visualization Comparison</h3>

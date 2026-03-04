@@ -89,6 +89,27 @@ class MultiCaseLoader:
 
         return yaml_files
 
+    def _matches_case_name(self, case_name: str, question: str) -> bool:
+        """
+        Check if a question matches the given case name.
+
+        Uses file path patterns to avoid false positives from substring matches.
+        For example, "time-varying" should not match "time-varying velocity field"
+        in a different case's description.
+        """
+        # Match based on file path patterns that are unique to each case
+        # These patterns appear in save paths like "{case_name}/results/{agent_mode}/{case_name}.png"
+        path_patterns = [
+            f'"{case_name}/results/',      # Save path in results directory
+            f'"{case_name}/data/',          # Data directory path
+            f'/{case_name}.',               # File names like /case_name.png
+            f"'{case_name}/results/",       # Single quotes variant
+            f"'{case_name}/data/",          # Single quotes variant
+            f"/{case_name}_",               # File prefixes like /case_name_script.py
+        ]
+
+        return any(pattern in question for pattern in path_patterns)
+
     def _get_vision_metrics_for_case(self, case_name: str, yaml_path: str) -> List[Dict[str, str]]:
         """Get vision metrics for a specific case from its YAML file."""
         if yaml_path not in self.yaml_test_cases:
@@ -102,7 +123,7 @@ class MultiCaseLoader:
             question = test_case.get("vars", {}).get("question", "")
 
             # Try to match case name from save path in question
-            if case_name in question:
+            if self._matches_case_name(case_name, question):
                 # Extract vision metrics
                 return self._get_vision_metrics(test_case)
 
@@ -175,7 +196,7 @@ class MultiCaseLoader:
         # Find the test case matching this case name
         for test_case in test_cases:
             question = test_case.get("vars", {}).get("question", "")
-            if case_name in question:
+            if self._matches_case_name(case_name, question):
                 return question
 
         return ""

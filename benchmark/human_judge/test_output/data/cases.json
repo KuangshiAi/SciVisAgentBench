@@ -1,0 +1,547 @@
+{
+  "metadata": {
+    "mode": "multi_case",
+    "cases_yaml": "D:\\Code\\SciVisAgentBench\\benchmark\\eval_cases\\selected_cases.yaml",
+    "total_cases": 21,
+    "unique_yamls": [
+      "benchmark/eval_cases/paraview/paraview_cases.yaml",
+      "benchmark\\eval_cases\\napari\\1_workflows\\eval_iso_surface_determination.yaml",
+      "benchmark\\eval_cases\\napari\\1_workflows\\eval_figure_recreation.yaml",
+      "benchmark\\eval_cases\\napari\\1_workflows\\eval_visualization_workflows.yaml",
+      "benchmark/eval_cases/molecular_vis/workflows/eval_analysis_workflows.yaml"
+    ]
+  },
+  "cases": [
+    {
+      "index": 0,
+      "name": "argon-bubble",
+      "description": "Color & Opacity Mapping, Volume Rendering",
+      "task_description": "Task:\nLoad the Argon Bubble dataset from \"argon-bubble/data/argon-bubble_128x128x256_float32.vtk\".\nGenerate a visualization image of the Argon Bubble scalar field dataset with the following visualization settings:\n1) Create volume rendering\n2) Set the opacity transfer function as a ramp function across values of the volumetric data, assigning opacity 0 to value 0 and assigning opacity 1 to value 1.\n3) Set the color transfer function to assign a warm red color [0.71, 0.02, 0.15] to the highest value, a cool color [0.23, 0.29, 0.75] to the lowest value, and a grey color[0.87, 0.87, 0.87] to the midrange value\n4) Set the viewpoint parameters as: [0, 450, 0] to position; [0, 0, -15] to focal point; [0, 0, -1] to camera up direction\n5) Visualization image resolution is 1024x1024. White background. Shade turned off. Volume rendering ray casting sample distance is 0.1\n6) Don't show color/scalar bar or coordinate axes.\n\nSave the visualization image as \"argon-bubble/results/{agent_mode}/argon-bubble.png\".\n(Optional, but must save if use paraview) Save the paraview state as \"argon-bubble/results/{agent_mode}/argon-bubble.pvsm\".\n(Optional, but must save if use pvpython script) Save the python script as \"argon-bubble/results/{agent_mode}/argon-bubble.py\".\n(Optional, but must save if use VTK) Save the cxx code script as \"argon-bubble/results/{agent_mode}/argon-bubble.cxx\"\nDo not save any other files, and always save the visualization image.\n",
+      "benchmark_type": "main",
+      "metrics": [
+        {
+          "criterion": "Does the visualization image clearly show the regions of cool, warm, and mild regions?"
+        },
+        {
+          "criterion": "Does the blueish region show areas with low opacity?"
+        },
+        {
+          "criterion": "Does the reddish region show areas with high opacity?"
+        }
+      ],
+      "ground_truth_images": [
+        "SciVisAgentBench-tasks\\paraview\\argon-bubble\\GS\\argon-bubble_gs.png"
+      ],
+      "result_images": [
+        "SciVisAgentBench-tasks\\paraview\\argon-bubble\\results\\paraview_mcp_claude-sonnet-4-5_exp1\\argon-bubble.png"
+      ],
+      "has_results": true
+    },
+    {
+      "index": 1,
+      "name": "richtmyer",
+      "description": "Color & Opacity Mapping, Volume Rendering",
+      "task_description": "Task:\nLoad the Richtmyer dataset from \"richtmyer/data/richtmyer_256x256x240_float32.vtk\".\nGenerate a visualization image of the Richtmyer dataset, Entropy field (timestep 160) of Richtmyer-Meshkov instability simulation, with the following visualization settings:\n1) Create volume rendering\n2) Set the opacity transfer function as a ramp function from value 0.05 to 1 of the volumetric data, assigning opacity 0 to value less than 0.05 and assigning opacity 1 to value 1.\n3) Set the color transfer function following the 7 rainbow colors and assign a red color [1.0, 0.0, 0.0] to the highest value, a purple color [0.5, 0.0, 1.0] to the lowest value.\n4) Visualization image resolution is 1024x1024\n5) Set the viewpoint parameters as: [420, 420, -550] to position; [128, 128, 150] to focal point; [-1, -1, 1] to camera up direction\n6) Turn on the shade and set the ambient, diffuse and specular as 1.0\n7) White background. Volume rendering ray casting sample distance is 0.1\n8) Don't show color/scalar bar or coordinate axes.\nSave the visualization image as \"richtmyer/results/{agent_mode}/richtmyer.png\".\n(Optional, but must save if use paraview) Save the paraview state as \"richtmyer/results/{agent_mode}/richtmyer.pvsm\".\n(Optional, but must save if use pvpython script) Save the python script as \"richtmyer/results/{agent_mode}/richtmyer.py\".\n(Optional, but must save if use VTK) Save the cxx code script as \"richtmyer/results/{agent_mode}/richtmyer.cxx\"\nDo not save any other files, and always save the visualization image.\n",
+      "benchmark_type": "main",
+      "metrics": [
+        {
+          "criterion": "Does the visualization show a clear surface with peaks and valleys?"
+        },
+        {
+          "criterion": "Are the peaks highlighted with the reddish color?"
+        },
+        {
+          "criterion": "Are the valleys highlighted with the bluish color?"
+        }
+      ],
+      "ground_truth_images": [
+        "SciVisAgentBench-tasks\\paraview\\richtmyer\\GS\\richtmyer_gs.png"
+      ],
+      "result_images": [
+        "SciVisAgentBench-tasks\\paraview\\richtmyer\\results\\paraview_mcp_claude-sonnet-4-5_exp1\\richtmyer.png"
+      ],
+      "has_results": true
+    },
+    {
+      "index": 2,
+      "name": "foot",
+      "description": "Volume Rendering",
+      "task_description": "Task:\n\nLoad the Foot dataset from \"foot/data/foot_256x256x256_uint8.raw\", the information about this dataset:\nFoot\nDescription: Rotational C-arm x-ray scan of a human foot. Tissue and bone are present in the dataset.\nData Type: uint8\nData Byte Order: little Endian\nData Spacing: 1x1x1\nData Extent: 256x256x256\nData loading is very important, make sure you correctly load the dataset according to their features.\n\nVisualize the anatomical structures:\n1. Apply volume rendering with an X-ray transfer function that distinguishes soft tissues and bones. Bones with darker color, and soft tissue with lighter color.\n\n2. Analyze the visualization and answer the following questions:\n\nQ1: Based on the X-ray style volume rendering of the foot dataset, which of the following best describes the visibility of bony structures?\nA. Both the phalanges and metatarsals are fully visible\nB. The phalanges are fully visible, but the metatarsals are only partially visible\nC. The metatarsals are fully visible, but the phalanges are only partially visible\nD. Neither the phalanges nor the metatarsals are clearly visible\n\n3. Use a white background. Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.\n\n4. Set the viewpoint parameters as: [-576.41, -264.41, -153.48] to position; [127.5, 127.5, 127.5] to focal point; [-0.52, 0.38, 0.76] to camera up direction.\n\n5. Save your work:\nSave the visualization image as \"foot/results/{agent_mode}/foot.png\".\nSave the answers to the analysis questions in plain text as \"foot/results/{agent_mode}/answers.txt\".\n(Optional, but must save if use paraview) Save the paraview state as \"foot/results/{agent_mode}/foot.pvsm\".\n(Optional, but must save if use pvpython script) Save the python script as \"foot/results/{agent_mode}/foot.py\".\n(Optional, but must save if use VTK) Save the cxx code script as \"foot/results/{agent_mode}/foot.cxx\"\nDo not save any other files, and always save the visualization image and the text file.\n",
+      "benchmark_type": "main",
+      "metrics": [
+        {
+          "criterion": "Overall Goal: Does the visualization effectively distinguish between different tissue types in the foot dataset?"
+        },
+        {
+          "criterion": "X-ray Appearance: Does the visualization resemble an X-ray (monochrome or grayscale, transparent look, consistent lighting)?"
+        }
+      ],
+      "ground_truth_images": [
+        "SciVisAgentBench-tasks\\paraview\\foot\\GS\\foot_gs.png"
+      ],
+      "result_images": [
+        "SciVisAgentBench-tasks\\paraview\\foot\\results\\paraview_mcp_claude-sonnet-4-5_exp1\\foot.png"
+      ],
+      "has_results": true
+    },
+    {
+      "index": 3,
+      "name": "crayfish_streamline",
+      "description": "Surface & Contour Extraction",
+      "task_description": "Load the Crayfish flow vector field from \"crayfish_streamline/data/crayfish_streamline_322x162x119_float32_scalar3.raw\", the information about this dataset:\nCrayfish Flow (Vector)\nData Scalar Type: float\nData Byte Order: Little Endian\nData Extent: 322x162x119\nNumber of Scalar Components: 3\nData loading is very important, make sure you correctly load the dataset according to their features.\n\nCreate two streamline sets using \"Stream Tracer\" filters with \"Point Cloud\" seed type, each with 100 seed points and radius 32.2:\n- Streamline 1: Seed center at [107.33, 81.0, 59.5]. Apply a \"Tube\" filter (radius 0.5, 12 sides). Color by Velocity magnitude using a diverging colormap with the following RGB control points:\n  - Value 0.0 -> RGB(0.231, 0.298, 0.753) (blue)\n  - Value 0.02 -> RGB(0.865, 0.865, 0.865) (white)\n  - Value 0.15 -> RGB(0.706, 0.016, 0.149) (red)\n- Streamline 2: Seed center at [214.67, 81.0, 59.5]. Apply a \"Tube\" filter (radius 0.5, 12 sides). Color by Velocity magnitude using the same colormap.\n\nShow the dataset bounding box as an outline (black).\n\nIn the pipeline browser panel, hide all stream tracers and only show the tube filters and the outline.\n\nUse a white background. Render at 1280x1280.\n\nSet the viewpoint parameters as: [436.67, -370.55, 562.71] to position; [160.5, 80.5, 59.07] to focal point; [-0.099, 0.714, 0.693] to camera up direction\n\nSave the paraview state as \"crayfish_streamline/results/{agent_mode}/crayfish_streamline.pvsm\".\nSave the visualization image as \"crayfish_streamline/results/{agent_mode}/crayfish_streamline.png\".\n(Optional, if use python script) Save the python script as \"crayfish_streamline/results/{agent_mode}/crayfish_streamline.py\".\nDo not save any other files, and always save the visualization image.\n",
+      "benchmark_type": "main",
+      "metrics": [
+        {
+          "criterion": "Overall Visualization Goal: Does the result show streamline tubes colored by velocity magnitude within a rectangular bounding box, similar to the ground truth?"
+        },
+        {
+          "criterion": "Streamline Clusters: Are there two distinct clusters that matches the ground truth layout?"
+        },
+        {
+          "criterion": "Color Mapping: Are the tubes colored by velocity magnitude using a blue-white-red diverging colormap, with a similar distribution as the ground truth?"
+        }
+      ],
+      "ground_truth_images": [
+        "SciVisAgentBench-tasks\\paraview\\crayfish_streamline\\GS\\crayfish_streamline_gs.png"
+      ],
+      "result_images": [
+        "SciVisAgentBench-tasks\\paraview\\crayfish_streamline\\results\\chatvis_claude-sonnet-4-5_exp1\\crayfish_streamline.png"
+      ],
+      "has_results": true
+    },
+    {
+      "index": 4,
+      "name": "twoswirls_streamribbon",
+      "description": "Surface & Contour Extraction",
+      "task_description": "Load the Two Swirls vector field from \"twoswirls_streamribbon/data/twoswirls_streamribbon_64x64x64_float32_scalar3.raw\", the information about this dataset:\nTwo Swirls (Vector)\nData Scalar Type: float\nData Byte Order: Little Endian\nData Extent: 64x64x64\nNumber of Scalar Components: 3\nData loading is very important, make sure you correctly load the dataset according to their features.\n\nCreate two stream ribbons using \"Stream Tracer\" filters with \"Line\" seed type (resolution 25 points each), and apply a \"Ribbon\" filter (width 2.5) to each:\n- Stream Ribbon 1: Line seed from [16, 10, 32] to [16, 54, 32]. Ribbon colored solid green (RGB: 0.2, 0.7, 0.3) with opacity 0.35.\n- Stream Ribbon 2: Line seed from [48, 10, 32] to [48, 54, 32]. Ribbon colored solid blue (RGB: 0.2, 0.4, 0.85) with opacity 0.35.\n\n\nShow the dataset bounding box as an outline (black, opacity 0.3).\n\nIn the pipeline browser panel, hide all stream tracers and only show the ribbon filters and the outline.\n\nUse a white background (RGB: 1.0, 1.0, 1.0). Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.\nSet the viewpoint parameters as: [30.51, -154.18, 144.99] to position; [30.51, 31.5, 30.91] to focal point; [0.0, 0.53, 0.85] to camera up direction.\nSave the visualization image as \"twoswirls_streamribbon/results/{agent_mode}/twoswirls_streamribbon.png\".\n(Optional, but must save if use paraview) Save the paraview state as \"twoswirls_streamribbon/results/{agent_mode}/twoswirls_streamribbon.pvsm\".\n(Optional, but must save if use pvpython script) Save the python script as \"twoswirls_streamribbon/results/{agent_mode}/twoswirls_streamribbon.py\".\n(Optional, but must save if use VTK) Save the cxx code script as \"twoswirls_streamribbon/results/{agent_mode}/twoswirls_streamribbon.cxx\"\nDo not save any other files, and always save the visualization image.\n",
+      "benchmark_type": "main",
+      "metrics": [
+        {
+          "criterion": "Swirl Separation: Are there two visually distinct swirl structures (one on the left and one on the right), matching the spatial arrangement in the ground truth?"
+        },
+        {
+          "criterion": "Stream Ribbon Shape: Do the ribbon surfaces show wrapped, swirling sheet-like structures similar to the ground truth?"
+        },
+        {
+          "criterion": "Color and Transparency: Are the stream ribbons rendered with distinct colors (green and blue) and semi-transparency, similar to the ground truth?"
+        }
+      ],
+      "ground_truth_images": [
+        "SciVisAgentBench-tasks\\paraview\\twoswirls_streamribbon\\GS\\twoswirls_streamribbon_gs.png"
+      ],
+      "result_images": [
+        "SciVisAgentBench-tasks\\paraview\\twoswirls_streamribbon\\results\\chatvis_claude-sonnet-4-5_exp1\\twoswirls_streamribbon.png"
+      ],
+      "has_results": true
+    },
+    {
+      "index": 5,
+      "name": "tornado",
+      "description": "Surface & Contour Extraction, Glyph & Marker Placement",
+      "task_description": "Load the Tornado vector field from \"tornado/data/tornado_64x64x64_float32_scalar3.raw\", the information about this dataset:\nTornado (Vector)\nData Scalar Type: float\nData Byte Order: Little Endian\nData Extent: 64x64x64\nNumber of Scalar Components: 3\nData loading is very important, make sure you correctly load the dataset according to their features.\n\nCreate a streamline visualization using a \"Stream Tracer\" filter with \"Point Cloud\" seed type. Set the seed center to [31.5, 31.5, 47.25], radius 12.6, and maximum streamline length to 512.0. Add a \"Tube\" filter (radius 0.25) on the stream tracer. Color the tubes by Velocity magnitude using the 'Cool to Warm (Diverging)' colormap. Also display the stream tracer directly with line width 5.0 and \"Render Lines As Tubes\" enabled.\n\nAdd a \"Glyph\" filter on the original data using Arrow glyph type. Orient arrows by the Velocity vector and scale by Velocity magnitude with a scale factor of 25.0. Set maximum number of sample points to 2500. Color glyphs by Velocity magnitude using the same colormap.\n\nAdd an \"Outline\" filter to display the dataset bounding box (black).\n\nUse a white background (RGB: 1.0, 1.0, 1.0). Find an optimal view. Render at 1280x1280. Show both color bar and coordinate axes.\nSet the viewpoint parameters as: [142.01, -36.46, 93.96] to position; [31.5, 31.5, 31.5] to focal point; [-0.35, 0.25, 0.90] to camera up direction.\nSave the visualization image as \"tornado/results/{agent_mode}/tornado.png\".\n(Optional, but must save if use paraview) Save the paraview state as \"tornado/results/{agent_mode}/tornado.pvsm\".\n(Optional, but must save if use pvpython script) Save the python script as \"tornado/results/{agent_mode}/tornado.py\".\n(Optional, but must save if use VTK) Save the cxx code script as \"tornado/results/{agent_mode}/tornado.cxx\"\nDo not save any other files, and always save the visualization image.\n",
+      "benchmark_type": "main",
+      "metrics": [
+        {
+          "criterion": "Vortex Structure: Is a funnel-shaped vortex core visible with streamlines spiraling around a central vertical axis, matching the ground truth?"
+        },
+        {
+          "criterion": "Glyph Presence: Are arrow glyphs distributed throughout the volume showing velocity direction, similar to the ground truth?"
+        },
+        {
+          "criterion": "Color Mapping: Are both the streamline tubes and arrow glyphs colored by velocity magnitude using a blue-to-red diverging colormap, matching the ground truth color distribution?"
+        }
+      ],
+      "ground_truth_images": [
+        "SciVisAgentBench-tasks\\paraview\\tornado\\GS\\tornado_gs.png"
+      ],
+      "result_images": [
+        "SciVisAgentBench-tasks\\paraview\\tornado\\results\\chatvis_claude-sonnet-4-5_exp1\\tornado.png"
+      ],
+      "has_results": true
+    },
+    {
+      "index": 6,
+      "name": "tgc-velocity_contour",
+      "description": "Surface & Contour Extraction",
+      "task_description": "Load the turbulence-gravity-cooling velocity field dataset from \"tgc-velocity_contour/data/tgc-velocity_contour.vti\" (VTI format, 64x64x64).\nExtract a slice at z=32 and color it by velocity magnitude using 'Viridis (matplotlib)' colormap.\nAlso add contour lines of velocity magnitude on the same slice at values [0.3, 0.6, 0.9, 1.2] using the Contour filter on the slice output.\nDisplay contour lines in white. Add a color bar labeled 'Velocity Magnitude'.\nLight gray background (RGB: 0.9, 0.9, 0.9). Top-down camera. Render at 1024x1024.\nSet the viewpoint parameters as: [31.5, 31.5, 100.0] to position; [31.5, 31.5, 32.0] to focal point; [0.0, 1.0, 0.0] to camera up direction.\nSave the visualization image as \"tgc-velocity_contour/results/{agent_mode}/tgc-velocity_contour.png\".\n(Optional, but must save if use paraview) Save the paraview state as \"tgc-velocity_contour/results/{agent_mode}/tgc-velocity_contour.pvsm\".\n(Optional, but must save if use pvpython script) Save the python script as \"tgc-velocity_contour/results/{agent_mode}/tgc-velocity_contour.py\".\n(Optional, but must save if use VTK) Save the cxx code script as \"tgc-velocity_contour/results/{agent_mode}/tgc-velocity_contour.cxx\"\nDo not save any other files, and always save the visualization image.\n",
+      "benchmark_type": "main",
+      "metrics": [
+        {
+          "criterion": "Overall Visualization Goal: Does the result match the ground truth slice and contour visualization of the TGC velocity field?"
+        },
+        {
+          "criterion": "Slice Pattern: Does the colored slice show similar patterns and structures as the ground truth?"
+        },
+        {
+          "criterion": "Contour Lines: Are the contour lines positioned and shaped similarly to the ground truth?"
+        },
+        {
+          "criterion": "Color Mapping: Is the color distribution on the slice visually similar to the ground truth?"
+        }
+      ],
+      "ground_truth_images": [
+        "SciVisAgentBench-tasks\\paraview\\tgc-velocity_contour\\GS\\tgc-velocity_contour_gs.png"
+      ],
+      "result_images": [
+        "SciVisAgentBench-tasks\\paraview\\tgc-velocity_contour\\results\\paraview_mcp_claude-sonnet-4-5_exp1\\tgc-velocity_contour.png"
+      ],
+      "has_results": true
+    },
+    {
+      "index": 7,
+      "name": "rti-velocity_slices",
+      "description": "View & Camera Control, Data Subsetting & Extraction",
+      "task_description": "Load the Rayleigh-Taylor instability velocity field from \"rti-velocity_slices/data/rti-velocity_slices.vti\" (VTI format, 128x128x128).\nCreate three orthogonal slices: at x=64 (YZ-plane), y=64 (XZ-plane), and z=64 (XY-plane).\nColor all three slices by velocity magnitude using the 'Turbo' colormap.\nAdd a color bar labeled 'Velocity Magnitude'.\nUse a white background. Set an isometric camera view that shows all three slices. Render at 1024x1024.\nSet the viewpoint parameters as: [200.0, 200.0, 200.0] to position; [63.5, 63.5, 63.5] to focal point; [0.0, 0.0, 1.0] to camera up direction.\nSave the visualization image as \"rti-velocity_slices/results/{agent_mode}/rti-velocity_slices.png\".\n(Optional, but must save if use paraview) Save the paraview state as \"rti-velocity_slices/results/{agent_mode}/rti-velocity_slices.pvsm\".\n(Optional, but must save if use pvpython script) Save the python script as \"rti-velocity_slices/results/{agent_mode}/rti-velocity_slices.py\".\n(Optional, but must save if use VTK) Save the cxx code script as \"rti-velocity_slices/results/{agent_mode}/rti-velocity_slices.cxx\"\nDo not save any other files, and always save the visualization image.\n",
+      "benchmark_type": "main",
+      "metrics": [
+        {
+          "criterion": "Slice Count and Orientation: Are there exactly three perpendicular slices (one horizontal XY-plane and two vertical XZ and YZ planes), matching the ground truth arrangement?"
+        },
+        {
+          "criterion": "Color Mapping: Are the slices colored using a Turbo-like colormap (blue to green to yellow to red) mapped to velocity magnitude, with a similar color distribution as the ground truth?"
+        },
+        {
+          "criterion": "Mixing Zone Pattern: Does the horizontal (XY) slice show a chaotic, high-velocity-magnitude mixing pattern in its center region, similar to the ground truth?"
+        }
+      ],
+      "ground_truth_images": [
+        "SciVisAgentBench-tasks\\paraview\\rti-velocity_slices\\GS\\rti-velocity_slices_gs.png"
+      ],
+      "result_images": [
+        "SciVisAgentBench-tasks\\paraview\\rti-velocity_slices\\results\\paraview_mcp_claude-sonnet-4-5_exp1\\rti-velocity_slices.png"
+      ],
+      "has_results": true
+    },
+    {
+      "index": 8,
+      "name": "rti-velocity_glyph",
+      "description": "Glyph & Marker Placement, Data Subsetting & Extraction",
+      "task_description": "Load the Rayleigh-Taylor instability velocity field dataset from \"rti-velocity_glyph/data/rti-velocity_glyph.vti\" (VTI format, 128x128x128 grid).\nCreate a slice at y=64 through the volume.\nPlace arrow glyphs on the slice, oriented by the velocity vector. Use uniform arrow size (no magnitude scaling, scale factor 3.0).\nColor the arrows by velocity magnitude using the 'Viridis (matplotlib)' colormap. Use a sampling stride of 3.\nAdd a color bar labeled 'Velocity Magnitude'.\nUse a white background. Set the camera to view along the negative y-axis. Render at 1024x1024.\nSet the viewpoint parameters as: [63.5, 250.0, 63.5] to position; [63.5, 64.0, 63.5] to focal point; [0.0, 0.0, 1.0] to camera up direction.\nSave the visualization image as \"rti-velocity_glyph/results/{agent_mode}/rti-velocity_glyph.png\".\n(Optional, but must save if use paraview) Save the paraview state as \"rti-velocity_glyph/results/{agent_mode}/rti-velocity_glyph.pvsm\".\n(Optional, but must save if use pvpython script) Save the python script as \"rti-velocity_glyph/results/{agent_mode}/rti-velocity_glyph.py\".\n(Optional, but must save if use VTK) Save the cxx code script as \"rti-velocity_glyph/results/{agent_mode}/rti-velocity_glyph.cxx\"\nDo not save any other files, and always save the visualization image.\n",
+      "benchmark_type": "main",
+      "metrics": [
+        {
+          "criterion": "Overall Visualization Goal: Does the result match the ground truth glyph visualization of the RTI velocity field?"
+        },
+        {
+          "criterion": "Glyph Patterns: Do the arrow glyphs show similar orientation and spatial patterns as the ground truth?"
+        },
+        {
+          "criterion": "Glyph Appearance: Do the glyphs appear with similar uniform sizing as the ground truth?"
+        },
+        {
+          "criterion": "Color Mapping: Is the color distribution across glyphs visually similar to the ground truth?"
+        }
+      ],
+      "ground_truth_images": [
+        "SciVisAgentBench-tasks\\paraview\\rti-velocity_glyph\\GS\\rti-velocity_glyph_gs.png"
+      ],
+      "result_images": [
+        "SciVisAgentBench-tasks\\paraview\\rti-velocity_glyph\\results\\chatvis_claude-sonnet-4-5_exp1\\rti-velocity_glyph.png"
+      ],
+      "has_results": true
+    },
+    {
+      "index": 9,
+      "name": "supernova_isosurface",
+      "description": "Surface & Contour Extraction (isosurface)",
+      "task_description": "Task:\n\nLoad the supernova dataset from \"supernova_isosurface/data/supernova_isosurface_256x256x256_float32.raw\", the information about this dataset:\nsupernova (Scalar)\nData Scalar Type: float\nData Byte Order: little Endian\nData Spacing: 1x1x1\nData Extent: 256x256x256\nData loading is very important, make sure you correctly load the dataset according to their features.\n\nThen visualize it and extract two isosurfaces. One of them use color red, showing areas with low density (isovalue 40 and opacity 0.2), while the other use color light blue, showing areas with high density (isovalue 150 and opacity 0.4).\n\nPlease think step by step and make sure to fulfill all the visualization goals mentioned above. Only make the two isosurfaces visible.\n\nUse a white background. Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.\n\nSet the viewpoint parameters as: [567.97, 80.17, 167.28] to position; [125.09, 108.83, 121.01] to focal point; [-0.11, -0.86, 0.50] to camera up direction.\n\nSave the visualization image as \"supernova_isosurface/results/{agent_mode}/supernova_isosurface.png\".\n(Optional, but must save if use paraview) Save the paraview state as \"supernova_isosurface/results/{agent_mode}/supernova_isosurface.pvsm\".\n(Optional, but must save if use pvpython script) Save the python script as \"supernova_isosurface/results/{agent_mode}/supernova_isosurface.py\".\n(Optional, but must save if use VTK) Save the cxx code script as \"supernova_isosurface/results/{agent_mode}/supernova_isosurface.cxx\"\nDo not save any other files, and always save the visualization image.\n",
+      "benchmark_type": "main",
+      "metrics": [
+        {
+          "criterion": "Overall Visualization Goal: How well does the result achieve the overall goal of showing the supernova structure with two distinct isosurfaces representing different density regions?"
+        },
+        {
+          "criterion": "Does the red isosurface show low density areas (outside regions) with lower opacity?"
+        },
+        {
+          "criterion": "Does the blue isosurface show high density areas (inside regions) with higher opacity?"
+        }
+      ],
+      "ground_truth_images": [
+        "SciVisAgentBench-tasks\\paraview\\supernova_isosurface\\GS\\supernova_isosurface_gs.png"
+      ],
+      "result_images": [
+        "SciVisAgentBench-tasks\\paraview\\supernova_isosurface\\results\\chatvis_claude-sonnet-4-5_exp1\\supernova_isosurface.png"
+      ],
+      "has_results": true
+    },
+    {
+      "index": 10,
+      "name": "time-varying",
+      "description": "Temporal Processing",
+      "task_description": "Read the dataset in the file \"time-varying/data/time-varying.ex2\", and color the data by the EQPS variable.\nViewing in the +y direction, play an animation through the time steps, with visible color bar legend.\nRescale the data range to last time step, and play the animation again.\nCreate a second linked render view to the right of the first, applying a temporal interpolator to the second view.\nPlay the animation simultaneously in both views, and save the animation of both views in \"time-varying/results/{agent_mode}/time-varying.avi\".\nPrint the following statistics: average value of EQPS over all locations and all time steps, average value of EQPS over all locations in the first half of the time steps, average value of EQPS over all locations in the even numbered time steps, and variance of EQPS over all locations and all the time steps.\nSave the last frame of the visualization image as \"time-varying/results/{agent_mode}/time-varying.png\".\n(Optional, but must save if use paraview) Save the paraview state as \"time-varying/results/{agent_mode}/time-varying.pvsm\".\n(Optional, but must save if use python script) Save the python script as \"time-varying/results/{agent_mode}/time-varying.py\".\nDo not save any other files, and always save the visualization image.\n",
+      "benchmark_type": "main",
+      "metrics": [
+        {
+          "criterion": "Temporal Animation Quality: Does the animation smoothly progress through all time steps showing the evolution of the EQPS variable over time?"
+        },
+        {
+          "criterion": "Dual View Configuration: Are both render views properly configured with the second view showing temporal interpolation effects compared to the first?"
+        },
+        {
+          "criterion": "Color Mapping and Legend: Is the EQPS variable properly color-mapped with an appropriate color bar legend visible throughout the animation?"
+        },
+        {
+          "criterion": "View Direction and Layout: Is the +y direction view properly set and are both views arranged side-by-side in the correct layout configuration?"
+        }
+      ],
+      "ground_truth_images": [
+        "SciVisAgentBench-tasks\\paraview\\time-varying\\GS\\time-varying_gs.mp4"
+      ],
+      "result_images": [
+        "SciVisAgentBench-tasks\\paraview\\time-varying\\results\\chatvis_claude-sonnet-4-5_exp1\\time-varying.mp4"
+      ],
+      "has_results": true
+    },
+    {
+      "index": 11,
+      "name": "chart-opacity",
+      "description": "Plot & Chart Generation",
+      "task_description": "Create a wavelet object.\nCreate a plot over line chart from the wavelet with three paths: arc_length, Points_Z, and RTData variables with opacity for arc_length 1 and opacity for Points_Z and RTData 0.3.\n\nSave the visualization image as \"chart-opacity/results/{agent_mode}/chart-opacity.png\".\n(Optional, but must save if use paraview) Save the paraview state as \"chart-opacity/results/{agent_mode}/chart-opacity.pvsm\".\n(Optional, but must save if use python script) Save the python script as \"chart-opacity/results/{agent_mode}/chart-opacity.py\".\nDo not save any other files, and always save the visualization image.\n",
+      "benchmark_type": "main",
+      "metrics": [
+        {
+          "criterion": "Chart Generation: Is the plot over line chart properly created from the wavelet data?"
+        },
+        {
+          "criterion": "Variable Display: Are arc_length, Points_Z, and RTData variables all correctly plotted, showing all three specified variables and distinguishable in the chart?"
+        },
+        {
+          "criterion": "Opacity Settings: Is the arc_length variable displayed with full opacity (1.0) while Points_Z and RTData show reduced opacity (0.3)?"
+        },
+        {
+          "criterion": "Chart Clarity: Does the chart provide clear visualization of the data trends with appropriate axis scaling and readable formatting?"
+        }
+      ],
+      "ground_truth_images": [
+        "SciVisAgentBench-tasks\\paraview\\chart-opacity\\GS\\chart-opacity_gs.png"
+      ],
+      "result_images": [
+        "SciVisAgentBench-tasks\\paraview\\chart-opacity\\results\\chatvis_claude-sonnet-4-5_exp1\\chart-opacity.png"
+      ],
+      "has_results": true
+    },
+    {
+      "index": 12,
+      "name": "climate",
+      "description": "Field Computation",
+      "task_description": "I would like to use ParaView to visualize a dataset of ocean currents.\nRead in the file named \"climate/data/climate.vtp\".\nApply a calculator filter to compute the following function:\n(-velocity_X*sin(coordsX*0.0174533) + velocity_Y*cos(coordsX*0.0174533)) * iHat + (-velocity_X * sin(coordsY*0.0174533) * cos(coordsX*0.0174533) - velocity_Y * sin(coordsY*0.0174533) * sin(coordsX*0.0174533) + velocity_Z * cos(coordsY*0.0174533)) * jHat + 0*kHat\nRender the computed values using a tube filter with 0.05 as the tube radius.\nColor the tubes by the magnitude of the velocity.\nLight the tubes with the maximum shininess and include normals in the lighting.\nAdd cone glyphs to show the direction of the velocity.\nThe glyphs are composed of 10 polygons, having a radius 0 0.15, a height of 0.5, and a scaling factor of 0.5.\nView the result in the -z direction.\nAdjust the view so that the tubes occupy the 90% of the image.\nSave a screenshot of the result, 2294 x 1440 pixels, white background, in the filename \"climate/results/{agent_mode}/climate.png\".\n(Optional, but must save if use paraview) Save the paraview state as \"climate/results/{agent_mode}/climate.pvsm\".\n(Optional, but must save if use python script) Save the python script as \"climate/results/{agent_mode}/climate.py\".\nDo not save any other files, and always save the visualization image.\n",
+      "benchmark_type": "main",
+      "metrics": [
+        {
+          "criterion": "Tube Visualization: Are the tubes rendered with correct radius (0.05), colored by velocity magnitude, and proper lighting with maximum shininess?"
+        },
+        {
+          "criterion": "Cone Glyph Direction: Are the cone glyphs properly configured with specified parameters and showing velocity direction accurately?"
+        },
+        {
+          "criterion": "View Configuration: Is the visualization displayed from -z direction with appropriate scaling and white background as specified?"
+        }
+      ],
+      "ground_truth_images": [
+        "SciVisAgentBench-tasks\\paraview\\climate\\GS\\climate_gs.png"
+      ],
+      "result_images": [
+        "SciVisAgentBench-tasks\\paraview\\climate\\results\\chatvis_claude-sonnet-4-5_exp1\\climate.png"
+      ],
+      "has_results": true
+    },
+    {
+      "index": 13,
+      "name": "shrink-sphere",
+      "description": "Geometric & Topological Transformation",
+      "task_description": "Create a default sphere and then hide it.\nCreate a shrink filter from the sphere.\nDouble the sphere's theta resolution.\nDivide the shrink filter's shrink factor in half.\nExtract a wireframe from the sphere.\nGroup the shrink filter and wireframe together and show them.\nSave a screenshot of the result in the filename \"shrink-sphere/results/{agent_mode}/shrink-sphere.png\".\nThe rendered view and saved screenshot should be 1920 x 1080 pixels and have a white background.\n(Optional, but must save if use paraview) Save the paraview state as \"shrink-sphere/results/{agent_mode}/shrink-sphere.pvsm\".\n(Optional, but must save if use python script) Save the python script as \"shrink-sphere/results/{agent_mode}/shrink-sphere.py\".\nDo not save any other files, and always save the visualization image.\n",
+      "benchmark_type": "main",
+      "metrics": [
+        {
+          "criterion": "Sphere Creation and Resolution: Is the sphere created with doubled theta resolution providing higher geometric detail and smoother curvature?"
+        },
+        {
+          "criterion": "Shrink Filter Application: Is the shrink filter properly applied with halved shrink factor creating visible separation between mesh elements?"
+        },
+        {
+          "criterion": "Dual Representation: Are both the wireframe sphere and shrink filter results simultaneously visible and properly grouped together?"
+        },
+        {
+          "criterion": "Visual Quality: Does the visualization clearly show the contrast between the wireframe structure and the shrunken elements with appropriate white background?"
+        }
+      ],
+      "ground_truth_images": [
+        "SciVisAgentBench-tasks\\paraview\\shrink-sphere\\GS\\shrink-sphere_gs.png"
+      ],
+      "result_images": [
+        "SciVisAgentBench-tasks\\paraview\\shrink-sphere\\results\\chatvis_claude-sonnet-4-5_exp1\\shrink-sphere.png"
+      ],
+      "has_results": true
+    },
+    {
+      "index": 14,
+      "name": "import-gltf",
+      "description": "Dataset Restructuring, View & Camera Control",
+      "task_description": "Load the \"BlueGrayBackground\" palette.\nRead the file \"import-gltf/data/import-gltf.glb\" and import the nodes \"/assembly/Axle\", \"assembly/OuterRing/Torus002\", and \"assembly/OuterRing/MiddleRing/InnerRing\".\nSet the layout size to 300x300 pixels.\nPoint the camera in the positive Y direction and zoom to fit.\nMake sure all views are rendered, then save a screenshot to \"import-gltf/results/{agent_mode}/import-gltf.png\".\n(Optional, but must save if use paraview) Save the paraview state as \"import-gltf/results/{agent_mode}/import-gltf.pvsm\".\n(Optional, but must save if use python script) Save the python script as \"import-gltf/results/{agent_mode}/import-gltf.py\".\nDo not save any other files, and always save the visualization image.\n",
+      "benchmark_type": "main",
+      "metrics": [
+        {
+          "criterion": "GLTF Import Success: Are the specified GLTF nodes properly imported and displayed as separate geometric components?"
+        },
+        {
+          "criterion": "Node Selection: Are all three specified nodes (Axle, Torus002, InnerRing) correctly imported and visible?"
+        },
+        {
+          "criterion": "Camera Positioning: Is the camera positioned in the positive Y direction with appropriate zoom to fit all imported geometry? Carefully compare the camera position of GT and result images."
+        },
+        {
+          "criterion": "Layout Configuration: Is the view properly sized to 300x300 pixels with correct rendering and background palette?"
+        }
+      ],
+      "ground_truth_images": [
+        "SciVisAgentBench-tasks\\paraview\\import-gltf\\GS\\import-gltf_gs.png"
+      ],
+      "result_images": [
+        "SciVisAgentBench-tasks\\paraview\\import-gltf\\results\\paraview_mcp_claude-sonnet-4-5_exp1\\import-gltf.png"
+      ],
+      "has_results": true
+    },
+    {
+      "index": 15,
+      "name": "render-histogram",
+      "description": "Plot & Chart Generation, Color & Opacity Mapping",
+      "task_description": "Create a wavelet object and render it as a surface colored by RTDATA with a visible color bar.\nRescale the colors to the data range and use the 'Cool to Warm' color map.\n\nNext, split the view horizontally to the right and create a histogram view from the wavelet RTDATA.\nApply the same 'Cool to Warm' color map to the histogram.\n\nSave a screenshot of both views (wavelet rendering on the left and histogram on the right) in the file \"render-histogram/results/{agent_mode}/render-histogram.png\".\n(Optional, but must save if use paraview) Save the paraview state as \"render-histogram/results/{agent_mode}/render-histogram.pvsm\".\n(Optional, but must save if use python script) Save the python script as \"render-histogram/results/{agent_mode}/render-histogram.py\".\nDo not save any other files, and always save the visualization image.\n",
+      "benchmark_type": "main",
+      "metrics": [
+        {
+          "criterion": "Wavelet Visualization: Is the wavelet object properly rendered with RTDATA coloring and visible color bar?"
+        },
+        {
+          "criterion": "Split View Layout: Is the view correctly split with the wavelet visualization on the left and histogram on the right?"
+        },
+        {
+          "criterion": "Histogram Generation: Is the histogram properly generated from RTDATA showing the data distribution?"
+        },
+        {
+          "criterion": "Color Map Consistency: Are both the wavelet visualization and histogram using the same Cool to Warm color map?"
+        }
+      ],
+      "ground_truth_images": [
+        "SciVisAgentBench-tasks\\paraview\\render-histogram\\GS\\render-histogram_gs.png"
+      ],
+      "result_images": [
+        "SciVisAgentBench-tasks\\paraview\\render-histogram\\results\\chatvis_claude-sonnet-4-5_exp1\\render-histogram.png"
+      ],
+      "has_results": true
+    },
+    {
+      "index": 16,
+      "name": "curved-membrane",
+      "description": "Data Subsetting & Extraction",
+      "task_description": "1. Please load the Martini coarse-grained simulation file from \"curved-membrane/data/curved-membrane.gro\" into VMD.\n\n2. Use VMD to show a zoomed in view of the membrane side coloring the water blue and the lipid phosphate (PO4 beads) red, and take a screenshot.\n\n3. Analyze the visualization and answer the following questions:\nQ1: Is there any water that penetrates into the membrane phase? (yes/no)\n\n4. Save your work:\nSave the VMD state as \"curved-membrane/results/{agent_mode}/curved-membrane.vmd\".\nSave the screenshot of the visualization as \"curved-membrane/results/{agent_mode}/curved-membrane.png\".\nSave the answers to the analysis questions in plain text as \"curved-membrane/results/{agent_mode}/answers.txt\".\n",
+      "benchmark_type": "main",
+      "metrics": [
+        {
+          "criterion": "Does the visualization show a side view of a bilayer rather than a top-down or oblique view?"
+        },
+        {
+          "criterion": "Is water present above and below the bilayer, with a mostly empty region in the middle corresponding to the bilayer core?"
+        }
+      ],
+      "ground_truth_images": [
+        "SciVisAgentBench-tasks\\molecular_vis\\workflows\\curved-membrane\\GS\\curved-membrane_gs.png"
+      ],
+      "result_images": [
+        "SciVisAgentBench-tasks\\molecular_vis\\workflows\\curved-membrane\\results\\gmx_vmd_mcp_claude-sonnet-4-5_exp1\\curved-membrane.png"
+      ],
+      "has_results": true
+    },
+    {
+      "index": 17,
+      "name": "ras-raf-membrane",
+      "description": "View & Camera Control",
+      "task_description": "1. Please load the Martini coarse-grained simulation file from \"ras-raf-membrane/data/ras-raf-membrane.gro\" into VMD. The simulations has a membrane and a RAS-RAF protein complex.\n\n2. Use VMD to show a zoomed in side view of the membrane and center on the protein with the protein below the membrane.\nFor the bilayer only show the PO4 lipids beads and ROH cholesterol bead and color them gray. \nAlso show the protein back bone beads coloring RAS (resid 2 to 187) red and RAF (resid 188 to 329) blue.\nTake a screenshot of the visualization.\n\n3. Analyze the visualization and answer the following questions:\nQ1: Are there any cholesterol head groups in the bilayer center? (yes/no)\n\nQ2: How many lipids are there within 1.5 nm of the RAF protein?\n  A. 0\n  B. 0-3\n  C. 3-5\n  D. >5\n\n4. Save your work:\nSave the VMD state as \"ras-raf-membrane/results/{agent_mode}/ras-raf-membrane.vmd\".\nSave the screenshot of the visualization as \"ras-raf-membrane/results/{agent_mode}/ras-raf-membrane.png\".\nSave the answers to the analysis questions in plain text as \"ras-raf-membrane/results/{agent_mode}/answers.txt\".\n",
+      "benchmark_type": "main",
+      "metrics": [
+        {
+          "criterion": "Camera Position: Is the image centered on a protein complex composed of clearly distinguishable half red RAS and half blue RAF components?"
+        },
+        {
+          "criterion": "Membrane Placement: Is a lipid bilayer clearly visible above the protein?"
+        },
+        {
+          "criterion": "Correct Leaflet Ordering: Is the inner leaflet of the bilayer closer to the protein and the outer leaflet positioned farther away?"
+        }
+      ],
+      "ground_truth_images": [
+        "SciVisAgentBench-tasks\\molecular_vis\\workflows\\ras-raf-membrane\\GS\\ras-raf-membrane_gs.png"
+      ],
+      "result_images": [
+        "SciVisAgentBench-tasks\\molecular_vis\\workflows\\ras-raf-membrane\\results\\gmx_vmd_mcp_claude-sonnet-4-5_exp1\\ras-raf-membrane.png"
+      ],
+      "has_results": true
+    },
+    {
+      "index": 3,
+      "name": "bio_isosurface-determination",
+      "description": "Surface & Contour Extraction (isosurface)",
+      "task_description": "1. Read the file \"data/dataset_003/eval_iso_surface_determination_target_1.txt\" to get the target iso-surface values for different tooth structures.\n2. Load data/dataset_003/dataset_003.tif into napari.\n3. Switch to 3D view mode and set the rendering to iso.\n4. Find the iso surface value that shows the target clearly.\n5. Rotate the camera to several angles and take a screenshot of the result each time to check if the target structure is clearly visible from different angles.\n6. If the target structure is not clearly visible, adjust the iso surface value and take a screenshot again.\n7. Stop when the target structure is clearly visible or you have tried five different iso surface values.\n8. Save the final screenshot to \"eval_iso_surface_determination/screenshot.png\".",
+      "benchmark_type": "main",
+      "metrics": [
+        {
+          "criterion": "Does the result rendering look similar to ground truth?"
+        },
+        {
+          "criterion": "Does the visualization show the target structure clearly?"
+        }
+      ],
+      "ground_truth_images": [
+        "SciVisAgentBench-tasks\\bioimage_data\\eval_iso_surface_determination\\operation_1\\GS\\operation_1_gs.png"
+      ],
+      "result_images": [
+        "SciVisAgentBench-tasks\\bioimage_data\\eval_iso_surface_determination\\operation_1\\results\\napari_mcp_claude-sonnet-4-5_exp_default\\operation_1.png"
+      ],
+      "has_results": true
+    },
+    {
+      "index": 3,
+      "name": "bio_visualization-workflows",
+      "description": "Color & Opacity Mapping, Volume Rendering, Temporal Processing",
+      "task_description": "1. Load the \"data/dataset_002/dataset_002.tif\" dataset into napari.\n2. Depending on the number of channels, set the colormap for the first channel 0 to red and channel 1 to green.\n3. Switch to the 3D view.\n4. Use additive blending for all channels to create an overlay visualization.\n5. Go the timestep 14. Q1. Does the cell show protrusions? (Yes/No)\n6. Take a screenshot of the result, save it to \"eval_visualization_workflows/screenshot_1.png\"\n7. Answer Q1 in a plain text file \"eval_visualization_workflows/Q1_answer.txt\".",
+      "benchmark_type": "main",
+      "metrics": [
+        {
+          "criterion": "Does the visualization show a green cell with red blobs on the inside?"
+        },
+        {
+          "criterion": "Does the result rendering look similar to ground truth?"
+        }
+      ],
+      "ground_truth_images": [
+        "SciVisAgentBench-tasks\\bioimage_data\\eval_visualization_workflows\\operation_1\\GS\\operation_1_gs.png"
+      ],
+      "result_images": [
+        "SciVisAgentBench-tasks\\bioimage_data\\eval_visualization_workflows\\operation_1\\results\\napari_mcp_claude-sonnet-4-5_exp_default\\operation_1.png"
+      ],
+      "has_results": true
+    },
+    {
+      "index": 3,
+      "name": "bio_figure-recreation",
+      "description": "Color & Opacity Mapping, Volume Rendering",
+      "task_description": "1. Load the dataset into napari \"data/dataset_001/dataset_001.tiff\"\n2. Read the target figure \"data/dataset_001/dataset_001.png\" but don't load it into napari.\n3. Read the dataset description \"data/dataset_001/dataset_001.yaml\".\n4. Set the same colormaps and blending modes as the target figure.\n5. Adjust contrast and gamma as needed to match the target figure.\n6. Take a screenshot of your recreation.\n7. If the recreation does not match the target figure, adjust the visualization settings and take a screenshot again.\n8. Stop when the recreation matches the target figure or you have tried five different visualization settings.\n9. Save the final screenshot to \"eval_figure_recreation/screenshot.png\".",
+      "benchmark_type": "main",
+      "metrics": [
+        {
+          "criterion": "Does the visualization show a green cell with red blobs on the inside?"
+        },
+        {
+          "criterion": "Does the result rendering look similar to ground truth?"
+        }
+      ],
+      "ground_truth_images": [
+        "SciVisAgentBench-tasks\\bioimage_data\\eval_figure_recreation\\operation_1\\GS\\operation_1_gs.png"
+      ],
+      "result_images": [
+        "SciVisAgentBench-tasks\\bioimage_data\\eval_figure_recreation\\operation_1\\results\\napari_mcp_claude-sonnet-4-5_exp_default\\operation_1.png"
+      ],
+      "has_results": true
+    }
+  ]
+}

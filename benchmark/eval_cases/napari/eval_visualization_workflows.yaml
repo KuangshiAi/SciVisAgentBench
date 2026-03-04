@@ -178,6 +178,7 @@
       4. Save the answer of Q1 in plain text as "eval_analysis_workflows/annotation_answer.txt".
   assert:
     - type: llm-rubric
+      subtype: text
       value: |
           1. Q1 correct answer: Yes
       rs-file: eval_analysis_workflows/annotation_answer.txt
