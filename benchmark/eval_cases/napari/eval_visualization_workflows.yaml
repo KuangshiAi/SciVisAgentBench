@@ -134,11 +134,11 @@
 # Test: Cell Counting and Measurement Analysis
 - vars:
     question: |
-      Load the image "data/dataset_002/dataset_002_ch0.tif" and set channel 0 to a magenta colormap.
-      Switch to a 3D MIP view. 
-      Take a screenshot and analyze it to count how many complete cells are visible (not cut off by edges).
+      1. Load the image "data/dataset_002/dataset_002_ch0.tif" and set channel 0 to a magenta colormap.
+      2. Switch to a 3D MIP view. 
+      3. Take a screenshot and analyze it to count how many complete cells are visible (not cut off by edges).
       Q1: answer with the number of complete cells you counted, for example "5" if you see 5 complete cells.
-      Save the answer of Q1 to the questions in plain text as "eval_analysis_workflows/Q1_answer.txt".
+      4. Save the answer of Q1 to the questions in plain text as "eval_analysis_workflows/Q1_answer.txt".
   assert:
     - type: llm-rubric
       subtype: text
