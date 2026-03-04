@@ -1,0 +1,211 @@
+# Basic Visualization Workflow Tests
+# Use https://www.ebi.ac.uk/bioimage-archive/galleries/S-BIAD573.html IM1 to test the workflows.
+
+# Test: Multi-channel Overlay with Colormaps with channels
+- vars:
+    question: |
+      1. Load the "data/dataset_002/dataset_002.tif" dataset into napari. 
+      2. Depending on the number of channels, set the colormap for the first channel 0 to red and channel 1 to green.
+      3. Switch to the 3D view. 
+      4. Use additive blending for all channels to create an overlay visualization.
+      5. Go the timestep 14. 
+        Q1: Does the cell show protrusions? (Yes/No)
+      6. Take a screenshot of the result, save it to "eval_visualization_workflows/screenshot_1.png"
+      7. Answer Q1 in a plain text file "eval_visualization_workflows/multi_channel_answer.txt".
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Does the visualization show a green cell with red blobs on the inside? 
+          2. Does the result rendering look similar to ground truth?
+      gs-file: GS/dataset_002_1.png
+      rs-file: eval_visualization_workflows/screenshot_1.png
+    - type: llm-rubric
+      subtype: text
+      value: |
+          1. Q1 correct answer: Yes
+      rs-file: eval_visualization_workflows/multi_channel_answer.txt                    
+  options:
+    cache: false
+    runSerially: true
+
+
+# Test: ingesting points
+- vars:
+    question: |
+      1. Load the "data/dataset_002/Points.csv" dataset into napari.
+      2. Check if the points layer has been created.
+        Q1: Was the points layer created successfully? (Yes/No)
+      3. Answer Q1 in a plain text file "eval_visualization_workflows/points_answer.txt".
+  assert:
+    - type: llm-rubric
+      subtype: text
+      value: |
+          1. Check if the points layer has been created.
+          2. Q1 correct answer: Yes
+      rs-file: eval_visualization_workflows/points_answer.txt
+  options:
+    cache: false
+    runSerially: true
+
+# Test: ingesting shapes
+- vars:
+    question: |
+      1. Load the "data/dataset_002/Shapes.csv" dataset into napari.
+      2. Check if the shapes layer has been created.
+        Q1: Was the shapes layer created successfully? (Yes/No)
+      3. Answer Q1 in a plain text file "eval_visualization_workflows/shapes_answer.txt".
+  assert:
+    - type: llm-rubric
+      subtype: text
+      value: |
+          1. Check if the shapes layer has been created.
+          2. Q1 correct answer: Yes
+      rs-file: eval_visualization_workflows/shapes_answer.txt
+  options:
+    cache: false
+    runSerially: true
+
+# Test: ingesting labels
+- vars:
+    question: |
+      1. Load the "data/dataset_002/Labels.tif" dataset into napari.
+      2. Check if the labels layer has been created.
+        Q1: Was the labels layer created successfully? (Yes/No)
+      3. Answer Q1 in a plain text file "eval_visualization_workflows/labels_answer.txt".
+  assert:
+    - type: llm-rubric
+      subtype: text
+      value: |
+        1. Check if the labels layer has been created.
+        2. Q1 correct answer: Yes
+      rs-file: eval_visualization_workflows/labels_answer.txt
+  options:
+    cache: false
+    runSerially: true
+
+
+#Test: Recreate a figure from a dataset. 
+- vars:
+    question: |
+      1. Load the dataset into napari: data/dataset_001/dataset_001.tiff
+      2. Read the target figure: data/dataset_001/dataset_001.png but don't load it into napari.
+      3. Read the dataset description: data/dataset_001/dataset_001.yaml. 
+      4. Set the same colormaps and blending modes as the target figure.
+      5. Adjust contrast and gamma as needed to match the target figure.
+      6. Take a screenshot of your recreation.
+      7. If the recreation does not match the target figure, adjust the visualization settings and take a screenshot again.
+      8. Stop when the recreation matches the target figure or you have tried five different visualization settings.
+      9. Save the final screenshot to "eval_figure_recreation/screenshot.png".
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Does the result screenshot look similar to the ground truth image?
+          2. Are the same colormaps and blending modes used as in the target figure?
+          3. Is the contrast and gamma adjusted to match the target figure?
+      gs-file: GS/dataset_001.png
+      rs-file: eval_figure_recreation/screenshot.png                 
+  options:
+    cache: false
+    runSerially: true
+
+# Test: Iso surface determination for a target
+- vars:
+    question: |
+      1. Read the file "data/dataset_003/eval_iso_surface_determination_target_1.txt" to get the target iso-surface values for different tooth structures.
+      2. Load data/dataset_003/dataset_003.tif into napari. 
+      3. Switch to 3D view mode and set the rendering to iso. 
+      4. Find the iso surface value that shows the target clearly.
+      5. Rotate the camera to several angles and take a screenshot of the result each time to check if the target structure is clearly visible from different angles.
+      6. If the target structure is not clearly visible, adjust the iso surface value and take a screenshot again.
+      7. Stop when the target structure is clearly visible or you have tried five different iso surface values.
+      8. Save the final screenshot to "eval_iso_surface_determination/screenshot.png".
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Does the result rendering look similar to ground truth? 
+          2. Does the visualization show the target structure clearly?
+      gs-file: GS/dataset_003.png
+      rs-file: eval_iso_surface_determination/screenshot.png                          
+  options:
+    cache: false
+    runSerially: true
+
+
+# Test: Cell Counting and Measurement Analysis
+- vars:
+    question: |
+      Load the image "data/dataset_001/dataset_001.tiff" and set it to magenta colormap.
+      Take a screenshot and analyze it to count how many complete cells are visible (not cut off by edges).
+      Add point annotations to mark the center of each counted cell.
+      Measure the distance between the two most distant cells.
+      Q1: answer with the number of complete cells you counted, for example "5" if you see 5 complete cells.
+      Save the answer of Q1 to the questions in plain text as "eval_analysis_workflows/Q1_answer.txt".
+  assert:
+    - type: llm-rubric
+      subtype: text
+      value: |
+        1. Q1 correct answer: 2
+      rs-file: eval_analysis_workflows/Q1_answer.txt
+  options:
+    cache: false
+    runSerially: true
+
+# Test: Statistical Analysis and Data Export
+- vars:
+    question: |
+      1. Load the image "data/dataset_001/dataset_001.tiff". 
+      2. Get basic statistics (min, max, mean, std) for the loaded layer.
+      3. Extract the raw layer data and examine its properties.
+      4. Save the current layer to a file for further analysis.
+       Q1: Was the statistical analysis and data export successful? (Yes/No)
+      6. Save the answer of Q1 in plain text as "eval_analysis_workflows/layer_statistics_answer.txt".
+  assert:
+    - type: llm-rubric
+      subtype: text
+      value: |
+        1. Q1 correct answer: Yes
+      rs-file: eval_analysis_workflows/layer_statistics_answer.txt
+  options:
+    cache: false
+    runSerially: true
+
+# Test: Annotation Workflow
+- vars:
+    question: |
+      1. Load the image "data/dataset_001/dataset_001.tiff". 
+      2. Add point annotations at random locations on the image.
+      3. Add shape annotations (rectangles or circles) at random locations on the image.
+       Q1: Check if layers have been generated. (Yes/No)
+      4. Save the answer of Q1 in plain text as "eval_analysis_workflows/annotation_answer.txt".
+  assert:
+    - type: llm-rubric
+      value: |
+          1. Q1 correct answer: Yes
+      rs-file: eval_analysis_workflows/annotation_answer.txt
+  options:
+    cache: false
+    runSerially: true
+
+# Test: Advanced Annotation Workflow: Cell Surface Trace
+- vars:
+    question: |
+      1. Load the image "data/dataset_002/dataset_002.tif" into napari.
+      2. Trace the cell surface on the current slice by adding a polygon shape in a new shapes layer.
+      3. Use a screenshot to validate whether the polygon correctly traces the cell surface.
+      4. If the trace is not accurate, adjust the polygon and take a new screenshot to validate.
+      5. Stop when the trace is accurate or you have tried five different attempts.
+      6. Save the results and the final screenshot to "eval_annotation_workflows/cell_surface_trace.png".
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Does the final screenshot show a polygon shape that accurately traces the outline of the cell surface?
+          2. Is the polygon layer correctly overlaid on the image?
+      rs-file: eval_annotation_workflows/cell_surface_trace.png
+  options:
+    cache: false
+    runSerially: true
+
