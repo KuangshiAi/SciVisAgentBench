@@ -68,7 +68,7 @@ class EvaluationReporter:
                     data['_timestamp'] = int(filename_parts[-1]) if filename_parts and filename_parts[-1].isdigit() else 0
                     results.append(data)
             except Exception as e:
-                print(f"   ⚠️  Error loading {json_file.name}: {e}")
+                print(f"   [WARNING]  Error loading {json_file.name}: {e}")
 
         # Group by case_name and keep only the latest result for each case
         case_results = {}
@@ -93,14 +93,14 @@ class EvaluationReporter:
         """Load test case definitions from YAML."""
         try:
             if not self.yaml_path.exists():
-                print(f"   ⚠️  YAML file not found: {self.yaml_path}")
+                print(f"   [WARNING]  YAML file not found: {self.yaml_path}")
                 return {}
 
             with open(self.yaml_path, 'r', encoding='utf-8') as f:
                 yaml_data = yaml.safe_load(f)
 
             if not yaml_data:
-                print(f"   ⚠️  YAML file is empty or could not be parsed: {self.yaml_path}")
+                print(f"   [WARNING]  YAML file is empty or could not be parsed: {self.yaml_path}")
                 return {}
 
             cases = {}
@@ -113,8 +113,8 @@ class EvaluationReporter:
                     case_name = None
 
                     # Try to extract case name from file paths in the question
-                    # Pattern matches directory name before /data/ or /results/ (includes underscores)
-                    match = re.search(r'([a-z0-9_-]+)/(?:data|results)/', question)
+                    # Pattern matches directory name before /data/ or /results/ (includes underscores and uppercase)
+                    match = re.search(r'([a-zA-Z0-9_-]+)/(?:data|results)/', question)
                     if match:
                         case_name = match.group(1)
                     else:
@@ -127,16 +127,16 @@ class EvaluationReporter:
 
             return cases
         except yaml.YAMLError as e:
-            print(f"   ⚠️  YAML parsing error in {self.yaml_path}: {e}")
-            print(f"   ⚠️  Report will be generated without YAML case definitions")
+            print(f"   [WARNING]  YAML parsing error in {self.yaml_path}: {e}")
+            print(f"   [WARNING]  Report will be generated without YAML case definitions")
             return {}
         except KeyboardInterrupt:
-            print(f"   ⚠️  YAML parsing interrupted (file might be malformed)")
-            print(f"   ⚠️  Report will be generated without YAML case definitions")
+            print(f"   [WARNING]  YAML parsing interrupted (file might be malformed)")
+            print(f"   [WARNING]  Report will be generated without YAML case definitions")
             return {}
         except Exception as e:
-            print(f"   ⚠️  Error loading YAML: {e}")
-            print(f"   ⚠️  Report will be generated without YAML case definitions")
+            print(f"   [WARNING]  Error loading YAML: {e}")
+            print(f"   [WARNING]  Report will be generated without YAML case definitions")
             return {}
 
     def compute_summary_stats(self, results: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -288,7 +288,7 @@ class EvaluationReporter:
                     if token_usage:
                         token_usage_map[case_name] = token_usage
             except Exception as e:
-                print(f"   ⚠️  Error loading token usage from {latest_file}: {e}")
+                print(f"   [WARNING]  Error loading token usage from {latest_file}: {e}")
 
         return token_usage_map
 
@@ -373,7 +373,7 @@ class EvaluationReporter:
 
             # Mark case as failure if result image not found (only for vision cases)
             if not result_img_found:
-                print(f"   ⚠️  Result image not found for {case_name}, marking as failure")
+                print(f"   [WARNING]  Result image not found for {case_name}, marking as failure")
                 result['image_missing'] = True
 
                 # Always mark as failed (remove the status == 'completed' check)
@@ -479,7 +479,7 @@ class EvaluationReporter:
 
             # Mark as failure if visualization image is missing
             if not has_visualization:
-                print(f"   ⚠️  {case_name}: no visualization image at {viz_image_path}, marking as failure")
+                print(f"   [WARNING]  {case_name}: no visualization image at {viz_image_path}, marking as failure")
                 result['no_visualization'] = True
 
                 # Update both top-level and evaluation-level status for consistency
@@ -558,7 +558,7 @@ class EvaluationReporter:
 
             # Mark as failure if vision visualization_quality score is <= 10% of max score
             if viz_score <= threshold:
-                print(f"   ⚠️  {case_name}: vision quality score {viz_score}/{viz_max_score} (<= 10%), marking as failure")
+                print(f"   [WARNING]  {case_name}: vision quality score {viz_score}/{viz_max_score} (<= 10%), marking as failure")
                 result['low_vision_score'] = True
 
                 # Update both top-level and evaluation-level status for consistency
@@ -620,7 +620,7 @@ class EvaluationReporter:
 
             # Mark as failure if text score is exactly 0
             if text_score == 0:
-                print(f"   ⚠️  {case_name}: text-only case with score 0, marking as failure")
+                print(f"   [WARNING]  {case_name}: text-only case with score 0, marking as failure")
                 result['zero_text_score'] = True
 
                 # Update both top-level and evaluation-level status for consistency

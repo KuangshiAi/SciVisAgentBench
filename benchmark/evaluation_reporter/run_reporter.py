@@ -115,7 +115,7 @@ def main():
         output_dir = Path("test_results") / f"{args.agent}_report"
         output_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"\n📊 SciVisAgentBench Evaluation Reporter")
+    print(f"\n[REPORT] SciVisAgentBench Evaluation Reporter")
     print(f"{'='*60}")
     print(f"Agent: {args.agent}")
     if args.agent_mode:
@@ -129,7 +129,7 @@ def main():
 
     # Check if test results directory exists
     if not test_results_dir.exists():
-        print(f"❌ Error: Test results directory not found: {test_results_dir}")
+        print(f"[ERROR] Error: Test results directory not found: {test_results_dir}")
         return 1
 
     # Load configuration
@@ -137,7 +137,7 @@ def main():
         with open(config_path, 'r', encoding='utf-8') as f:
             config = json.load(f)
     except Exception as e:
-        print(f"❌ Error loading config: {e}")
+        print(f"[ERROR] Error loading config: {e}")
         return 1
 
     # Create reporter
@@ -152,12 +152,12 @@ def main():
     )
 
     # Generate report
-    print("🔄 Generating report...")
+    print("[PROCESSING] Generating report...")
     try:
         report_path = reporter.generate_report()
-        print(f"✅ Report generated: {report_path}")
+        print(f"[OK] Report generated: {report_path}")
     except Exception as e:
-        print(f"❌ Error generating report: {e}")
+        print(f"[ERROR] Error generating report: {e}")
         import traceback
         traceback.print_exc()
         return 1
