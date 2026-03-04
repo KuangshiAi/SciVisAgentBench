@@ -1,0 +1,566 @@
+# Basic Napari Function Tests - Action Level
+# These tests evaluate individual server functions with simple, single-function calls
+# Each test focuses on testing one specific function with appropriate parameters
+# We suggest using https://www.ebi.ac.uk/bioimage-archive/galleries/S-BIAD7.html IM1 as dataset_001
+# We suggest using https://uk1s3.embassy.ebi.ac.uk/bia-integrator-data/pages/S-BIAD573.html IM1 as dataset_002
+#
+# Taxonomy Level: Task (small-scale visualization task involving a few operations)
+# Each task is marked with a comment indicating the end of the task and the task name
+
+# ============================================================
+# TASK 1: Napari - Load & Layer Management
+# ============================================================
+
+# Test: open_file - Load a multi-dimensional image file (T, Z, Y, X, C)
+- vars:
+    question: |
+      Load the file "data/dataset_001/dataset_001.tiff" into the viewer.
+      Respond with <1> if the file was successfully loaded, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test: delete layers - Delete all loaded layers from the viewer
+- vars:
+    question: |
+      Delete the all currently loaded layers.
+      Respond with <1> if all layers were successfully deleted, or <0> if the operation failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+    
+# Test: open_file - Load a single image file
+- vars:
+    question: |
+      Load the file "data/dataset_002/dataset_002.tif" into the viewer.
+      Respond with <1> if the file was successfully loaded, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test: list_layers - Get information about loaded layers
+- vars:
+    question: |
+      Retrieve information about all currently loaded layers in the viewer.
+      Respond with <1> if you successfully retrieved layer information, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# END OF TASK 1: Napari - Load & Layer Management
+# Operations: Load multi-dimensional file, delete layers, load single image file, retrieve layer information
+
+# ============================================================
+# TASK 2: Napari - 3D/4D Navigation
+# ============================================================
+
+# Test: Z-stack Navigation - Scroll through different depths
+- vars:
+    question: |
+      Navigate through the z-stack of the loaded image. Use set_z_slice to jump to at least z-slice 0 to examine structures at different depths. 
+      Take a screenshot at each z-slice to verify navigation. 
+      Respond with <1> if you successfully navigated through different z-slices and could see structural changes, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+
+# Test: Time Series Navigation - Navigate through time points
+- vars:
+    question: |
+      If the data has time dimensions, use set_timestep to navigate through different time points.
+      Take screenshots at different time points to show temporal changes.
+      If no time dimension exists, simulate time navigation by adjusting the current view and taking multiple screenshots.
+      Respond with <1> if you successfully navigated through time points or simulated time navigation, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# END OF TASK 2: Napari - 3D/4D Navigation
+# Operations: Z-stack navigation, time series navigation
+
+# ============================================================
+# TASK 3: Napari - Color & Opacity
+# ============================================================
+
+# Test: set_colormap - Change layer colormap
+- vars:
+    question: |
+      Change the colormap of the active image layer (dataset_002_ch1) to 'viridis'.
+      Respond with <1> if the colormap was successfully changed, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test: set_opacity - Adjust layer transparency
+- vars:
+    question: |
+      Set the opacity of the active layer (dataset_002_ch1) to 0.5 (50% transparent).
+      Respond with <1> if the opacity was successfully changed, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test: set_blending - Change layer blending mode
+- vars:
+    question: |
+      Change the blending mode of the active layer to 'additive'.
+      Respond with <1> if the blending mode was successfully changed, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# END OF TASK 3: Napari - Color & Opacity
+# Operations: Set colormap, adjust opacity, change blending mode
+
+# ============================================================
+# TASK 4: Napari - Contrast Adjustment
+# ============================================================
+
+# Test: auto_contrast - Auto-adjust contrast
+- vars:
+    question: |
+      Automatically adjust the contrast of the active image layer.
+      Respond with <1> if the contrast was successfully auto-adjusted, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test: set_contrast_limits - Set specific contrast limits
+- vars:
+    question: |
+      Set the contrast limits of the active layer to min=0.1 and max=0.9.
+      Respond with <1> if the contrast limits were successfully set, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test: set_gamma - Adjust gamma correction
+- vars:
+    question: |
+      Set the gamma correction of the active layer to 1.5.
+      Respond with <1> if the gamma was successfully adjusted, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test: set_interpolation - Change interpolation mode - doesn't work
+- vars:
+    question: |
+      Change the interpolation mode of the active layer to 'linear'.
+      Respond with <1> if the interpolation mode was successfully changed, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# END OF TASK 4: Napari - Contrast Adjustment
+# Operations: Auto-adjust contrast, set specific contrast limits, adjust gamma correction, change interpolation mode
+
+# ============================================================
+# TASK 5: Napari - Camera Control
+# ============================================================
+
+# Test: toggle_view - Switch between 2D and 3D view
+- vars:
+    question: |
+      Switch the viewer to 3D mode.
+      Respond with <1> if the view was successfully switched to 3D, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test: get_dims_info - Get dimension information
+- vars:
+    question: |
+      Get information about the viewer's current dimension settings.
+      Respond with <1> if you successfully retrieved dimension information, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test: get_camera - Get current camera settings
+- vars:
+    question: |
+      Retrieve the current camera settings of the viewer.
+      Respond with <1> if you successfully retrieved camera settings, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test: reset_camera - Reset camera to default view
+- vars:
+    question: |
+      Reset the camera to the default view.
+      Respond with <1> if the camera was successfully reset, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test: set_camera - Adjust camera settings
+- vars:
+    question: |
+      Set the camera zoom to 2.0.
+      Respond with <1> if the camera zoom was successfully set, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# END OF TASK 5: Napari - Camera Control
+# Operations: Switch 2D/3D view, get dimension info, get camera settings, reset camera, adjust camera zoom
+
+# ============================================================
+# TASK 6: Napari - Visibility & Screenshot
+# ============================================================
+
+# Test: set_layer_visibility - Toggle layer visibility
+- vars:
+    question: |
+      Hide the active layer (set visible to false).
+      Respond with <1> if the layer visibility was successfully changed, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test: set_layer_visibility - Show layer again
+- vars:
+    question: |
+      Show the active layer again (set visible to true).
+      Respond with <1> if the layer visibility was successfully changed, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test: screenshot - Take a screenshot
+- vars:
+    question: |
+      Take a screenshot of the current view.
+      Respond with <1> if the screenshot was successfully taken, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# END OF TASK 6: Napari - Visibility & Screenshot
+# Operations: Hide layer, show layer, take screenshot
+
+# ============================================================
+# TASK 7: Napari - Annotations
+# ============================================================
+
+# # Test: get_layer_statistics - Get layer statistics
+# - vars:
+#     question: |
+#       Retrieve basic statistics (min, max, mean, std) for the active layer.
+#       Respond with <1> if you successfully retrieved layer statistics, or <0> if it failed. Only respond with <1> or <0>.
+#   assert:
+#     - type: contains-all
+#       value: "<1>"
+#     - type: not-contains
+#       value: "<0>"
+#   options:
+#     cache: false
+#     runSerially: true
+
+# # Test: add_points - Add point annotations - doesn't work
+# - vars:
+#     question: |
+#       Add two point markers at coordinates [[100, 100], [200, 200]] with the name "test_points".
+#       Respond with <1> if the points were successfully added, or <0> if it failed. Only respond with <1> or <0>.
+#   assert:
+#     - type: contains-all
+#       value: "<1>"
+#     - type: not-contains
+#       value: "<0>"
+#   options:
+#     cache: false
+#     runSerially: true
+
+# Test: add_shapes - Add shape annotations
+- vars:
+    question: |
+      Add a rectangle shape with coordinates [[[50, 50], [150, 50], [150, 150], [50, 150]]] and name "test_rectangle".
+      Respond with <1> if the shape was successfully added, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# END OF TASK 7: Napari - Annotations
+# Operations: Add shape annotations
+
+# ============================================================
+# TASK 8: Napari - Scale Bar & Export
+# ============================================================
+
+# # Test: measure_distance - Measure distance between points - doesn't work 
+# - vars:
+#     question: |
+#       Measure the distance between point [100, 100] and point [200, 200].
+#       Respond with <1> if the distance was successfully measured, or <0> if it failed. Only respond with <1> or <0>.
+#   assert:
+#     - type: contains-all
+#       value: "<1>"
+#     - type: not-contains
+#       value: "<0>"
+#   options:
+#     cache: false
+#    runSerially: true
+
+# Test: set_scale_bar - Show scale bar
+- vars:
+    question: |
+      Show the scale bar with unit 'um'.
+      Respond with <1> if the scale bar was successfully shown, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# # Test: set_axis_labels - Set axis labels - doesn't work
+# - vars:
+#     question: |
+#       Set axis labels to ['y', 'x'] for the 2D data.
+#       Respond with <1> if the axis labels were successfully set, or <0> if it failed. Only respond with <1> or <0>.
+#   assert:
+#     - type: contains-all
+#       value: "<1>"
+#     - type: not-contains
+#       value: "<0>"
+#   options:
+#     cache: false
+#     runSerially: true
+
+# Test: screenshot - Save screenshot to file
+- vars:
+    question: |
+      Save a screenshot.
+      Respond with <1> if the screenshot was successfully exported, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# END OF TASK 8: Napari - Scale Bar & Export
+# Operations: Show scale bar with units, save screenshot to file
+
+# ============================================================
+# TASK 9: Napari - Export & Cleanup
+# ============================================================
+
+# Test: save_layers - Save layer to file
+- vars:
+    question: |
+      Save the active layer to the file "test_layer.tif".
+      Respond with <1> if the layer was successfully saved, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test: remove_layer - Remove a layer
+- vars:
+    question: |
+      Remove the layer named "test_rectangle".
+      Respond with <1> if the layer was successfully removed, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# END OF TASK 9: Napari - Export & Cleanup
+# Operations: Save layer to file, remove layer
+
+# ============================================================
+# TASK 10: Napari - Error Handling
+# ============================================================
+
+# Test: Error handling - Try to load non-existent file
+- vars:
+    question: |
+      Try to load the non-existent file "nonexistent.tif" and handle the error gracefully.
+      Respond with <1> if the error was handled gracefully (no crash), or <0> if it crashed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test: Error handling - Try to remove non-existent layer
+- vars:
+    question: |
+      Try to remove a layer that doesn't exist named "nonexistent_layer" and handle the error gracefully.
+      Respond with <1> if the error was handled gracefully (no crash), or <0> if it crashed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# END OF TASK 10: Napari - Error Handling
+# Operations: Handle non-existent file, handle non-existent layer removal
+
+# ============================================================
+# TASK 11: Napari - 3D Rendering
+# ============================================================
+
+# Test: 3D View and Iso-surface Rendering
+- vars:
+    question: |
+      Enable iso-surface rendering for the loaded layer.
+      Take a screenshot to verify the 3D iso-surface rendering.
+      Respond with <1> if the 3D iso-surface rendering was successfully set up, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# Test: Cleanup - Remove remaining test layers
+- vars:
+    question: |
+      Remove the layer named "test_rectangle" to clean up test annotations.
+      Respond with <1> if the layer was successfully removed, or <0> if it failed. Only respond with <1> or <0>.
+  assert:
+    - type: contains-all
+      value: "<1>"
+    - type: not-contains
+      value: "<0>"
+  options:
+    cache: false
+    runSerially: true
+
+# END OF TASK 11: Napari - 3D Rendering
+# Operations: Enable iso-surface rendering in 3D, remove test layers for cleanup
