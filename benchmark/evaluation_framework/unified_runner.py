@@ -208,8 +208,8 @@ class UnifiedTestRunner:
         self.cases_dir = Path(cases_dir)
         self.data_dir = Path(data_dir) if data_dir else self.cases_dir
 
-        # Save centralized results to test_results/<benchmark_name>/<agent_name>/
-        # e.g., test_results/main/paraview_mcp/, test_results/bioimage_data/napari_mcp/, etc.
+        # Save centralized results to test_results/<benchmark_name>/<agent_mode>/
+        # e.g., test_results/main/paraview_mcp_claude-sonnet-4-5_exp1/, test_results/bioimage_data/napari_mcp_gpt-4o_exp2/, etc.
         if output_dir:
             self.output_dir = Path(output_dir)
         else:
@@ -227,11 +227,11 @@ class UnifiedTestRunner:
             else:
                 benchmark_name = self.cases_dir.name
 
-            # Get agent name from agent config
-            agent_name = agent.agent_name
-            # Save to repository root / test_results / benchmark_name / agent_name
+            # Get agent mode from agent config (includes agent name, model, and experiment number)
+            agent_mode = agent.agent_mode
+            # Save to repository root / test_results / benchmark_name / agent_mode
             repo_root = Path.cwd()  # Assumes running from repo root
-            self.output_dir = repo_root / "test_results" / benchmark_name / agent_name
+            self.output_dir = repo_root / "test_results" / benchmark_name / agent_mode
 
         # Store YAML filename for later use (without extension)
         self.yaml_filename = self.yaml_path.stem
