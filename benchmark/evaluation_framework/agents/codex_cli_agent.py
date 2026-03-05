@@ -232,12 +232,12 @@ Output Requirements:
    - The screenshot will be used for visual evaluation of your work
 
 Strategy:
-- You should check the visualization you generate to confirm if the task is accomplished or further modification is needed. Try to be efficient about the iteration and use least amount of checking while achieve reasonable result. And you should never check anything mark as GS (ground truth).
+- You should check the visualization you generate to confirm if the task is accomplished or further modification is needed. Try to be efficient about the iteration and use least amount of checking while achieve reasonable result. Do not use more than 40 turns.
 
 Task:
 {task}
 
-IMPORTANT: Make sure to save all output files (state files, screenshots, text files) to the exact paths specified in the task description.
+IMPORTANT: Don't read folder not specificed in the instruction, and you can never check anything mark as GS (ground truth) for aidding the task. Make sure to save all output files (state files, screenshots, text files) to the exact paths specified in the task description. Use bash shell and the current python environment, it should have all the necessary package
 """
 
         return context
@@ -426,8 +426,13 @@ IMPORTANT: Make sure to save all output files (state files, screenshots, text fi
                             elif event_type == "turn.completed":
                                 usage = event.get("usage", {})
                                 input_tokens = usage.get("input_tokens", 0)
+                                cached_input_tokens = usage.get("cached_input_tokens", 0)
                                 output_tokens = usage.get("output_tokens", 0)
-                                result_line = f"\n{'='*60}\n✅ Turn completed - Input: {input_tokens} tokens, Output: {output_tokens} tokens\n{'='*60}\n"
+                                total_tokens = input_tokens + cached_input_tokens + output_tokens
+                                result_line = f"\n{'='*60}\n✅ Turn completed - Input: {input_tokens} tokens"
+                                if cached_input_tokens > 0:
+                                    result_line += f" (+ {cached_input_tokens} cached)"
+                                result_line += f", Output: {output_tokens} tokens, Total: {total_tokens} tokens\n{'='*60}\n"
                                 print(result_line.strip(), flush=True)
                                 parsed_output_lines.append(result_line)
 
@@ -550,6 +555,7 @@ IMPORTANT: Make sure to save all output files (state files, screenshots, text fi
         """
         token_info = {
             "input_tokens": 0,
+            "cached_input_tokens": 0,
             "output_tokens": 0,
             "total_tokens": 0,
             "source": "unknown"
@@ -562,17 +568,23 @@ IMPORTANT: Make sure to save all output files (state files, screenshots, text fi
                 if event.get("type") == "turn.completed":
                     usage = event.get("usage", {})
                     input_tokens = usage.get("input_tokens", 0)
+                    cached_input_tokens = usage.get("cached_input_tokens", 0)
                     output_tokens = usage.get("output_tokens", 0)
 
                     # Accumulate tokens from all turns
                     token_info["input_tokens"] += input_tokens
+                    token_info["cached_input_tokens"] += cached_input_tokens
                     token_info["output_tokens"] += output_tokens
                     token_info["source"] = "codex_output"
             except (json.JSONDecodeError, AttributeError):
                 continue
 
         # Calculate total
-        token_info["total_tokens"] = token_info["input_tokens"] + token_info["output_tokens"]
+        token_info["total_tokens"] = (
+            token_info["input_tokens"] +
+            token_info["cached_input_tokens"] +
+            token_info["output_tokens"]
+        )
 
         # If no tokens found, estimate based on output length
         if token_info["total_tokens"] == 0:

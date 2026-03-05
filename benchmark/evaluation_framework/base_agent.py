@@ -106,8 +106,16 @@ class BaseAgent(ABC):
         self._tokenizer = None
         try:
             import tiktoken
-            # Use cl100k_base which works for both GPT-4 and is a reasonable approximation for other models
-            self._tokenizer = tiktoken.get_encoding("cl100k_base")
+            # Prefer model-specific encoding when available (best for OpenAI GPT models),
+            # otherwise fall back to cl100k_base as a reasonable approximation.
+            model_name = config.get("model", "")
+            try:
+                if model_name:
+                    self._tokenizer = tiktoken.encoding_for_model(model_name)
+                else:
+                    self._tokenizer = tiktoken.get_encoding("cl100k_base")
+            except Exception:
+                self._tokenizer = tiktoken.get_encoding("cl100k_base")
         except Exception:
             pass
 

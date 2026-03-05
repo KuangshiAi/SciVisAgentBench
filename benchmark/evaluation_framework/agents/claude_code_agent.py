@@ -233,12 +233,12 @@ Output Requirements:
    - The screenshot will be used for visual evaluation of your work
 
 Stratergy:
-- You should check the visualization you generate to confirm if the task is accomplished or further modification is needed. Try to be efficient about the iteration and use least amount of checking while achieve reasonable result. And you should never check anything mark as GS (ground truth).
+- You should check the visualization you generate to confirm if the task is accomplished or further modification is needed. Try to be efficient about the iteration and use least amount of checking while achieve reasonable result. 
 
 Task:
 {task}
 
-IMPORTANT: Make sure to save all output files (state files, screenshots, text files) to the exact paths specified in the task description.
+IMPORTANT: You should never check anything mark as GS (ground truth) for aidding the task. Make sure to save all output files (state files, screenshots, text files) to the exact paths specified in the task description.
 """
 
         return context
@@ -567,24 +567,29 @@ IMPORTANT: Make sure to save all output files (state files, screenshots, text fi
                 continue
 
         # Fallback: Try regex patterns for non-JSON output
-        patterns = [
-            r'input[_\s]tokens?[:\s=]+(\d+)',
-            r'output[_\s]tokens?[:\s=]+(\d+)',
-            r'total[_\s]tokens?[:\s=]+(\d+)',
-        ]
+        patterns = {
+            "input_tokens": r'input[_\s]tokens?[:\s=]+(\d+)',
+            "output_tokens": r'output[_\s]tokens?[:\s=]+(\d+)',
+            "cache_read_input_tokens": r'cache[_\s]read[_\s]input[_\s]tokens?[:\s=]+(\d+)',
+            "cache_creation_input_tokens": r'cache[_\s]creation[_\s]input[_\s]tokens?[:\s=]+(\d+)',
+            "total_tokens": r'total[_\s]tokens?[:\s=]+(\d+)',
+        }
 
-        for pattern in patterns:
+        for field, pattern in patterns.items():
             matches = re.findall(pattern, output, re.IGNORECASE)
             if matches:
-                if 'input' in pattern.lower():
-                    token_info["input_tokens"] = int(matches[0])
-                    token_info["source"] = "claude_output_regex"
-                elif 'output' in pattern.lower():
-                    token_info["output_tokens"] = int(matches[0])
-                    token_info["source"] = "claude_output_regex"
-                elif 'total' in pattern.lower():
-                    token_info["total_tokens"] = int(matches[0])
-                    token_info["source"] = "claude_output_regex"
+                # Prefer the last occurrence in case the output contains multiple summaries
+                token_info[field] = int(matches[-1])
+                token_info["source"] = "claude_output_regex"
+
+        # Optional: cost, if present in plaintext logs
+        cost_matches = re.findall(r'total[_\s]cost[_\s]usd[:\s=]+([0-9]*\\.?[0-9]+)', output, re.IGNORECASE)
+        if cost_matches:
+            try:
+                token_info["cost_usd"] = float(cost_matches[-1])
+                token_info["source"] = "claude_output_regex"
+            except ValueError:
+                pass
 
         # Calculate total if not found
         if token_info["total_tokens"] == 0 and token_info["source"] != "unknown":
