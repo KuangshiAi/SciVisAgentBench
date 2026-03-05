@@ -401,14 +401,39 @@ IMPORTANT: Make sure to save all output files (state files, screenshots, text fi
                                     parsed_output_lines.append(error_line)
 
                             elif event_type == "result":
-                                # Final result
+                                # Final result with token usage
                                 subtype = event.get("subtype", "unknown")
                                 duration_ms = event.get("duration_ms", 0)
                                 num_turns = event.get("num_turns", 0)
 
-                                result_line = f"\n{'='*60}\nCompleted: {subtype} in {duration_ms/1000:.2f}s ({num_turns} turns)\n{'='*60}\n"
+                                # Extract token usage
+                                usage = event.get("usage", {})
+                                input_tokens = usage.get("input_tokens", 0)
+                                output_tokens = usage.get("output_tokens", 0)
+                                cache_creation = usage.get("cache_creation_input_tokens", 0)
+                                cache_read = usage.get("cache_read_input_tokens", 0)
+                                total_tokens = input_tokens + output_tokens + cache_creation + cache_read
+                                cost_usd = event.get("total_cost_usd", 0.0)
+
+                                result_line = f"\n{'='*60}\n✅ Completed: {subtype} in {duration_ms/1000:.2f}s ({num_turns} turns)\n"
+                                result_line += f"📊 Tokens: {input_tokens} input + {output_tokens} output"
+                                if cache_read > 0:
+                                    result_line += f" + {cache_read} cached"
+                                if cache_creation > 0:
+                                    result_line += f" + {cache_creation} cache creation"
+                                result_line += f" = {total_tokens} total\n"
+                                result_line += f"💰 Cost: ${cost_usd:.4f}\n"
+                                result_line += f"{'='*60}\n"
+
                                 print(f"\n{'='*60}", flush=True)
-                                print(f"Completed: {subtype} in {duration_ms/1000:.2f}s ({num_turns} turns)", flush=True)
+                                print(f"✅ Completed: {subtype} in {duration_ms/1000:.2f}s ({num_turns} turns)", flush=True)
+                                print(f"📊 Tokens: {input_tokens} input + {output_tokens} output", end='', flush=True)
+                                if cache_read > 0:
+                                    print(f" + {cache_read} cached", end='', flush=True)
+                                if cache_creation > 0:
+                                    print(f" + {cache_creation} cache creation", end='', flush=True)
+                                print(f" = {total_tokens} total", flush=True)
+                                print(f"💰 Cost: ${cost_usd:.4f}", flush=True)
                                 print(f"{'='*60}\n", flush=True)
                                 parsed_output_lines.append(result_line)
 
@@ -496,51 +521,78 @@ IMPORTANT: Make sure to save all output files (state files, screenshots, text fi
         """
         Parse token usage from Claude Code output.
 
-        Looks for patterns like:
-        - "tokens: input=X, output=Y"
-        - "Input tokens: X, Output tokens: Y"
-        - JSON with token information
+        Claude Code with --output-format=stream-json provides a final result event:
+        {"type":"result","usage":{"input_tokens":X,"output_tokens":Y,...},"total_cost_usd":Z}
 
         Args:
             output: Claude Code stdout/stderr
 
         Returns:
-            Dictionary with input_tokens, output_tokens, total_tokens
+            Dictionary with input_tokens, output_tokens, total_tokens, cost_usd
         """
         token_info = {
             "input_tokens": 0,
             "output_tokens": 0,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
             "total_tokens": 0,
+            "cost_usd": 0.0,
             "source": "unknown"
         }
 
-        # Try various patterns to extract token usage
+        # Parse JSON lines looking for the final result event
+        for line in output.split('\n'):
+            try:
+                event = json.loads(line.strip())
+                if event.get("type") == "result":
+                    usage = event.get("usage", {})
+
+                    # Extract token counts
+                    input_tokens = usage.get("input_tokens", 0)
+                    output_tokens = usage.get("output_tokens", 0)
+                    cache_creation = usage.get("cache_creation_input_tokens", 0)
+                    cache_read = usage.get("cache_read_input_tokens", 0)
+
+                    token_info["input_tokens"] = input_tokens
+                    token_info["output_tokens"] = output_tokens
+                    token_info["cache_creation_input_tokens"] = cache_creation
+                    token_info["cache_read_input_tokens"] = cache_read
+                    token_info["total_tokens"] = input_tokens + output_tokens + cache_creation + cache_read
+                    token_info["cost_usd"] = event.get("total_cost_usd", 0.0)
+                    token_info["source"] = "claude_output"
+
+                    # Successfully extracted from result event
+                    return token_info
+            except (json.JSONDecodeError, AttributeError, KeyError):
+                continue
+
+        # Fallback: Try regex patterns for non-JSON output
         patterns = [
             r'input[_\s]tokens?[:\s=]+(\d+)',
             r'output[_\s]tokens?[:\s=]+(\d+)',
             r'total[_\s]tokens?[:\s=]+(\d+)',
-            r'tokens?[:\s]+input[=:]\s*(\d+)',
-            r'tokens?[:\s]+output[=:]\s*(\d+)',
         ]
 
         for pattern in patterns:
             matches = re.findall(pattern, output, re.IGNORECASE)
             if matches:
-                # Extract numbers and assign to appropriate fields
                 if 'input' in pattern.lower():
                     token_info["input_tokens"] = int(matches[0])
-                    token_info["source"] = "claude_output"
+                    token_info["source"] = "claude_output_regex"
                 elif 'output' in pattern.lower():
                     token_info["output_tokens"] = int(matches[0])
-                    token_info["source"] = "claude_output"
+                    token_info["source"] = "claude_output_regex"
                 elif 'total' in pattern.lower():
                     token_info["total_tokens"] = int(matches[0])
-                    token_info["source"] = "claude_output"
+                    token_info["source"] = "claude_output_regex"
 
         # Calculate total if not found
-        if token_info["total_tokens"] == 0:
+        if token_info["total_tokens"] == 0 and token_info["source"] != "unknown":
             token_info["total_tokens"] = (
-                token_info["input_tokens"] + token_info["output_tokens"]
+                token_info["input_tokens"] +
+                token_info["output_tokens"] +
+                token_info["cache_creation_input_tokens"] +
+                token_info["cache_read_input_tokens"]
             )
 
         # If no tokens found, estimate based on output length
