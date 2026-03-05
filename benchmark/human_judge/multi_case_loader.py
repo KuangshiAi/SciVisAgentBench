@@ -215,7 +215,7 @@ class MultiCaseLoader:
         if not gs_dir.exists():
             return []
 
-        # Get directory name for fallback (for cases like bio_* where directory is operation_1)
+        # Get directory name for fallback (for cases like bio_* where directory is case_1)
         dir_name = case_dir.name
 
         # Try different file formats in order: MP4, PNG
@@ -239,7 +239,7 @@ class MultiCaseLoader:
         if agent_mode:
             result_dir = case_dir / "results" / agent_mode
             if result_dir.exists():
-                # Get directory name for fallback (for cases like bio_* where directory is operation_1)
+                # Get directory name for fallback (for cases like bio_* where directory is case_1)
                 dir_name = case_dir.name
 
                 # Try MP4 first (prioritize video for temporal cases)

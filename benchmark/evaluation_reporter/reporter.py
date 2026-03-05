@@ -79,8 +79,17 @@ class EvaluationReporter:
             if case_name not in case_results or timestamp > case_results[case_name].get('_timestamp', 0):
                 case_results[case_name] = result
 
-        # Sort by case name for consistent ordering
-        sorted_cases = sorted(case_results.values(), key=lambda x: x.get('case_name', ''))
+        # Sort by case name for consistent ordering (natural sort for case_1, case_2, ..., case_10)
+        import re
+        def natural_sort_key(case):
+            """Sort key that handles numeric parts correctly (case_1 < case_2 < case_10)"""
+            case_name = case.get('case_name', '')
+            # Split into text and number parts
+            parts = re.split(r'(\d+)', case_name)
+            # Convert numeric parts to integers for proper sorting
+            return [int(p) if p.isdigit() else p.lower() for p in parts]
+
+        sorted_cases = sorted(case_results.values(), key=natural_sort_key)
 
         # Print which files were selected
         print(f"   Selected {len(sorted_cases)} latest results (one per case)")
@@ -118,9 +127,9 @@ class EvaluationReporter:
                     if match:
                         case_name = match.group(1)
                     else:
-                        # Fallback: use operation_{index+1} naming pattern
+                        # Fallback: use case_{index+1} naming pattern
                         # This works for napari workflows and similar cases
-                        case_name = f"operation_{idx + 1}"
+                        case_name = f"case_{idx + 1}"
 
                     if case_name:
                         cases[case_name] = item
@@ -673,8 +682,17 @@ class EvaluationReporter:
         print("   Recomputing summary statistics with updated scores...")
         summary = self.compute_summary_stats(results)
 
-        # Sort results by case name
-        results = sorted(results, key=lambda x: x.get('case_name', ''))
+        # Sort results by case name (natural sort for case_1, case_2, ..., case_10)
+        import re
+        def natural_sort_key(case):
+            """Sort key that handles numeric parts correctly (case_1 < case_2 < case_10)"""
+            case_name = case.get('case_name', '')
+            # Split into text and number parts
+            parts = re.split(r'(\d+)', case_name)
+            # Convert numeric parts to integers for proper sorting
+            return [int(p) if p.isdigit() else p.lower() for p in parts]
+
+        results = sorted(results, key=natural_sort_key)
 
         # Generate HTML
         print("   Generating HTML...")

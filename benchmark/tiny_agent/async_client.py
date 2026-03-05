@@ -331,7 +331,13 @@ class AsyncInferenceClient:
 
         Another possibility is to use an async context (e.g. `async with AsyncInferenceClient(): ...`).
         """
-        await asyncio.gather(*[session.close() for session in self._sessions.keys()])
+        # Create a list of sessions to avoid dict changing size during iteration
+        sessions_to_close = list(self._sessions.keys())
+        # Close all sessions, ignoring errors (they might already be closed)
+        await asyncio.gather(
+            *[session.close() for session in sessions_to_close],
+            return_exceptions=True
+        )
 
     async def audio_classification(
         self,
@@ -3402,10 +3408,12 @@ class AsyncInferenceClient:
         session._close = session.close
 
         async def close_session():
-            for response in self._sessions[session]:
-                response.close()
+            # Safely handle session cleanup even if session is not tracked
+            if session in self._sessions:
+                for response in self._sessions[session]:
+                    response.close()
+                self._sessions.pop(session, None)
             await session._close()
-            self._sessions.pop(session, None)
 
         session.close = close_session
         return session

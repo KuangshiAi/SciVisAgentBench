@@ -892,8 +892,13 @@ def generate_image_section(case_name: str, has_vision: bool = True) -> str:
 def generate_rubric_section(eval_data: Dict[str, Any], result: Dict[str, Any] = None) -> str:
     """Generate rubric evaluation scores section."""
     subtype_results = eval_data.get('subtype_results', {})
+    has_vision_eval = result.get('has_vision_evaluation', False) if result else False
 
-    # Check if we have evaluation data
+    # Don't show vision rubrics for non-vision cases (text-only cases)
+    if not has_vision_eval:
+        return ""
+
+    # Check if we have evaluation data - only show vision rubrics for vision cases
     if 'vision' in subtype_results:
         vision_data = subtype_results['vision']
         rubric = vision_data.get('rubric', '')
@@ -905,7 +910,7 @@ def generate_rubric_section(eval_data: Dict[str, Any], result: Dict[str, Any] = 
         viz_score = viz_quality.get('score', 0)
         has_evaluation = True
     else:
-        # No evaluation - test failed, but we can still show the rubric structure
+        # Vision case that failed before evaluation - show rubric structure with error
         if result is None:
             return ""
         rubric = result.get('llm_rubric', '')
@@ -1090,11 +1095,12 @@ def generate_text_section(eval_data: Dict[str, Any]) -> str:
 def generate_metrics_section(eval_data: Dict[str, Any], result: Dict[str, Any], token_usage: Dict[str, Any]) -> str:
     """Generate detailed metrics section."""
     subtype_results = eval_data.get('subtype_results', {})
+    has_vision = result.get('has_vision_evaluation', False)
 
     metrics = []
 
-    # Vision metrics
-    if 'vision' in subtype_results:
+    # Vision metrics - only show if case has vision evaluation in YAML
+    if 'vision' in subtype_results and has_vision:
         vision_data = subtype_results['vision']
         scores = vision_data.get('scores', {})
         image_metrics = vision_data.get('image_metrics', {}).get('averaged_metrics', {})

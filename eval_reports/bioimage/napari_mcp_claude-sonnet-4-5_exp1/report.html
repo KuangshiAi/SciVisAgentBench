@@ -532,7 +532,7 @@
             <h1>🎯 SciVisAgentBench Evaluation Report</h1>
             <div class="header-meta">
                 <span class="agent-name">napari_mcp</span>
-                <span class="timestamp">Generated: 2026-03-03T23:38:33.258021</span>
+                <span class="timestamp">Generated: 2026-03-04T22:27:32.682443</span>
             </div>
         </header>
 
@@ -544,17 +544,17 @@
                 <div class="summary-card">
                     <h3>Overall Score</h3>
                     <div class="value score-poor">
-                        37.3%
+                        49.4%
                     </div>
                     <div class="sub-value">
-                        82/220 Points
+                        126/255 Points
                     </div>
                 </div>
 
                 <div class="summary-card">
                     <h3>Test Cases</h3>
                     <div class="value">
-                        5/10
+                        8/11
                     </div>
                     <div class="sub-value">
                         Completed Successfully
@@ -564,13 +564,13 @@
                 <div class="summary-card">
                     <h3>Avg Vision Score</h3>
                     <div class="value">
-                        22.5%
+                        31.3%
                     </div>
                     <div class="sub-value">
                         Visualization Quality
                     </div>
                     <div class="sub-value">
-                        18/90
+                        33/110
                     </div>
                 </div>
 
@@ -580,7 +580,7 @@
                         N/A
                     </div>
                     <div class="sub-value">
-                        Peak SNR (0/5 valid)
+                        Peak SNR (0/8 valid)
                     </div>
                 </div>
 
@@ -607,7 +607,7 @@
                 <div class="summary-card">
                     <h3>Completion Rate</h3>
                     <div class="value">
-                        50.0%
+                        72.7%
                     </div>
                     <div class="sub-value">
                         Tasks Completed
@@ -657,34 +657,35 @@
         <nav class="case-nav">
             <h3>Jump to Case:</h3>
             <div class="case-links">
-                <a href="#operation_1" class="case-link">operation_1</a>
-<a href="#operation_10" class="case-link case-link-failed">operation_10</a>
-<a href="#operation_2" class="case-link">operation_2</a>
-<a href="#operation_3" class="case-link">operation_3</a>
-<a href="#operation_4" class="case-link case-link-failed">operation_4</a>
-<a href="#operation_5" class="case-link case-link-failed">operation_5</a>
-<a href="#operation_6" class="case-link case-link-failed">operation_6</a>
-<a href="#operation_7" class="case-link case-link-failed">operation_7</a>
-<a href="#operation_8" class="case-link">operation_8</a>
-<a href="#operation_9" class="case-link">operation_9</a>
+                <a href="#case_1" class="case-link">case_1</a>
+<a href="#case_2" class="case-link">case_2</a>
+<a href="#case_3" class="case-link">case_3</a>
+<a href="#case_4" class="case-link case-link-failed">case_4</a>
+<a href="#case_5" class="case-link">case_5</a>
+<a href="#case_6" class="case-link">case_6</a>
+<a href="#case_7" class="case-link case-link-failed">case_7</a>
+<a href="#case_8" class="case-link">case_8</a>
+<a href="#case_9" class="case-link">case_9</a>
+<a href="#case_10" class="case-link">case_10</a>
+<a href="#case_11" class="case-link case-link-failed">case_11</a>
             </div>
         </nav>
 
         
-        <section class="case-section" id="operation_1">
+        <section class="case-section" id="case_1">
             <div class="case-header">
                 <div class="case-title-group">
-                    <h2 class="case-title">📝 operation_1</h2>
+                    <h2 class="case-title">📝 case_1</h2>
                     
                 </div>
-                <div class="case-score">42/45 (93.3%)</div>
+                <div class="case-score">41/45 (91.1%)</div>
             </div>
 
             <div class="case-content">
                 <div class="section-box">
                     <h3>📋 Task Description</h3>
-                    <div class="task-description">1. Load the "data/dataset_002/dataset_002.tif" dataset into napari. 
-2. Depending on the number of channels, set the colormap for the first channel 0 to red and channel 1 to green.
+                    <div class="task-description">1. Load the "data/dataset_002/dataset_002_ch0.tif" dataset into napari as channel 0 and "data/dataset_002/dataset_002_ch1.tif" as channel 1. 
+2. Set the colormap for channel 0 to red and channel 1 to green.
 3. Switch to the 3D view. 
 4. Use additive blending for all channels to create an overlay visualization.
 5. Go the timestep 14. 
@@ -700,11 +701,11 @@
             <div class="image-comparison">
                 <div class="image-box">
                     <h4>Ground Truth</h4>
-                    <img src="images/operation_1_gt.png" alt="Ground Truth" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
+                    <img src="images/case_1_gt.png" alt="Ground Truth" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
                 </div>
                 <div class="image-box">
                     <h4>Agent Result</h4>
-                    <img src="images/operation_1_result.png" alt="Result" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
+                    <img src="images/case_1_result.png" alt="Result" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
                 </div>
             </div>
         </div>
@@ -720,7 +721,7 @@
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">18/20</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">17/20</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
@@ -738,13 +739,13 @@
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 1</div>
-                    <div class="rubric-score">10/10</div>
+                    <div class="rubric-score">9/10</div>
                 </div>
                 <div class="rubric-criterion">
                     <strong>Criterion:</strong> Does the visualization show a green cell with red blobs on the inside?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The result clearly shows green fluorescent cells, including a prominent central green cell that contains multiple distinct red punctate blobs inside it (red spots concentrated within the cell body). This matches the requirement of a green cell with red blobs on the inside.
+                    <strong>Judge's Assessment:</strong> The result clearly shows green cells (membrane/cytoplasm signal) with distinct red/orange punctate blobs inside the central green cell, matching the intended content. The red blobs are visible and located intracellularly as in the ground truth. Minor difference: overall intensity/contrast is slightly reduced in the result, making some red puncta a bit less prominent.
                 </div>
             </div>
          
@@ -757,14 +758,14 @@
                     <strong>Criterion:</strong> Does the result rendering look similar to ground truth?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The result rendering is very similar in content, colors, and spatial arrangement (same central spiky green cell with internal red puncta, and the same neighboring green cell on the right). However, the result appears to be displayed with additional black borders/margins and slightly different framing/scale compared to the ground truth, making it not an almost pixel-identical match.
+                    <strong>Judge's Assessment:</strong> The result is very similar in composition and structure to the ground truth: same cell positions (central spiky green cell with red puncta; round green cell on the right; partial cell at top), and similar color mapping. However, the result includes a large black border/matte around the image (letterboxing), and the displayed scene is slightly smaller/dimmer within the frame compared to the ground truth, reducing visual similarity.
                 </div>
             </div>
         
                 </div>
                 <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
-                    <p style="color: #666;">The core biological visualization (green cells with internal red puncta) matches the ground truth very well. Minor presentation differences (notably the added black border and slight framing changes) reduce overall similarity but do not change the essential visual content.</p>
+                    <p style="color: #666;">The agent output successfully captures the key biological visualization (green cells with internal red blobs) and largely matches the ground truth scene. The main discrepancy is presentation: the result is letterboxed with substantial black margins and slightly lower apparent contrast/scale, preventing a near-identical match.</p>
                 </div>
             </div>
         </div>
@@ -783,10 +784,12 @@
                 <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Q1 correct answer: Yes</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Yes</div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Q1: Does the cell show protrusions? (Yes/No)
+
+Answer: Yes</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided task answer is exactly "Yes", which matches the expected correct answer. Therefore, it fully satisfies the evaluation criterion with no discrepancies.</div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided answer to Q1 is "Yes," which exactly matches the specified correct answer. Therefore, it fully meets the evaluation criterion with no discrepancies.</div>
             </div>
         </div>
     
@@ -797,7 +800,7 @@
             <div class="metrics-grid">
             <div class="metric-box">
                 <div class="metric-label">Visualization Quality</div>
-                <div class="metric-value">18/20</div>
+                <div class="metric-value">17/20</div>
             </div>
         
             <div class="metric-box">
@@ -809,7 +812,7 @@
                 <div class="metric-label">Efficiency</div>
                 <div class="metric-value">9/10</div>
                 <div class="metric-subvalue">
-                    Completed in 52.14 seconds (excellent)
+                    Completed in 50.99 seconds (excellent)
                 </div>
             </div>
         
@@ -823,17 +826,22 @@
         
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">126,564</div>
+                <div class="metric-value">141,075</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">1,540</div>
+                <div class="metric-value">1,752</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">128,104</div>
+                <div class="metric-value">142,827</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Cost</div>
+                <div class="metric-value">$0.4495</div>
             </div>
         </div>
         </div>
@@ -842,152 +850,10 @@
         </section>
     
 
-        <section class="case-section case-section-failed" id="operation_10">
+        <section class="case-section" id="case_2">
             <div class="case-header">
                 <div class="case-title-group">
-                    <h2 class="case-title">📝 operation_10</h2>
-                    <span class="status-badge status-failed">❌ FAILED</span>
-                </div>
-                <div class="case-score">0/35 (0.0%)</div>
-            </div>
-
-            <div class="case-content">
-                <div class="section-box">
-                    <h3>📋 Task Description</h3>
-                    <div class="task-description">1. Load the image "data/dataset_002/dataset_002.tif" into napari.
-2. Trace the cell surface on the current slice by adding a polygon shape in a new shapes layer.
-3. Use a screenshot to validate whether the polygon correctly traces the cell surface.
-4. If the trace is not accurate, adjust the polygon and take a new screenshot to validate.
-5. Stop when the trace is accurate or you have tried five different attempts.
-6. Save the results and the final screenshot to "eval_annotation_workflows/cell_surface_trace.png".
-</div>
-                </div>
-
-                
-        <div class="section-box">
-            <h3>🖼️ Visualization Comparison</h3>
-            <div class="image-comparison">
-                <div class="image-box">
-                    <h4>Ground Truth</h4>
-                    <img src="images/operation_10_gt.png" alt="Ground Truth" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
-                </div>
-                <div class="image-box">
-                    <h4>Agent Result</h4>
-                    <img src="images/operation_10_result.png" alt="Result" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
-                </div>
-            </div>
-        </div>
-    
-
-                
-        <div class="section-box">
-            <h3 class="expandable">📏 Vision Evaluation Rubrics</h3>
-            <div class="expandable-content">
-                
-        <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
-            <h4 style="color: #667eea; margin-bottom: 10px;">Score Summary</h4>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
-                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
-                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">0/20</div>
-                </div>
-                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
-                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">2</div>
-                </div>
-                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
-                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Points/Goal</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">10</div>
-                </div>
-            </div>
-        </div>
-    
-                <div class="rubric-scores" style="margin-top: 15px;">
-                    
-            <div class="rubric-item">
-                <div class="rubric-header">
-                    <div class="rubric-title">Goal 1</div>
-                    <div class="rubric-score">0/10</div>
-                </div>
-                <div class="rubric-criterion">
-                    <strong>Criterion:</strong> Does the final screenshot show a polygon shape that accurately traces the outline of the cell surface?
-                </div>
-                <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> <em style="color: #9ca3af;">Not evaluated</em>
-                </div>
-            </div>
-         
-            <div class="rubric-item">
-                <div class="rubric-header">
-                    <div class="rubric-title">Goal 2</div>
-                    <div class="rubric-score">0/10</div>
-                </div>
-                <div class="rubric-criterion">
-                    <strong>Criterion:</strong> Is the polygon layer correctly overlaid on the image?
-                </div>
-                <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> <em style="color: #9ca3af;">Not evaluated</em>
-                </div>
-            </div>
-        
-                </div>
-                <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
-                    <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
-                    <p style="color: #666;"><em style="color: #9ca3af;">No overall explanation available</em></p>
-                </div>
-            </div>
-        </div>
-    
-
-                
-
-                
-        <div class="section-box">
-            <h3>📊 Detailed Metrics</h3>
-            <div class="metrics-grid">
-            <div class="metric-box">
-                <div class="metric-label">Visualization Quality</div>
-                <div class="metric-value">0/20</div>
-            </div>
-        
-            <div class="metric-box">
-                <div class="metric-label">Output Generation</div>
-                <div class="metric-value">5/5</div>
-            </div>
-        
-            <div class="metric-box">
-                <div class="metric-label">Efficiency</div>
-                <div class="metric-value">5/10</div>
-                <div class="metric-subvalue">
-                    Completed in 204.02 seconds (acceptable)
-                </div>
-            </div>
-        
-            <div class="metric-box">
-                <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">223,024</div>
-            </div>
-        
-            <div class="metric-box">
-                <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">2,467</div>
-            </div>
-        
-            <div class="metric-box">
-                <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">225,491</div>
-            </div>
-        </div>
-        </div>
-    
-            </div>
-        </section>
-    
-
-        <section class="case-section" id="operation_2">
-            <div class="case-header">
-                <div class="case-title-group">
-                    <h2 class="case-title">📝 operation_2</h2>
+                    <h2 class="case-title">📝 case_2</h2>
                     
                 </div>
                 <div class="case-score">10/10 (100.0%)</div>
@@ -1021,10 +887,10 @@
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
                 <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Q1: Was the points layer created successfully? (Yes/No)
-Yes</div>
+Answer: Yes</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided answer to Q1 is "Yes," which exactly matches the expected correct answer. Therefore, it fully satisfies the evaluation criterion with no discrepancies.</div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 expects the correct answer to Q1 to be "Yes" (the points layer was created successfully). The provided answer is "Yes," which exactly matches the required correct answer. Therefore, it fully satisfies the evaluation criterion.</div>
             </div>
         </div>
     
@@ -1043,17 +909,22 @@ Yes</div>
         
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">86,601</div>
+                <div class="metric-value">98,074</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">1,235</div>
+                <div class="metric-value">1,243</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">87,836</div>
+                <div class="metric-value">99,317</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Cost</div>
+                <div class="metric-value">$0.3129</div>
             </div>
         </div>
         </div>
@@ -1062,10 +933,10 @@ Yes</div>
         </section>
     
 
-        <section class="case-section" id="operation_3">
+        <section class="case-section" id="case_3">
             <div class="case-header">
                 <div class="case-title-group">
-                    <h2 class="case-title">📝 operation_3</h2>
+                    <h2 class="case-title">📝 case_3</h2>
                     
                 </div>
                 <div class="case-score">10/10 (100.0%)</div>
@@ -1098,10 +969,12 @@ Yes</div>
                 <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Q1 correct answer: Yes</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Yes</div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Q1: Was the shapes layer created successfully? (Yes/No)
+
+Yes</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided task answer is exactly "Yes", which matches the expected correct answer. Therefore, it fully satisfies the evaluation criterion with no discrepancies.</div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided answer to Q1 is "Yes," which exactly matches the expected correct answer. Therefore, it fully satisfies the evaluation criterion.</div>
             </div>
         </div>
     
@@ -1120,17 +993,22 @@ Yes</div>
         
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">115,392</div>
+                <div class="metric-value">106,650</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">1,438</div>
+                <div class="metric-value">1,569</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">116,830</div>
+                <div class="metric-value">108,219</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Cost</div>
+                <div class="metric-value">$0.3435</div>
             </div>
         </div>
         </div>
@@ -1139,10 +1017,10 @@ Yes</div>
         </section>
     
 
-        <section class="case-section case-section-failed" id="operation_4">
+        <section class="case-section case-section-failed" id="case_4">
             <div class="case-header">
                 <div class="case-title-group">
-                    <h2 class="case-title">📝 operation_4</h2>
+                    <h2 class="case-title">📝 case_4</h2>
                     <span class="status-badge status-failed">❌ FAILED</span>
                 </div>
                 <div class="case-score">0/10 (0.0%)</div>
@@ -1152,8 +1030,8 @@ Yes</div>
                 <div class="section-box">
                     <h3>📋 Task Description</h3>
                     <div class="task-description">1. Load the "data/dataset_002/Labels.tif" dataset into napari.
-2. Check if the labels layer has been created.
-  Q1: Was the labels layer created successfully? (Yes/No)
+2. Check if a new layer called "Labels" has been created.
+  Q1: Was the layer created successfully? (Yes/No)
 3. Answer Q1 in a plain text file "eval_visualization_workflows/labels_answer.txt".
 </div>
                 </div>
@@ -1178,7 +1056,7 @@ Yes</div>
                 <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">No</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 requires the answer to Q1 to be "Yes". The provided task answer is "No", which directly contradicts the specified correct answer. Therefore, it does not meet the evaluation criterion at all and receives 0/10.</div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1): The provided task answer is "No", but the evaluation criterion states the correct answer is "Yes". This is a direct mismatch with no partial alignment, so it does not meet the criterion at all. Score for the criterion: 0/10. Total score: 0/10.</div>
             </div>
         </div>
     
@@ -1197,17 +1075,22 @@ Yes</div>
         
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">85,473</div>
+                <div class="metric-value">73,617</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">1,149</div>
+                <div class="metric-value">1,040</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">86,622</div>
+                <div class="metric-value">74,657</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Cost</div>
+                <div class="metric-value">$0.2365</div>
             </div>
         </div>
         </div>
@@ -1216,13 +1099,13 @@ Yes</div>
         </section>
     
 
-        <section class="case-section case-section-failed" id="operation_5">
+        <section class="case-section" id="case_5">
             <div class="case-header">
                 <div class="case-title-group">
-                    <h2 class="case-title">📝 operation_5</h2>
-                    <span class="status-badge status-failed">❌ FAILED</span>
+                    <h2 class="case-title">📝 case_5</h2>
+                    <span class="status-badge status-warning">⚠️ LOW SCORE</span>
                 </div>
-                <div class="case-score">0/45 (0.0%)</div>
+                <div class="case-score">15/45 (33.3%)</div>
             </div>
 
             <div class="case-content">
@@ -1246,11 +1129,11 @@ Yes</div>
             <div class="image-comparison">
                 <div class="image-box">
                     <h4>Ground Truth</h4>
-                    <img src="images/operation_5_gt.png" alt="Ground Truth" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
+                    <img src="images/case_5_gt.png" alt="Ground Truth" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
                 </div>
                 <div class="image-box">
                     <h4>Agent Result</h4>
-                    <img src="images/operation_5_result.png" alt="Result" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
+                    <img src="images/case_5_result.png" alt="Result" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
                 </div>
             </div>
         </div>
@@ -1266,7 +1149,7 @@ Yes</div>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">0/30</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">5/30</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
@@ -1290,40 +1173,40 @@ Yes</div>
                     <strong>Criterion:</strong> Does the result screenshot look similar to the ground truth image?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The ground truth shows a dark-field style multichannel fluorescence image with many red nuclei and green/blue neurite-like structures spanning the frame. The result image is mostly black with a small magenta/purple rectangular patch in the lower-right and does not resemble the cellular structures, composition, or full-frame content of the ground truth.
+                    <strong>Judge's Assessment:</strong> The ground truth shows a dark field fluorescence image with clear cellular structures: green neurite-like networks and many distinct red/orange nuclei, plus some faint blue signal. The result image is a very different scene: a grainy yellow-green background with a few bright green blobs and some magenta in the lower left, and a large black band at the top. Overall composition, structures, and content do not resemble the ground truth.
                 </div>
             </div>
          
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 2</div>
-                    <div class="rubric-score">0/10</div>
+                    <div class="rubric-score">2/10</div>
                 </div>
                 <div class="rubric-criterion">
                     <strong>Criterion:</strong> Are the same colormaps and blending modes used as in the target figure?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> Ground truth uses distinct RGB channels (prominent red nuclei, green processes, faint cyan/blue puncta) blended over a dark background. The result uses a single magenta/purple appearance in a small region, indicating different colormap/channel mapping and no comparable blending of multiple channels across the scene.
+                    <strong>Judge's Assessment:</strong> Ground truth uses a multi-channel RGB blend (green + red/orange nuclei + faint cyan/blue) on a black background, consistent with additive screen-like blending. The result appears dominated by a yellow-green tint with occasional bright green and some magenta, lacking the prominent red nuclei channel and the same additive color mixture; blending/colormap choices do not match.
                 </div>
             </div>
          
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 3</div>
-                    <div class="rubric-score">1/10</div>
+                    <div class="rubric-score">2/10</div>
                 </div>
                 <div class="rubric-criterion">
                     <strong>Criterion:</strong> Is the contrast and gamma adjusted to match the target figure?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> Ground truth has balanced contrast with visible dim structures and brighter nuclei on a near-black background. The result is largely underexposed/blank (black) with a noisy magenta patch; gamma/contrast clearly do not match the target’s dynamic range or visibility of structures.
+                    <strong>Judge's Assessment:</strong> Ground truth has high contrast with deep blacks and bright, well-separated fluorescent structures; gamma/levels appear tuned to keep background very dark while preserving signal. The result has elevated background (murky yellow-green), low separation of structures, visible noise, and an incorrect exposure/contrast balance (plus an unused black area at the top), indicating mismatched contrast/gamma.
                 </div>
             </div>
         
                 </div>
                 <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
-                    <p style="color: #666;">The result does not match the ground truth in content, color/channel mapping, blending, or tone mapping. It appears to be an incorrect or partially rendered image with the wrong colormap and severely mismatched contrast/gamma.</p>
+                    <p style="color: #666;">The result does not match the ground truth in visual content, color channel mapping/blending, or intensity tuning. It looks like a different dataset or incorrect rendering settings (colormaps and levels), producing a noisy, yellow-green image rather than the crisp multi-channel fluorescence scene in the target.</p>
                 </div>
             </div>
         </div>
@@ -1337,7 +1220,7 @@ Yes</div>
             <div class="metrics-grid">
             <div class="metric-box">
                 <div class="metric-label">Visualization Quality</div>
-                <div class="metric-value">2/30</div>
+                <div class="metric-value">5/30</div>
             </div>
         
             <div class="metric-box">
@@ -1347,25 +1230,30 @@ Yes</div>
         
             <div class="metric-box">
                 <div class="metric-label">Efficiency</div>
-                <div class="metric-value">4/10</div>
+                <div class="metric-value">5/10</div>
                 <div class="metric-subvalue">
-                    Completed in 123.43 seconds (good)
+                    Completed in 148.35 seconds (good)
                 </div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">405,572</div>
+                <div class="metric-value">361,502</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">6,166</div>
+                <div class="metric-value">6,605</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">411,738</div>
+                <div class="metric-value">368,107</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Cost</div>
+                <div class="metric-value">$1.1836</div>
             </div>
         </div>
         </div>
@@ -1374,13 +1262,13 @@ Yes</div>
         </section>
     
 
-        <section class="case-section case-section-failed" id="operation_6">
+        <section class="case-section" id="case_6">
             <div class="case-header">
                 <div class="case-title-group">
-                    <h2 class="case-title">📝 operation_6</h2>
-                    <span class="status-badge status-failed">❌ FAILED</span>
+                    <h2 class="case-title">📝 case_6</h2>
+                    <span class="status-badge status-warning">⚠️ LOW SCORE</span>
                 </div>
-                <div class="case-score">0/35 (0.0%)</div>
+                <div class="case-score">15/35 (42.9%)</div>
             </div>
 
             <div class="case-content">
@@ -1403,11 +1291,11 @@ Yes</div>
             <div class="image-comparison">
                 <div class="image-box">
                     <h4>Ground Truth</h4>
-                    <img src="images/operation_6_gt.png" alt="Ground Truth" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
+                    <img src="images/case_6_gt.png" alt="Ground Truth" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
                 </div>
                 <div class="image-box">
                     <h4>Agent Result</h4>
-                    <img src="images/operation_6_result.png" alt="Result" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
+                    <img src="images/case_6_result.png" alt="Result" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
                 </div>
             </div>
         </div>
@@ -1423,7 +1311,7 @@ Yes</div>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">0/20</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">3/20</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
@@ -1441,13 +1329,13 @@ Yes</div>
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 1</div>
-                    <div class="rubric-score">1/10</div>
+                    <div class="rubric-score">2/10</div>
                 </div>
                 <div class="rubric-criterion">
                     <strong>Criterion:</strong> Does the result rendering look similar to ground truth?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The ground truth shows a smooth, solid, high-quality shaded 3D tooth-like surface centered in the frame on a black background. The result image instead shows a sparse/noisy point-cloud-like slab tilted in space with a colored line/axis segment, and does not resemble the tooth geometry, shading, pose, or rendering style. Overall visual similarity is essentially absent.
+                    <strong>Judge's Assessment:</strong> The ground truth shows a clear, smooth, tooth-like 3D surface rendering centered on a black background with coherent specular highlights and well-defined shape. The result image instead shows a rotated, square-ish noisy volume/point-cloud-like slab with heavy speckle and no recognizable tooth geometry. Overall appearance, viewpoint, and rendering style do not match the ground truth.
                 </div>
             </div>
          
@@ -1460,14 +1348,14 @@ Yes</div>
                     <strong>Criterion:</strong> Does the visualization show the target structure clearly?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> In the ground truth, the target structure (tooth) is clearly defined with continuous surface shading and visible anatomical features. In the result, the structure is not clearly reconstructed—it's dominated by scattered points/noise forming an indistinct block, with no recognizable tooth morphology or clear surface, so the target structure is not shown clearly.
+                    <strong>Judge's Assessment:</strong> In the ground truth, the target structure (tooth) is clearly visible with distinct cusps and root-like extensions. In the result, the structure is obscured by severe noise and looks like an amorphous block; no clear tooth anatomy or surface boundaries can be identified.
                 </div>
             </div>
         
                 </div>
                 <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
-                    <p style="color: #666;">The result fails to match the ground truth both in appearance and in effectively displaying the intended tooth structure. It appears to render an incorrect dataset/representation (noisy point cloud and axis/line) rather than the expected solid tooth surface.</p>
+                    <p style="color: #666;">The result does not resemble the ground truth rendering and fails to clearly show the intended tooth-like target structure, appearing instead as a noisy, rotated volumetric slab.</p>
                 </div>
             </div>
         </div>
@@ -1481,7 +1369,7 @@ Yes</div>
             <div class="metrics-grid">
             <div class="metric-box">
                 <div class="metric-label">Visualization Quality</div>
-                <div class="metric-value">2/20</div>
+                <div class="metric-value">3/20</div>
             </div>
         
             <div class="metric-box">
@@ -1491,25 +1379,30 @@ Yes</div>
         
             <div class="metric-box">
                 <div class="metric-label">Efficiency</div>
-                <div class="metric-value">5/10</div>
+                <div class="metric-value">7/10</div>
                 <div class="metric-subvalue">
-                    Completed in 92.73 seconds (good)
+                    Completed in 76.36 seconds (very good)
                 </div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">329,879</div>
+                <div class="metric-value">247,343</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">3,106</div>
+                <div class="metric-value">3,257</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">332,985</div>
+                <div class="metric-value">250,600</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Cost</div>
+                <div class="metric-value">$0.7909</div>
             </div>
         </div>
         </div>
@@ -1518,10 +1411,10 @@ Yes</div>
         </section>
     
 
-        <section class="case-section case-section-failed" id="operation_7">
+        <section class="case-section case-section-failed" id="case_7">
             <div class="case-header">
                 <div class="case-title-group">
-                    <h2 class="case-title">📝 operation_7</h2>
+                    <h2 class="case-title">📝 case_7</h2>
                     <span class="status-badge status-failed">❌ FAILED</span>
                 </div>
                 <div class="case-score">0/10 (0.0%)</div>
@@ -1530,12 +1423,11 @@ Yes</div>
             <div class="case-content">
                 <div class="section-box">
                     <h3>📋 Task Description</h3>
-                    <div class="task-description">Load the image "data/dataset_001/dataset_001.tiff" and set it to magenta colormap.
-Take a screenshot and analyze it to count how many complete cells are visible (not cut off by edges).
-Add point annotations to mark the center of each counted cell.
-Measure the distance between the two most distant cells.
+                    <div class="task-description">1. Load the image "data/dataset_002/dataset_002_ch0.tif" and set channel 0 to a magenta colormap.
+2. Switch to a 3D MIP view. 
+3. Take a screenshot and analyze it to count how many complete cells are visible (not cut off by edges).
 Q1: answer with the number of complete cells you counted, for example "5" if you see 5 complete cells.
-Save the answer of Q1 to the questions in plain text as "eval_analysis_workflows/Q1_answer.txt".
+4. Save the answer of Q1 to the questions in plain text as "eval_analysis_workflows/Q1_answer.txt".
 </div>
                 </div>
 
@@ -1556,10 +1448,10 @@ Save the answer of Q1 to the questions in plain text as "eval_analysis_workflows
                 <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Q1 correct answer: 2</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">5</div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">7</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: 2): The provided task answer is "5", but the expected correct answer is "2". This does not meet the criterion, as the response is incorrect with no partial alignment to the required value. Therefore, the score for this criterion is 0/10, yielding a total score of 0/10.</div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 specifies that the correct answer to Q1 is 2. The provided task answer is 7, which does not match the required correct answer. Therefore, it fails to meet the criterion. Since there is only one criterion and it is not satisfied, the overall score is 0/10.</div>
             </div>
         </div>
     
@@ -1578,17 +1470,22 @@ Save the answer of Q1 to the questions in plain text as "eval_analysis_workflows
         
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">211,917</div>
+                <div class="metric-value">125,977</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">3,072</div>
+                <div class="metric-value">1,426</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">214,989</div>
+                <div class="metric-value">127,403</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Cost</div>
+                <div class="metric-value">$0.3993</div>
             </div>
         </div>
         </div>
@@ -1597,10 +1494,10 @@ Save the answer of Q1 to the questions in plain text as "eval_analysis_workflows
         </section>
     
 
-        <section class="case-section" id="operation_8">
+        <section class="case-section" id="case_8">
             <div class="case-header">
                 <div class="case-title-group">
-                    <h2 class="case-title">📝 operation_8</h2>
+                    <h2 class="case-title">📝 case_8</h2>
                     
                 </div>
                 <div class="case-score">10/10 (100.0%)</div>
@@ -1657,17 +1554,22 @@ Save the answer of Q1 to the questions in plain text as "eval_analysis_workflows
         
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">90,233</div>
+                <div class="metric-value">87,853</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">1,248</div>
+                <div class="metric-value">1,189</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">91,481</div>
+                <div class="metric-value">89,042</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Cost</div>
+                <div class="metric-value">$0.2814</div>
             </div>
         </div>
         </div>
@@ -1676,10 +1578,10 @@ Save the answer of Q1 to the questions in plain text as "eval_analysis_workflows
         </section>
     
 
-        <section class="case-section" id="operation_9">
+        <section class="case-section" id="case_9">
             <div class="case-header">
                 <div class="case-title-group">
-                    <h2 class="case-title">📝 operation_9</h2>
+                    <h2 class="case-title">📝 case_9</h2>
                     
                 </div>
                 <div class="case-score">10/10 (100.0%)</div>
@@ -1716,7 +1618,7 @@ Save the answer of Q1 to the questions in plain text as "eval_analysis_workflows
                 <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Yes</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided task answer is exactly "Yes", which matches the expected correct answer. Therefore, it fully satisfies the criterion with no discrepancies.</div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided task answer is exactly "Yes", which matches the expected correct answer. Therefore, it fully satisfies the evaluation criterion with no discrepancies.</div>
             </div>
         </div>
     
@@ -1735,17 +1637,317 @@ Save the answer of Q1 to the questions in plain text as "eval_analysis_workflows
         
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">133,789</div>
+                <div class="metric-value">117,942</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">1,797</div>
+                <div class="metric-value">1,663</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">135,586</div>
+                <div class="metric-value">119,605</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Cost</div>
+                <div class="metric-value">$0.3788</div>
+            </div>
+        </div>
+        </div>
+    
+            </div>
+        </section>
+    
+
+        <section class="case-section" id="case_10">
+            <div class="case-header">
+                <div class="case-title-group">
+                    <h2 class="case-title">📝 case_10</h2>
+                    <span class="status-badge status-warning">⚠️ LOW SCORE</span>
+                </div>
+                <div class="case-score">15/35 (42.9%)</div>
+            </div>
+
+            <div class="case-content">
+                <div class="section-box">
+                    <h3>📋 Task Description</h3>
+                    <div class="task-description">1. Load the image "data/dataset_002/dataset_002_ch0.tif" into napari.
+2. Trace the cell surface on the current slice by adding a polygon shape in a new shape layer.
+3. Use a screenshot to validate whether the polygon correctly traces the cell surface.
+4. If the trace is not accurate, adjust the polygon and take a new screenshot to validate.
+5. Stop when the trace is accurate or you have tried five different attempts.
+6. Save the results and the final screenshot to "eval_annotation_workflows/cell_surface_trace.png".
+</div>
+                </div>
+
+                
+        <div class="section-box">
+            <h3>🖼️ Visualization Comparison</h3>
+            <div class="image-comparison">
+                <div class="image-box">
+                    <h4>Ground Truth</h4>
+                    <img src="images/case_10_gt.png" alt="Ground Truth" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
+                </div>
+                <div class="image-box">
+                    <h4>Agent Result</h4>
+                    <img src="images/case_10_result.png" alt="Result" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
+                </div>
+            </div>
+        </div>
+    
+
+                
+        <div class="section-box">
+            <h3 class="expandable">📏 Vision Evaluation Rubrics</h3>
+            <div class="expandable-content">
+                
+        <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+            <h4 style="color: #667eea; margin-bottom: 10px;">Score Summary</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">8/20</div>
+                </div>
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">2</div>
+                </div>
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Points/Goal</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">10</div>
+                </div>
+            </div>
+        </div>
+    
+                <div class="rubric-scores" style="margin-top: 15px;">
+                    
+            <div class="rubric-item">
+                <div class="rubric-header">
+                    <div class="rubric-title">Goal 1</div>
+                    <div class="rubric-score">2/10</div>
+                </div>
+                <div class="rubric-criterion">
+                    <strong>Criterion:</strong> Does the final screenshot show a polygon shape that accurately traces the outline of the cell surface?
+                </div>
+                <div class="rubric-explanation">
+                    <strong>Judge's Assessment:</strong> A large, mostly smooth gray polygon occupies the upper-right quadrant, but there is no clearly visible cell boundary in the underlying image that it appears to trace. The polygon looks generic (rounded/flat-edged) rather than tightly following a discernible cell surface outline. Most of the image is dark with sparse magenta puncta/line; the polygon does not align to any evident membrane edge.
+                </div>
+            </div>
+         
+            <div class="rubric-item">
+                <div class="rubric-header">
+                    <div class="rubric-title">Goal 2</div>
+                    <div class="rubric-score">6/10</div>
+                </div>
+                <div class="rubric-criterion">
+                    <strong>Criterion:</strong> Is the polygon layer correctly overlaid on the image?
+                </div>
+                <div class="rubric-explanation">
+                    <strong>Judge's Assessment:</strong> The polygon layer is present and visibly overlaid on top of the image content (it occludes underlying pixels). However, the overlay is very opaque and hides any potential boundary underneath, making it difficult to judge alignment. No clear outline/stroke is shown to indicate the exact polygon boundary; only a filled region is visible.
+                </div>
+            </div>
+        
+                </div>
+                <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
+                    <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
+                    <p style="color: #666;">Without ground truth, the result shows a polygon overlay but it does not convincingly correspond to an identifiable cell surface outline in the image. The overlay is correctly rendered on top, yet its high opacity and lack of a clear boundary line reduce interpretability and make accurate tracing unlikely.</p>
+                </div>
+            </div>
+        </div>
+    
+
+                
+
+                
+        <div class="section-box">
+            <h3>📊 Detailed Metrics</h3>
+            <div class="metrics-grid">
+            <div class="metric-box">
+                <div class="metric-label">Visualization Quality</div>
+                <div class="metric-value">8/20</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Generation</div>
+                <div class="metric-value">5/5</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Efficiency</div>
+                <div class="metric-value">2/10</div>
+                <div class="metric-subvalue">
+                    Completed in 203.85 seconds (acceptable)
+                </div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Input Tokens</div>
+                <div class="metric-value">734,767</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Tokens</div>
+                <div class="metric-value">6,744</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Tokens</div>
+                <div class="metric-value">741,511</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Cost</div>
+                <div class="metric-value">$2.3055</div>
+            </div>
+        </div>
+        </div>
+    
+            </div>
+        </section>
+    
+
+        <section class="case-section case-section-failed" id="case_11">
+            <div class="case-header">
+                <div class="case-title-group">
+                    <h2 class="case-title">📝 case_11</h2>
+                    <span class="status-badge status-failed">❌ FAILED</span>
+                </div>
+                <div class="case-score">0/35 (0.0%)</div>
+            </div>
+
+            <div class="case-content">
+                <div class="section-box">
+                    <h3>📋 Task Description</h3>
+                    <div class="task-description">1. Load the "data/dataset_002/dataset_002_ch0.tif" dataset into napari as channel 0 and "data/dataset_002/dataset_002_ch1.tif" as channel 1.
+2. Depending on the number of channels, set the colormap for the first channel 0 to red and channel 1 to green.
+3. Switch to the 3D view. 
+4. Zoom in to the cell in the middle.
+5. Rotate the camera to a side view.
+6. Take a screenshot of the zoomed-in view and save it to "eval_camera_operations/zoom_screenshot.png".
+7. Take a screenshot of the side view and save it to "eval_camera_operations/rotate_screenshot.png".
+</div>
+                </div>
+
+                
+        <div class="section-box">
+            <h3>🖼️ Visualization Comparison</h3>
+            <div class="image-comparison">
+                <div class="image-box">
+                    <h4>Ground Truth</h4>
+                    <img src="images/case_11_gt.png" alt="Ground Truth" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
+                </div>
+                <div class="image-box">
+                    <h4>Agent Result</h4>
+                    <img src="images/case_11_result.png" alt="Result" onerror="this.parentElement.innerHTML='<div class=\'no-image\'>Image not available</div>'">
+                </div>
+            </div>
+        </div>
+    
+
+                
+        <div class="section-box">
+            <h3 class="expandable">📏 Vision Evaluation Rubrics</h3>
+            <div class="expandable-content">
+                
+        <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+            <h4 style="color: #667eea; margin-bottom: 10px;">Score Summary</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">0/20</div>
+                </div>
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">2</div>
+                </div>
+                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Points/Goal</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">10</div>
+                </div>
+            </div>
+        </div>
+    
+                <div class="rubric-scores" style="margin-top: 15px;">
+                    
+            <div class="rubric-item">
+                <div class="rubric-header">
+                    <div class="rubric-title">Goal 1</div>
+                    <div class="rubric-score">0/10</div>
+                </div>
+                <div class="rubric-criterion">
+                    <strong>Criterion:</strong> Does the visualization show a side view of the cell?
+                </div>
+                <div class="rubric-explanation">
+                    <strong>Judge's Assessment:</strong> The provided image appears to be entirely black with no discernible cell geometry, boundaries, or internal structures. Because no cell is visible, it is not possible to confirm a side view (or any view) of the cell.
+                </div>
+            </div>
+         
+            <div class="rubric-item">
+                <div class="rubric-header">
+                    <div class="rubric-title">Goal 2</div>
+                    <div class="rubric-score">0/10</div>
+                </div>
+                <div class="rubric-criterion">
+                    <strong>Criterion:</strong> Does the result rendering look similar to ground truth?
+                </div>
+                <div class="rubric-explanation">
+                    <strong>Judge's Assessment:</strong> Without a visible rendering (the image contains no detectable features/objects), there is no basis to judge similarity to an expected/ground-truth-like result. The output looks like a failed render (e.g., missing lighting/geometry, incorrect camera, or blank output).
+                </div>
+            </div>
+        
+                </div>
+                <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
+                    <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
+                    <p style="color: #666;">Evaluation performed without ground truth. The submitted visualization is effectively blank/fully dark, so neither the side-view requirement nor any resemblance to an intended cell rendering can be assessed; both goals are unmet.</p>
+                </div>
+            </div>
+        </div>
+    
+
+                
+
+                
+        <div class="section-box">
+            <h3>📊 Detailed Metrics</h3>
+            <div class="metrics-grid">
+            <div class="metric-box">
+                <div class="metric-label">Visualization Quality</div>
+                <div class="metric-value">0/20</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Generation</div>
+                <div class="metric-value">5/5</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Efficiency</div>
+                <div class="metric-value">7/10</div>
+                <div class="metric-subvalue">
+                    Completed in 73.19 seconds (very good)
+                </div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Input Tokens</div>
+                <div class="metric-value">282,762</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Output Tokens</div>
+                <div class="metric-value">2,547</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Tokens</div>
+                <div class="metric-value">285,309</div>
+            </div>
+        
+            <div class="metric-box">
+                <div class="metric-label">Total Cost</div>
+                <div class="metric-value">$0.8865</div>
             </div>
         </div>
         </div>
@@ -1756,7 +1958,7 @@ Save the answer of Q1 to the questions in plain text as "eval_analysis_workflows
 
         <footer class="footer">
             <p>Generated by SciVisAgentBench Evaluation Reporter</p>
-            <p>Timestamp: 2026-03-03T23:38:33.258021</p>
+            <p>Timestamp: 2026-03-04T22:27:32.682443</p>
         </footer>
     </div>
 

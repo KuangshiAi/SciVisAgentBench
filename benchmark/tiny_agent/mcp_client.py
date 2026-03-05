@@ -150,13 +150,20 @@ class MCPClient:
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         """Exit the context manager"""
-        await self.client.__aexit__(exc_type, exc_val, exc_tb)
-        await self.cleanup()
+        # Only clean up exit_stack here, client is already cleaned up by __aexit__
+        try:
+            await self.client.__aexit__(exc_type, exc_val, exc_tb)
+        finally:
+            # Always try to close exit_stack even if client cleanup fails
+            await self.cleanup()
 
     async def cleanup(self):
-        """Clean up resources"""
-        await self.client.close()
-        await self.exit_stack.aclose()
+        """Clean up resources (exit_stack only, client is already closed in __aexit__)"""
+        try:
+            await self.exit_stack.aclose()
+        except Exception as e:
+            # Log but don't raise - we're in cleanup
+            print(f"Warning: Error during exit_stack cleanup: {e}")
 
     @overload
     async def add_mcp_server(self, type: Literal["stdio"], **params: Unpack[StdioServerParameters_T]): ...

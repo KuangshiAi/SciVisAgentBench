@@ -315,13 +315,15 @@ class UnifiedTestRunner:
         """Extract case name from YAML test case data."""
         # Check if this is molecular_vis or bioimage_data benchmark
         # For these benchmarks, use simple case numbering
-        cases_path_str = str(self.cases_dir)
-        if ('molecular_vis' in cases_path_str and 'workflows' not in cases_path_str) or 'bioimage_data' in cases_path_str:
-            return f"operation_{index + 1}"
-
-        task_description = case_data.get('vars', {}).get('question', '')
-
         import re
+        task_description = case_data.get('vars', {}).get('question', '')
+        cases_path_str = str(self.cases_dir)
+        if 'molecular_vis' in cases_path_str or 'bioimage_data' in cases_path_str:
+            path_with_dash = re.search(r'([a-zA-Z0-9_-]+)/data/\1[^"]*', task_description)
+            if path_with_dash:
+                return path_with_dash.group(1)
+            return f"case_{index + 1}"
+
         # Case 1: anonymized dataset_X
         dataset_match = re.search(r'dataset_(\d+)', task_description)
         if dataset_match:

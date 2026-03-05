@@ -16,6 +16,7 @@
       subtype: text
       value: |
           1. Q1 correct answer: Yes
+      rs-file: "md_analysis/results/answers_basic_vis.txt"
 
 #simple coloring by element of a protein
 - vars:
@@ -31,6 +32,7 @@
       subtype: text
       value: |
           1. Q1 correct answer: Yes
+      rs-file: "md_analysis/results/answers_element_coloring.txt"
 
 #simple selection and coloring of a protein
 - vars:
@@ -46,6 +48,7 @@
       subtype: text
       value: |
           1. Q1 correct answer: Yes
+      rs-file: "md_analysis/results/answers_selection_coloring.txt"
 
 #simple coloring by charge of a protein
 - vars:
@@ -61,6 +64,7 @@
       subtype: text
       value: |
           1. Q1 correct answer: Yes
+      rs-file: "md_analysis/results/answers_charge_coloring.txt"
 
 #simple selection and coloring of specific atoms
 - vars:
@@ -76,6 +80,7 @@
       subtype: text
       value: |
           1. Q1 correct answer: Yes
+      rs-file: "md_analysis/results/answers_complex_selection.txt"
 
 #simple selection and coloring of aromatic residues
 - vars:
@@ -91,6 +96,7 @@
       subtype: text
       value: |
           1. Q1 correct answer: Yes
+      rs-file: "md_analysis/results/answers_aromatic_selection.txt"
 
 #simple RMSD and RMSF calculation of a protein
 - vars:
@@ -106,6 +112,7 @@
       value: |
           1. Does the output report the calculated RMSD?
           2. Does the output report the calculated RMSF values or state that it requires a trajectory?
+      rs-file: "md_analysis/results/answers_rmsd_rmsf.txt"
 
 #simple radius of gyration calculation of a protein
 - vars:
@@ -119,6 +126,7 @@
       subtype: text
       value: |
           1. Does the output report a numeric value for the calculated Radius of Gyration?
+      rs-file: "md_analysis/results/answers_rg.txt"
 
 - vars:
     question: |
@@ -133,6 +141,7 @@
       value: |
           1. Does the output report the calculated distance between the alpha carbons of residue 1 and 10?
           2. Does the output report the calculated phi and psi dihedral angles for residue 5?
+      rs-file: "md_analysis/results/answers_distances_angles.txt"
 
 #simple contact calculation of a protein
 - vars:
@@ -146,6 +155,7 @@
       subtype: text
       value: |
           1. Does the output report a numeric count of contacts?
+      rs-file: "md_analysis/results/answers_native_contacts.txt"
 
 # 1. Curved membrane simulation
 # As part of a protocol paper for building membrane using the coarse-grained Martini 3 force field, https://doi.org/10.1016/bs.mie.2024.03.010, a tutorial was developed: https://bbs.llnl.gov/data/building-membranes-data

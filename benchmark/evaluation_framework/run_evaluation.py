@@ -225,7 +225,7 @@ def clear_case_results(cases_dir: str, case_name: str = None):
     dirs_to_remove = ["results", "evaluation_results", "test_results"]
 
     # Get list of cases to clear
-    # For bioimage_data, we need to handle nested structure: bioimage_data/eval_xxx/operation_1
+    # For bioimage_data, we need to handle nested structure: bioimage_data/eval_xxx/case_1
     cases_to_clear = []
 
     if case_name:
@@ -239,12 +239,12 @@ def clear_case_results(cases_dir: str, case_name: str = None):
         # All cases - find all nested cases
         for subdir in cases_path.iterdir():
             if subdir.is_dir() and not subdir.name.startswith('.'):
-                # Check if this is a YAML-named directory with operation_X subdirectories
-                has_operation_subdirs = any(
-                    d.name.startswith('operation_') for d in subdir.iterdir()
+                # Check if this is a YAML-named directory with case_X subdirectories
+                has_case_subdirs = any(
+                    d.name.startswith('case_') for d in subdir.iterdir()
                     if d.is_dir()
                 )
-                if has_operation_subdirs:
+                if has_case_subdirs:
                     # This is a YAML-named directory with cases
                     for case_subdir in subdir.iterdir():
                         if case_subdir.is_dir() and not case_subdir.name.startswith('.'):
@@ -258,7 +258,7 @@ def clear_case_results(cases_dir: str, case_name: str = None):
 
     for yaml_dir, case in cases_to_clear:
         if yaml_dir:
-            # Nested structure: bioimage_data/eval_xxx/operation_1
+            # Nested structure: bioimage_data/eval_xxx/case_1
             case_dir = cases_path / yaml_dir / case
             parent_dir = cases_path / yaml_dir
         else:
