@@ -237,7 +237,7 @@ Strategy:
 Task:
 {task}
 
-IMPORTANT: Don't read folder not specificed in the instruction, and you can never check anything mark as GS (ground truth) for aidding the task. Make sure to save all output files (state files, screenshots, text files) to the exact paths specified in the task description. Use bash shell and the current python environment, it should have all the necessary package
+IMPORTANT: Don't read folder not specificed in the instruction, and you can never check anything mark as GS (ground truth) for aidding the task. Make sure to save all output files (state files, screenshots, text files) to the exact paths specified in the task description. Use the current shell and python environment, it should have all the necessary package
 """
 
         return context
