@@ -1,0 +1,28 @@
+{
+  "provider": "openai",
+  "model": "gpt-5.2",
+  "eval_mode": "generic",
+  "agent_name": "codex_cli",
+  "experiment_number": "exp1",
+  "timeout_per_task": 600,
+  "codex_cli_path": "codex",
+  "preserve_workdir": false,
+  "auto_approve": true,
+  "verbose": false,
+  "custom_system_prompt": "",
+  "environment": {
+    "type": "conda",
+    "name": "scivis_bench",
+    "packages": [
+      "paraview",
+      "napari",
+      "numpy",
+      "scipy",
+      "matplotlib"
+    ]
+  },
+  "price": {
+    "input_per_1m_tokens": "$5.00",
+    "output_per_1m_tokens": "$15.00"
+  }
+}

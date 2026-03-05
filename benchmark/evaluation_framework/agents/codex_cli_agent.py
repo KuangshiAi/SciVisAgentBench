@@ -1,10 +1,10 @@
 """
-Claude Code Agent
+Codex CLI Agent
 
-This agent integrates Claude Code CLI as a general-purpose coding agent
+This agent integrates OpenAI Codex CLI as a general-purpose coding agent
 for the SciVisAgentBench evaluation framework.
 
-Claude Code receives natural language task descriptions and figures out
+Codex CLI receives natural language task descriptions and figures out
 how to use visualization tools (ParaView, Napari, GMX-VMD, etc.) without
 specialized MCP servers or pre-built tools.
 """
@@ -27,10 +27,10 @@ from evaluation_framework.base_agent import BaseAgent, AgentResult
 from evaluation_framework.agent_registry import register_agent
 
 
-@register_agent("claude_code")
-class ClaudeCodeAgent(BaseAgent):
+@register_agent("codex_cli")
+class CodexCLIAgent(BaseAgent):
     """
-    Claude Code agent that uses the Claude CLI to complete visualization tasks.
+    Codex CLI agent that uses the OpenAI Codex CLI to complete visualization tasks.
 
     This agent is tool-agnostic - it receives task descriptions and figures out
     how to interact with visualization packages (paraview.simple, napari, etc.)
@@ -39,12 +39,12 @@ class ClaudeCodeAgent(BaseAgent):
 
     def __init__(self, config: Dict[str, Any]):
         """
-        Initialize Claude Code agent.
+        Initialize Codex CLI agent.
 
         Args:
             config: Configuration dictionary with keys:
-                - model: Claude model to use (e.g., "claude-sonnet-4-5")
-                - claude_code_path: Path to Claude CLI (default: "claude")
+                - model: OpenAI model to use (e.g., "gpt-4o-commercial")
+                - codex_cli_path: Path to Codex CLI (default: "codex")
                 - timeout_per_task: Timeout in seconds (default: 600)
                 - preserve_workdir: Keep working directories for debugging
                 - environment: Environment specification (optional)
@@ -53,47 +53,47 @@ class ClaudeCodeAgent(BaseAgent):
         """
         # Set defaults for BaseAgent
         config["eval_mode"] = config.get("eval_mode", "generic")
-        config["agent_name"] = config.get("agent_name", "claude_code")
+        config["agent_name"] = config.get("agent_name", "codex_cli")
 
         super().__init__(config)
 
-        self.claude_path = config.get("claude_code_path", "claude")
+        self.codex_path = config.get("codex_cli_path", "codex")
         self.timeout = config.get("timeout_per_task", 600)
         self.preserve_workdir = config.get("preserve_workdir", False)
         self.auto_approve = config.get("auto_approve", True)  # Default to auto-approve for benchmarking
         self.custom_system_prompt = config.get("custom_system_prompt", "")
         self.verbose = config.get("verbose", False)  # Enable real-time output streaming
 
-        print(f"ClaudeCodeAgent initialized:")
+        print(f"CodexCLIAgent initialized:")
         print(f"  - Model: {config.get('model', 'default')}")
         print(f"  - Agent mode: {self.agent_mode}")
         print(f"  - Timeout: {self.timeout}s")
-        print(f"  - Claude path: {self.claude_path}")
+        print(f"  - Codex path: {self.codex_path}")
         print(f"  - Auto-approve: {self.auto_approve}")
         print(f"  - Verbose: {self.verbose}")
         if self.custom_system_prompt:
             print(f"  - Custom prompt: {len(self.custom_system_prompt)} chars")
 
     async def setup(self):
-        """Verify Claude Code CLI is available."""
+        """Verify Codex CLI is available."""
         try:
             result = subprocess.run(
-                [self.claude_path, "--version"],
+                [self.codex_path, "--version"],
                 capture_output=True,
                 text=True,
                 timeout=10
             )
             if result.returncode == 0:
-                print(f"✓ Claude Code CLI found: {result.stdout.strip()}")
+                print(f"✓ Codex CLI found: {result.stdout.strip()}")
             else:
-                print(f"⚠ Claude Code CLI check returned non-zero: {result.returncode}")
+                print(f"⚠ Codex CLI check returned non-zero: {result.returncode}")
         except FileNotFoundError:
             raise RuntimeError(
-                f"Claude Code CLI not found at '{self.claude_path}'. "
-                "Please install it or set 'claude_code_path' in config."
+                f"Codex CLI not found at '{self.codex_path}'. "
+                "Please install it or set 'codex_cli_path' in config."
             )
         except Exception as e:
-            print(f"⚠ Warning: Could not verify Claude Code CLI: {e}")
+            print(f"⚠ Warning: Could not verify Codex CLI: {e}")
 
     async def run_task(
         self,
@@ -101,7 +101,7 @@ class ClaudeCodeAgent(BaseAgent):
         task_config: Dict[str, Any]
     ) -> AgentResult:
         """
-        Execute task using Claude Code CLI.
+        Execute task using Codex CLI.
 
         Args:
             task_description: Natural language task description
@@ -127,21 +127,20 @@ class ClaudeCodeAgent(BaseAgent):
             dirs = self.get_result_directories(str(case_dir), case_name)
             dirs["results_dir"].mkdir(parents=True, exist_ok=True)
 
-            # Invoke Claude Code
-            success, output, duration = await self._invoke_claude_code(
+            # Invoke Codex CLI
+            success, output, duration = await self._invoke_codex_cli(
                 prompt=prompt,
                 working_dir=working_dir,
                 timeout=self.timeout
             )
 
-            # Find output files generated by Claude Code
+            # Find output files generated by Codex CLI
             output_files = self._find_output_files(dirs["results_dir"], case_name)
 
             # Extract token usage from output if available
             token_usage = self._extract_token_usage(output)
 
-            # If token usage is still estimated (Claude Code doesn't output usage),
-            # provide a better estimate based on prompt + generated code
+            # If token usage is still estimated, provide a better estimate based on context
             if token_usage["source"] in ["estimated", "unknown"]:
                 try:
                     token_usage = self._estimate_token_usage_from_context(
@@ -167,7 +166,7 @@ class ClaudeCodeAgent(BaseAgent):
                     "duration": duration,
                     "token_usage": token_usage,
                     "working_dir": str(working_dir),
-                    "claude_path": self.claude_path
+                    "codex_path": self.codex_path
                 }
             )
 
@@ -188,7 +187,7 @@ class ClaudeCodeAgent(BaseAgent):
         task_config: Dict[str, Any]
     ) -> str:
         """
-        Prepare task description for Claude Code.
+        Prepare task description for Codex CLI.
 
         Adds environment context and resolves placeholder variables.
 
@@ -197,7 +196,7 @@ class ClaudeCodeAgent(BaseAgent):
             task_config: Task configuration
 
         Returns:
-            Complete prompt for Claude Code
+            Complete prompt for Codex CLI
         """
         # Replace {agent_mode} placeholders with actual agent mode
         task = task_description.replace("{agent_mode}", self.agent_mode)
@@ -232,7 +231,7 @@ Output Requirements:
    - Save screenshots to the same results directory as state files
    - The screenshot will be used for visual evaluation of your work
 
-Stratergy:
+Strategy:
 - You should check the visualization you generate to confirm if the task is accomplished or further modification is needed. Try to be efficient about the iteration and use least amount of checking while achieve reasonable result. And you should never check anything mark as GS (ground truth).
 
 Task:
@@ -243,18 +242,18 @@ IMPORTANT: Make sure to save all output files (state files, screenshots, text fi
 
         return context
 
-    async def _invoke_claude_code(
+    async def _invoke_codex_cli(
         self,
         prompt: str,
         working_dir: Path,
         timeout: int
     ) -> Tuple[bool, str, float]:
         """
-        Run Claude Code CLI and return results.
+        Run Codex CLI and return results.
 
         Args:
             prompt: Complete task prompt
-            working_dir: Directory to run Claude Code in
+            working_dir: Directory to run Codex CLI in
             timeout: Maximum execution time in seconds
 
         Returns:
@@ -271,61 +270,59 @@ IMPORTANT: Make sure to save all output files (state files, screenshots, text fi
             prompt_file = f.name
 
         try:
-            # Prepare command with optional auto-approve
-            # Note: --dangerously-skip-permissions is required for non-interactive benchmarking
-            # Security considerations:
-            # 1. Only use in controlled environments (no sensitive data)
-            # 2. Network access can be restricted via settings.json "deny": ["WebFetch", "WebSearch"]
-            # 3. Run in isolated conda environment
-            # 4. Monitor file system changes
+            # Build command with codex exec
+            # --json: Output JSONL events
+            # --ephemeral: Don't persist session files
+            # --dangerously-bypass-approvals-and-sandbox: Skip confirmations and run without sandbox
+            # -C: Change to working directory
 
-            # Build command with --print flag to prevent interactive session
-            # --print makes Claude Code "print response and exit" instead of staying in interactive mode
-            # In verbose mode, use stream-json for real-time streaming output
-            if self.verbose:
-                if self.auto_approve:
-                    cmd = [self.claude_path, "--print", "--verbose", "--output-format", "stream-json",
-                           "--dangerously-skip-permissions", prompt]
-                else:
-                    cmd = [self.claude_path, "--print", "--verbose", "--output-format", "stream-json", prompt]
-            else:
-                if self.auto_approve:
-                    cmd = [self.claude_path, "--print", "--dangerously-skip-permissions", prompt]
-                else:
-                    cmd = [self.claude_path, "--print", prompt]
+            cmd = [
+                self.codex_path, "exec",
+                "--json",
+                "--ephemeral",
+                "-C", str(working_dir)
+            ]
 
-            print(f"Invoking Claude Code...")
-            print(f"Command: {' '.join(cmd[:3] if len(cmd) > 2 else cmd[:2])}...")  # Don't print full prompt
+            if self.auto_approve:
+                cmd.append("--dangerously-bypass-approvals-and-sandbox")
+
+            # Add prompt from stdin
+            cmd.append("-")
+
+            print(f"Invoking Codex CLI...")
+            print(f"Command: {' '.join(cmd[:-1])}... < prompt")
 
             start_time = time.time()
 
             # Verbose mode: stream output in real-time with JSON event parsing
             if self.verbose:
                 # Create verbose log file in working directory
-                verbose_log_path = working_dir / f"claude_code_verbose_{int(time.time())}.log"
+                verbose_log_path = working_dir / f"codex_cli_verbose_{int(time.time())}.log"
 
                 print(f"\n{'='*60}")
-                print(f"CLAUDE CODE OUTPUT (streaming):")
+                print(f"CODEX CLI OUTPUT (streaming):")
                 print(f"Verbose log: {verbose_log_path}")
                 print(f"{'='*60}\n")
 
                 output_lines = []
                 parsed_output_lines = []  # Human-readable parsed output
 
-                process = subprocess.Popen(
-                    cmd,
-                    cwd=str(working_dir),
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    text=True,
-                    bufsize=0,  # Unbuffered for real-time streaming
-                    encoding='utf-8',
-                    errors='replace'
-                )
+                with open(prompt_file, 'r') as prompt_input:
+                    process = subprocess.Popen(
+                        cmd,
+                        cwd=str(working_dir),
+                        stdin=prompt_input,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.STDOUT,
+                        text=True,
+                        bufsize=0,  # Unbuffered for real-time streaming
+                        encoding='utf-8',
+                        errors='replace'
+                    )
 
                 # Open log file for writing
                 with open(verbose_log_path, 'w', encoding='utf-8') as log_file:
-                    log_file.write(f"Claude Code Verbose Output Log\n")
+                    log_file.write(f"Codex CLI Verbose Output Log\n")
                     log_file.write(f"Started: {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
                     log_file.write(f"Working Directory: {working_dir}\n")
                     log_file.write(f"{'='*80}\n\n")
@@ -342,80 +339,124 @@ IMPORTANT: Make sure to save all output files (state files, screenshots, text fi
                             event = json.loads(line.strip())
                             event_type = event.get("type")
 
-                            if event_type == "system":
-                                # Skip system init messages (not user-facing)
-                                parsed_output_lines.append("[System initialization]\n")
-                                continue
+                            if event_type == "thread.started":
+                                thread_id = event.get("thread_id", "unknown")
+                                msg = f"[Thread started: {thread_id}]\n"
+                                print(msg.strip(), flush=True)
+                                parsed_output_lines.append(msg)
 
-                            elif event_type == "assistant":
-                                message = event.get("message", {})
-                                content = message.get("content", [])
+                            elif event_type == "turn.started":
+                                msg = "[Turn started]\n"
+                                print(msg.strip(), flush=True)
+                                parsed_output_lines.append(msg)
 
-                                for item in content:
-                                    if item.get("type") == "text":
-                                        # Display text content
-                                        text = item.get("text", "")
-                                        if text:
-                                            print(text, flush=True)
-                                            parsed_output_lines.append(f"{text}\n")
+                            elif event_type == "item.started":
+                                item = event.get("item", {})
+                                item_type = item.get("type")
+                                item_id = item.get("id", "")
 
-                                    elif item.get("type") == "tool_use":
-                                        # Display tool use
-                                        tool_name = item.get("name", "unknown")
-                                        tool_input = item.get("input", {})
+                                if item_type == "reasoning":
+                                    text = item.get("text", "")
+                                    if text:
+                                        print(f"\n🤔 Reasoning: {text[:200]}{'...' if len(text) > 200 else ''}", flush=True)
+                                        parsed_output_lines.append(f"[Reasoning] {text}\n")
+                                elif item_type == "command_execution":
+                                    cmd = item.get("command", "")
+                                    print(f"\n⚙️  Executing: {cmd[:100]}{'...' if len(cmd) > 100 else ''}", flush=True)
+                                    parsed_output_lines.append(f"[Command] {cmd}\n")
+                                elif item_type == "todo_list":
+                                    items = item.get("items", [])
+                                    print(f"\n📋 Todo list ({len(items)} items)", flush=True)
+                                    for todo_item in items:
+                                        status = "✅" if todo_item.get("completed") else "⬜"
+                                        print(f"  {status} {todo_item.get('text', '')}", flush=True)
+                                    parsed_output_lines.append(f"[Todo list] {len(items)} items\n")
 
-                                        # Format tool display
-                                        output_line = f"\n→ Using tool: {tool_name}\n"
-                                        print(output_line.strip(), flush=True)
-                                        parsed_output_lines.append(output_line)
+                            elif event_type == "item.completed":
+                                item = event.get("item", {})
+                                item_type = item.get("type")
 
-                                        # Show key parameters (not all, to avoid clutter)
-                                        if "command" in tool_input:
-                                            param_line = f"  Command: {tool_input['command'][:80]}\n"
-                                            print(param_line.strip(), flush=True)
-                                            parsed_output_lines.append(param_line)
-                                        elif "file_path" in tool_input:
-                                            param_line = f"  File: {tool_input['file_path']}\n"
-                                            print(param_line.strip(), flush=True)
-                                            parsed_output_lines.append(param_line)
-                                        elif "pattern" in tool_input:
-                                            param_line = f"  Pattern: {tool_input['pattern']}\n"
-                                            print(param_line.strip(), flush=True)
-                                            parsed_output_lines.append(param_line)
+                                if item_type == "agent_message":
+                                    text = item.get("text", "")
+                                    if text:
+                                        print(f"\n💬 Agent: {text}", flush=True)
+                                        parsed_output_lines.append(f"[Agent message] {text}\n")
+                                elif item_type == "reasoning":
+                                    text = item.get("text", "")
+                                    if text:
+                                        print(f"\n🤔 Reasoning: {text[:200]}{'...' if len(text) > 200 else ''}", flush=True)
+                                        parsed_output_lines.append(f"[Reasoning] {text}\n")
+                                elif item_type == "command_execution":
+                                    cmd = item.get("command", "")[:80]
+                                    exit_code = item.get("exit_code")
+                                    status = item.get("status")
+                                    output = item.get("aggregated_output", "")
 
-                            elif event_type == "user":
-                                # Tool result - show abbreviated output
-                                tool_result = event.get("tool_use_result", {})
-                                stdout = tool_result.get("stdout", "")
-                                stderr = tool_result.get("stderr", "")
+                                    if status == "completed" and exit_code == 0:
+                                        print(f"  ✅ Command completed", flush=True)
+                                        if output and len(output.strip()) > 0:
+                                            print(f"  Output: {output[:150]}{'...' if len(output) > 150 else ''}", flush=True)
+                                    elif status == "failed":
+                                        print(f"  ❌ Command failed (exit {exit_code})", flush=True)
+                                        if output:
+                                            print(f"  Error: {output[:150]}{'...' if len(output) > 150 else ''}", flush=True)
 
-                                if stdout:
-                                    preview = stdout[:200] + ("..." if len(stdout) > 200 else "")
-                                    output_line = f"  Output: {preview}\n"
-                                    print(output_line.strip(), flush=True)
-                                    parsed_output_lines.append(output_line)
-                                if stderr:
-                                    preview = stderr[:200] + ("..." if len(stderr) > 200 else "")
-                                    error_line = f"  Error: {preview}\n"
-                                    print(error_line.strip(), flush=True)
-                                    parsed_output_lines.append(error_line)
+                                    parsed_output_lines.append(f"[Command result] {status} (exit {exit_code})\n")
+                                elif item_type == "error":
+                                    error_msg = item.get("message", "")
+                                    # Skip non-critical warnings
+                                    if "under-development features" in error_msg.lower():
+                                        print(f"⚠  {error_msg[:100]}", flush=True)
+                                    else:
+                                        print(f"❌ Error: {error_msg}", flush=True)
+                                    parsed_output_lines.append(f"[Error] {error_msg}\n")
 
-                            elif event_type == "result":
-                                # Final result
-                                subtype = event.get("subtype", "unknown")
-                                duration_ms = event.get("duration_ms", 0)
-                                num_turns = event.get("num_turns", 0)
+                            elif event_type == "item.updated":
+                                item = event.get("item", {})
+                                item_type = item.get("type")
 
-                                result_line = f"\n{'='*60}\nCompleted: {subtype} in {duration_ms/1000:.2f}s ({num_turns} turns)\n{'='*60}\n"
-                                print(f"\n{'='*60}", flush=True)
-                                print(f"Completed: {subtype} in {duration_ms/1000:.2f}s ({num_turns} turns)", flush=True)
-                                print(f"{'='*60}\n", flush=True)
+                                if item_type == "todo_list":
+                                    items = item.get("items", [])
+                                    print(f"\n📋 Todo updated:", flush=True)
+                                    for todo_item in items:
+                                        status = "✅" if todo_item.get("completed") else "⬜"
+                                        print(f"  {status} {todo_item.get('text', '')}", flush=True)
+                                    parsed_output_lines.append(f"[Todo updated] {len(items)} items\n")
+
+                            elif event_type == "turn.completed":
+                                usage = event.get("usage", {})
+                                input_tokens = usage.get("input_tokens", 0)
+                                output_tokens = usage.get("output_tokens", 0)
+                                result_line = f"\n{'='*60}\n✅ Turn completed - Input: {input_tokens} tokens, Output: {output_tokens} tokens\n{'='*60}\n"
+                                print(result_line.strip(), flush=True)
                                 parsed_output_lines.append(result_line)
+
+                            elif event_type == "turn.failed":
+                                error = event.get("error", {})
+                                error_msg = error.get("message", "Unknown error")
+                                result_line = f"\n{'='*60}\n❌ Turn failed: {error_msg}\n{'='*60}\n"
+                                print(result_line.strip(), flush=True)
+                                parsed_output_lines.append(result_line)
+
+                            elif event_type == "error":
+                                error_msg = event.get("message", "Unknown error")
+                                print(f"❌ Error: {error_msg}", flush=True)
+                                parsed_output_lines.append(f"[Error: {error_msg}]\n")
 
                         except json.JSONDecodeError:
                             # Not valid JSON - could be stderr or error message
-                            # Print raw line
                             if line.strip():
+                                # Skip auth/model refresh warnings (non-critical stderr)
+                                line_lower = line.lower()
+                                if any(skip_pattern in line_lower for skip_pattern in [
+                                    'failed to refresh token',
+                                    'failed to refresh available models',
+                                    'authentication error',
+                                    'litellm virtual key'
+                                ]):
+                                    # Write to log but don't display
+                                    continue
+
                                 raw_line = f"[raw] {line}"
                                 print(raw_line, end='', flush=True)
                                 parsed_output_lines.append(raw_line)
@@ -448,15 +489,17 @@ IMPORTANT: Make sure to save all output files (state files, screenshots, text fi
 
             # Non-verbose mode: capture output silently
             else:
-                result = subprocess.run(
-                    cmd,
-                    cwd=str(working_dir),
-                    capture_output=True,
-                    text=True,
-                    timeout=timeout,
-                    encoding='utf-8',
-                    errors='replace'
-                )
+                with open(prompt_file, 'r') as prompt_input:
+                    result = subprocess.run(
+                        cmd,
+                        cwd=str(working_dir),
+                        stdin=prompt_input,
+                        capture_output=True,
+                        text=True,
+                        timeout=timeout,
+                        encoding='utf-8',
+                        errors='replace'
+                    )
 
                 duration = time.time() - start_time
 
@@ -481,7 +524,7 @@ IMPORTANT: Make sure to save all output files (state files, screenshots, text fi
 
         except Exception as e:
             duration = time.time() - start_time if 'start_time' in locals() else 0
-            output = f"Error invoking Claude Code: {str(e)}"
+            output = f"Error invoking Codex CLI: {str(e)}"
             print(f"✗ {output}")
             return False, output, duration
 
@@ -494,15 +537,13 @@ IMPORTANT: Make sure to save all output files (state files, screenshots, text fi
 
     def _extract_token_usage(self, output: str) -> Dict[str, Any]:
         """
-        Parse token usage from Claude Code output.
+        Parse token usage from Codex CLI output.
 
-        Looks for patterns like:
-        - "tokens: input=X, output=Y"
-        - "Input tokens: X, Output tokens: Y"
-        - JSON with token information
+        Codex CLI outputs token usage in JSON events like:
+        {"type":"turn.completed","usage":{"input_tokens":6466,"cached_input_tokens":0,"output_tokens":57}}
 
         Args:
-            output: Claude Code stdout/stderr
+            output: Codex CLI stdout/stderr
 
         Returns:
             Dictionary with input_tokens, output_tokens, total_tokens
@@ -514,34 +555,24 @@ IMPORTANT: Make sure to save all output files (state files, screenshots, text fi
             "source": "unknown"
         }
 
-        # Try various patterns to extract token usage
-        patterns = [
-            r'input[_\s]tokens?[:\s=]+(\d+)',
-            r'output[_\s]tokens?[:\s=]+(\d+)',
-            r'total[_\s]tokens?[:\s=]+(\d+)',
-            r'tokens?[:\s]+input[=:]\s*(\d+)',
-            r'tokens?[:\s]+output[=:]\s*(\d+)',
-        ]
+        # Parse JSON lines looking for turn.completed events with usage
+        for line in output.split('\n'):
+            try:
+                event = json.loads(line.strip())
+                if event.get("type") == "turn.completed":
+                    usage = event.get("usage", {})
+                    input_tokens = usage.get("input_tokens", 0)
+                    output_tokens = usage.get("output_tokens", 0)
 
-        for pattern in patterns:
-            matches = re.findall(pattern, output, re.IGNORECASE)
-            if matches:
-                # Extract numbers and assign to appropriate fields
-                if 'input' in pattern.lower():
-                    token_info["input_tokens"] = int(matches[0])
-                    token_info["source"] = "claude_output"
-                elif 'output' in pattern.lower():
-                    token_info["output_tokens"] = int(matches[0])
-                    token_info["source"] = "claude_output"
-                elif 'total' in pattern.lower():
-                    token_info["total_tokens"] = int(matches[0])
-                    token_info["source"] = "claude_output"
+                    # Accumulate tokens from all turns
+                    token_info["input_tokens"] += input_tokens
+                    token_info["output_tokens"] += output_tokens
+                    token_info["source"] = "codex_output"
+            except (json.JSONDecodeError, AttributeError):
+                continue
 
-        # Calculate total if not found
-        if token_info["total_tokens"] == 0:
-            token_info["total_tokens"] = (
-                token_info["input_tokens"] + token_info["output_tokens"]
-            )
+        # Calculate total
+        token_info["total_tokens"] = token_info["input_tokens"] + token_info["output_tokens"]
 
         # If no tokens found, estimate based on output length
         if token_info["total_tokens"] == 0:
@@ -562,16 +593,14 @@ IMPORTANT: Make sure to save all output files (state files, screenshots, text fi
         """
         Provide better token usage estimate based on actual content.
 
-        Claude Code CLI doesn't expose token usage, so we estimate based on:
+        Estimates based on:
         1. Input prompt length (task + system context)
         2. Generated code files (Python scripts)
         3. Terminal output text
-        4. System prompt overhead (~1000 tokens for Claude Code internals)
-
-        This provides much more realistic estimates than just terminal output.
+        4. System prompt overhead (~1000 tokens for Codex internals)
 
         Args:
-            prompt: The task prompt sent to Claude Code
+            prompt: The task prompt sent to Codex CLI
             output_files: Dictionary of generated output files
             results_dir: Results directory path
             case_name: Name of the test case
@@ -580,19 +609,15 @@ IMPORTANT: Make sure to save all output files (state files, screenshots, text fi
             Dict with input_tokens, output_tokens, total_tokens, source
         """
         # Estimate input tokens from prompt
-        # The prompt includes task description, environment context, and instructions
         input_tokens = self.count_tokens(prompt)
 
-        # Add Claude Code system prompt overhead
-        # Claude Code has built-in system instructions for tools, file operations, etc.
-        # Estimated at ~1000 tokens based on typical Claude Code system context
+        # Add Codex system prompt overhead
         input_tokens += 1000
 
         # Estimate output tokens from generated code files
         output_tokens = 0
 
         # Priority 1: Check results directory for Python scripts
-        # (if Claude Code followed our instructions)
         script_found = False
         for pattern in [f"{case_name}_script.py", f"{case_name}_visualization.py", f"{case_name}.py", "*.py"]:
             py_files = list(results_dir.glob(pattern))
@@ -611,7 +636,6 @@ IMPORTANT: Make sure to save all output files (state files, screenshots, text fi
                     break
 
         # Priority 2: Check working directory for Python scripts
-        # (fallback if Claude Code saved in working dir)
         if not script_found:
             working_dir = results_dir.parent
             import glob
@@ -624,13 +648,10 @@ IMPORTANT: Make sure to save all output files (state files, screenshots, text fi
                 python_files = glob.glob(pattern)
                 for py_file in python_files:
                     try:
-                        # Get file modification time to avoid counting old files
-                        import os
+                        # Only count files modified in the last 5 minutes
                         file_mtime = os.path.getmtime(py_file)
                         current_time = time.time()
 
-                        # Only count files modified in the last 5 minutes
-                        # This avoids counting old scripts from previous runs
                         if (current_time - file_mtime) < 300:  # 5 minutes
                             with open(py_file, 'r') as f:
                                 code_content = f.read()
@@ -644,13 +665,9 @@ IMPORTANT: Make sure to save all output files (state files, screenshots, text fi
                     break
 
         # Add tokens for terminal output and explanations
-        # Claude Code provides explanations, status updates, etc.
-        # Typical: 500-1500 tokens depending on verbosity
-        # We'll add a baseline of 800 tokens
         output_tokens += 800
 
         # If we found no code or very little, use a reasonable default
-        # Typical ParaView visualization script: 2000-4000 tokens
         if output_tokens < 1500:
             print(f"  No recent Python files found, using default estimate")
             output_tokens = 3000  # Conservative default for visualization tasks
@@ -703,9 +720,6 @@ IMPORTANT: Make sure to save all output files (state files, screenshots, text fi
                     output_files[file_type] = str(matches[0])
                     break
 
-        # Also check if files exist in working directory and copy them
-        # (In case Claude Code saved them in the wrong location)
-
         if output_files:
             print(f"Found output files: {list(output_files.keys())}")
         else:
@@ -715,16 +729,14 @@ IMPORTANT: Make sure to save all output files (state files, screenshots, text fi
 
     async def prepare_task(self, task_config: Dict[str, Any]):
         """Prepare for a specific task (optional hook)."""
-        # Could be used to set up per-task environment if needed
         pass
 
     async def cleanup_task(self, task_config: Dict[str, Any]):
         """Cleanup after a specific task (optional hook)."""
-        # Could be used to clean up temporary files if needed
         if not self.preserve_workdir:
             # Clean up any temporary files created during task
             pass
 
     async def teardown(self):
         """Teardown after all tasks complete."""
-        print("Claude Code agent teardown complete")
+        print("Codex CLI agent teardown complete")
