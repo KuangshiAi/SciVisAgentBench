@@ -18,6 +18,10 @@ contributions:
       title: Remove viewer layer
       python_name: napari_socket._commands:remove_layer
 
+    - id: napari-socket.clear_all_layers
+      title: Clear all layers and reset viewer
+      python_name: napari_socket._commands:clear_all_layers
+
     - id: napari-socket.toggle_ndisplay
       python_name: napari_socket._commands:toggle_ndisplay
       title: Toggle 2D/3D view

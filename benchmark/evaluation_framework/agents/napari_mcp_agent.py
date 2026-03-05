@@ -99,6 +99,68 @@ class NapariMCPAgent(BaseAgent):
                 print(f"Warning: Could not clean up config file: {e}")
         self.current_config_path = None
 
+    async def _clear_napari_state(self, agent: TinyAgent, processed_message_ids: set,
+                                   total_input_tokens: int, total_output_tokens: int,
+                                   total_cache_creation_tokens: int, total_cache_read_tokens: int) -> tuple:
+        """Clear Napari viewer state before starting. Returns updated token counts and connection status."""
+        napari_connection_ok = True
+        try:
+            print("Clearing Napari viewer state through MCP...")
+
+            # Send a simple clear_all_layers command to the agent
+            clear_message = "Call the clear_all_layers tool to remove all layers from the napari viewer."
+
+            response_parts = []
+            async for chunk in agent.run(clear_message):
+                # Track token usage from clearing operation
+                if hasattr(chunk, 'usage') and chunk.usage is not None:
+                    message_id = getattr(chunk, 'id', None)
+                    if message_id and message_id not in processed_message_ids:
+                        processed_message_ids.add(message_id)
+                        usage = chunk.usage
+
+                        # Accumulate tokens
+                        if hasattr(usage, 'input_tokens') and usage.input_tokens:
+                            total_input_tokens += usage.input_tokens
+                        if hasattr(usage, 'output_tokens') and usage.output_tokens:
+                            total_output_tokens += usage.output_tokens
+                        if hasattr(usage, 'cache_creation_input_tokens') and usage.cache_creation_input_tokens:
+                            total_cache_creation_tokens += usage.cache_creation_input_tokens
+                        if hasattr(usage, 'cache_read_input_tokens') and usage.cache_read_input_tokens:
+                            total_cache_read_tokens += usage.cache_read_input_tokens
+
+                        # OpenAI-style fallback
+                        if not hasattr(usage, 'input_tokens') and hasattr(usage, 'prompt_tokens') and usage.prompt_tokens:
+                            total_input_tokens += usage.prompt_tokens
+                        if not hasattr(usage, 'output_tokens') and hasattr(usage, 'completion_tokens') and usage.completion_tokens:
+                            total_output_tokens += usage.completion_tokens
+
+                if hasattr(chunk, 'choices') and chunk.choices:
+                    delta = chunk.choices[0].delta
+                    if delta and delta.content:
+                        content = delta.content
+                        response_parts.append(content)
+                elif hasattr(chunk, 'role') and chunk.role == "tool":
+                    tool_message = f"[Tool: {chunk.name}] {chunk.content}"
+                    response_parts.append(tool_message)
+                    if chunk.name == "clear_all_layers":
+                        print(f"Viewer clearing result: {chunk.content}")
+                        # Check if napari is not running
+                        if "Connection refused" in chunk.content or "Errno 61" in chunk.content:
+                            napari_connection_ok = False
+                            print("❌ Napari connection refused - viewer is not running!")
+
+            if response_parts:
+                print("Viewer clearing completed")
+            else:
+                print("No response received for viewer clearing")
+
+        except Exception as e:
+            print(f"⚠️  Warning: Could not clear Napari state: {e}")
+            napari_connection_ok = False
+
+        return (total_input_tokens, total_output_tokens, total_cache_creation_tokens, total_cache_read_tokens, napari_connection_ok)
+
     async def run_task(self, task_description: str, task_config: Dict[str, Any]) -> AgentResult:
         """
         Run a single bioimage visualization task using Napari MCP.
@@ -132,10 +194,54 @@ class NapariMCPAgent(BaseAgent):
                 await agent.load_tools()
                 print(f"Agent loaded with {len(agent.available_tools)} tools")
 
+                # Clear Napari state at the beginning and track tokens
+                print("Clearing Napari state for fresh start...")
+                (total_input_tokens, total_output_tokens,
+                 total_cache_creation_tokens, total_cache_read_tokens, napari_ok) = await self._clear_napari_state(
+                    agent, processed_message_ids,
+                    total_input_tokens, total_output_tokens,
+                    total_cache_creation_tokens, total_cache_read_tokens
+                )
+
+                # Check if napari is running - fail fast if not
+                if not napari_ok:
+                    duration = time.time() - start_time
+                    print("❌ Napari viewer is not running or connection failed. Skipping this case.")
+                    return AgentResult(
+                        success=False,
+                        error="Napari viewer is not running or connection refused. Please restart napari and try again.",
+                        metadata={
+                            "duration": duration,
+                            "_token_info": {
+                                "input_tokens": total_input_tokens + total_cache_creation_tokens + total_cache_read_tokens,
+                                "output_tokens": total_output_tokens,
+                                "cache_creation_input_tokens": total_cache_creation_tokens,
+                                "cache_read_input_tokens": total_cache_read_tokens,
+                                "source": "api_reported"
+                            }
+                        }
+                    )
+
+                # Add efficiency guidelines to the task description
+                efficiency_prompt = """
+IMPORTANT EFFICIENCY GUIDELINES:
+- Be decisive and efficient with tool calls. Avoid excessive iterations.
+- For iso-surface/threshold finding: Try 2-3 carefully chosen values max (e.g., based on data statistics). Do NOT iterate more than 3 times.
+- For camera angles: Choose 1-2 good angles. Do NOT try many random angles.
+- For contrast/visualization settings: Make educated adjustments based on data range. Avoid trial-and-error loops.
+- Screenshot usage:
+  * get_screenshot() - Use this to VIEW/VERIFY your current visualization (you can see the image). Limit to 2-3 times for verification.
+  * save_screenshot(filename) - Use this ONCE at the end to save the final result to the target location.
+- Excessive tool calls can crash the napari viewer. Work efficiently and make smart decisions.
+
+YOUR TASK:
+"""
+                enhanced_task_description = efficiency_prompt + task_description
+
                 # Run the task
                 print(f"Starting execution...")
 
-                async for chunk in agent.run(task_description):
+                async for chunk in agent.run(enhanced_task_description):
                     # Try to extract usage from chunk (if available)
                     # Per Claude Agent SDK: Only count each message ID once
                     # Multiple messages with same ID have identical usage - charge only once per step

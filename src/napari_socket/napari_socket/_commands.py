@@ -4,6 +4,34 @@ import numpy as np
 import collections.abc
 import json
 import tifffile
+from functools import wraps
+
+
+def safe_command(func):
+    """Decorator to wrap command functions with error handling.
+
+    This ensures that even if a command fails, it returns a helpful error
+    message instead of crashing the MCP server.
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except KeyError as e:
+            # Layer not found errors
+            viewer = kwargs.get('viewer') or (args[0] if args and hasattr(args[0], 'layers') else None)
+            if viewer:
+                available_layers = [layer.name for layer in viewer.layers]
+                return f"❌ Error: {str(e)}. Available layers: {available_layers}"
+            return f"❌ KeyError: {str(e)}"
+        except (ValueError, TypeError) as e:
+            # Invalid parameter errors
+            return f"❌ Invalid parameter: {str(e)}"
+        except Exception as e:
+            # Catch-all for any other errors
+            return f"❌ Error in {func.__name__}: {str(e)}"
+    return wrapper
+
 
 def _detect_channel_axis(data_shape, axes_string=None):
     """Detect which axis corresponds to channels in multi-dimensional data.
@@ -124,6 +152,18 @@ def remove_layer(name_or_index: str | int, viewer: Viewer):
         available_layers = [layer.name for layer in viewer.layers]
         return f"Layer '{name_or_index}' not found. Available layers: {available_layers}"
 
+def clear_all_layers(viewer: Viewer):
+    """Remove all layers from the viewer and reset to a fresh state."""
+    try:
+        layer_count = len(viewer.layers)
+        # Remove all layers
+        viewer.layers.clear()
+        # Reset camera
+        viewer.camera.reset()
+        return f"Successfully cleared {layer_count} layer(s) and reset camera."
+    except Exception as e:
+        return f"Error clearing layers: {str(e)}"
+
 def toggle_ndisplay(viewer: Viewer):
     """Toggle napari between 2-D (ndisplay = 2) and 3-D (ndisplay = 3)."""
     viewer.dims.ndisplay = 3 if viewer.dims.ndisplay == 2 else 2
@@ -141,33 +181,42 @@ def iso_contour(
 ) -> int:
     """
     Switch layers to iso-surface rendering mode.
-    
+
     Enables 3D iso-surface visualization for image/volume layers.
     Returns the number of layers that were modified.
     """
-    # ensure a 3-D canvas so the surface is visible
-    if viewer.dims.ndisplay != 3:
-        viewer.dims.ndisplay = 3
+    try:
+        # ensure a 3-D canvas so the surface is visible
+        if viewer.dims.ndisplay != 3:
+            viewer.dims.ndisplay = 3
 
-    # resolve which layers to edit
-    if layer_name is None:
-        # Only apply to Image layers that support iso-surface rendering
-        targets = [lyr for lyr in viewer.layers if hasattr(lyr, "rendering") and hasattr(lyr, "iso_threshold")]
-    else:
-        layer = viewer.layers[layer_name] if isinstance(layer_name, int) else viewer.layers[layer_name]
-        # Check if the layer supports iso-surface rendering
-        if hasattr(layer, "rendering") and hasattr(layer, "iso_threshold"):
-            targets = [layer]
+        # resolve which layers to edit
+        if layer_name is None:
+            # Only apply to Image layers that support iso-surface rendering
+            targets = [lyr for lyr in viewer.layers if hasattr(lyr, "rendering") and hasattr(lyr, "iso_threshold")]
         else:
-            return 0  # No layers modified
+            # Use _get_layer for smart matching (handles channel-split layers)
+            try:
+                layer = _get_layer(viewer, layer_name)
+                # Check if the layer supports iso-surface rendering
+                if hasattr(layer, "rendering") and hasattr(layer, "iso_threshold"):
+                    targets = [layer]
+                else:
+                    return 0  # No layers modified
+            except KeyError as e:
+                print(f"Warning: {e}")
+                return 0
 
-    # apply rendering mode / threshold
-    for lyr in targets:
-        lyr.rendering = "iso"
-        if threshold is not None:
-            lyr.iso_threshold = threshold
+        # apply rendering mode / threshold
+        for lyr in targets:
+            lyr.rendering = "iso"
+            if threshold is not None:
+                lyr.iso_threshold = threshold
 
-    return len(targets)
+        return len(targets)
+    except Exception as e:
+        print(f"Error in iso_contour: {e}")
+        return 0
 
 
 # ----------------------------------------------------------------------
@@ -283,6 +332,14 @@ def _get_layer(viewer: Viewer, layer_name: str | int | None = None):
         try:
             return viewer.layers[layer_name]
         except (KeyError, IndexError):
+            # If exact match fails and layer_name is a string, try to find a matching channel layer
+            if isinstance(layer_name, str):
+                # Look for layers that start with this name (e.g., "dataset_001_ch0" when looking for "dataset_001")
+                matching_layers = [layer for layer in viewer.layers if layer.name.startswith(layer_name)]
+                if matching_layers:
+                    # Return the first matching layer (usually ch0)
+                    return matching_layers[0]
+
             # Re-raise with more context
             available_layers = [layer.name for layer in viewer.layers]
             raise KeyError(f"Layer '{layer_name}' not found. Available layers: {available_layers}")
@@ -492,46 +549,64 @@ def add_vectors(
 # Data Export & Save Functions
 # ----------------------------------------------------------------------
 
+@safe_command
 def save_layers(
     file_path: str | Path,
     layer_names: list | None = None,
     viewer: Viewer = None,
 ):
     """Save layers to file."""
-    path = Path(file_path)
-    
-    if layer_names is None:
-        # Save all layers
-        layers_to_save = list(viewer.layers)
-    else:
-        # Save specific layers
-        layers_to_save = [viewer.layers[name] for name in layer_names]
-    
-    # Save each layer individually based on file extension
-    saved_count = 0
-    for i, layer in enumerate(layers_to_save):
-        if hasattr(layer, 'data') and layer.data is not None:
-            # For image data, save as TIFF
-            if path.suffix.lower() in ['.tif', '.tiff']:
-                layer_data = layer.data
-                if hasattr(layer_data, 'compute'):  # Handle dask arrays
-                    layer_data = layer_data.compute()
-                tifffile.imwrite(str(path), layer_data)
-                saved_count += 1
-                break  # Only save the first layer for TIFF
-            else:
-                # For other formats, try to save using layer's save method if available
+    try:
+        path = Path(file_path)
+
+        if layer_names is None:
+            # Save all layers
+            layers_to_save = list(viewer.layers)
+        else:
+            # Save specific layers - use _get_layer for smart matching
+            layers_to_save = []
+            for name in layer_names:
                 try:
-                    if hasattr(layer, 'save'):
-                        layer.save(str(path))
-                        saved_count += 1
-                    else:
-                        return f"Layer '{layer.name}' does not support saving"
-                except Exception as e:
-                    return f"Error saving layer '{layer.name}': {e}"
-    
-    if saved_count == 0:
-        return "No layers were saved"
+                    layer = _get_layer(viewer, name)
+                    layers_to_save.append(layer)
+                except KeyError as e:
+                    # Log the error but continue with other layers
+                    print(f"Warning: {e}")
+                    continue
+
+        if not layers_to_save:
+            available_layers = [layer.name for layer in viewer.layers]
+            return f"No valid layers found to save. Available layers: {available_layers}"
+
+        # Save each layer individually based on file extension
+        saved_count = 0
+        for i, layer in enumerate(layers_to_save):
+            if hasattr(layer, 'data') and layer.data is not None:
+                # For image data, save as TIFF
+                if path.suffix.lower() in ['.tif', '.tiff']:
+                    layer_data = layer.data
+                    if hasattr(layer_data, 'compute'):  # Handle dask arrays
+                        layer_data = layer_data.compute()
+                    tifffile.imwrite(str(path), layer_data)
+                    saved_count += 1
+                    break  # Only save the first layer for TIFF
+                else:
+                    # For other formats, try to save using layer's save method if available
+                    try:
+                        if hasattr(layer, 'save'):
+                            layer.save(str(path))
+                            saved_count += 1
+                        else:
+                            return f"Layer '{layer.name}' does not support saving"
+                    except Exception as e:
+                        return f"Error saving layer '{layer.name}': {e}"
+
+        if saved_count == 0:
+            return "No layers were saved"
+    except Exception as e:
+        # Catch any unexpected errors and return a helpful message
+        available_layers = [layer.name for layer in viewer.layers]
+        return f"Error saving layers: {str(e)}. Available layers: {available_layers}"
     
     return f"Saved {saved_count} layer(s) to {path}"
 

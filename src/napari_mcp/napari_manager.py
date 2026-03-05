@@ -113,6 +113,14 @@ class NapariManager:  # pylint: disable=too-few-public-methods
         """
         return self.send_command("napari-socket.remove_layer", [name_or_index])
 
+    def clear_all_layers(self) -> Tuple[bool, str]:
+        """Remove all layers from the viewer and reset to a fresh state.
+
+        The command id is *napari‑socket.clear_all_layers* as declared in the plugin's
+        manifest.
+        """
+        return self.send_command("napari-socket.clear_all_layers")
+
 
     # ------------------------------------------------------------------
     # view helpers

@@ -124,6 +124,7 @@ def build_mcp(manager: NapariManager) -> FastMCP:
         "Available tools:\n"
         "• open_file(path) - load image files (TIFF, PNG, ND2, NPZ, etc.)\n"
         "• remove_layer(name_or_index) - remove a layer\n"
+        "• clear_all_layers() - remove all layers and reset viewer to fresh state\n"
         "• toggle_view() - switch between 2D and 3D view\n"
         "• iso_contour(layer_name=None, threshold=None) - enable iso-surface rendering\n"
         "• get_screenshot() - get screenshot to view current state (returns image)\n"
@@ -185,21 +186,35 @@ def build_mcp(manager: NapariManager) -> FastMCP:
         return _format_response(success, message, f"✅ Successfully loaded file: {file_path}")
 
     @mcp.tool()
-    def remove_layer(name_or_index: str | int) -> str:  
+    def remove_layer(name_or_index: str | int) -> str:
         """Remove a layer by name or index.
-        
+
         Args:
             name_or_index: Layer name (str) or positional index (int) of the layer to remove
-            
+
         Returns:
             str: Success message or error message prefixed with ❌
-            
+
         Note:
             Use list_layers() to see available layers and their indices.
             Layer indices are 0-based.
         """
         success, message = manager.remove_layer(name_or_index)
         return _format_response(success, message, f"✅ Layer '{name_or_index}' removed successfully")
+
+    @mcp.tool()
+    def clear_all_layers() -> str:
+        """Remove all layers from the viewer and reset to a fresh state.
+
+        This function clears the entire napari viewer, removing all loaded layers
+        and resetting the camera to default view. Use this to start fresh before
+        loading new data.
+
+        Returns:
+            str: Success message indicating number of layers cleared or error message prefixed with ❌
+        """
+        success, message = manager.clear_all_layers()
+        return _format_response(success, message, "✅ All layers cleared successfully")
 
 
     @mcp.tool(name="toggle_view")

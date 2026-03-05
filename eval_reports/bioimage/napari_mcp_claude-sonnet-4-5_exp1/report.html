@@ -532,7 +532,7 @@
             <h1>🎯 SciVisAgentBench Evaluation Report</h1>
             <div class="header-meta">
                 <span class="agent-name">napari_mcp</span>
-                <span class="timestamp">Generated: 2026-03-04T22:27:32.682443</span>
+                <span class="timestamp">Generated: 2026-03-04T23:08:57.987425</span>
             </div>
         </header>
 
@@ -543,18 +543,18 @@
             <div class="summary-grid">
                 <div class="summary-card">
                     <h3>Overall Score</h3>
-                    <div class="value score-poor">
-                        49.4%
+                    <div class="value score-fair">
+                        64.7%
                     </div>
                     <div class="sub-value">
-                        126/255 Points
+                        165/255 Points
                     </div>
                 </div>
 
                 <div class="summary-card">
                     <h3>Test Cases</h3>
                     <div class="value">
-                        8/11
+                        9/11
                     </div>
                     <div class="sub-value">
                         Completed Successfully
@@ -564,13 +564,13 @@
                 <div class="summary-card">
                     <h3>Avg Vision Score</h3>
                     <div class="value">
-                        31.3%
+                        51.7%
                     </div>
                     <div class="sub-value">
                         Visualization Quality
                     </div>
                     <div class="sub-value">
-                        33/110
+                        53/110
                     </div>
                 </div>
 
@@ -580,7 +580,7 @@
                         N/A
                     </div>
                     <div class="sub-value">
-                        Peak SNR (0/8 valid)
+                        Peak SNR (0/9 valid)
                     </div>
                 </div>
 
@@ -607,7 +607,7 @@
                 <div class="summary-card">
                     <h3>Completion Rate</h3>
                     <div class="value">
-                        72.7%
+                        81.8%
                     </div>
                     <div class="sub-value">
                         Tasks Completed
@@ -667,7 +667,7 @@
 <a href="#case_8" class="case-link">case_8</a>
 <a href="#case_9" class="case-link">case_9</a>
 <a href="#case_10" class="case-link">case_10</a>
-<a href="#case_11" class="case-link case-link-failed">case_11</a>
+<a href="#case_11" class="case-link">case_11</a>
             </div>
         </nav>
 
@@ -678,7 +678,7 @@
                     <h2 class="case-title">📝 case_1</h2>
                     
                 </div>
-                <div class="case-score">41/45 (91.1%)</div>
+                <div class="case-score">40/45 (88.9%)</div>
             </div>
 
             <div class="case-content">
@@ -721,7 +721,7 @@
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">17/20</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">16/20</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
@@ -745,27 +745,27 @@
                     <strong>Criterion:</strong> Does the visualization show a green cell with red blobs on the inside?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The result clearly shows green cells (membrane/cytoplasm signal) with distinct red/orange punctate blobs inside the central green cell, matching the intended content. The red blobs are visible and located intracellularly as in the ground truth. Minor difference: overall intensity/contrast is slightly reduced in the result, making some red puncta a bit less prominent.
+                    <strong>Judge's Assessment:</strong> The result image clearly shows green-stained cells, including a prominent green cell in the center-left with multiple red/orange punctate blobs inside it, matching the intended 'green cell with red blobs on the inside' appearance. The red blobs are visible and located within the green cell body, similar to the ground truth. Minor differences are mainly due to framing/scale rather than content.
                 </div>
             </div>
          
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 2</div>
-                    <div class="rubric-score">8/10</div>
+                    <div class="rubric-score">7/10</div>
                 </div>
                 <div class="rubric-criterion">
                     <strong>Criterion:</strong> Does the result rendering look similar to ground truth?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The result is very similar in composition and structure to the ground truth: same cell positions (central spiky green cell with red puncta; round green cell on the right; partial cell at top), and similar color mapping. However, the result includes a large black border/matte around the image (letterboxing), and the displayed scene is slightly smaller/dimmer within the frame compared to the ground truth, reducing visual similarity.
+                    <strong>Judge's Assessment:</strong> Overall content is very similar (same cells, same central spiky green cell with red puncta, similar background noise pattern), but the result rendering is noticeably different in presentation: it appears scaled down and placed within a larger black canvas with thick black borders/margins, while the ground truth is tightly cropped and fills the frame. The visual similarity of the microscopy content is high, but the layout/framing difference is significant.
                 </div>
             </div>
         
                 </div>
                 <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
-                    <p style="color: #666;">The agent output successfully captures the key biological visualization (green cells with internal red blobs) and largely matches the ground truth scene. The main discrepancy is presentation: the result is letterboxed with substantial black margins and slightly lower apparent contrast/scale, preventing a near-identical match.</p>
+                    <p style="color: #666;">The generated visualization successfully captures the key biological visual features (green cells with internal red puncta) and matches the ground truth scene. The main mismatch is the result’s framing (letterboxed with large black margins) which reduces similarity compared to the tightly cropped ground truth.</p>
                 </div>
             </div>
         </div>
@@ -785,11 +785,10 @@
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
                 <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Q1: Does the cell show protrusions? (Yes/No)
-
 Answer: Yes</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided answer to Q1 is "Yes," which exactly matches the specified correct answer. Therefore, it fully meets the evaluation criterion with no discrepancies.</div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided answer to Q1 is 'Yes', which exactly matches the stated correct answer. Therefore, it fully satisfies the evaluation criterion with no discrepancies.</div>
             </div>
         </div>
     
@@ -800,7 +799,7 @@ Answer: Yes</div>
             <div class="metrics-grid">
             <div class="metric-box">
                 <div class="metric-label">Visualization Quality</div>
-                <div class="metric-value">17/20</div>
+                <div class="metric-value">16/20</div>
             </div>
         
             <div class="metric-box">
@@ -812,7 +811,7 @@ Answer: Yes</div>
                 <div class="metric-label">Efficiency</div>
                 <div class="metric-value">9/10</div>
                 <div class="metric-subvalue">
-                    Completed in 50.99 seconds (excellent)
+                    Completed in 56.19 seconds (excellent)
                 </div>
             </div>
         
@@ -826,22 +825,22 @@ Answer: Yes</div>
         
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">141,075</div>
+                <div class="metric-value">193,293</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">1,752</div>
+                <div class="metric-value">1,756</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">142,827</div>
+                <div class="metric-value">195,049</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Cost</div>
-                <div class="metric-value">$0.4495</div>
+                <div class="metric-value">$0.6062</div>
             </div>
         </div>
         </div>
@@ -886,11 +885,10 @@ Answer: Yes</div>
                 <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Q1 correct answer: Yes</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Q1: Was the points layer created successfully? (Yes/No)
-Answer: Yes</div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Yes</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 expects the correct answer to Q1 to be "Yes" (the points layer was created successfully). The provided answer is "Yes," which exactly matches the required correct answer. Therefore, it fully satisfies the evaluation criterion.</div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided task answer is exactly "Yes", which matches the expected correct answer. Therefore, it fully satisfies the evaluation criterion with no discrepancies.</div>
             </div>
         </div>
     
@@ -909,22 +907,22 @@ Answer: Yes</div>
         
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">98,074</div>
+                <div class="metric-value">110,726</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">1,243</div>
+                <div class="metric-value">1,256</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">99,317</div>
+                <div class="metric-value">111,982</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Cost</div>
-                <div class="metric-value">$0.3129</div>
+                <div class="metric-value">$0.3510</div>
             </div>
         </div>
         </div>
@@ -970,11 +968,10 @@ Answer: Yes</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
                 <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Q1: Was the shapes layer created successfully? (Yes/No)
-
 Yes</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided answer to Q1 is "Yes," which exactly matches the expected correct answer. Therefore, it fully satisfies the evaluation criterion.</div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided answer to Q1 is "Yes," which exactly matches the expected correct answer. Therefore, it fully satisfies the evaluation criterion with no discrepancies.</div>
             </div>
         </div>
     
@@ -993,22 +990,22 @@ Yes</div>
         
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">106,650</div>
+                <div class="metric-value">71,482</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">1,569</div>
+                <div class="metric-value">666</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">108,219</div>
+                <div class="metric-value">72,148</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Cost</div>
-                <div class="metric-value">$0.3435</div>
+                <div class="metric-value">$0.2244</div>
             </div>
         </div>
         </div>
@@ -1053,10 +1050,12 @@ Yes</div>
                 <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Q1 correct answer: Yes</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">No</div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Q1: Was the layer created successfully? (Yes/No)
+
+No</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1): The provided task answer is "No", but the evaluation criterion states the correct answer is "Yes". This is a direct mismatch with no partial alignment, so it does not meet the criterion at all. Score for the criterion: 0/10. Total score: 0/10.</div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided answer to Q1 is "No", which directly contradicts the expected correct answer "Yes". Therefore, it does not meet the evaluation criterion at all and receives 0/10.</div>
             </div>
         </div>
     
@@ -1075,22 +1074,22 @@ Yes</div>
         
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">73,617</div>
+                <div class="metric-value">71,595</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">1,040</div>
+                <div class="metric-value">827</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">74,657</div>
+                <div class="metric-value">72,422</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Cost</div>
-                <div class="metric-value">$0.2365</div>
+                <div class="metric-value">$0.2272</div>
             </div>
         </div>
         </div>
@@ -1105,7 +1104,7 @@ Yes</div>
                     <h2 class="case-title">📝 case_5</h2>
                     <span class="status-badge status-warning">⚠️ LOW SCORE</span>
                 </div>
-                <div class="case-score">15/45 (33.3%)</div>
+                <div class="case-score">14/45 (31.1%)</div>
             </div>
 
             <div class="case-content">
@@ -1149,7 +1148,7 @@ Yes</div>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">5/30</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">4/30</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
@@ -1167,46 +1166,46 @@ Yes</div>
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 1</div>
-                    <div class="rubric-score">1/10</div>
+                    <div class="rubric-score">2/10</div>
                 </div>
                 <div class="rubric-criterion">
                     <strong>Criterion:</strong> Does the result screenshot look similar to the ground truth image?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The ground truth shows a dark field fluorescence image with clear cellular structures: green neurite-like networks and many distinct red/orange nuclei, plus some faint blue signal. The result image is a very different scene: a grainy yellow-green background with a few bright green blobs and some magenta in the lower left, and a large black band at the top. Overall composition, structures, and content do not resemble the ground truth.
+                    <strong>Judge's Assessment:</strong> The result image does not resemble the ground truth in overall appearance. The ground truth shows a dark/black background with sparse green neuronal processes and red/orange nuclei, with some faint blue puncta; the result instead has a bright brown/olive background and dominant magenta/cyan structures. The spatial impression and feature colors are substantially different, so visual similarity is poor.
                 </div>
             </div>
          
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 2</div>
-                    <div class="rubric-score">2/10</div>
+                    <div class="rubric-score">1/10</div>
                 </div>
                 <div class="rubric-criterion">
                     <strong>Criterion:</strong> Are the same colormaps and blending modes used as in the target figure?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> Ground truth uses a multi-channel RGB blend (green + red/orange nuclei + faint cyan/blue) on a black background, consistent with additive screen-like blending. The result appears dominated by a yellow-green tint with occasional bright green and some magenta, lacking the prominent red nuclei channel and the same additive color mixture; blending/colormap choices do not match.
+                    <strong>Judge's Assessment:</strong> Colormaps/channels and blending do not match. Ground truth uses a black background with green + red/orange (and faint blue) in an additive fluorescence style. The result uses magenta and cyan (with some purple) over a brownish background, suggesting different channel assignments/colormaps and likely different blending/tonemapping. This is a major mismatch.
                 </div>
             </div>
          
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 3</div>
-                    <div class="rubric-score">2/10</div>
+                    <div class="rubric-score">1/10</div>
                 </div>
                 <div class="rubric-criterion">
                     <strong>Criterion:</strong> Is the contrast and gamma adjusted to match the target figure?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> Ground truth has high contrast with deep blacks and bright, well-separated fluorescent structures; gamma/levels appear tuned to keep background very dark while preserving signal. The result has elevated background (murky yellow-green), low separation of structures, visible noise, and an incorrect exposure/contrast balance (plus an unused black area at the top), indicating mismatched contrast/gamma.
+                    <strong>Judge's Assessment:</strong> Contrast and gamma are very different. Ground truth has high contrast with a near-black background and bright but not blown-out signal. The result is much brighter overall with elevated background and washed/flat contrast in places, indicating incorrect intensity scaling/gamma relative to the target.
                 </div>
             </div>
         
                 </div>
                 <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
-                    <p style="color: #666;">The result does not match the ground truth in visual content, color channel mapping/blending, or intensity tuning. It looks like a different dataset or incorrect rendering settings (colormaps and levels), producing a noisy, yellow-green image rather than the crisp multi-channel fluorescence scene in the target.</p>
+                    <p style="color: #666;">Across all criteria, the result does not match the ground truth: the overall look is different, the channel colors/colormaps and blending style are inconsistent with the target, and the intensity/contrast (gamma/background level) is far from the dark, high-contrast ground truth appearance.</p>
                 </div>
             </div>
         </div>
@@ -1220,7 +1219,7 @@ Yes</div>
             <div class="metrics-grid">
             <div class="metric-box">
                 <div class="metric-label">Visualization Quality</div>
-                <div class="metric-value">5/30</div>
+                <div class="metric-value">4/30</div>
             </div>
         
             <div class="metric-box">
@@ -1232,28 +1231,28 @@ Yes</div>
                 <div class="metric-label">Efficiency</div>
                 <div class="metric-value">5/10</div>
                 <div class="metric-subvalue">
-                    Completed in 148.35 seconds (good)
+                    Completed in 93.05 seconds (good)
                 </div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">361,502</div>
+                <div class="metric-value">311,955</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">6,605</div>
+                <div class="metric-value">3,881</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">368,107</div>
+                <div class="metric-value">315,836</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Cost</div>
-                <div class="metric-value">$1.1836</div>
+                <div class="metric-value">$0.9941</div>
             </div>
         </div>
         </div>
@@ -1266,9 +1265,9 @@ Yes</div>
             <div class="case-header">
                 <div class="case-title-group">
                     <h2 class="case-title">📝 case_6</h2>
-                    <span class="status-badge status-warning">⚠️ LOW SCORE</span>
+                    
                 </div>
-                <div class="case-score">15/35 (42.9%)</div>
+                <div class="case-score">18/35 (51.4%)</div>
             </div>
 
             <div class="case-content">
@@ -1311,7 +1310,7 @@ Yes</div>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">3/20</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">7/20</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
@@ -1329,33 +1328,33 @@ Yes</div>
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 1</div>
-                    <div class="rubric-score">2/10</div>
+                    <div class="rubric-score">3/10</div>
                 </div>
                 <div class="rubric-criterion">
                     <strong>Criterion:</strong> Does the result rendering look similar to ground truth?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The ground truth shows a clear, smooth, tooth-like 3D surface rendering centered on a black background with coherent specular highlights and well-defined shape. The result image instead shows a rotated, square-ish noisy volume/point-cloud-like slab with heavy speckle and no recognizable tooth geometry. Overall appearance, viewpoint, and rendering style do not match the ground truth.
+                    <strong>Judge's Assessment:</strong> The ground truth shows a centered, upright tooth-like structure (crown at top, two roots extending downward) rendered in a glossy gray material on a black background. The result image shows a very different viewpoint/orientation: the object is rotated to a horizontal/diagonal pose, is heavily zoomed/cropped, and only a portion of the structure is visible. While the rendering style (gray shiny surface, black background) is similar, the overall composition, camera angle, and visible morphology do not match the ground truth.
                 </div>
             </div>
          
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 2</div>
-                    <div class="rubric-score">1/10</div>
+                    <div class="rubric-score">4/10</div>
                 </div>
                 <div class="rubric-criterion">
                     <strong>Criterion:</strong> Does the visualization show the target structure clearly?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> In the ground truth, the target structure (tooth) is clearly visible with distinct cusps and root-like extensions. In the result, the structure is obscured by severe noise and looks like an amorphous block; no clear tooth anatomy or surface boundaries can be identified.
+                    <strong>Judge's Assessment:</strong> In the ground truth, the full target structure is clearly visible, including the crown and both roots with a distinct separation. In the result, the structure is not shown clearly because it is zoomed in and partially out of frame; the key anatomical features (full crown-to-root extent and the two-root separation) are not readily interpretable. Surface shading is present, but the framing and orientation significantly reduce clarity of the intended structure.
                 </div>
             </div>
         
                 </div>
                 <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
-                    <p style="color: #666;">The result does not resemble the ground truth rendering and fails to clearly show the intended tooth-like target structure, appearing instead as a noisy, rotated volumetric slab.</p>
+                    <p style="color: #666;">The result uses a similar material/background but fails to match the ground-truth view and framing. The target structure is only partially shown and rotated, which substantially reduces both similarity and clarity compared with the expected visualization.</p>
                 </div>
             </div>
         </div>
@@ -1369,7 +1368,7 @@ Yes</div>
             <div class="metrics-grid">
             <div class="metric-box">
                 <div class="metric-label">Visualization Quality</div>
-                <div class="metric-value">3/20</div>
+                <div class="metric-value">7/20</div>
             </div>
         
             <div class="metric-box">
@@ -1379,30 +1378,30 @@ Yes</div>
         
             <div class="metric-box">
                 <div class="metric-label">Efficiency</div>
-                <div class="metric-value">7/10</div>
+                <div class="metric-value">6/10</div>
                 <div class="metric-subvalue">
-                    Completed in 76.36 seconds (very good)
+                    Completed in 80.48 seconds (very good)
                 </div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">247,343</div>
+                <div class="metric-value">351,365</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">3,257</div>
+                <div class="metric-value">2,815</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">250,600</div>
+                <div class="metric-value">354,180</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Cost</div>
-                <div class="metric-value">$0.7909</div>
+                <div class="metric-value">$1.0963</div>
             </div>
         </div>
         </div>
@@ -1448,10 +1447,10 @@ Q1: answer with the number of complete cells you counted, for example "5" if you
                 <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">1. Q1 correct answer: 2</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Agent's Answers</h4>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">7</div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">4</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 specifies that the correct answer to Q1 is 2. The provided task answer is 7, which does not match the required correct answer. Therefore, it fails to meet the criterion. Since there is only one criterion and it is not satisfied, the overall score is 0/10.</div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 specifies that the correct answer to Q1 is 2. The provided task answer is 4, which does not match the expected correct answer. Therefore, it fails to meet the criterion and receives 0/10 for this criterion. With only one criterion, the total score is 0/10.</div>
             </div>
         </div>
     
@@ -1470,22 +1469,22 @@ Q1: answer with the number of complete cells you counted, for example "5" if you
         
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">125,977</div>
+                <div class="metric-value">174,589</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">1,426</div>
+                <div class="metric-value">1,507</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">127,403</div>
+                <div class="metric-value">176,096</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Cost</div>
-                <div class="metric-value">$0.3993</div>
+                <div class="metric-value">$0.5464</div>
             </div>
         </div>
         </div>
@@ -1554,22 +1553,22 @@ Q1: answer with the number of complete cells you counted, for example "5" if you
         
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">87,853</div>
+                <div class="metric-value">124,929</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">1,189</div>
+                <div class="metric-value">1,460</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">89,042</div>
+                <div class="metric-value">126,389</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Cost</div>
-                <div class="metric-value">$0.2814</div>
+                <div class="metric-value">$0.3967</div>
             </div>
         </div>
         </div>
@@ -1618,7 +1617,7 @@ Q1: answer with the number of complete cells you counted, for example "5" if you
                 <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; white-space: pre-wrap; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">Yes</div>
 
                 <h4 style="color: #667eea; margin-bottom: 10px;">Judge's Evaluation</h4>
-                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided task answer is exactly "Yes", which matches the expected correct answer. Therefore, it fully satisfies the evaluation criterion with no discrepancies.</div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 3px solid #667eea;"><strong style="color: #667eea;">Evaluation:</strong><br><br>Criterion 1 (Q1 correct answer: Yes): The provided task answer is exactly "Yes", which matches the expected correct answer. Therefore it fully satisfies the evaluation criterion with no discrepancies.</div>
             </div>
         </div>
     
@@ -1637,22 +1636,22 @@ Q1: answer with the number of complete cells you counted, for example "5" if you
         
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">117,942</div>
+                <div class="metric-value">100,341</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">1,663</div>
+                <div class="metric-value">1,170</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">119,605</div>
+                <div class="metric-value">101,511</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Cost</div>
-                <div class="metric-value">$0.3788</div>
+                <div class="metric-value">$0.3186</div>
             </div>
         </div>
         </div>
@@ -1665,9 +1664,9 @@ Q1: answer with the number of complete cells you counted, for example "5" if you
             <div class="case-header">
                 <div class="case-title-group">
                     <h2 class="case-title">📝 case_10</h2>
-                    <span class="status-badge status-warning">⚠️ LOW SCORE</span>
+                    
                 </div>
-                <div class="case-score">15/35 (42.9%)</div>
+                <div class="case-score">28/35 (80.0%)</div>
             </div>
 
             <div class="case-content">
@@ -1708,7 +1707,7 @@ Q1: answer with the number of complete cells you counted, for example "5" if you
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">8/20</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">15/20</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
@@ -1726,33 +1725,33 @@ Q1: answer with the number of complete cells you counted, for example "5" if you
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 1</div>
-                    <div class="rubric-score">2/10</div>
+                    <div class="rubric-score">7/10</div>
                 </div>
                 <div class="rubric-criterion">
                     <strong>Criterion:</strong> Does the final screenshot show a polygon shape that accurately traces the outline of the cell surface?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> A large, mostly smooth gray polygon occupies the upper-right quadrant, but there is no clearly visible cell boundary in the underlying image that it appears to trace. The polygon looks generic (rounded/flat-edged) rather than tightly following a discernible cell surface outline. Most of the image is dark with sparse magenta puncta/line; the polygon does not align to any evident membrane edge.
+                    <strong>Judge's Assessment:</strong> A filled gray polygon is present and generally follows a single cell-like boundary in the center of the image. However, the contour looks overly simplified/rounded with relatively few vertices, especially along the upper-left edge where the cell boundary appears to have a sharper indentation/irregularity than the polygon captures. Because the underlying cell edge is faint, exact accuracy is hard to confirm, but the shape likely approximates the outline rather than tightly tracing it.
                 </div>
             </div>
          
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 2</div>
-                    <div class="rubric-score">6/10</div>
+                    <div class="rubric-score">8/10</div>
                 </div>
                 <div class="rubric-criterion">
                     <strong>Criterion:</strong> Is the polygon layer correctly overlaid on the image?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The polygon layer is present and visibly overlaid on top of the image content (it occludes underlying pixels). However, the overlay is very opaque and hides any potential boundary underneath, making it difficult to judge alignment. No clear outline/stroke is shown to indicate the exact polygon boundary; only a filled region is visible.
+                    <strong>Judge's Assessment:</strong> The polygon layer is correctly positioned over the central cell region and does not appear spatially offset from the presumed cell location. Its opaque/solid fill strongly obscures the underlying image content inside the cell, which makes assessing alignment difficult and reduces interpretability; an outline or semi-transparent fill would better demonstrate correct overlay.
                 </div>
             </div>
         
                 </div>
                 <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
-                    <p style="color: #666;">Without ground truth, the result shows a polygon overlay but it does not convincingly correspond to an identifiable cell surface outline in the image. The overlay is correctly rendered on top, yet its high opacity and lack of a clear boundary line reduce interpretability and make accurate tracing unlikely.</p>
+                    <p style="color: #666;">Without ground truth, the result appears to show a reasonable cell-sized polygon overlay centered on the cell and broadly matching its boundary, but with noticeable simplification and some mismatch in areas of higher curvature/irregularity. Overlay placement seems correct, though the fully opaque fill hampers visual verification of boundary fit.</p>
                 </div>
             </div>
         </div>
@@ -1766,7 +1765,7 @@ Q1: answer with the number of complete cells you counted, for example "5" if you
             <div class="metrics-grid">
             <div class="metric-box">
                 <div class="metric-label">Visualization Quality</div>
-                <div class="metric-value">8/20</div>
+                <div class="metric-value">15/20</div>
             </div>
         
             <div class="metric-box">
@@ -1776,30 +1775,30 @@ Q1: answer with the number of complete cells you counted, for example "5" if you
         
             <div class="metric-box">
                 <div class="metric-label">Efficiency</div>
-                <div class="metric-value">2/10</div>
+                <div class="metric-value">8/10</div>
                 <div class="metric-subvalue">
-                    Completed in 203.85 seconds (acceptable)
+                    Completed in 60.77 seconds (very good)
                 </div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">734,767</div>
+                <div class="metric-value">179,928</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">6,744</div>
+                <div class="metric-value">1,807</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">741,511</div>
+                <div class="metric-value">181,735</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Cost</div>
-                <div class="metric-value">$2.3055</div>
+                <div class="metric-value">$0.5669</div>
             </div>
         </div>
         </div>
@@ -1808,13 +1807,13 @@ Q1: answer with the number of complete cells you counted, for example "5" if you
         </section>
     
 
-        <section class="case-section case-section-failed" id="case_11">
+        <section class="case-section" id="case_11">
             <div class="case-header">
                 <div class="case-title-group">
                     <h2 class="case-title">📝 case_11</h2>
-                    <span class="status-badge status-failed">❌ FAILED</span>
+                    
                 </div>
-                <div class="case-score">0/35 (0.0%)</div>
+                <div class="case-score">25/35 (71.4%)</div>
             </div>
 
             <div class="case-content">
@@ -1856,7 +1855,7 @@ Q1: answer with the number of complete cells you counted, for example "5" if you
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total Score</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">0/20</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #667eea;">11/20</div>
                 </div>
                 <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
                     <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Goals</div>
@@ -1874,33 +1873,33 @@ Q1: answer with the number of complete cells you counted, for example "5" if you
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 1</div>
-                    <div class="rubric-score">0/10</div>
+                    <div class="rubric-score">6/10</div>
                 </div>
                 <div class="rubric-criterion">
                     <strong>Criterion:</strong> Does the visualization show a side view of the cell?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> The provided image appears to be entirely black with no discernible cell geometry, boundaries, or internal structures. Because no cell is visible, it is not possible to confirm a side view (or any view) of the cell.
+                    <strong>Judge's Assessment:</strong> The image shows a 2D fluorescence view of a roughly spherical cell with membrane/cortical signal and some protrusive structures. However, it is not clearly a side (cross-sectional) view of a cell layer; there is no obvious apical–basal axis, substrate contact plane, or z-section characteristics. It reads more like a top/down projection or single focal plane with neighboring cells partially visible.
                 </div>
             </div>
          
             <div class="rubric-item">
                 <div class="rubric-header">
                     <div class="rubric-title">Goal 2</div>
-                    <div class="rubric-score">0/10</div>
+                    <div class="rubric-score">5/10</div>
                 </div>
                 <div class="rubric-criterion">
                     <strong>Criterion:</strong> Does the result rendering look similar to ground truth?
                 </div>
                 <div class="rubric-explanation">
-                    <strong>Judge's Assessment:</strong> Without a visible rendering (the image contains no detectable features/objects), there is no basis to judge similarity to an expected/ground-truth-like result. The output looks like a failed render (e.g., missing lighting/geometry, incorrect camera, or blank output).
+                    <strong>Judge's Assessment:</strong> Without ground truth, the rendering appears plausible as a noisy green fluorescence microscopy image, but overall quality is limited: the cell boundaries are soft, contrast is uneven, and background speckle/noise is high. The scene composition (one bright cell and a partial adjacent cell) could match many datasets, but there are no distinctive cues suggesting high fidelity to a specific expected ground-truth rendering for case_11.
                 </div>
             </div>
         
                 </div>
                 <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
                     <h4 style="color: #667eea; margin-bottom: 10px;">Overall Assessment</h4>
-                    <p style="color: #666;">Evaluation performed without ground truth. The submitted visualization is effectively blank/fully dark, so neither the side-view requirement nor any resemblance to an intended cell rendering can be assessed; both goals are unmet.</p>
+                    <p style="color: #666;">Evaluation is performed without ground truth. The result looks like a reasonable fluorescence micrograph of cells, but it does not strongly communicate a side view of the cell, and the rendering fidelity/clarity is moderate due to noise and ambiguous viewpoint.</p>
                 </div>
             </div>
         </div>
@@ -1914,7 +1913,7 @@ Q1: answer with the number of complete cells you counted, for example "5" if you
             <div class="metrics-grid">
             <div class="metric-box">
                 <div class="metric-label">Visualization Quality</div>
-                <div class="metric-value">0/20</div>
+                <div class="metric-value">11/20</div>
             </div>
         
             <div class="metric-box">
@@ -1924,30 +1923,30 @@ Q1: answer with the number of complete cells you counted, for example "5" if you
         
             <div class="metric-box">
                 <div class="metric-label">Efficiency</div>
-                <div class="metric-value">7/10</div>
+                <div class="metric-value">9/10</div>
                 <div class="metric-subvalue">
-                    Completed in 73.19 seconds (very good)
+                    Completed in 46.81 seconds (excellent)
                 </div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Input Tokens</div>
-                <div class="metric-value">282,762</div>
+                <div class="metric-value">156,372</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Output Tokens</div>
-                <div class="metric-value">2,547</div>
+                <div class="metric-value">1,684</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Tokens</div>
-                <div class="metric-value">285,309</div>
+                <div class="metric-value">158,056</div>
             </div>
         
             <div class="metric-box">
                 <div class="metric-label">Total Cost</div>
-                <div class="metric-value">$0.8865</div>
+                <div class="metric-value">$0.4944</div>
             </div>
         </div>
         </div>
@@ -1958,7 +1957,7 @@ Q1: answer with the number of complete cells you counted, for example "5" if you
 
         <footer class="footer">
             <p>Generated by SciVisAgentBench Evaluation Reporter</p>
-            <p>Timestamp: 2026-03-04T22:27:32.682443</p>
+            <p>Timestamp: 2026-03-04T23:08:57.987425</p>
         </footer>
     </div>
 
