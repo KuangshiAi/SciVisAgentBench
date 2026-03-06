@@ -144,6 +144,12 @@ def _take_screenshots_subprocess(state_path, output_dir, prefix="", data_directo
     # Get the directory containing this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
+    # Convert paths to absolute paths to avoid working directory issues
+    state_path = os.path.abspath(state_path)
+    output_dir = os.path.abspath(output_dir)
+    if data_directory:
+        data_directory = os.path.abspath(data_directory)
+
     # Create a temporary Python script to run in subprocess
     script_content = f'''
 import sys
