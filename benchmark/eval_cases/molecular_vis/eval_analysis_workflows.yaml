@@ -89,7 +89,7 @@
         Save the rendered image as:
         "trajectory-inspection/results/{agent_mode}/membrane-curved-tilted-side-5us.jpg"
 
-        4. Perform curvature-based lipid distribution analysis and generate the following figures:
+        4. Perform curvature-based lipid distribution analysis for all the frames in the trajectory and generate the following figures:
 
         - A 2D density heatmap of CDL0 lipids across the curved membrane surface.
         - A 2D density heatmap of POPC lipids across the curved membrane surface.
@@ -125,6 +125,7 @@
           1. Do both images show a side view of a curved lipid bilayer rather than a top-down view?
           2. Are two lipid species visible with different colors, corresponding to POPC and CDL0 PO4 beads?
           3. Does the membrane visibly undulate, with one lipid type enriched on the inner curvature and the other on the outer curvature?
+          4. Is the simulation box shown in blue with the membrane inside the box
 
     - type: llm-rubric
       subtype: vision
@@ -132,8 +133,7 @@
       rs_file: trajectory-inspection/results/{agent_mode}/avg_2d_dens_CDL0.png
       value: |
           1. Do both images show a curved membrane band visualized as a heatmap density map?
-          2. Are sampling markers or dots visible along the membrane surface in both images?
-          3. Is higher CDL0 density concentrated along the inner side of the curved membrane in both images?
+          2. Is higher CDL0 density concentrated along the inner side of the curved membrane in both images?
 
     - type: llm-rubric
       subtype: vision
@@ -141,8 +141,7 @@
       rs_file: trajectory-inspection/results/{agent_mode}/avg_2d_dens_POPC.png
       value: |
           1. Do both images show a curved membrane band represented as a heatmap density map?
-          2. Are sampling markers or dots visible along the membrane surface in both images?
-          3. Is higher POPC density concentrated along the outer side of the curved membrane in both images?
+          2. Is higher POPC density concentrated along the outer side of the curved membrane in both images?
 
     - type: llm-rubric
       subtype: vision
