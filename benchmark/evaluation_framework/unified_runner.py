@@ -43,13 +43,13 @@ class YAMLTestCase:
 
         # Extract all LLM rubrics from assert section
         assert_list = yaml_data.get('assert', [])
-        self.rubrics = {}  # Dictionary mapping subtype to rubric value
+        self.rubrics = {}  # Dictionary mapping subtype to list of rubric values (supports multiple per subtype)
         self.evaluation_subtypes = []  # List of all subtypes
         self.assertions = []  # Store all assertions for assertion-based evaluation
         self.is_assertion_based = False  # Flag to indicate if this is assertion-based
         self.rule_based_assertions = []  # Store rule_based assertions
         self.is_rule_based = False  # Flag for rule_based evaluation
-        self.file_configs = {}  # Dictionary mapping subtype to file paths (gs_file, rs_file)
+        self.file_configs = {}  # Dictionary mapping subtype to list of file paths (supports multiple per subtype)
 
         # Check if this is assertion-based evaluation
         # (contains-all, not-contains, etc. instead of just llm-rubric)
@@ -64,18 +64,23 @@ class YAMLTestCase:
                 subtype = assert_item.get('subtype', 'vision')
                 rubric_value = assert_item.get('value', '').strip()
                 if rubric_value:
-                    self.rubrics[subtype] = rubric_value
+                    # Support multiple rubrics per subtype
+                    if subtype not in self.rubrics:
+                        self.rubrics[subtype] = []
+                    self.rubrics[subtype].append(rubric_value)
                     if subtype not in self.evaluation_subtypes:
                         self.evaluation_subtypes.append(subtype)
 
-                    # Extract file paths for custom evaluation
+                    # Extract file paths for custom evaluation - support multiple per subtype
                     file_config = {}
                     if 'gs_file' in assert_item or 'gs-file' in assert_item:
                         file_config['gs_file'] = assert_item.get('gs_file') or assert_item.get('gs-file')
                     if 'rs_file' in assert_item or 'rs-file' in assert_item:
                         file_config['rs_file'] = assert_item.get('rs_file') or assert_item.get('rs-file')
                     if file_config:
-                        self.file_configs[subtype] = file_config
+                        if subtype not in self.file_configs:
+                            self.file_configs[subtype] = []
+                        self.file_configs[subtype].append(file_config)
             elif assert_type == 'code-similarity':
                 self.assertions.append(assert_item)
                 subtype = assert_item.get('subtype', 'code')
@@ -84,7 +89,10 @@ class YAMLTestCase:
                     'gs_file': assert_item.get('gs_file', []),
                     'rs_file': assert_item.get('rs_file', [])
                 }
-                self.rubrics[subtype] = code_config
+                # Support multiple code-similarity assertions
+                if subtype not in self.rubrics:
+                    self.rubrics[subtype] = []
+                self.rubrics[subtype].append(code_config)
                 if subtype not in self.evaluation_subtypes:
                     self.evaluation_subtypes.append(subtype)
             elif assert_type == 'rule_based':
@@ -100,9 +108,15 @@ class YAMLTestCase:
 
         # Backward compatibility
         # Try 'vision' first, then fall back to the first available rubric
-        self.llm_rubric = self.rubrics.get('vision', '')
-        if not self.llm_rubric and self.evaluation_subtypes:
-            self.llm_rubric = self.rubrics.get(self.evaluation_subtypes[0], '')
+        # For backward compatibility, join multiple rubrics if present
+        vision_rubrics = self.rubrics.get('vision', [])
+        if vision_rubrics:
+            self.llm_rubric = '\n\n'.join(vision_rubrics) if isinstance(vision_rubrics, list) else vision_rubrics
+        elif self.evaluation_subtypes:
+            first_subtype_rubrics = self.rubrics.get(self.evaluation_subtypes[0], [])
+            self.llm_rubric = '\n\n'.join(first_subtype_rubrics) if isinstance(first_subtype_rubrics, list) else first_subtype_rubrics
+        else:
+            self.llm_rubric = ''
         self.evaluation_subtype = 'vision' if 'vision' in self.rubrics else (
             self.evaluation_subtypes[0] if self.evaluation_subtypes else 'vision'
         )

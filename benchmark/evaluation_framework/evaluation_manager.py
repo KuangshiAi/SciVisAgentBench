@@ -107,7 +107,8 @@ class EvaluationManager:
         vision_rubric: str,
         gs_file: Optional[str] = None,
         rs_file: Optional[str] = None,
-        data_dir: Optional[str] = None
+        data_dir: Optional[str] = None,
+        skip_output_and_efficiency: bool = False
     ) -> Dict[str, Any]:
         """
         Run vision-based evaluation using the appropriate evaluator.
@@ -189,18 +190,28 @@ class EvaluationManager:
             # Run visualization quality evaluation
             viz_score = evaluator.evaluate_visualization_quality()
 
-            # Run output generation evaluation
-            output_score = evaluator.evaluate_output_generation()
+            # Conditionally run output generation and efficiency
+            # When evaluating multiple vision rubrics, only run these once
+            if skip_output_and_efficiency:
+                output_score = 0
+                efficiency_score = 0
+                image_metrics = {}
+                max_possible_score = goals_count * 10  # Only viz quality
+            else:
+                # Run output generation evaluation
+                output_score = evaluator.evaluate_output_generation()
 
-            # Run efficiency evaluation
-            efficiency_score = evaluator.evaluate_efficiency()
+                # Run efficiency evaluation
+                efficiency_score = evaluator.evaluate_efficiency()
 
-            # Calculate image metrics
-            image_metrics = evaluator.evaluate_image_metrics()
+                # Calculate image metrics
+                image_metrics = evaluator.evaluate_image_metrics()
+
+                # Calculate total scores
+                max_possible_score = (goals_count * 10) + 5 + 10  # viz(goals*10) + output(5) + efficiency(10)
 
             # Calculate total scores
             total_score = viz_score + output_score + efficiency_score
-            max_possible_score = (goals_count * 10) + 5 + 10  # viz(goals*10) + output(5) + efficiency(10)
 
             scores = evaluator.evaluation_results.get("scores", {})
 
@@ -500,22 +511,22 @@ Be specific about what aspects of the answers meet or don't meet the criteria.""
         case_dir: str,
         case_name: str,
         evaluation_subtypes: List[str],
-        rubrics: Dict[str, str],
-        file_configs: Optional[Dict[str, Dict[str, str]]] = None,
+        rubrics: Dict[str, Any],  # Now supports str or List[str]
+        file_configs: Optional[Dict[str, Any]] = None,  # Now supports Dict or List[Dict]
         data_dir: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Run comprehensive evaluation for a test case with support for multiple subtypes.
 
         This method preserves all functionality from the existing yaml_runner files,
-        supporting both vision and text evaluation.
+        supporting both vision and text evaluation. Now supports MULTIPLE rubrics per subtype.
 
         Args:
             case_dir: Test case directory
             case_name: Test case name
             evaluation_subtypes: List of evaluation subtypes (e.g., ["vision", "text"])
-            rubrics: Dictionary mapping subtype to rubric text
-            file_configs: Optional dictionary mapping subtype to file paths (gs_file, rs_file)
+            rubrics: Dictionary mapping subtype to rubric text (str) or list of rubric texts (List[str])
+            file_configs: Optional dictionary mapping subtype to file paths or list of file paths
             data_dir: Optional data directory (working directory for the agent)
 
         Returns:
@@ -540,70 +551,199 @@ Be specific about what aspects of the answers meet or don't meet the criteria.""
         for subtype in evaluation_subtypes:
             print(f"Running {subtype} evaluation...")
 
-            if subtype == 'vision':
-                # Get file config for vision evaluation
-                vision_config = file_configs.get('vision', {})
-                gs_file = vision_config.get('gs_file')
-                rs_file = vision_config.get('rs_file')
-                result = await self.evaluate_vision(
-                    case_dir,
-                    case_name,
-                    rubrics.get('vision', ''),
-                    gs_file=gs_file,
-                    rs_file=rs_file,
-                    data_dir=data_dir
-                )
-            elif subtype == 'text':
-                # Get file config for text evaluation
-                text_config = file_configs.get('text', {})
-                rs_file = text_config.get('rs_file')
-                result = await self.evaluate_text(
-                    case_dir,
-                    case_name,
-                    rubrics.get('text', ''),
-                    rs_file=rs_file,
-                    data_dir=data_dir
-                )
-            elif subtype == 'code':
-                result = await self.evaluate_code(
-                    case_dir,
-                    case_name,
-                    rubrics.get('code', {})
-                )
-            else:
-                print(f"⚠️  Unknown evaluation subtype: {subtype}")
-                continue
+            # Get rubrics for this subtype (can be single string or list)
+            subtype_rubrics = rubrics.get(subtype, [])
+            if isinstance(subtype_rubrics, str):
+                subtype_rubrics = [subtype_rubrics]
 
-            if result and result.get('status') == 'completed':
-                evaluation_results[subtype] = result
-                subtype_score = result.get('scores', {}).get('total_score', 0)
-                subtype_max = result.get('scores', {}).get('max_possible_score', 0)
-                total_score += subtype_score
-                max_possible_score += subtype_max
+            # Get file configs for this subtype (can be single dict or list)
+            subtype_file_configs = file_configs.get(subtype, [])
+            if isinstance(subtype_file_configs, dict):
+                subtype_file_configs = [subtype_file_configs]
 
-                # Print breakdown for vision evaluation
-                if subtype == 'vision' and 'scores' in result:
-                    viz_qual = result['scores'].get('visualization_quality', 0)
-                    output_gen = result['scores'].get('output_generation', 0)
-                    efficiency = result['scores'].get('efficiency', 0)
-                    goals = result.get('goals_count', 0)
-                    print(f"✅ {subtype} evaluation completed: {subtype_score}/{subtype_max}")
-                    print(f"   - Visualization quality: {viz_qual}/{goals * 10}")
-                    print(f"   - Output generation: {output_gen}/5")
-                    print(f"   - Efficiency: {efficiency}/10")
-                elif subtype == 'code' and 'scores' in result:
-                    code_sim = result['scores'].get('code_similarity', 0)
-                    similarity_raw = result.get('detailed_scores', {}).get('code_similarity', {}).get('similarity_raw_score', 0)
-                    print(f"✅ {subtype} evaluation completed: {subtype_score}/{subtype_max}")
-                    print(f"   - Code similarity: {code_sim}/10 (raw: {similarity_raw:.3f})")
+            # If no file configs, create empty list with same length as rubrics
+            if not subtype_file_configs and subtype_rubrics:
+                subtype_file_configs = [{}] * len(subtype_rubrics)
+
+            # Store all evaluation results for this subtype
+            subtype_results = []
+            subtype_total_score = 0
+            subtype_max_score = 0
+
+            # Evaluate each rubric for this subtype
+            # For vision with multiple rubrics, skip output/efficiency in individual evaluations
+            has_multiple_vision_rubrics = (subtype == 'vision' and len(subtype_rubrics) > 1)
+
+            for idx, rubric in enumerate(subtype_rubrics):
+                file_config = subtype_file_configs[idx] if idx < len(subtype_file_configs) else {}
+
+                print(f"  Evaluating {subtype} rubric {idx + 1}/{len(subtype_rubrics)}...")
+
+                if subtype == 'vision':
+                    gs_file = file_config.get('gs_file')
+                    rs_file = file_config.get('rs_file')
+                    result = await self.evaluate_vision(
+                        case_dir,
+                        case_name,
+                        rubric,
+                        gs_file=gs_file,
+                        rs_file=rs_file,
+                        data_dir=data_dir,
+                        skip_output_and_efficiency=has_multiple_vision_rubrics  # Skip if multiple rubrics
+                    )
+                elif subtype == 'text':
+                    rs_file = file_config.get('rs_file')
+                    result = await self.evaluate_text(
+                        case_dir,
+                        case_name,
+                        rubric,
+                        rs_file=rs_file,
+                        data_dir=data_dir
+                    )
+                elif subtype == 'code':
+                    result = await self.evaluate_code(
+                        case_dir,
+                        case_name,
+                        rubric  # rubric is the code config for code subtype
+                    )
                 else:
-                    print(f"✅ {subtype} evaluation completed: {subtype_score}/{subtype_max}")
+                    print(f"⚠️  Unknown evaluation subtype: {subtype}")
+                    continue
+
+                if result and result.get('status') == 'completed':
+                    result['rubric_index'] = idx  # Track which rubric this is
+                    subtype_results.append(result)
+                    result_score = result.get('scores', {}).get('total_score', 0)
+                    result_max = result.get('scores', {}).get('max_possible_score', 0)
+                    subtype_total_score += result_score
+                    subtype_max_score += result_max
+
+                    # Print breakdown for vision evaluation
+                    if subtype == 'vision' and 'scores' in result:
+                        viz_qual = result['scores'].get('visualization_quality', 0)
+                        goals = result.get('goals_count', 0)
+                        print(f"    ✅ Rubric {idx + 1} completed: {result_score}/{result_max}")
+                        print(f"       - Visualization quality: {viz_qual}/{goals * 10}")
+                        # Only show output/efficiency if they were evaluated (not skipped)
+                        if not has_multiple_vision_rubrics:
+                            output_gen = result['scores'].get('output_generation', 0)
+                            efficiency = result['scores'].get('efficiency', 0)
+                            print(f"       - Output generation: {output_gen}/5")
+                            print(f"       - Efficiency: {efficiency}/10")
+                    elif subtype == 'code' and 'scores' in result:
+                        code_sim = result['scores'].get('code_similarity', 0)
+                        similarity_raw = result.get('detailed_scores', {}).get('code_similarity', {}).get('similarity_raw_score', 0)
+                        print(f"    ✅ Rubric {idx + 1} completed: {result_score}/{result_max}")
+                        print(f"       - Code similarity: {code_sim}/10 (raw: {similarity_raw:.3f})")
+                    else:
+                        print(f"    ✅ Rubric {idx + 1} completed: {result_score}/{result_max}")
+                else:
+                    print(f"    ⚠️ Rubric {idx + 1} did not complete successfully")
+                    if result:
+                        print(f"       Status: {result.get('status')}")
+                        print(f"       Reason: {result.get('reason', 'Unknown')}")
+                        result['rubric_index'] = idx
+                        subtype_results.append(result)  # Still store failed result for debugging
+
+            # Aggregate results for this subtype
+            if subtype_results:
+                # Build backward-compatible structure
+                aggregated_result = {
+                    'status': 'completed',
+                    'rubric_count': len(subtype_rubrics),
+                    'individual_results': subtype_results,  # New: array of individual evaluations
+                    'scores': {
+                        'total_score': subtype_total_score,
+                        'max_possible_score': subtype_max_score,
+                        'percentage': (subtype_total_score / subtype_max_score * 100) if subtype_max_score > 0 else 0
+                    }
+                }
+
+                # Add backward compatibility: aggregate detailed_scores and other fields from individual results
+                # This ensures existing reporter code continues to work
+                if subtype == 'vision' and subtype_results:
+                    # Aggregate vision-specific fields
+                    total_goals_count = sum(r.get('goals_count', 0) for r in subtype_results)
+                    total_viz_qual = sum(r.get('scores', {}).get('visualization_quality', 0) for r in subtype_results)
+
+                    # For multiple vision rubrics, evaluate output/efficiency once
+                    if has_multiple_vision_rubrics:
+                        print(f"  Evaluating output generation and efficiency once for all {len(subtype_rubrics)} vision rubrics...")
+                        # Get evaluator to check output and efficiency
+                        evaluator = self.get_evaluator_for_case(case_dir, case_name)
+                        total_output_gen = evaluator.evaluate_output_generation()
+                        total_efficiency = evaluator.evaluate_efficiency()
+
+                        # Update totals to include output and efficiency
+                        subtype_total_score += total_output_gen + total_efficiency
+                        subtype_max_score += 5 + 10  # 5 for output, 10 for efficiency
+                        aggregated_result['scores']['total_score'] = subtype_total_score
+                        aggregated_result['scores']['max_possible_score'] = subtype_max_score
+                        aggregated_result['scores']['percentage'] = (subtype_total_score / subtype_max_score * 100) if subtype_max_score > 0 else 0
+
+                        # Print summary
+                        print(f"    - Output generation: {total_output_gen}/5")
+                        print(f"    - Efficiency: {total_efficiency}/10")
+                    else:
+                        # Single rubric: already has output and efficiency
+                        total_output_gen = sum(r.get('scores', {}).get('output_generation', 0) for r in subtype_results)
+                        total_efficiency = sum(r.get('scores', {}).get('efficiency', 0) for r in subtype_results)
+
+                    aggregated_result['goals_count'] = total_goals_count
+                    aggregated_result['scores']['visualization_quality'] = total_viz_qual
+                    aggregated_result['scores']['output_generation'] = total_output_gen
+                    aggregated_result['scores']['efficiency'] = total_efficiency
+
+                    # Aggregate image_metrics (average them)
+                    all_image_metrics = [r.get('image_metrics', {}).get('averaged_metrics', {}) for r in subtype_results]
+                    if all_image_metrics:
+                        avg_psnr_values = [m.get('psnr') for m in all_image_metrics if m.get('psnr') is not None and m.get('psnr') != float('inf')]
+                        avg_ssim_values = [m.get('ssim') for m in all_image_metrics if m.get('ssim') is not None]
+                        avg_lpips_values = [m.get('lpips') for m in all_image_metrics if m.get('lpips') is not None]
+
+                        aggregated_result['image_metrics'] = {
+                            'averaged_metrics': {
+                                'psnr': sum(avg_psnr_values) / len(avg_psnr_values) if avg_psnr_values else None,
+                                'ssim': sum(avg_ssim_values) / len(avg_ssim_values) if avg_ssim_values else None,
+                                'lpips': sum(avg_lpips_values) / len(avg_lpips_values) if avg_lpips_values else None
+                            }
+                        }
+
+                    # Aggregate detailed_scores for backward compatibility
+                    aggregated_result['detailed_scores'] = {
+                        'visualization_quality': {
+                            'score': total_viz_qual,
+                            'max_score': total_goals_count * 10
+                        },
+                        'output_generation': {
+                            'score': total_output_gen,
+                            'max_score': len(subtype_results) * 5  # 5 points per evaluation
+                        },
+                        'efficiency': {
+                            'score': total_efficiency,
+                            'max_score': len(subtype_results) * 10  # 10 points per evaluation
+                        }
+                    }
+
+                evaluation_results[subtype] = aggregated_result
+                total_score += subtype_total_score
+                max_possible_score += subtype_max_score
+
+                # Print detailed summary
+                if subtype == 'vision' and has_multiple_vision_rubrics:
+                    viz_qual = aggregated_result['scores'].get('visualization_quality', 0)
+                    output_gen = aggregated_result['scores'].get('output_generation', 0)
+                    efficiency = aggregated_result['scores'].get('efficiency', 0)
+                    total_goals = aggregated_result.get('goals_count', 0)
+                    print(f"  ✅ {subtype} evaluation completed: {subtype_total_score}/{subtype_max_score} ({len(subtype_rubrics)} rubrics)")
+                    print(f"     Total breakdown:")
+                    print(f"     - Visualization quality: {viz_qual}/{total_goals * 10} (across {len(subtype_rubrics)} rubrics)")
+                    print(f"     - Output generation: {output_gen}/5 (checked once)")
+                    print(f"     - Efficiency: {efficiency}/10 (checked once)")
+                else:
+                    print(f"  ✅ {subtype} evaluation completed: {subtype_total_score}/{subtype_max_score} ({len(subtype_rubrics)} rubric{'s' if len(subtype_rubrics) > 1 else ''})")
             else:
-                print(f"⚠️  {subtype} evaluation did not complete successfully")
-                print(f"   Status: {result.get('status') if result else 'None'}")
-                print(f"   Reason: {result.get('reason') if result else 'No result returned'}")
-                if result and result.get('status') == 'failed':
-                    evaluation_results[subtype] = result  # Still store failed result for debugging
+                print(f"  ⚠️ {subtype} evaluation: no results")
 
         # Create comprehensive evaluation result
         from datetime import datetime
