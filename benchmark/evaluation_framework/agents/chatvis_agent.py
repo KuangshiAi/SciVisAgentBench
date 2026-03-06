@@ -169,8 +169,10 @@ class ChatVisAgent(BaseAgent):
         case_dir = Path(task_config["case_dir"])
 
         # Track cumulative token usage from API responses
+        # Note: input_tokens from multi_provider_client already includes cache tokens
         total_input_tokens = 0
         total_output_tokens = 0
+        # Track cache tokens separately for reporting (already included in input_tokens)
         total_cache_creation_tokens = 0
         total_cache_read_tokens = 0
 
@@ -196,8 +198,10 @@ class ChatVisAgent(BaseAgent):
             # Get response and token usage from API
             response_content = self.client.get_response_content(sr)
             token_usage = self.client.get_token_usage(sr)
+            # input_tokens already includes cache tokens (combined in multi_provider_client)
             total_input_tokens += token_usage["input_tokens"]
             total_output_tokens += token_usage["output_tokens"]
+            # Track cache breakdown separately for reporting only (not for cost calculation)
             total_cache_creation_tokens += token_usage.get("cache_creation_input_tokens", 0)
             total_cache_read_tokens += token_usage.get("cache_read_input_tokens", 0)
 
@@ -240,8 +244,10 @@ class ChatVisAgent(BaseAgent):
                 # Accumulate token usage from API
                 fix_response = self.client.get_response_content(fix_sr)
                 fix_token_usage = self.client.get_token_usage(fix_sr)
+                # input_tokens already includes cache tokens (combined in multi_provider_client)
                 total_input_tokens += fix_token_usage["input_tokens"]
                 total_output_tokens += fix_token_usage["output_tokens"]
+                # Track cache breakdown separately for reporting only (not for cost calculation)
                 total_cache_creation_tokens += fix_token_usage.get("cache_creation_input_tokens", 0)
                 total_cache_read_tokens += fix_token_usage.get("cache_read_input_tokens", 0)
 
@@ -257,20 +263,22 @@ class ChatVisAgent(BaseAgent):
 
             if errors:
                 print(f"    ✘ still has errors after {max_attempts} attempts")
-                # Calculate true total input including cache tokens
-                true_input_tokens = total_input_tokens + total_cache_creation_tokens + total_cache_read_tokens
+                # total_input_tokens already includes cache tokens (no need to add again)
+                print(f"\n✓ Token Usage Breakdown:", flush=True)
+                print(f"  - Total Input Tokens: {total_input_tokens:,} (includes cache: {total_cache_creation_tokens:,} creation + {total_cache_read_tokens:,} read)", flush=True)
+                print(f"  - Output Tokens: {total_output_tokens:,}", flush=True)
                 return AgentResult(
                     success=False,
                     error=f"Script execution failed after {max_attempts} attempts. Last errors: {errors[:3]}",
                     metadata={
                         "duration": duration,
                         "token_usage": {
-                            "input_tokens": true_input_tokens,
+                            "input_tokens": total_input_tokens,
                             "output_tokens": total_output_tokens,
-                            "total_tokens": true_input_tokens + total_output_tokens
+                            "total_tokens": total_input_tokens + total_output_tokens
                         },
                         "_token_info": {
-                            "input_tokens": true_input_tokens,
+                            "input_tokens": total_input_tokens,
                             "output_tokens": total_output_tokens,
                             "cache_creation_input_tokens": total_cache_creation_tokens,
                             "cache_read_input_tokens": total_cache_read_tokens,
@@ -291,8 +299,10 @@ class ChatVisAgent(BaseAgent):
                 if pvsm.exists():
                     print(f"    ✓ state file created: {pvsm.name}")
 
-                # Calculate true total input including cache tokens
-                true_input_tokens = total_input_tokens + total_cache_creation_tokens + total_cache_read_tokens
+                # total_input_tokens already includes cache tokens (no need to add again)
+                print(f"\n✓ Token Usage Breakdown:", flush=True)
+                print(f"  - Total Input Tokens: {total_input_tokens:,} (includes cache: {total_cache_creation_tokens:,} creation + {total_cache_read_tokens:,} read)", flush=True)
+                print(f"  - Output Tokens: {total_output_tokens:,}", flush=True)
 
                 return AgentResult(
                     success=True,
@@ -301,12 +311,12 @@ class ChatVisAgent(BaseAgent):
                     metadata={
                         "duration": duration,
                         "token_usage": {
-                            "input_tokens": true_input_tokens,
+                            "input_tokens": total_input_tokens,
                             "output_tokens": total_output_tokens,
-                            "total_tokens": true_input_tokens + total_output_tokens
+                            "total_tokens": total_input_tokens + total_output_tokens
                         },
                         "_token_info": {
-                            "input_tokens": true_input_tokens,
+                            "input_tokens": total_input_tokens,
                             "output_tokens": total_output_tokens,
                             "cache_creation_input_tokens": total_cache_creation_tokens,
                             "cache_read_input_tokens": total_cache_read_tokens,

@@ -171,7 +171,6 @@ class MultiProviderClient:
             'messages': anthropic_messages,
             'max_tokens': kwargs.get('max_tokens', 4096),
         }
-        
         if system_message:
             completion_kwargs['system'] = system_message
             
@@ -200,10 +199,19 @@ class MultiProviderClient:
         """Extract token usage from response based on provider."""
         if self.provider == 'openai':
             usage = response.usage
+            # Extract cached tokens if available (OpenAI prompt caching)
+            cached_tokens = 0
+            if hasattr(usage, 'prompt_tokens_details') and usage.prompt_tokens_details:
+                cached_tokens = getattr(usage.prompt_tokens_details, 'cached_tokens', 0) or 0
+
+            # Add cached tokens to input tokens for cost calculation
+            total_input_tokens = usage.prompt_tokens + cached_tokens
+
             return {
-                'input_tokens': usage.prompt_tokens,
+                'input_tokens': total_input_tokens,
                 'output_tokens': usage.completion_tokens,
-                'total_tokens': usage.total_tokens
+                'total_tokens': total_input_tokens + usage.completion_tokens,
+                'cached_tokens': cached_tokens
             }
         elif self.provider == 'anthropic':
             usage = response.usage
@@ -211,12 +219,15 @@ class MultiProviderClient:
             cache_creation_tokens = getattr(usage, 'cache_creation_input_tokens', 0) or 0
             cache_read_tokens = getattr(usage, 'cache_read_input_tokens', 0) or 0
 
+            # Add all cache tokens to input tokens for cost calculation
+            total_input_tokens = usage.input_tokens + cache_creation_tokens + cache_read_tokens
+
             return {
-                'input_tokens': usage.input_tokens,
+                'input_tokens': total_input_tokens,
                 'output_tokens': usage.output_tokens,
+                'total_tokens': total_input_tokens + usage.output_tokens,
                 'cache_creation_input_tokens': cache_creation_tokens,
-                'cache_read_input_tokens': cache_read_tokens,
-                'total_tokens': usage.input_tokens + usage.output_tokens + cache_creation_tokens + cache_read_tokens
+                'cache_read_input_tokens': cache_read_tokens
             }
         elif self.provider in ['hf', 'nebius', 'huggingface']:
             # HF might not always provide detailed usage
