@@ -400,10 +400,15 @@ class UnifiedTestRunner:
 
             agent_result: AgentResult = await self.agent.run_task(task_description, task_config)
 
-            # Get token usage from agent's _token_info if available (from API or comprehensive estimation)
+            # Get token usage from agent's _token_info or token_usage if available (from API or comprehensive estimation)
             # Otherwise fall back to simple counting
             if "_token_info" in agent_result.metadata:
                 token_info = agent_result.metadata["_token_info"]
+                input_tokens = token_info.get("input_tokens", 0)
+                output_tokens = token_info.get("output_tokens", 0)
+                token_source = token_info.get("source", "unknown")
+            elif "token_usage" in agent_result.metadata:
+                token_info = agent_result.metadata["token_usage"]
                 input_tokens = token_info.get("input_tokens", 0)
                 output_tokens = token_info.get("output_tokens", 0)
                 token_source = token_info.get("source", "unknown")
