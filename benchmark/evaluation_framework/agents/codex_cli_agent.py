@@ -425,14 +425,12 @@ IMPORTANT: Don't read folder not specificed in the instruction, and you can neve
 
                             elif event_type == "turn.completed":
                                 usage = event.get("usage", {})
-                                input_tokens = usage.get("input_tokens", 0)
-                                cached_input_tokens = usage.get("cached_input_tokens", 0)
+                                base_input = usage.get("input_tokens", 0)
+                                cached_input = usage.get("cached_input_tokens", 0)
+                                combined_input = base_input + cached_input
                                 output_tokens = usage.get("output_tokens", 0)
-                                total_tokens = input_tokens + cached_input_tokens + output_tokens
-                                result_line = f"\n{'='*60}\n✅ Turn completed - Input: {input_tokens} tokens"
-                                if cached_input_tokens > 0:
-                                    result_line += f" (+ {cached_input_tokens} cached)"
-                                result_line += f", Output: {output_tokens} tokens, Total: {total_tokens} tokens\n{'='*60}\n"
+                                total_tokens = combined_input + output_tokens
+                                result_line = f"\n{'='*60}\n✅ Turn completed - Input: {combined_input} tokens (includes cache), Output: {output_tokens} tokens, Total: {total_tokens} tokens\n{'='*60}\n"
                                 print(result_line.strip(), flush=True)
                                 parsed_output_lines.append(result_line)
 
@@ -547,6 +545,8 @@ IMPORTANT: Don't read folder not specificed in the instruction, and you can neve
         Codex CLI outputs token usage in JSON events like:
         {"type":"turn.completed","usage":{"input_tokens":6466,"cached_input_tokens":0,"output_tokens":57}}
 
+        Cache tokens are combined into input_tokens for simplified reporting.
+
         Args:
             output: Codex CLI stdout/stderr
 
@@ -555,7 +555,6 @@ IMPORTANT: Don't read folder not specificed in the instruction, and you can neve
         """
         token_info = {
             "input_tokens": 0,
-            "cached_input_tokens": 0,
             "output_tokens": 0,
             "total_tokens": 0,
             "source": "unknown"
@@ -567,13 +566,13 @@ IMPORTANT: Don't read folder not specificed in the instruction, and you can neve
                 event = json.loads(line.strip())
                 if event.get("type") == "turn.completed":
                     usage = event.get("usage", {})
-                    input_tokens = usage.get("input_tokens", 0)
-                    cached_input_tokens = usage.get("cached_input_tokens", 0)
+                    base_input = usage.get("input_tokens", 0)
+                    cached_input = usage.get("cached_input_tokens", 0)
+                    combined_input = base_input + cached_input
                     output_tokens = usage.get("output_tokens", 0)
 
                     # Accumulate tokens from all turns
-                    token_info["input_tokens"] += input_tokens
-                    token_info["cached_input_tokens"] += cached_input_tokens
+                    token_info["input_tokens"] += combined_input
                     token_info["output_tokens"] += output_tokens
                     token_info["source"] = "codex_output"
             except (json.JSONDecodeError, AttributeError):
@@ -582,7 +581,6 @@ IMPORTANT: Don't read folder not specificed in the instruction, and you can neve
         # Calculate total
         token_info["total_tokens"] = (
             token_info["input_tokens"] +
-            token_info["cached_input_tokens"] +
             token_info["output_tokens"]
         )
 

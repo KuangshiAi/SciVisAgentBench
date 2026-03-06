@@ -406,33 +406,24 @@ IMPORTANT: You should never check anything mark as GS (ground truth) for aidding
                                 duration_ms = event.get("duration_ms", 0)
                                 num_turns = event.get("num_turns", 0)
 
-                                # Extract token usage
+                                # Extract token usage and combine cache tokens
                                 usage = event.get("usage", {})
-                                input_tokens = usage.get("input_tokens", 0)
-                                output_tokens = usage.get("output_tokens", 0)
+                                base_input = usage.get("input_tokens", 0)
                                 cache_creation = usage.get("cache_creation_input_tokens", 0)
                                 cache_read = usage.get("cache_read_input_tokens", 0)
-                                total_tokens = input_tokens + output_tokens + cache_creation + cache_read
+                                combined_input = base_input + cache_creation + cache_read
+                                output_tokens = usage.get("output_tokens", 0)
+                                total_tokens = combined_input + output_tokens
                                 cost_usd = event.get("total_cost_usd", 0.0)
 
                                 result_line = f"\n{'='*60}\n✅ Completed: {subtype} in {duration_ms/1000:.2f}s ({num_turns} turns)\n"
-                                result_line += f"📊 Tokens: {input_tokens} input + {output_tokens} output"
-                                if cache_read > 0:
-                                    result_line += f" + {cache_read} cached"
-                                if cache_creation > 0:
-                                    result_line += f" + {cache_creation} cache creation"
-                                result_line += f" = {total_tokens} total\n"
+                                result_line += f"📊 Tokens: {combined_input} input (includes cache) + {output_tokens} output = {total_tokens} total\n"
                                 result_line += f"💰 Cost: ${cost_usd:.4f}\n"
                                 result_line += f"{'='*60}\n"
 
                                 print(f"\n{'='*60}", flush=True)
                                 print(f"✅ Completed: {subtype} in {duration_ms/1000:.2f}s ({num_turns} turns)", flush=True)
-                                print(f"📊 Tokens: {input_tokens} input + {output_tokens} output", end='', flush=True)
-                                if cache_read > 0:
-                                    print(f" + {cache_read} cached", end='', flush=True)
-                                if cache_creation > 0:
-                                    print(f" + {cache_creation} cache creation", end='', flush=True)
-                                print(f" = {total_tokens} total", flush=True)
+                                print(f"📊 Tokens: {combined_input} input (includes cache) + {output_tokens} output = {total_tokens} total", flush=True)
                                 print(f"💰 Cost: ${cost_usd:.4f}", flush=True)
                                 print(f"{'='*60}\n", flush=True)
                                 parsed_output_lines.append(result_line)
@@ -524,6 +515,8 @@ IMPORTANT: You should never check anything mark as GS (ground truth) for aidding
         Claude Code with --output-format=stream-json provides a final result event:
         {"type":"result","usage":{"input_tokens":X,"output_tokens":Y,...},"total_cost_usd":Z}
 
+        Cache tokens are combined into input_tokens for simplified reporting.
+
         Args:
             output: Claude Code stdout/stderr
 
@@ -533,8 +526,6 @@ IMPORTANT: You should never check anything mark as GS (ground truth) for aidding
         token_info = {
             "input_tokens": 0,
             "output_tokens": 0,
-            "cache_creation_input_tokens": 0,
-            "cache_read_input_tokens": 0,
             "total_tokens": 0,
             "cost_usd": 0.0,
             "source": "unknown"
@@ -547,17 +538,17 @@ IMPORTANT: You should never check anything mark as GS (ground truth) for aidding
                 if event.get("type") == "result":
                     usage = event.get("usage", {})
 
-                    # Extract token counts
-                    input_tokens = usage.get("input_tokens", 0)
-                    output_tokens = usage.get("output_tokens", 0)
+                    # Extract token counts and combine cache tokens into input
+                    base_input = usage.get("input_tokens", 0)
                     cache_creation = usage.get("cache_creation_input_tokens", 0)
                     cache_read = usage.get("cache_read_input_tokens", 0)
+                    combined_input = base_input + cache_creation + cache_read
 
-                    token_info["input_tokens"] = input_tokens
+                    output_tokens = usage.get("output_tokens", 0)
+
+                    token_info["input_tokens"] = combined_input
                     token_info["output_tokens"] = output_tokens
-                    token_info["cache_creation_input_tokens"] = cache_creation
-                    token_info["cache_read_input_tokens"] = cache_read
-                    token_info["total_tokens"] = input_tokens + output_tokens + cache_creation + cache_read
+                    token_info["total_tokens"] = combined_input + output_tokens
                     token_info["cost_usd"] = event.get("total_cost_usd", 0.0)
                     token_info["source"] = "claude_output"
 
@@ -567,38 +558,47 @@ IMPORTANT: You should never check anything mark as GS (ground truth) for aidding
                 continue
 
         # Fallback: Try regex patterns for non-JSON output
+        # Parse separate fields then combine cache tokens into input
+        temp_tokens = {
+            "base_input": 0,
+            "output": 0,
+            "cache_read": 0,
+            "cache_creation": 0,
+        }
+
         patterns = {
-            "input_tokens": r'input[_\s]tokens?[:\s=]+(\d+)',
-            "output_tokens": r'output[_\s]tokens?[:\s=]+(\d+)',
-            "cache_read_input_tokens": r'cache[_\s]read[_\s]input[_\s]tokens?[:\s=]+(\d+)',
-            "cache_creation_input_tokens": r'cache[_\s]creation[_\s]input[_\s]tokens?[:\s=]+(\d+)',
-            "total_tokens": r'total[_\s]tokens?[:\s=]+(\d+)',
+            "base_input": r'input[_\s]tokens?[:\s=]+(\d+)',
+            "output": r'output[_\s]tokens?[:\s=]+(\d+)',
+            "cache_read": r'cache[_\s]read[_\s]input[_\s]tokens?[:\s=]+(\d+)',
+            "cache_creation": r'cache[_\s]creation[_\s]input[_\s]tokens?[:\s=]+(\d+)',
         }
 
         for field, pattern in patterns.items():
             matches = re.findall(pattern, output, re.IGNORECASE)
             if matches:
                 # Prefer the last occurrence in case the output contains multiple summaries
-                token_info[field] = int(matches[-1])
+                temp_tokens[field] = int(matches[-1])
                 token_info["source"] = "claude_output_regex"
+
+        # Combine cache tokens into input
+        if token_info["source"] == "claude_output_regex":
+            token_info["input_tokens"] = (
+                temp_tokens["base_input"] +
+                temp_tokens["cache_creation"] +
+                temp_tokens["cache_read"]
+            )
+            token_info["output_tokens"] = temp_tokens["output"]
+            token_info["total_tokens"] = token_info["input_tokens"] + token_info["output_tokens"]
 
         # Optional: cost, if present in plaintext logs
         cost_matches = re.findall(r'total[_\s]cost[_\s]usd[:\s=]+([0-9]*\\.?[0-9]+)', output, re.IGNORECASE)
         if cost_matches:
             try:
                 token_info["cost_usd"] = float(cost_matches[-1])
-                token_info["source"] = "claude_output_regex"
+                if token_info["source"] == "unknown":
+                    token_info["source"] = "claude_output_regex"
             except ValueError:
                 pass
-
-        # Calculate total if not found
-        if token_info["total_tokens"] == 0 and token_info["source"] != "unknown":
-            token_info["total_tokens"] = (
-                token_info["input_tokens"] +
-                token_info["output_tokens"] +
-                token_info["cache_creation_input_tokens"] +
-                token_info["cache_read_input_tokens"]
-            )
 
         # If no tokens found, estimate based on output length
         if token_info["total_tokens"] == 0:
