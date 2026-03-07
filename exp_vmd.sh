@@ -24,7 +24,17 @@ python -m benchmark.evaluation_framework.run_evaluation \
     --yaml benchmark/eval_cases/molecular_vis/eval_analysis_workflows.yaml \
     --cases SciVisAgentBench-tasks/molecular_vis \
     --eval-model gpt-5.2 \
-    --experiment-number exp1
+    --experiment-number exp1 \
+    --exe-only
+
+python -m benchmark.evaluation_framework.run_evaluation \
+    --agent gmx_vmd_mcp \
+    --config benchmark/configs/gmx_vmd_mcp/config_anthropic.json \
+    --yaml benchmark/eval_cases/molecular_vis/eval_analysis_workflows.yaml \
+    --cases SciVisAgentBench-tasks/molecular_vis \
+    --eval-model gpt-5.2 \
+    --experiment-number exp1 \
+    --eval-only
 
 python -m benchmark.evaluation_reporter.run_reporter \
     --agent gmx_vmd_mcp_agent \

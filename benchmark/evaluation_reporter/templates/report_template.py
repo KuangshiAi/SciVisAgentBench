@@ -823,18 +823,14 @@ def generate_case_section(result: Dict[str, Any], yaml_data: Dict[str, Any], tok
         # Fallback to task_description from result JSON
         task_desc = result.get('task_description', 'No description available')
 
-    # Generate rubric scores section (pass result for failed cases)
-    rubric_html = generate_rubric_section(eval_data, result)
+    # Generate rubric scores section with images (pass result for failed cases and case_name for images)
+    rubric_html = generate_rubric_section(eval_data, result, case_name)
 
     # Generate text-based Q&A section if present
     text_html = generate_text_section(eval_data)
 
     # Generate metrics section (pass token_usage from test results)
     metrics_html = generate_metrics_section(eval_data, result, token_usage)
-
-    # Generate image comparison (only for vision cases)
-    has_vision = result.get('has_vision_evaluation', False)
-    images_html = generate_image_section(case_name, has_vision)
 
     # Add failed class if case is failed
     section_class = "case-section case-section-failed" if final_status == 'failed' else "case-section"
@@ -855,8 +851,6 @@ def generate_case_section(result: Dict[str, Any], yaml_data: Dict[str, Any], tok
                     <div class="task-description">{task_desc}</div>
                 </div>
 
-                {images_html}
-
                 {rubric_html}
 
                 {text_html}
@@ -867,12 +861,22 @@ def generate_case_section(result: Dict[str, Any], yaml_data: Dict[str, Any], tok
     """
 
 
-def generate_image_section(case_name: str, has_vision: bool = True) -> str:
-    """Generate image comparison section (only for vision cases)."""
+def generate_image_section(case_name: str, has_vision: bool = True, eval_data: Dict[str, Any] = None) -> str:
+    """Generate image comparison section (only for vision cases). Supports multiple image sets for multi-rubric cases."""
     if not has_vision:
         return ""  # Don't show image section for text-only cases
 
-    return f"""
+    # Check if we have multiple rubrics (multi-rubric case)
+    rubric_count = 1
+    if eval_data:
+        subtype_results = eval_data.get('subtype_results', {})
+        if 'vision' in subtype_results:
+            vision_data = subtype_results['vision']
+            rubric_count = vision_data.get('rubric_count', 1)
+
+    # If only one rubric, use the old format (single image pair)
+    if rubric_count == 1:
+        return f"""
         <div class="section-box">
             <h3>🖼️ Visualization Comparison</h3>
             <div class="image-comparison">
@@ -888,52 +892,102 @@ def generate_image_section(case_name: str, has_vision: bool = True) -> str:
         </div>
     """
 
+    # Multiple rubrics - show each image set separately
+    image_sections = []
+    for i in range(rubric_count):
+        image_sections.append(f"""
+        <div class="section-box">
+            <h3>🖼️ Visualization Comparison - Rubric {i + 1}</h3>
+            <div class="image-comparison">
+                <div class="image-box">
+                    <h4>Ground Truth</h4>
+                    <img src="images/{case_name}_gt_{i}.png" alt="Ground Truth {i + 1}" onerror="this.parentElement.innerHTML='<div class=\\'no-image\\'>Image not available</div>'">
+                </div>
+                <div class="image-box">
+                    <h4>Agent Result</h4>
+                    <img src="images/{case_name}_result_{i}.png" alt="Result {i + 1}" onerror="this.parentElement.innerHTML='<div class=\\'no-image\\'>Image not available</div>'">
+                </div>
+            </div>
+        </div>
+        """)
 
-def generate_rubric_section(eval_data: Dict[str, Any], result: Dict[str, Any] = None) -> str:
-    """Generate rubric evaluation scores section."""
-    subtype_results = eval_data.get('subtype_results', {})
-    has_vision_eval = result.get('has_vision_evaluation', False) if result else False
+    return '\n'.join(image_sections)
 
-    # Don't show vision rubrics for non-vision cases (text-only cases)
-    if not has_vision_eval:
-        return ""
 
-    # Check if we have evaluation data - only show vision rubrics for vision cases
-    if 'vision' in subtype_results:
-        vision_data = subtype_results['vision']
-        # Try to get rubric from individual_results first (new format), fallback to direct access (old format)
-        individual_results = vision_data.get('individual_results', [])
-        if individual_results and len(individual_results) > 0:
-            rubric = individual_results[0].get('rubric', '')
-            # Also get detailed scores from individual_results
-            individual_detailed_scores = individual_results[0].get('detailed_scores', {})
-            individual_viz_quality = individual_detailed_scores.get('visualization_quality', {})
-            llm_response = individual_viz_quality.get('llm_raw_response', {})
-            goals_count = individual_results[0].get('goals_count', 0)
+def generate_single_rubric_section(
+    individual_result: Dict[str, Any],
+    vision_data: Dict[str, Any],
+    result: Dict[str, Any],
+    rubric_index: int,
+    is_multi_rubric: bool,
+    case_name: str = None
+) -> str:
+    """Generate a single rubric section from individual_result data, including its image comparison."""
+    rubric = individual_result.get('rubric', '')
+    individual_detailed_scores = individual_result.get('detailed_scores', {})
+    individual_viz_quality = individual_detailed_scores.get('visualization_quality', {})
+    llm_response = individual_viz_quality.get('llm_raw_response', {})
+    goals_count = individual_result.get('goals_count', 0)
+    viz_score = individual_viz_quality.get('score', 0)
+    viz_quality_max = individual_viz_quality.get('max_score', goals_count * 10)
+
+    rubric_title = f"Vision Evaluation Rubrics - Set {rubric_index + 1}" if is_multi_rubric else "Vision Evaluation Rubrics"
+
+    # Generate rubric evaluation HTML
+    rubric_html = generate_single_rubric_html(
+        rubric=rubric,
+        llm_response=llm_response,
+        goals_count=goals_count,
+        viz_score=viz_score,
+        viz_quality_max=viz_quality_max,
+        result=result,
+        has_evaluation=True,
+        rubric_title=rubric_title
+    )
+
+    # Generate image comparison for this rubric
+    image_html = ""
+    if case_name:
+        if is_multi_rubric:
+            image_title = f"🖼️ Visualization Comparison - Set {rubric_index + 1}"
+            gt_image_path = f"images/{case_name}_gt_{rubric_index}.png"
+            result_image_path = f"images/{case_name}_result_{rubric_index}.png"
         else:
-            rubric = vision_data.get('rubric', '')
-            detailed_scores = vision_data.get('detailed_scores', {})
-            viz_quality = detailed_scores.get('visualization_quality', {})
-            llm_response = viz_quality.get('llm_raw_response', {})
-            goals_count = vision_data.get('goals_count', 0)
+            image_title = "🖼️ Visualization Comparison"
+            gt_image_path = f"images/{case_name}_gt.png"
+            result_image_path = f"images/{case_name}_result.png"
 
-        # Get scores from top-level (these are aggregated across all individual results)
-        detailed_scores = vision_data.get('detailed_scores', {})
-        viz_quality = detailed_scores.get('visualization_quality', {})
-        viz_quality_max = viz_quality.get('max_score', goals_count * 10)
-        viz_score = viz_quality.get('score', 0)
-        has_evaluation = True
-    else:
-        # Vision case that failed before evaluation - show rubric structure with error
-        if result is None:
-            return ""
-        rubric = result.get('llm_rubric', '')
-        if not rubric:
-            return ""
-        llm_response = {}
-        goals_count = 0
-        has_evaluation = False
+        image_html = f"""
+        <div class="section-box">
+            <h3>{image_title}</h3>
+            <div class="image-comparison">
+                <div class="image-box">
+                    <h4>Ground Truth</h4>
+                    <img src="{gt_image_path}" alt="Ground Truth {rubric_index + 1 if is_multi_rubric else ''}" onerror="this.parentElement.innerHTML='<div class=\\'no-image\\'>Image not available</div>'">
+                </div>
+                <div class="image-box">
+                    <h4>Agent Result</h4>
+                    <img src="{result_image_path}" alt="Result {rubric_index + 1 if is_multi_rubric else ''}" onerror="this.parentElement.innerHTML='<div class=\\'no-image\\'>Image not available</div>'">
+                </div>
+            </div>
+        </div>
+        """
 
+    # Return image first, then rubric evaluation
+    return image_html + '\n' + rubric_html
+
+
+def generate_single_rubric_html(
+    rubric: str,
+    llm_response: Dict[str, Any],
+    goals_count: int,
+    viz_score: int,
+    viz_quality_max: int,
+    result: Dict[str, Any],
+    has_evaluation: bool,
+    rubric_title: str = "Vision Evaluation Rubrics"
+) -> str:
+    """Generate HTML for a single rubric's evaluation."""
     # Parse the original rubric criteria
     rubric_criteria = []
     if rubric:
@@ -949,12 +1003,6 @@ def generate_rubric_section(eval_data: Dict[str, Any], result: Dict[str, Any] = 
         if len(rubric_criteria) <= 1:
             criteria_parts = re.split(r'(?:^|\s)\d+\.\s*', rubric)
             rubric_criteria = [c.strip() for c in criteria_parts if c.strip()]
-
-    # If no goals_count from evaluation, infer from rubric
-    if not has_evaluation:
-        goals_count = len(rubric_criteria) if rubric_criteria else len(re.findall(r'\n\s*\d+\.', rubric))
-        viz_quality_max = goals_count * 10
-        viz_score = 0
 
     # Extract individual goal scores
     rubric_items = []
@@ -981,11 +1029,7 @@ def generate_rubric_section(eval_data: Dict[str, Any], result: Dict[str, Any] = 
                     error_msg_display = error_msg
                 goal_explanation = f'<em style="color: #dc2626;">Test execution failed - no evaluation performed. Error: {error_msg_display}</em>'
             else:
-                eval_status = vision_data.get('status', 'unknown') if 'vision_data' in locals() else 'unknown'
-                if eval_status == 'failed':
-                    goal_explanation = '<em style="color: #dc2626;">Evaluation failed - no assessment available</em>'
-                else:
-                    goal_explanation = '<em style="color: #9ca3af;">Not evaluated</em>'
+                goal_explanation = '<em style="color: #9ca3af;">Not evaluated</em>'
 
         rubric_items.append(f"""
             <div class="rubric-item">
@@ -1013,14 +1057,9 @@ def generate_rubric_section(eval_data: Dict[str, Any], result: Dict[str, Any] = 
                 error_msg = 'Unknown error'
             overall_explanation = f'<em style="color: #dc2626;">Test execution failed - no evaluation was performed.<br><br><strong>Error:</strong> {error_msg}</em>'
         else:
-            eval_status = vision_data.get('status', 'unknown') if 'vision_data' in locals() else 'unknown'
-            if eval_status == 'failed':
-                overall_explanation = '<em style="color: #dc2626;">Evaluation failed - no overall assessment available</em>'
-            else:
-                overall_explanation = '<em style="color: #9ca3af;">No overall explanation available</em>'
+            overall_explanation = '<em style="color: #9ca3af;">No overall explanation available</em>'
 
     # Show total score breakdown
-    # viz_score is already set above (line 851 for successful cases, line 877 for failed cases)
     score_summary = f"""
         <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
             <h4 style="color: #667eea; margin-bottom: 10px;">Score Summary</h4>
@@ -1043,7 +1082,7 @@ def generate_rubric_section(eval_data: Dict[str, Any], result: Dict[str, Any] = 
 
     return f"""
         <div class="section-box">
-            <h3 class="expandable">📏 Vision Evaluation Rubrics</h3>
+            <h3 class="expandable">📏 {rubric_title}</h3>
             <div class="expandable-content">
                 {score_summary}
                 <div class="rubric-scores" style="margin-top: 15px;">
@@ -1056,6 +1095,142 @@ def generate_rubric_section(eval_data: Dict[str, Any], result: Dict[str, Any] = 
             </div>
         </div>
     """
+
+
+def generate_rubric_section(eval_data: Dict[str, Any], result: Dict[str, Any] = None, case_name: str = None) -> str:
+    """Generate rubric evaluation scores section with images. Supports multiple rubrics."""
+    subtype_results = eval_data.get('subtype_results', {})
+    has_vision_eval = result.get('has_vision_evaluation', False) if result else False
+
+    # Don't show vision rubrics for non-vision cases (text-only cases)
+    if not has_vision_eval:
+        return ""
+
+    # Check if we have evaluation data - only show vision rubrics for vision cases
+    if 'vision' in subtype_results:
+        vision_data = subtype_results['vision']
+        individual_results = vision_data.get('individual_results', [])
+        rubric_count = vision_data.get('rubric_count', 1)
+
+        # Check if we have multiple rubrics
+        if rubric_count > 1 and individual_results and len(individual_results) > 1:
+            # Multi-rubric case - generate a section for each rubric with its image
+            rubric_sections = []
+            for idx, individual_result in enumerate(individual_results):
+                rubric_section_html = generate_single_rubric_section(
+                    individual_result=individual_result,
+                    vision_data=vision_data,
+                    result=result,
+                    rubric_index=idx,
+                    is_multi_rubric=True,
+                    case_name=case_name
+                )
+                rubric_sections.append(rubric_section_html)
+            return '\n'.join(rubric_sections)
+
+        # Single rubric case - use the first individual_result (or old format)
+        if individual_results and len(individual_results) > 0:
+            return generate_single_rubric_section(
+                individual_result=individual_results[0],
+                vision_data=vision_data,
+                result=result,
+                rubric_index=0,
+                is_multi_rubric=False,
+                case_name=case_name
+            )
+        else:
+            # Old format fallback - need to add image section manually
+            rubric = vision_data.get('rubric', '')
+            detailed_scores = vision_data.get('detailed_scores', {})
+            viz_quality = detailed_scores.get('visualization_quality', {})
+            llm_response = viz_quality.get('llm_raw_response', {})
+            goals_count = vision_data.get('goals_count', 0)
+            viz_quality_max = viz_quality.get('max_score', goals_count * 10)
+            viz_score = viz_quality.get('score', 0)
+
+            rubric_html = generate_single_rubric_html(
+                rubric=rubric,
+                llm_response=llm_response,
+                goals_count=goals_count,
+                viz_score=viz_score,
+                viz_quality_max=viz_quality_max,
+                result=result,
+                has_evaluation=True,
+                rubric_title="Vision Evaluation Rubrics"
+            )
+
+            # Add image section for old format
+            image_html = ""
+            if case_name:
+                image_html = f"""
+        <div class="section-box">
+            <h3>🖼️ Visualization Comparison</h3>
+            <div class="image-comparison">
+                <div class="image-box">
+                    <h4>Ground Truth</h4>
+                    <img src="images/{case_name}_gt.png" alt="Ground Truth" onerror="this.parentElement.innerHTML='<div class=\\'no-image\\'>Image not available</div>'">
+                </div>
+                <div class="image-box">
+                    <h4>Agent Result</h4>
+                    <img src="images/{case_name}_result.png" alt="Result" onerror="this.parentElement.innerHTML='<div class=\\'no-image\\'>Image not available</div>'">
+                </div>
+            </div>
+        </div>
+        """
+
+            return image_html + '\n' + rubric_html
+    else:
+        # Vision case that failed before evaluation - show rubric structure with error
+        if result is None:
+            return ""
+        rubric = result.get('llm_rubric', '')
+        if not rubric:
+            return ""
+
+        # Infer goals_count from rubric
+        import re
+        rubric_criteria = []
+        criteria_parts = re.split(r'(?:^|\s)\d+\)\s*', rubric)
+        rubric_criteria = [c.strip() for c in criteria_parts if c.strip()]
+        if len(rubric_criteria) <= 1:
+            criteria_parts = re.split(r'(?:^|\s)\d+\.\s*', rubric)
+            rubric_criteria = [c.strip() for c in criteria_parts if c.strip()]
+
+        goals_count = len(rubric_criteria) if rubric_criteria else len(re.findall(r'\n\s*\d+\.', rubric))
+        viz_quality_max = goals_count * 10
+        viz_score = 0
+
+        rubric_html = generate_single_rubric_html(
+            rubric=rubric,
+            llm_response={},
+            goals_count=goals_count,
+            viz_score=viz_score,
+            viz_quality_max=viz_quality_max,
+            result=result,
+            has_evaluation=False,
+            rubric_title="Vision Evaluation Rubrics"
+        )
+
+        # Add image section for failed case
+        image_html = ""
+        if case_name:
+            image_html = f"""
+        <div class="section-box">
+            <h3>🖼️ Visualization Comparison</h3>
+            <div class="image-comparison">
+                <div class="image-box">
+                    <h4>Ground Truth</h4>
+                    <img src="images/{case_name}_gt.png" alt="Ground Truth" onerror="this.parentElement.innerHTML='<div class=\\'no-image\\'>Image not available</div>'">
+                </div>
+                <div class="image-box">
+                    <h4>Agent Result</h4>
+                    <img src="images/{case_name}_result.png" alt="Result" onerror="this.parentElement.innerHTML='<div class=\\'no-image\\'>Image not available</div>'">
+                </div>
+            </div>
+        </div>
+        """
+
+        return image_html + '\n' + rubric_html
 
 
 def generate_text_section(eval_data: Dict[str, Any]) -> str:

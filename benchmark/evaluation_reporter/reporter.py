@@ -343,49 +343,142 @@ class EvaluationReporter:
             else:
                 agent_mode = self._detect_agent_mode(result)
 
-            # Try to find and copy result images
-            result_img_found = False
+            # Check for multi-rubric case
+            eval_data = result.get('evaluation', {})
+            subtype_results = eval_data.get('subtype_results', {})
+            vision_data = subtype_results.get('vision', {})
+            rubric_count = vision_data.get('rubric_count', 1)
 
-            # Pattern 1: results/{agent_mode}/{case_name}.png (use agent_mode first)
-            result_img = case_dir / "results" / agent_mode / f"{case_name}.png"
-            if result_img.exists():
-                shutil.copy(result_img, images_dir / f"{case_name}_result.png")
-                result_img_found = True
+            # Get image file paths from YAML if available
+            yaml_image_paths = self._get_yaml_image_paths(case_name, yaml_cases, agent_mode)
 
-            # Pattern 2: Fallback to other modes if agent_mode not specified
-            if not result_img_found and not self.agent_mode:
-                for mode in ['pvpython', 'mcp', 'generic']:
-                    result_img = case_dir / "results" / mode / f"{case_name}.png"
+            # Copy images for each rubric
+            all_result_imgs_found = True
+            all_gt_imgs_found = True
+
+            for rubric_idx in range(rubric_count):
+                # Determine file naming for destination
+                if rubric_count == 1:
+                    result_filename = f"{case_name}_result.png"
+                    gt_filename = f"{case_name}_gt.png"
+                else:
+                    result_filename = f"{case_name}_result_{rubric_idx}.png"
+                    gt_filename = f"{case_name}_gt_{rubric_idx}.png"
+
+                # Try to find and copy result images
+                result_img_found = False
+
+                # If YAML specifies rs_file for this rubric, use that path
+                if rubric_idx < len(yaml_image_paths) and yaml_image_paths[rubric_idx].get('rs_file'):
+                    result_img = self.cases_dir / yaml_image_paths[rubric_idx]['rs_file']
                     if result_img.exists():
-                        shutil.copy(result_img, images_dir / f"{case_name}_result.png")
+                        shutil.copy(result_img, images_dir / result_filename)
                         result_img_found = True
-                        break
 
-            # Pattern 3: evaluation_results/{agent_mode}/screenshots/result_*.png
-            if not result_img_found:
-                modes_to_try = [agent_mode] if self.agent_mode else [agent_mode, 'pvpython', 'mcp', 'generic']
-                for mode in modes_to_try:
-                    eval_results_dir = case_dir / "evaluation_results" / mode / "screenshots"
-                    if eval_results_dir.exists():
-                        # Look for any result_*.png files
-                        result_imgs = list(eval_results_dir.glob("result_*.png"))
-                        if result_imgs:
-                            # Use the first one found, or prefer diagonal view
-                            img_to_copy = result_imgs[0]
-                            for img in result_imgs:
-                                if 'diagonal' in img.name:
-                                    img_to_copy = img
-                                    break
-                            shutil.copy(img_to_copy, images_dir / f"{case_name}_result.png")
-                            result_img_found = True
-                            break
+                # Otherwise use default naming patterns
+                if not result_img_found:
+                    # Default source naming: single rubric uses {case_name}, multi-rubric uses {case_name}_{idx}
+                    if rubric_count == 1:
+                        result_source_name = f"{case_name}.png"
+                    else:
+                        result_source_name = f"{case_name}_{rubric_idx}.png"
 
-            # Mark case as failure if result image not found (only for vision cases)
-            if not result_img_found:
+                    # Pattern 1: results/{agent_mode}/{result_source_name}
+                    result_img = case_dir / "results" / agent_mode / result_source_name
+                    if result_img.exists():
+                        shutil.copy(result_img, images_dir / result_filename)
+                        result_img_found = True
+
+                    # Pattern 2: Fallback to other modes if agent_mode not specified
+                    if not result_img_found and not self.agent_mode:
+                        for mode in ['pvpython', 'mcp', 'generic']:
+                            result_img = case_dir / "results" / mode / result_source_name
+                            if result_img.exists():
+                                shutil.copy(result_img, images_dir / result_filename)
+                                result_img_found = True
+                                break
+
+                    # Pattern 3: evaluation_results/{agent_mode}/screenshots/result_*.png
+                    if not result_img_found:
+                        modes_to_try = [agent_mode] if self.agent_mode else [agent_mode, 'pvpython', 'mcp', 'generic']
+                        for mode in modes_to_try:
+                            eval_results_dir = case_dir / "evaluation_results" / mode / "screenshots"
+                            if eval_results_dir.exists():
+                                # Look for indexed result files first if multi-rubric
+                                if rubric_count > 1:
+                                    indexed_result = eval_results_dir / f"result_{rubric_idx}.png"
+                                    if indexed_result.exists():
+                                        shutil.copy(indexed_result, images_dir / result_filename)
+                                        result_img_found = True
+                                        break
+
+                                # Fall back to any result_*.png files for single rubric
+                                if not result_img_found and rubric_count == 1:
+                                    result_imgs = list(eval_results_dir.glob("result_*.png"))
+                                    if result_imgs:
+                                        # Use the first one found, or prefer diagonal view
+                                        img_to_copy = result_imgs[0]
+                                        for img in result_imgs:
+                                            if 'diagonal' in img.name:
+                                                img_to_copy = img
+                                                break
+                                        shutil.copy(img_to_copy, images_dir / result_filename)
+                                        result_img_found = True
+                                        break
+
+                if not result_img_found:
+                    all_result_imgs_found = False
+                    print(f"   [WARNING]  Result image not found for {case_name} rubric {rubric_idx}")
+
+                # Try to find and copy ground truth images
+                gt_img_found = False
+
+                # If YAML specifies gs_file for this rubric, use that path
+                if rubric_idx < len(yaml_image_paths) and yaml_image_paths[rubric_idx].get('gs_file'):
+                    gt_img = self.cases_dir / yaml_image_paths[rubric_idx]['gs_file']
+                    if gt_img.exists():
+                        shutil.copy(gt_img, images_dir / gt_filename)
+                        gt_img_found = True
+
+                # Otherwise use default naming patterns
+                if not gt_img_found:
+                    # Default source naming
+                    if rubric_count == 1:
+                        gt_source_name = f"{case_name}_gs.png"
+                    else:
+                        gt_source_name = f"{case_name}_gs_{rubric_idx}.png"
+
+                    # Pattern 1: GS/{gt_source_name}
+                    gt_img = case_dir / "GS" / gt_source_name
+                    if gt_img.exists():
+                        shutil.copy(gt_img, images_dir / gt_filename)
+                        gt_img_found = True
+
+                    # Pattern 2: GS/gs_*.png (try diagonal view first) - only for single rubric
+                    if not gt_img_found and rubric_count == 1:
+                        gs_dir = case_dir / "GS"
+                        if gs_dir.exists():
+                            gs_imgs = list(gs_dir.glob("gs_*.png"))
+                            if gs_imgs:
+                                # Prefer diagonal view
+                                img_to_copy = gs_imgs[0]
+                                for img in gs_imgs:
+                                    if 'diagonal' in img.name:
+                                        img_to_copy = img
+                                        break
+                                shutil.copy(img_to_copy, images_dir / gt_filename)
+                                gt_img_found = True
+
+                if not gt_img_found:
+                    all_gt_imgs_found = False
+                    print(f"   [WARNING]  Ground truth image not found for {case_name} rubric {rubric_idx}")
+
+            # Mark case as failure if result images not found (only for vision cases)
+            if not all_result_imgs_found:
                 print(f"   [WARNING]  Result image not found for {case_name}, marking as failure")
                 result['image_missing'] = True
 
-                # Always mark as failed (remove the status == 'completed' check)
+                # Always mark as failed
                 result['status'] = 'failed'
                 if not result.get('error'):
                     result['error'] = f'Result image not found at: results/{agent_mode}/{case_name}.png'
@@ -417,29 +510,33 @@ class EvaluationReporter:
                             if 'token_usage' in efficiency:
                                 efficiency['token_usage']['score'] = 0
 
-            # Try to find and copy ground truth images
-            gt_img_found = False
+    def _get_yaml_image_paths(self, case_name: str, yaml_cases: Dict[str, Dict[str, Any]], agent_mode: str) -> List[Dict[str, str]]:
+        """Extract gs_file and rs_file paths from YAML assertions for a case."""
+        image_paths = []
 
-            # Pattern 1: GS/{case_name}_gs.png
-            gt_img = case_dir / "GS" / f"{case_name}_gs.png"
-            if gt_img.exists():
-                shutil.copy(gt_img, images_dir / f"{case_name}_gt.png")
-                gt_img_found = True
+        if case_name not in yaml_cases:
+            return image_paths
 
-            # Pattern 2: GS/gs_*.png (try diagonal view first)
-            if not gt_img_found:
-                gs_dir = case_dir / "GS"
-                if gs_dir.exists():
-                    gs_imgs = list(gs_dir.glob("gs_*.png"))
-                    if gs_imgs:
-                        # Prefer diagonal view
-                        img_to_copy = gs_imgs[0]
-                        for img in gs_imgs:
-                            if 'diagonal' in img.name:
-                                img_to_copy = img
-                                break
-                        shutil.copy(img_to_copy, images_dir / f"{case_name}_gt.png")
-                        gt_img_found = True
+        case_def = yaml_cases[case_name]
+        assertions = case_def.get('assert', [])
+
+        for assertion in assertions:
+            if assertion.get('type') == 'llm-rubric' and assertion.get('subtype') == 'vision':
+                gs_file = assertion.get('gs_file', '')
+                rs_file = assertion.get('rs_file', '')
+
+                # Replace {agent_mode} placeholder in paths
+                if gs_file:
+                    gs_file = gs_file.replace('{agent_mode}', agent_mode)
+                if rs_file:
+                    rs_file = rs_file.replace('{agent_mode}', agent_mode)
+
+                image_paths.append({
+                    'gs_file': gs_file,
+                    'rs_file': rs_file
+                })
+
+        return image_paths
 
     def _detect_agent_mode(self, result: Dict[str, Any]) -> str:
         """Detect the agent mode from result data."""
