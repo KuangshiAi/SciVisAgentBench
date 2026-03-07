@@ -901,11 +901,25 @@ def generate_rubric_section(eval_data: Dict[str, Any], result: Dict[str, Any] = 
     # Check if we have evaluation data - only show vision rubrics for vision cases
     if 'vision' in subtype_results:
         vision_data = subtype_results['vision']
-        rubric = vision_data.get('rubric', '')
+        # Try to get rubric from individual_results first (new format), fallback to direct access (old format)
+        individual_results = vision_data.get('individual_results', [])
+        if individual_results and len(individual_results) > 0:
+            rubric = individual_results[0].get('rubric', '')
+            # Also get detailed scores from individual_results
+            individual_detailed_scores = individual_results[0].get('detailed_scores', {})
+            individual_viz_quality = individual_detailed_scores.get('visualization_quality', {})
+            llm_response = individual_viz_quality.get('llm_raw_response', {})
+            goals_count = individual_results[0].get('goals_count', 0)
+        else:
+            rubric = vision_data.get('rubric', '')
+            detailed_scores = vision_data.get('detailed_scores', {})
+            viz_quality = detailed_scores.get('visualization_quality', {})
+            llm_response = viz_quality.get('llm_raw_response', {})
+            goals_count = vision_data.get('goals_count', 0)
+
+        # Get scores from top-level (these are aggregated across all individual results)
         detailed_scores = vision_data.get('detailed_scores', {})
         viz_quality = detailed_scores.get('visualization_quality', {})
-        llm_response = viz_quality.get('llm_raw_response', {})
-        goals_count = vision_data.get('goals_count', 0)
         viz_quality_max = viz_quality.get('max_score', goals_count * 10)
         viz_score = viz_quality.get('score', 0)
         has_evaluation = True
@@ -1052,10 +1066,18 @@ def generate_text_section(eval_data: Dict[str, Any]) -> str:
         return ""
 
     text_data = subtype_results['text']
-    rubric = text_data.get('rubric', '')
-    answers_content = text_data.get('answers_content', '')
+    # Try to get rubric and answers from individual_results first (new format), fallback to direct access (old format)
+    individual_results = text_data.get('individual_results', [])
+    if individual_results and len(individual_results) > 0:
+        rubric = individual_results[0].get('rubric', '')
+        answers_content = individual_results[0].get('answers_content', '')
+        explanation = individual_results[0].get('explanation', '')
+    else:
+        rubric = text_data.get('rubric', '')
+        answers_content = text_data.get('answers_content', '')
+        explanation = text_data.get('explanation', '')
+
     scores = text_data.get('scores', {})
-    explanation = text_data.get('explanation', '')
 
     total_score = scores.get('total_score', 0)
     max_score = scores.get('max_possible_score', 0)

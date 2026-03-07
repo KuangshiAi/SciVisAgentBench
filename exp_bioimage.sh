@@ -4,7 +4,8 @@ python -m benchmark.evaluation_framework.run_evaluation \
     --yaml benchmark/eval_cases/napari/eval_visualization_tasks.yaml \
     --cases SciVisAgentBench-tasks/bioimage_data \
     --eval-model gpt-5.2 \
-    --experiment-number exp1
+    --experiment-number exp1 \
+    --eval-only
 
 python -m benchmark.evaluation_reporter.run_reporter \
     --agent napari_mcp \
