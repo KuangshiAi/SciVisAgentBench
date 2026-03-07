@@ -5,6 +5,7 @@ python -m benchmark.evaluation_framework.run_evaluation \
     --cases SciVisAgentBench-tasks/bioimage_data \
     --eval-model gpt-5.2 \
     --experiment-number exp1 \
+    --start-from case_11 \
     --eval-only
 
 python -m benchmark.evaluation_reporter.run_reporter \

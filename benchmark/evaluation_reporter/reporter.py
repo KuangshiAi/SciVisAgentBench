@@ -370,7 +370,12 @@ class EvaluationReporter:
 
                 # If YAML specifies rs_file for this rubric, use that path
                 if rubric_idx < len(yaml_image_paths) and yaml_image_paths[rubric_idx].get('rs_file'):
-                    result_img = self.cases_dir / yaml_image_paths[rubric_idx]['rs_file']
+                    rs_file_path = yaml_image_paths[rubric_idx]['rs_file']
+                    # Try relative to cases_dir first
+                    result_img = self.cases_dir / rs_file_path
+                    if not result_img.exists():
+                        # Try relative to parent directory (for bioimage data structure)
+                        result_img = self.cases_dir.parent / rs_file_path
                     if result_img.exists():
                         shutil.copy(result_img, images_dir / result_filename)
                         result_img_found = True
@@ -435,7 +440,12 @@ class EvaluationReporter:
 
                 # If YAML specifies gs_file for this rubric, use that path
                 if rubric_idx < len(yaml_image_paths) and yaml_image_paths[rubric_idx].get('gs_file'):
-                    gt_img = self.cases_dir / yaml_image_paths[rubric_idx]['gs_file']
+                    gs_file_path = yaml_image_paths[rubric_idx]['gs_file']
+                    # Try relative to cases_dir first
+                    gt_img = self.cases_dir / gs_file_path
+                    if not gt_img.exists():
+                        # Try relative to parent directory (for bioimage data structure)
+                        gt_img = self.cases_dir.parent / gs_file_path
                     if gt_img.exists():
                         shutil.copy(gt_img, images_dir / gt_filename)
                         gt_img_found = True
@@ -522,8 +532,9 @@ class EvaluationReporter:
 
         for assertion in assertions:
             if assertion.get('type') == 'llm-rubric' and assertion.get('subtype') == 'vision':
-                gs_file = assertion.get('gs_file', '')
-                rs_file = assertion.get('rs_file', '')
+                # Check both underscore and hyphen variants (gs_file, gs-file)
+                gs_file = assertion.get('gs_file', '') or assertion.get('gs-file', '')
+                rs_file = assertion.get('rs_file', '') or assertion.get('rs-file', '')
 
                 # Replace {agent_mode} placeholder in paths
                 if gs_file:
