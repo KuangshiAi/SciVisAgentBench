@@ -87,4 +87,6 @@ src/session
 SciVisAgentBench-tasks_beforeFeb24/
 
 exp*.sh
+!exp_bioimage.sh
+!exp_vmd.sh
 exp*.ps1
