@@ -92,3 +92,5 @@ exp*.sh
 exp*.ps1
 
 eval_reports/
+
+src/gmx_vmd_mcp/.mcp
