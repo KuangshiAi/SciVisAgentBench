@@ -710,6 +710,41 @@ class EvaluationReporter:
                     if 'token_usage' in efficiency:
                         efficiency['token_usage']['score'] = 0
 
+    def normalize_rule_based_results(self, results: List[Dict[str, Any]]):
+        """Normalize rule_based evaluation data into the standard scores/subtype_results format."""
+        for result in results:
+            eval_data = result.get('evaluation', {})
+            if eval_data.get('eval_type') != 'rule_based':
+                continue
+
+            rule_score = eval_data.get('score', 0) or 0
+            rule_max = eval_data.get('max_score', 0) or 0
+            llm_eval = eval_data.get('llm_evaluation', {})
+            llm_scores = llm_eval.get('scores', {})
+            llm_total = llm_scores.get('total_score', 0) or 0
+            llm_max = llm_scores.get('max_possible_score', 0) or 0
+
+            combined_total = rule_score + llm_total
+            combined_max = rule_max + llm_max
+            combined_pct = (combined_total / combined_max * 100) if combined_max > 0 else 0
+
+            eval_data['scores'] = {
+                'total_score': combined_total,
+                'max_possible_score': combined_max,
+                'percentage': combined_pct,
+            }
+
+            # Build subtype_results: rule_based entry + any LLM subtypes
+            subtype_results = {}
+            subtype_results['rule_based'] = {
+                'score': rule_score,
+                'max_score': rule_max,
+                'assertion_results': eval_data.get('assertion_results', []),
+            }
+            llm_subtypes = llm_eval.get('subtype_results', {})
+            subtype_results.update(llm_subtypes)
+            eval_data['subtype_results'] = subtype_results
+
     def mark_zero_text_score_as_failure(self, results: List[Dict[str, Any]]):
         """Mark text-only cases with zero score as failures."""
         for result in results:
@@ -718,6 +753,10 @@ class EvaluationReporter:
 
             # Skip if already failed (check both top-level and evaluation status)
             if result.get('status') == 'failed' or eval_data.get('status') == 'failed':
+                continue
+
+            # Skip rule_based cases — their score combines rule-based + LLM components
+            if eval_data.get('eval_type') == 'rule_based':
                 continue
 
             # Check if this case has text evaluation but NOT vision evaluation
@@ -756,12 +795,42 @@ class EvaluationReporter:
                     result['evaluation']['scores']['total_score'] = 0
                     result['evaluation']['scores']['percentage'] = 0.0
 
+    def mark_zero_total_score_as_failure(self, results: List[Dict[str, Any]]):
+        """Mark any case whose total score is 0 as a failure."""
+        for result in results:
+            case_name = result.get('case_name', 'unknown')
+            eval_data = result.get('evaluation', {})
+
+            # Skip if already failed
+            if result.get('status') == 'failed' or eval_data.get('status') == 'failed':
+                continue
+
+            scores = eval_data.get('scores', {})
+            if not scores:
+                continue
+
+            total_score = scores.get('total_score', 0)
+            if total_score == 0:
+                print(f"   [WARNING]  {case_name}: total score is 0, marking as failure")
+                result['zero_total_score'] = True
+                result['status'] = 'failed'
+                eval_data['status'] = 'failed'
+                error_msg = "Total evaluation score is 0"
+                if not result.get('error'):
+                    result['error'] = error_msg
+                else:
+                    result['error'] = f"{result['error']}; {error_msg}"
+                scores['percentage'] = 0.0
+
     def generate_report(self) -> Path:
         """Generate the HTML report."""
         # Load all data
         print("   Loading test results...")
         results = self.load_test_results()
         print(f"   Loaded {len(results)} test cases")
+
+        print("   Normalizing rule_based evaluation results...")
+        self.normalize_rule_based_results(results)
 
         print("   Loading YAML definitions...")
         yaml_cases = self.load_yaml_cases()
@@ -785,6 +854,9 @@ class EvaluationReporter:
 
         print("   Checking for text-only cases with zero score...")
         self.mark_zero_text_score_as_failure(results)
+
+        print("   Checking for cases with zero total score...")
+        self.mark_zero_total_score_as_failure(results)
 
         # Recompute summary statistics after marking failures
         print("   Recomputing summary statistics with updated scores...")

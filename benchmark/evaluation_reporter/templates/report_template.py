@@ -826,6 +826,9 @@ def generate_case_section(result: Dict[str, Any], yaml_data: Dict[str, Any], tok
     # Generate rubric scores section with images (pass result for failed cases and case_name for images)
     rubric_html = generate_rubric_section(eval_data, result, case_name)
 
+    # Generate rule-based assertion section if present
+    rule_based_html = generate_rule_based_section(eval_data)
+
     # Generate text-based Q&A section if present
     text_html = generate_text_section(eval_data)
 
@@ -852,6 +855,8 @@ def generate_case_section(result: Dict[str, Any], yaml_data: Dict[str, Any], tok
                 </div>
 
                 {rubric_html}
+
+                {rule_based_html}
 
                 {text_html}
 
@@ -1289,12 +1294,72 @@ def generate_text_section(eval_data: Dict[str, Any]) -> str:
     """
 
 
+def generate_rule_based_section(eval_data: Dict[str, Any]) -> str:
+    """Generate rule-based assertion results section for topology-style cases."""
+    subtype_results = eval_data.get('subtype_results', {})
+    if 'rule_based' not in subtype_results:
+        return ""
+
+    rb_data = subtype_results['rule_based']
+    rb_score = rb_data.get('score', 0)
+    rb_max = rb_data.get('max_score', 0)
+    rb_pct = (rb_score / rb_max * 100) if rb_max > 0 else 0
+    assertion_results = rb_data.get('assertion_results', [])
+
+    assertions_html = ""
+    for i, ar in enumerate(assertion_results):
+        a_score = ar.get('score', 0)
+        a_max = ar.get('max_score', 0)
+        a_pct = (a_score / a_max * 100) if a_max > 0 else 0
+        a_status = ar.get('status', '')
+        a_error = ar.get('error') or ''
+        eval_fn = ar.get('eval_function', f'assertion_{i}')
+        color = '#22c55e' if a_pct >= 80 else ('#f59e0b' if a_pct >= 40 else '#dc2626')
+        error_html = f'<div style="color:#dc2626; margin-top:8px; font-size:0.9em;">{a_error}</div>' if a_error else ''
+        assertions_html += f"""
+            <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid {color}; margin-bottom: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: 600; color: #333;">{eval_fn}</span>
+                    <span style="font-size: 1.2em; font-weight: 700; color: {color};">{a_score}/{a_max} ({a_pct:.1f}%)</span>
+                </div>
+                {error_html}
+            </div>
+        """
+
+    return f"""
+        <div class="section-box">
+            <h3 class="expandable">🔬 Rule-Based Evaluation</h3>
+            <div class="expandable-content">
+                <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <h4 style="color: #667eea; margin-bottom: 10px;">Score</h4>
+                    <div style="font-size: 2em; font-weight: 700; color: #667eea;">{rb_score}/{rb_max} ({rb_pct:.1f}%)</div>
+                </div>
+                {assertions_html}
+            </div>
+        </div>
+    """
+
+
 def generate_metrics_section(eval_data: Dict[str, Any], result: Dict[str, Any], token_usage: Dict[str, Any]) -> str:
     """Generate detailed metrics section."""
     subtype_results = eval_data.get('subtype_results', {})
     has_vision = result.get('has_vision_evaluation', False)
 
     metrics = []
+
+    # Rule-based score metric
+    if 'rule_based' in subtype_results:
+        rb_data = subtype_results['rule_based']
+        rb_score = rb_data.get('score', 0)
+        rb_max = rb_data.get('max_score', 0)
+        rb_pct = (rb_score / rb_max * 100) if rb_max > 0 else 0
+        metrics.append(f"""
+            <div class="metric-box">
+                <div class="metric-label">Rule-Based Score</div>
+                <div class="metric-value">{rb_score}/{rb_max}</div>
+                <div class="metric-subvalue">{rb_pct:.1f}%</div>
+            </div>
+        """)
 
     # Vision metrics - only show if case has vision evaluation in YAML
     if 'vision' in subtype_results and has_vision:
