@@ -1,0 +1,39 @@
+name: viz-agent
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  # core scientific
+  - numpy
+  - scipy
+  - pandas
+  - scikit-image
+  - scikit-learn
+  # plotting
+  - matplotlib
+  - seaborn
+  - plotly
+  - bokeh
+  - holoviews
+  - hvplot
+  - panel
+  # 3D / volume / mesh visualization
+  - vtk
+  - pyvista
+  - mayavi
+  - topologytoolkit
+  - imageio
+  - imageio-ffmpeg
+  # napari ecosystem
+  - napari
+  - magicgui
+  - napari-plugin-engine
+  # notebooks
+  - jupyterlab
+  - ipykernel
+  - ipywidgets
+  # helper tools
+  - click
+  - rich
