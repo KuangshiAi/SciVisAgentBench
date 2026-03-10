@@ -502,11 +502,7 @@ class UnifiedTestRunner:
 
     async def save_centralized_result(self, test_case: YAMLTestCase, result: Dict):
         """Save test result to centralized output directory."""
-        # For napari_mcp agent, add yaml filename subdirectory
-        if self.agent.agent_name == "napari_mcp" or self.agent.agent_name == "gmx_vmd_mcp":
-            output_dir = self.output_dir / self.yaml_filename
-        else:
-            output_dir = self.output_dir
+        output_dir = self.output_dir
 
         output_dir.mkdir(parents=True, exist_ok=True)
         centralized_file = output_dir / f"{test_case.case_name}_result_{int(time.time())}.json"

@@ -90,3 +90,5 @@ exp*.sh
 !exp_bioimage.sh
 !exp_vmd.sh
 exp*.ps1
+
+eval_reports/
