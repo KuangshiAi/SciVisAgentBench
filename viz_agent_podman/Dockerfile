@@ -47,22 +47,6 @@ RUN mamba env create -f /tmp/environment.yml && \
 ENV CONDA_DEFAULT_ENV=viz-agent
 ENV PATH=${CONDA_DIR}/envs/viz-agent/bin:${PATH}
 
-# -------- ParaView installation --------
-# Note: ParaView binaries are usually only provided for x86_64.
-ENV PARAVIEW_VERSION=5.12.0
-ENV PARAVIEW_DIR=/opt/paraview
-
-# Only install ParaView if arch is x86_64, otherwise skip or handle separately
-RUN arch=$(uname -m) && \
-    if [ "${arch}" = "x86_64" ]; then \
-        wget https://www.paraview.org/files/v${PARAVIEW_VERSION}/ParaView-${PARAVIEW_VERSION}-osmesa-MPI-Linux-Python3.10-x86_64.tar.gz -O /tmp/paraview.tar.gz && \
-        mkdir -p ${PARAVIEW_DIR} && \
-        tar -xzf /tmp/paraview.tar.gz -C ${PARAVIEW_DIR} --strip-components=1 && \
-        rm /tmp/paraview.tar.gz; \
-    else \
-        echo "Skipping ParaView binary install on non-x86_64 architecture (${arch})"; \
-    fi
-
 ENV PATH=${PARAVIEW_DIR}/bin:${PATH}
 ENV LD_LIBRARY_PATH=${PARAVIEW_DIR}/lib:${LD_LIBRARY_PATH}
 ENV PYTHONPATH=${PARAVIEW_DIR}/lib/python3.10/site-packages:${PYTHONPATH}

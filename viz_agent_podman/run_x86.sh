@@ -11,6 +11,7 @@ echo "Architecture inside container will be x86_64"
 podman run \
     --platform linux/amd64 \
     -it \
+    --tls-verify=false \
     --rm \
     -v "$(pwd)":/workspace \
     "$IMAGE_NAME" \

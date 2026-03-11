@@ -1,6 +1,7 @@
 {
   "provider": "anthropic",
   "model": "claude-sonnet-4-5",
+  "base_url": "https://livai-api.llnl.gov",
   "eval_mode": "generic",
   "agent_name": "claude_code",
   "experiment_number": "exp1",

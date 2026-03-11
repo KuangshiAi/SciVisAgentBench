@@ -8,8 +8,12 @@ echo "This will use Podman's emulation via QEMU"
 
 podman build \
     --platform linux/amd64 \
+    --tls-verify=false \
+    --ulimit nofile=1024:1024 \
+    --memory=8g \
+    --memory-swap=12g \
     -t viz-agent:x86 \
-    -f Dockerfile \
+    -f Dockerfile.x86 \
     .
 
 echo ""

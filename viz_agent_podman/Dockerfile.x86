@@ -31,25 +31,63 @@ RUN installer="Mambaforge-${MAMBA_VERSION}-Linux-x86_64.sh" && \
 ENV PATH=${CONDA_DIR}/bin:${PATH}
 SHELL ["/bin/bash", "-c"]
 
+# Reduce mamba's memory usage during solving
+ENV CONDA_SUBDIR=linux-64
+
 # -------- Environment file --------
 COPY environment.yml /tmp/environment.yml
 
-RUN mamba env create -f /tmp/environment.yml && \
+# Install packages in stages to reduce memory usage during emulation
+# Create main viz-agent environment
+RUN mamba create -n viz-agent python=3.10 -y && \
     mamba clean -a -y
 
-# Activate this environment by default
+RUN /bin/bash -c "source ${CONDA_DIR}/etc/profile.d/conda.sh && \
+    conda activate viz-agent && \
+    mamba install -y numpy scipy pandas matplotlib click rich && \
+    mamba clean -a -y"
+
+RUN /bin/bash -c "source ${CONDA_DIR}/etc/profile.d/conda.sh && \
+    conda activate viz-agent && \
+    mamba install -y paraview && \
+    mamba clean -a -y"
+
+RUN /bin/bash -c "source ${CONDA_DIR}/etc/profile.d/conda.sh && \
+    conda activate viz-agent && \
+    mamba install -y mdanalysis nglview && \
+    mamba clean -a -y"
+
+RUN /bin/bash -c "source ${CONDA_DIR}/etc/profile.d/conda.sh && \
+    conda activate viz-agent && \
+    mamba install -y napari && \
+    mamba clean -a -y"
+
+# Create separate environment for topologytoolkit to isolate VTK dependencies
+RUN /bin/bash -c "source ${CONDA_DIR}/etc/profile.d/conda.sh && \
+    mamba create -n ttk python=3.10 -y && \
+    mamba clean -a -y"
+
+RUN /bin/bash -c "source ${CONDA_DIR}/etc/profile.d/conda.sh && \
+    conda activate ttk && \
+    mamba install -y topologytoolkit numpy scipy pandas matplotlib && \
+    mamba clean -a -y"
+
+# Activate viz-agent environment by default
 ENV CONDA_DEFAULT_ENV=viz-agent
 ENV PATH=${CONDA_DIR}/envs/viz-agent/bin:${PATH}
 
-# -------- ParaView installation --------
-ENV PARAVIEW_VERSION=5.12.0
-ENV PARAVIEW_DIR=/opt/paraview
+# Create environment activation helper script
+RUN echo '#!/bin/bash' > /usr/local/bin/use-ttk && \
+    echo 'source ${CONDA_DIR}/etc/profile.d/conda.sh' >> /usr/local/bin/use-ttk && \
+    echo 'conda activate ttk' >> /usr/local/bin/use-ttk && \
+    echo 'echo "Activated ttk environment (TopologyToolKit)"' >> /usr/local/bin/use-ttk && \
+    chmod +x /usr/local/bin/use-ttk
 
-# Install ParaView x86_64 binary
-RUN wget https://www.paraview.org/files/v${PARAVIEW_VERSION}/ParaView-${PARAVIEW_VERSION}-osmesa-MPI-Linux-Python3.10-x86_64.tar.gz -O /tmp/paraview.tar.gz && \
-    mkdir -p ${PARAVIEW_DIR} && \
-    tar -xzf /tmp/paraview.tar.gz -C ${PARAVIEW_DIR} --strip-components=1 && \
-    rm /tmp/paraview.tar.gz
+RUN echo '#!/bin/bash' > /usr/local/bin/use-viz && \
+    echo 'source ${CONDA_DIR}/etc/profile.d/conda.sh' >> /usr/local/bin/use-viz && \
+    echo 'conda activate viz-agent' >> /usr/local/bin/use-viz && \
+    echo 'echo "Activated viz-agent environment (ParaView, Napari, etc.)"' >> /usr/local/bin/use-viz && \
+    chmod +x /usr/local/bin/use-viz
 
 ENV PATH=${PARAVIEW_DIR}/bin:${PATH}
 ENV LD_LIBRARY_PATH=${PARAVIEW_DIR}/lib:${LD_LIBRARY_PATH}
@@ -57,7 +95,11 @@ ENV PYTHONPATH=${PARAVIEW_DIR}/lib/python3.10/site-packages:${PYTHONPATH}
 
 WORKDIR /workspace
 
-# Test ParaView import
-RUN python -c "import paraview.simple as pvs; print('ParaView version:', pvs.GetParaViewVersion().GetVersion())"
+# Test both environments
+RUN /bin/bash -c "source ${CONDA_DIR}/etc/profile.d/conda.sh && \
+    conda activate viz-agent && \
+    python -c \"import paraview.simple as pvs; print('[viz-agent] ParaView version:', pvs.GetParaViewVersion().GetVersion())\" && \
+    conda activate ttk && \
+    python -c \"import topologytoolkit as ttk; print('[ttk] TopologyToolKit imported successfully')\""
 
 CMD ["/bin/bash"]

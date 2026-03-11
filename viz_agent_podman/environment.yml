@@ -9,7 +9,9 @@ dependencies:
   - numpy
   - scipy
   - pandas
-  - vmd-python
+  # - vmd-python  # Replaced with mdanalysis + nglview due to VTK conflicts with topologytoolkit
+  - mdanalysis
+  - nglview
   # - scikit-image
   # - scikit-learn
   # plotting
@@ -22,10 +24,10 @@ dependencies:
   # - hvplot
   # - panel
   # 3D / volume / mesh visualization
-  - vtk
+  # - vtk
   # - pyvista
   # - mayavi
-  # - topologytoolkit
+  - topologytoolkit
   # - imageio
   # - imageio-ffmpeg
   # napari ecosystem
