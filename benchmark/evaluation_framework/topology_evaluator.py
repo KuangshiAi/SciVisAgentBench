@@ -13,8 +13,22 @@ Each assertion specifies:
 
 import importlib.util
 import sys
+import signal
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
+
+# Default timeout for evaluation functions (5 minutes)
+DEFAULT_EVAL_TIMEOUT = 300
+
+
+class TimeoutError(Exception):
+    """Raised when evaluation times out"""
+    pass
+
+
+def _timeout_handler(signum, frame):
+    """Signal handler for timeout"""
+    raise TimeoutError("Evaluation timed out")
 
 
 def _resolve_paths(
@@ -175,12 +189,31 @@ def run_rule_based_evaluation(
         # Call with interleaved args: gs1, gs2, ..., rs1, rs2, ...
         # (matching the convention used by the topology eval scripts)
         args = gs_files + rs_files
-        score = eval_func(*args)
 
-        result["score"] = float(score)
-        result["status"] = "completed"
+        print(f"⏱️  Running evaluation with {DEFAULT_EVAL_TIMEOUT}s timeout...")
 
+        # Set up timeout using signal alarm (Unix/Linux only)
+        signal.signal(signal.SIGALRM, _timeout_handler)
+        signal.alarm(DEFAULT_EVAL_TIMEOUT)
+
+        try:
+            score = eval_func(*args)
+            signal.alarm(0)  # Cancel the alarm
+
+            result["score"] = float(score)
+            result["status"] = "completed"
+        except TimeoutError:
+            signal.alarm(0)  # Cancel the alarm
+            result["status"] = "error"
+            result["error"] = f"Evaluation timed out after {DEFAULT_EVAL_TIMEOUT} seconds. This usually indicates the generated output is too large or incorrect (e.g., missing persistence simplification)."
+            print(f"⚠️  Evaluation timed out after {DEFAULT_EVAL_TIMEOUT}s")
+
+    except TimeoutError:
+        signal.alarm(0)  # Cancel the alarm if still active
+        result["status"] = "error"
+        result["error"] = f"Evaluation timed out after {DEFAULT_EVAL_TIMEOUT} seconds"
     except Exception as e:
+        signal.alarm(0)  # Cancel the alarm if still active
         result["status"] = "error"
         result["error"] = str(e)
 
