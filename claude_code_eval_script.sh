@@ -17,11 +17,11 @@ python -m benchmark.evaluation_reporter.run_reporter --agent claude_code --confi
 
 ######### anonymized #########
 ### paraview cases claude code
-python benchmark/run_claude_code_eval.py --agent claude_code --config benchmark/configs/claude_code/config.json --yaml benchmark/eval_cases/paraview/what_obj_cases_anonymized.yaml --cases SciVisAgentBench-tasks/sci_volume_data/ --eval-model gpt-5.2 --exe-only --verbose --experiment-number exp1
+python benchmark/run_claude_code_eval.py --agent claude_code --config benchmark/configs/claude_code/config.json --yaml benchmark/eval_cases/paraview/what_obj_cases_anonymized.yaml --cases SciVisAgentBench-tasks/anonymized_datasets/ --eval-model gpt-5.2 --exe-only --verbose --experiment-number exp1
 
-python benchmark/run_claude_code_eval.py --agent claude_code --config benchmark/configs/claude_code/config.json --yaml benchmark/eval_cases/paraview/what_obj_cases_anonymized.yaml --cases SciVisAgentBench-tasks/sci_volume_data/ --eval-model gpt-5.2 --eval-only --experiment-number exp1
+python benchmark/run_claude_code_eval.py --agent claude_code --config benchmark/configs/claude_code/config.json --yaml benchmark/eval_cases/paraview/what_obj_cases_anonymized.yaml --cases SciVisAgentBench-tasks/anonymized_datasets/ --eval-model gpt-5.2 --eval-only --experiment-number exp1 --openai-base-url https://livai-api.llnl.gov
 
-python -m benchmark.evaluation_reporter.run_reporter --agent claude_code --config benchmark/configs/claude_code/config.json --yaml benchmark/eval_cases/paraview/what_obj_cases_anonymized.yaml --cases SciVisAgentBench-tasks/sci_volume_data/ --test-results test_results/sci_volume_data/claude_code_claude-sonnet-4-5_exp1/ --output eval_reports/sci_volume_data/claude_code_claude-sonnet-4-5_exp1 --agent-mode claude_code_claude-sonnet-4-5_exp1 --port 8081
+python -m benchmark.evaluation_reporter.run_reporter --agent claude_code --config benchmark/configs/claude_code/config.json --yaml benchmark/eval_cases/paraview/what_obj_cases_anonymized.yaml --cases SciVisAgentBench-tasks/anonymized_datasets/ --test-results test_results/anonymized_datasets/claude_code_claude-sonnet-4-5_exp1/ --output eval_reports/sci_volume_data/claude_code_claude-sonnet-4-5_exp1 --agent-mode claude_code_claude-sonnet-4-5_exp1 --port 8081
 
 
 #### Napari #####

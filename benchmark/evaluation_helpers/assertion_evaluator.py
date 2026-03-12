@@ -27,7 +27,8 @@ class AssertionEvaluator:
         eval_mode: str = "mcp",
         agent_mode: str = None,
         openai_api_key: Optional[str] = None,
-        eval_model: str = "gpt-4o"
+        eval_model: str = "gpt-4o",
+        openai_base_url: Optional[str] = None
     ):
         """
         Initialize the assertion evaluator.
@@ -40,6 +41,7 @@ class AssertionEvaluator:
                        If None, defaults to eval_mode for backward compatibility.
             openai_api_key: OpenAI API key for LLM evaluation
             eval_model: Model to use for LLM evaluation
+            openai_base_url: Optional custom OpenAI-compatible API endpoint
         """
         self.case_dir = Path(case_dir)
         self.case_name = case_name
@@ -47,6 +49,7 @@ class AssertionEvaluator:
         self.agent_mode = agent_mode if agent_mode else eval_mode
         self.openai_api_key = openai_api_key or os.getenv("OPENAI_API_KEY")
         self.eval_model = eval_model
+        self.openai_base_url = openai_base_url or os.getenv("OPENAI_BASE_URL")
 
         # Paths
         self.test_results_dir = self.case_dir / "test_results" / self.agent_mode
@@ -169,7 +172,10 @@ class AssertionEvaluator:
         """
         try:
             from openai import AsyncOpenAI
-            client = AsyncOpenAI(api_key=self.openai_api_key)
+            client_kwargs = {"api_key": self.openai_api_key}
+            if self.openai_base_url:
+                client_kwargs["base_url"] = self.openai_base_url
+            client = AsyncOpenAI(**client_kwargs)
 
             evaluation_prompt = f"""You are evaluating an AI agent's response against specific criteria.
 

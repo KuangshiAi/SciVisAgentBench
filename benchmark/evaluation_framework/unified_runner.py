@@ -563,7 +563,8 @@ class UnifiedTestRunner:
                 eval_mode=self.agent.eval_mode,  # Evaluation mode (mcp/pvpython)
                 agent_mode=self.agent.agent_mode,  # Full agent mode for results paths
                 openai_api_key=self.openai_api_key,
-                eval_model=self.eval_model
+                eval_model=self.eval_model,
+                openai_base_url=self.openai_base_url
             )
 
             return await evaluator.evaluate_assertions(test_case.assertions)

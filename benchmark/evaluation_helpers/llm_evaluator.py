@@ -198,12 +198,17 @@ class LLMEvaluator:
         Returns:
             tuple: (base64_string, mime_type)
         """
-        import imghdr
         from PIL import Image
         import io
 
         # Detect actual image format (not just extension)
-        img_type = imghdr.what(image_path)
+        # Use PIL instead of imghdr (which was removed in Python 3.13)
+        try:
+            with Image.open(image_path) as img:
+                img_type = img.format.lower() if img.format else None
+        except Exception as e:
+            print(f"  Warning: Could not detect image format for {image_path}: {e}")
+            img_type = None
 
         # Supported formats by OpenAI: png, jpeg, gif, webp
         supported_formats = {'png', 'jpeg', 'gif', 'webp'}
