@@ -224,6 +224,40 @@ class LLMEvaluator:
         # Remove empty categories
         return {k: v for k, v in categories.items() if v}
     
+    def _should_use_max_completion_tokens(self) -> bool:
+        """
+        Determine if the model requires max_completion_tokens instead of max_tokens.
+
+        Newer OpenAI models (GPT-5.x, O-series) use max_completion_tokens.
+        Older models (GPT-4.x, GPT-4o) use max_tokens.
+        Anthropic models use max_tokens.
+
+        Returns:
+            bool: True if model uses max_completion_tokens, False if it uses max_tokens
+        """
+        if self.provider == "anthropic":
+            return False
+
+        # Models that use max_completion_tokens
+        models_using_max_completion_tokens = [
+            # GPT-5 series
+            "gpt-5", "gpt-5.1", "gpt-5.2", "gpt-5-mini", "gpt-5-nano",
+            "gpt-5.2-chat-latest", "gpt-5.1-chat-latest", "gpt-5-chat-latest",
+            "gpt-5.1-codex-max", "gpt-5.1-codex", "gpt-5-codex", "gpt-5.1-codex-mini",
+            "gpt-5.2-pro", "gpt-5-pro",
+            # O-series models
+            "o1", "o1-pro", "o1-mini",
+            "o3", "o3-pro", "o3-mini", "o3-deep-research",
+            "o4-mini", "o4-mini-deep-research",
+        ]
+
+        # Check if the model starts with any of these prefixes or is in the list
+        for model_name in models_using_max_completion_tokens:
+            if self.model.startswith(model_name):
+                return True
+
+        return False
+
     def encode_image(self, image_path: str) -> tuple:
         """
         Encode image to base64 string and detect format.
@@ -336,17 +370,25 @@ class LLMEvaluator:
                     }
                 })
 
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
+            # Prepare API call parameters
+            api_params = {
+                "model": self.model,
+                "messages": [
                     {
                         "role": "user",
                         "content": content
                     }
                 ],
-                max_tokens=self.max_tokens,
-                temperature=self.temperature
-            )
+                "temperature": self.temperature
+            }
+
+            # Use max_completion_tokens for newer models, max_tokens for older models
+            if self._should_use_max_completion_tokens():
+                api_params["max_completion_tokens"] = self.max_tokens
+            else:
+                api_params["max_tokens"] = self.max_tokens
+
+            response = self.client.chat.completions.create(**api_params)
 
             return response.choices[0].message.content
     
