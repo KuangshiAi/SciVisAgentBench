@@ -276,7 +276,7 @@ class EvaluationManager:
             Evaluation result dictionary
         """
         try:
-            from openai import OpenAI
+            from llm_evaluator import LLMEvaluator
 
             # Load the answers file
             if rs_file:
@@ -337,37 +337,24 @@ Respond with a JSON object in the following format:
 
 Be specific about what aspects of the answers meet or don't meet the criteria."""
 
-            # Use OpenAI to evaluate
-            client_kwargs = {"api_key": self.openai_api_key}
-            if self.openai_base_url:
-                client_kwargs["base_url"] = self.openai_base_url
-            client = OpenAI(**client_kwargs)
-
-            response = client.chat.completions.create(
+            # Use LLMEvaluator to evaluate (supports both OpenAI and Anthropic)
+            evaluator = LLMEvaluator(
+                api_key=self.openai_api_key,
                 model=self.eval_model,
-                messages=[
-                    {"role": "system", "content": "You are an expert scientific visualization evaluator. Provide accurate and fair assessments."},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.1
+                max_tokens=2000,
+                temperature=0.1,
+                base_url=self.openai_base_url
             )
 
-            response_content = response.choices[0].message.content.strip()
+            evaluation_result = evaluator.evaluate_text(prompt)
 
-            # Parse JSON response
-            try:
-                json_start = response_content.find('{')
-                json_end = response_content.rfind('}') + 1
-                if json_start >= 0 and json_end > json_start:
-                    json_content = response_content[json_start:json_end]
-                    evaluation_result = json.loads(json_content)
-                else:
-                    raise ValueError("No JSON found in response")
-            except (json.JSONDecodeError, ValueError) as e:
+            # Check for errors
+            if "error" in evaluation_result:
                 return {
                     "status": "failed",
                     "subtype": "text",
-                    "reason": f"Failed to parse evaluation: {e}"
+                    "reason": f"LLM evaluation error: {evaluation_result['error']}",
+                    "raw_response": evaluation_result.get('raw_response', '')
                 }
 
             score = evaluation_result.get('score', 0)
@@ -384,14 +371,17 @@ Be specific about what aspects of the answers meet or don't meet the criteria.""
                     "percentage": (score / max_score * 100) if max_score > 0 else 0
                 },
                 "explanation": explanation,
-                "evaluation_response": response_content
+                "evaluator_info": evaluation_result.get('evaluator_info', {}),
+                "evaluation_response": evaluation_result.get('evaluation_text', '')
             }
 
         except Exception as e:
+            import traceback
             return {
                 "status": "failed",
                 "subtype": "text",
-                "reason": str(e)
+                "reason": str(e),
+                "traceback": traceback.format_exc()
             }
 
     async def evaluate_code(

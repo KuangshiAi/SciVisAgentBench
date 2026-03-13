@@ -459,10 +459,10 @@ class LLMEvaluator:
         try:
             print(f"Evaluating visualization quality with {self.provider} LLM (result images only)...")
             evaluation_text = self._call_llm(evaluation_prompt, images)
-            
+
             # Try multiple strategies to extract and parse JSON
             json_result = None
-            
+
             # Strategy 1: Try to find JSON within markdown code blocks (```json ... ```)
             code_block_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', evaluation_text, re.DOTALL)
             if code_block_match:
@@ -470,14 +470,14 @@ class LLMEvaluator:
                     json_result = json.loads(code_block_match.group(1))
                 except json.JSONDecodeError as e:
                     print(f"Warning: Failed to parse JSON from code block: {e}")
-            
+
             # Strategy 2: Try to parse entire response as JSON
             if json_result is None:
                 try:
                     json_result = json.loads(evaluation_text.strip())
                 except json.JSONDecodeError:
                     pass
-            
+
             # Strategy 3: Try to find JSON object using improved regex (non-greedy, balanced)
             if json_result is None:
                 # Find the first { and last } to extract JSON
@@ -489,12 +489,12 @@ class LLMEvaluator:
                         json_result = json.loads(json_str)
                     except json.JSONDecodeError:
                         pass
-            
+
             if json_result:
                 # Add evaluator metadata to the result
                 json_result["evaluator_info"] = self.get_evaluator_info()
                 return json_result
-            
+
             # If all JSON parsing strategies fail, return a structured response with error
             print(f"Warning: Could not parse JSON from LLM response.")
             print(f"Response preview (first 500 chars): {evaluation_text[:500]}")
@@ -504,7 +504,74 @@ class LLMEvaluator:
                 "raw_response": evaluation_text,
                 "evaluator_info": self.get_evaluator_info()
             }
-            
+
+        except Exception as e:
+            return {
+                "error": f"LLM evaluation failed: {str(e)}",
+                "raw_response": "",
+                "evaluator_info": self.get_evaluator_info()
+            }
+
+    def evaluate_text(self, evaluation_prompt: str) -> Dict[str, Any]:
+        """
+        Text-based evaluation using LLM (no images)
+
+        Args:
+            evaluation_prompt (str): The complete evaluation prompt to send to LLM
+
+        Returns:
+            Dict: Evaluation results with scores and explanations
+        """
+        try:
+            print(f"Evaluating with {self.provider} LLM ({self.model}) - text-based rubric...")
+            # Call LLM with no images
+            evaluation_text = self._call_llm(evaluation_prompt, [])
+
+            # Try multiple strategies to extract and parse JSON
+            json_result = None
+
+            # Strategy 1: Try to find JSON within markdown code blocks (```json ... ```)
+            code_block_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', evaluation_text, re.DOTALL)
+            if code_block_match:
+                try:
+                    json_result = json.loads(code_block_match.group(1))
+                except json.JSONDecodeError as e:
+                    print(f"Warning: Failed to parse JSON from code block: {e}")
+
+            # Strategy 2: Try to parse entire response as JSON
+            if json_result is None:
+                try:
+                    json_result = json.loads(evaluation_text.strip())
+                except json.JSONDecodeError:
+                    pass
+
+            # Strategy 3: Try to find JSON object using improved regex (non-greedy, balanced)
+            if json_result is None:
+                # Find the first { and last } to extract JSON
+                json_start = evaluation_text.find('{')
+                json_end = evaluation_text.rfind('}')
+                if json_start != -1 and json_end != -1 and json_end > json_start:
+                    try:
+                        json_str = evaluation_text[json_start:json_end+1]
+                        json_result = json.loads(json_str)
+                    except json.JSONDecodeError:
+                        pass
+
+            if json_result:
+                # Add evaluator metadata to the result
+                json_result["evaluator_info"] = self.get_evaluator_info()
+                return json_result
+
+            # If all JSON parsing strategies fail, return a structured response with error
+            print(f"Warning: Could not parse JSON from LLM response.")
+            print(f"Response preview (first 500 chars): {evaluation_text[:500]}")
+            return {
+                "evaluation_text": evaluation_text,
+                "error": "Could not parse JSON response",
+                "raw_response": evaluation_text,
+                "evaluator_info": self.get_evaluator_info()
+            }
+
         except Exception as e:
             return {
                 "error": f"LLM evaluation failed: {str(e)}",
