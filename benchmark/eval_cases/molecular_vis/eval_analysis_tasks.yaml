@@ -2,7 +2,7 @@
 # This test evaluates the ability to complete molecular visualization tasks
 # with detailed requirements and evaluation criteria
 
-#simple licorice visualization of a protein 
+# Case 1: simple licorice visualization of a protein 
 - vars:
     question: |
         1. I want you to visualize a molecular structure from a CIF file. 
@@ -10,15 +10,15 @@
         3. Visualize the molecular using a licorice representation. 
         4. Take a screenshot of the visualization.
          Q1. Does it show a licorice representation of the protein? (yes/no)
-        5. Answer Q1 in a plain text file "md_analysis/results/answers_basic_vis.txt".
+        5. Answer Q1 in a plain text file "case_1/results/{agent_mode}/answers_basic_vis.txt".
   assert:
     - type: llm-rubric
       subtype: text
       value: |
           1. Q1 correct answer: Yes
-      rs-file: "md_analysis/results/answers_basic_vis.txt"
+      rs-file: "case_1/results/{agent_mode}/answers_basic_vis.txt"
 
-#simple coloring by element of a protein
+# Case 2: simple coloring by element of a protein
 - vars:
     question: |
         1. I want you to visualize a molecular structure from a CIF file. 
@@ -26,15 +26,15 @@
         3. Visualize the molecular using a CPK or similar representation where atoms are colored by their chemical element.
         4. Take a screenshot of the visualization.
          Q1. Is the molecule colored according to the chemical element of its atoms (e.g., CPK coloring)? (yes/no)
-        5. Answer Q1 in a plain text file "md_analysis/results/answers_element_coloring.txt".
+        5. Answer Q1 in a plain text file "case_2/results/{agent_mode}/answers_element_coloring.txt".
   assert:
     - type: llm-rubric
       subtype: text
       value: |
           1. Q1 correct answer: Yes
-      rs-file: "md_analysis/results/answers_element_coloring.txt"
+      rs-file: "case_2/results/{agent_mode}/answers_element_coloring.txt"
 
-#simple selection and coloring of a protein
+# Case 3: simple selection and coloring of a protein
 - vars:
     question: |
         1. I want you to visualize a molecular structure from a CIF file. 
@@ -42,15 +42,15 @@
         3. Select all carbon atoms and color them cyan.
         4. Take a screenshot of the visualization.
          Q1. Are all carbon atoms colored cyan? (yes/no)
-        5. Answer Q1 in a plain text file "md_analysis/results/answers_selection_coloring.txt".
+        5. Answer Q1 in a plain text file "case_3/results/{agent_mode}/answers_selection_coloring.txt".
   assert:
     - type: llm-rubric
       subtype: text
       value: |
           1. Q1 correct answer: Yes
-      rs-file: "md_analysis/results/answers_selection_coloring.txt"
+      rs-file: "case_3/results/{agent_mode}/answers_selection_coloring.txt"
 
-#simple coloring by charge of a protein
+# Case 4: simple coloring by charge of a protein
 - vars:
     question: |
         1. I want you to visualize a molecular structure from a CIF file. 
@@ -58,15 +58,15 @@
         3. Color the molecule according to atomic charge: use one color for positive charges, another for negative charges, and a third for neutral atoms.
         4. Take a screenshot of the visualization.
          Q1. Is the molecule colored by atomic charge (differentiating positive, negative, and neutral)? (yes/no)
-        5. Answer Q1 in a plain text file "md_analysis/results/answers_charge_coloring.txt".
+        5. Answer Q1 in a plain text file "case_4/results/{agent_mode}/answers_charge_coloring.txt".
   assert:
     - type: llm-rubric
       subtype: text
       value: |
           1. Q1 correct answer: Yes
-      rs-file: "md_analysis/results/answers_charge_coloring.txt"
+      rs-file: "case_4/results/{agent_mode}/answers_charge_coloring.txt"
 
-#simple selection and coloring of specific atoms
+# Case 5: simple selection and coloring of specific atoms
 - vars:
     question: |
         1. I want you to visualize a molecular structure from a CIF file. 
@@ -74,15 +74,15 @@
         3. Select all oxygen atoms in residues 1 to 20 and color them red.
         4. Take a screenshot of the visualization.
          Q1. Are all oxygen atoms in residues 1 to 20 colored red? (yes/no)
-        5. Answer Q1 in a plain text file "md_analysis/results/answers_complex_selection.txt".
+        5. Answer Q1 in a plain text file "case_5/results/{agent_mode}/answers_complex_selection.txt".
   assert:
     - type: llm-rubric
       subtype: text
       value: |
           1. Q1 correct answer: Yes
-      rs-file: "md_analysis/results/answers_complex_selection.txt"
+      rs-file: "case_5/results/{agent_mode}/answers_complex_selection.txt"
 
-#simple selection and coloring of aromatic residues
+# Case 6: simple selection and coloring of aromatic residues
 - vars:
     question: |
         1. I want you to visualize a molecular structure from a CIF file. 
@@ -90,69 +90,70 @@
         3. Select all aromatic residues (PHE, TYR, TRP) and color them purple.
         4. Take a screenshot of the visualization.
          Q1. Are all aromatic residues (PHE, TYR, TRP) colored purple? (yes/no)
-        5. Answer Q1 in a plain text file "md_analysis/results/answers_aromatic_selection.txt".
+        5. Answer Q1 in a plain text file "case_6/results/{agent_mode}/answers_aromatic_selection.txt".
   assert:
     - type: llm-rubric
       subtype: text
       value: |
           1. Q1 correct answer: Yes
-      rs-file: "md_analysis/results/answers_aromatic_selection.txt"
+      rs-file: "case_6/results/{agent_mode}/answers_aromatic_selection.txt"
 
-#simple RMSD and RMSF calculation of a protein
+# Case 7: simple RMSD and RMSF calculation of a protein
 - vars:
     question: |
         1. I want you to perform a structural analysis on a molecular structure from a CIF file. 
         2. Load the data/1CRN.cif. 
         3. Calculate the Root Mean Square Deviation (RMSD) of the structure against itself.
         4. Calculate the Root Mean Square Fluctuation (RMSF) for the structure.
-        5. Save the computed RMSD and RMSF values as plain text to "md_analysis/results/answers_rmsd_rmsf.txt".
+        5. Save the computed RMSD and RMSF values as plain text to "case_7/results/{agent_mode}/answers_rmsd_rmsf.txt".
   assert:
     - type: llm-rubric
       subtype: text
       value: |
           1. Does the output report the calculated RMSD?
           2. Does the output report the calculated RMSF values or state that it requires a trajectory?
-      rs-file: "md_analysis/results/answers_rmsd_rmsf.txt"
+      rs-file: "case_7/results/{agent_mode}/answers_rmsd_rmsf.txt"
 
-#simple radius of gyration calculation of a protein
+# Case 8: simple radius of gyration calculation of a protein
 - vars:
     question: |
         1. I want you to calculate the compactness of a protein from a CIF file. 
         2. Load the data/1CRN.cif. 
         3. Calculate the Radius of Gyration (Rg) of the protein structure.
-        4. Save the calculated Radius of Gyration as plain text to "md_analysis/results/answers_rg.txt".
+        4. Save the calculated Radius of Gyration as plain text to "case_8/results/{agent_mode}/answers_rg.txt".
   assert:
     - type: llm-rubric
       subtype: text
       value: |
           1. Does the output report a numeric value for the calculated Radius of Gyration?
-      rs-file: "md_analysis/results/answers_rg.txt"
+      rs-file: "case_8/results/{agent_mode}/answers_rg.txt"
 
+# Case 9: calculate specific geometric properties
 - vars:
     question: |
-        1. I want you to calculate specific geometric properties of a molecular structure from a CIF file. 
-        2. Load the data/1CRN.cif. 
+        1. I want you to calculate specific geometric properties of a molecular structure from a CIF file.
+        2. Load the data/1CRN.cif.
         3. Calculate the distance between the alpha carbons of residue 1 and residue 10.
         4. Calculate the backbone dihedral angles (phi and psi) for residue 5.
-        5. Save the computed distance and angles as plain text to "md_analysis/results/answers_distances_angles.txt".
+        5. Save the computed distance and angles as plain text to "case_9/results/{agent_mode}/answers_distances_angles.txt".
   assert:
     - type: llm-rubric
       subtype: text
       value: |
           1. Does the output report the calculated distance between the alpha carbons of residue 1 and 10?
           2. Does the output report the calculated phi and psi dihedral angles for residue 5?
-      rs-file: "md_analysis/results/answers_distances_angles.txt"
+      rs-file: "case_9/results/{agent_mode}/answers_distances_angles.txt"
 
-#simple contact calculation of a protein
+# Case 10: simple contact calculation of a protein
 - vars:
     question: |
         1. I want you to calculate the number of contacts in a folded protein from a CIF file.
         2. Load the data/1CRN.cif.
         3. Calculate the number of contacts within an 8 Angstrom cutoff.
-        4. Save the total count of contacts as plain text to "md_analysis/results/answers_native_contacts.txt".
+        4. Save the total count of contacts as plain text to "case_10/results/{agent_mode}/answers_native_contacts.txt".
   assert:
     - type: llm-rubric
       subtype: text
       value: |
           1. Does the output report a numeric count of contacts?
-      rs-file: "md_analysis/results/answers_native_contacts.txt"
+      rs-file: "case_10/results/{agent_mode}/answers_native_contacts.txt"
