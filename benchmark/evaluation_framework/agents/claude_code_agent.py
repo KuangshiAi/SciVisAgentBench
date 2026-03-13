@@ -233,7 +233,7 @@ Output Requirements:
    - The screenshot will be used for visual evaluation of your work
 
 Stratergy:
-- You should check the visualization you generate to confirm if the task is accomplished or further modification is needed. Try to be efficient about the iteration and use least amount of checking while achieve reasonable result. Use headless mode for all the software tools. Do not use more than 40 turns.
+- You should check the visualization you generate to confirm if the task is accomplished or further modification is needed. Try to be efficient about the iteration and use least amount of checking while achieve reasonable result. Use headless mode for all the software tools. Take screenshot of the viewport or rendering not the software. Do not use more than 40 turns.
 
 Task:
 {task}

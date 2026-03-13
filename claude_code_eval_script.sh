@@ -9,10 +9,10 @@ export VTK_DEFAULT_RENDER_WINDOW_OFFSCREEN=1
 python benchmark/run_claude_code_eval.py --agent claude_code --config benchmark/configs/claude_code/config.json --yaml benchmark/eval_cases/paraview/paraview_cases.yaml --cases SciVisAgentBench-tasks/paraview/ --eval-model gpt-5.2 --exe-only --verbose --experiment-number exp1
 
 
-python benchmark/run_claude_code_eval.py --agent claude_code --config benchmark/configs/claude_code/config.json --yaml benchmark/eval_cases/paraview/paraview_cases.yaml --cases SciVisAgentBench-tasks/paraview/ --eval-model gpt-5.2 --eval-only --experiment-number exp1 --openai-base-url https://livai-api.llnl.gov
+python benchmark/run_claude_code_eval.py --agent claude_code --config benchmark/configs/claude_code/config.json --yaml benchmark/eval_cases/paraview/paraview_cases.yaml --cases SciVisAgentBench-tasks/paraview --eval-model gpt-5.2 --eval-only --experiment-number exp1 --openai-base-url https://livai-api.llnl.gov
 
 
-python -m benchmark.evaluation_reporter.run_reporter --agent claude_code --config benchmark/configs/claude_code/config.json --yaml benchmark/eval_cases/paraview/paraview_cases.yaml --cases SciVisAgentBench-tasks/paraview/ --test-results test_results/paraview/claude_code_claude-sonnet-4-5_exp1/ --output eval_reports/paraview/claude_code_claude-sonnet-4-5_exp1 --agent-mode claude_code_claude-sonnet-4-5_exp1 --port 8081 --no-browser --static-only
+python -m benchmark.evaluation_reporter.run_reporter --agent claude_code --config benchmark/configs/claude_code/config.json --yaml benchmark/eval_cases/paraview/paraview_cases.yaml --cases SciVisAgentBench-tasks/paraview --test-results test_results/paraview/claude_code_claude-sonnet-4-5_exp1/ --output eval_reports/paraview/claude_code_claude-sonnet-4-5_exp1 --agent-mode claude_code_claude-sonnet-4-5_exp1 --port 8081 --no-browser --static-only
 
 
 ######### anonymized #########
