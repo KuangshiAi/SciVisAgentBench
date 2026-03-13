@@ -32,7 +32,7 @@ python benchmark/run_claude_code_eval.py --agent claude_code --config benchmark/
 
 python benchmark/run_claude_code_eval.py --agent claude_code --config benchmark/configs/claude_code/config.json --yaml benchmark/eval_cases/napari/eval_visualization_tasks.yaml --cases SciVisAgentBench-tasks/bioimage_data/ --eval-model gpt-5.2 --eval-only --experiment-number exp1 --openai-base-url https://livai-api.llnl.gov
 
-python -m benchmark.evaluation_reporter.run_reporter --agent claude_code --config benchmark/configs/claude_code/config.json --yaml benchmark/eval_cases/napari/eval_visualization_tasks.yaml --cases SciVisAgentBench-tasks/bioimage_data/eval_visualization_tasks/ --test-results /Users/liu42/gitRepo/LC/2026_AgentBenchmark/SciVisAgentBench/test_results/bioimage_data/claude_code_claude-sonnet-4-5_exp1 --output eval_reports/napari/claude_code_claude-sonnet-4-5_exp1 --agent-mode claude_code_claude-sonnet-4-5_exp1 --port 8081 --no-browser --static-only
+python -m benchmark.evaluation_reporter.run_reporter --agent claude_code --config benchmark/configs/claude_code/config.json --yaml benchmark/eval_cases/napari/eval_visualization_tasks.yaml --cases SciVisAgentBench-tasks/bioimage_data/eval_visualization_tasks/ --test-results test_results/bioimage_data/claude_code_claude-sonnet-4-5_exp1 --output eval_reports/napari/claude_code_claude-sonnet-4-5_exp1 --agent-mode claude_code_claude-sonnet-4-5_exp1 --port 8081 --no-browser --static-only
 
 
 # # molecular_VIS (VMD)
