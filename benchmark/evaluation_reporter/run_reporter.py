@@ -79,8 +79,8 @@ def parse_args():
     parser.add_argument(
         "--port",
         type=int,
-        default=8080,
-        help="Port to serve the report on (default: 8080)"
+        default=None,
+        help="Port to serve the report on. If not specified, generates report without starting server."
     )
 
     parser.add_argument(
@@ -162,8 +162,8 @@ def main():
         traceback.print_exc()
         return 1
 
-    # If static-only mode, just exit
-    if args.static_only:
+    # If static-only mode or no port specified, just exit
+    if args.static_only or args.port is None:
         print(f"\n💾 Static report saved to: {report_path}")
         print(f"   Open in browser: file://{report_path}")
         return 0

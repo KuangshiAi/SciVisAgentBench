@@ -1,8 +1,9 @@
 """
-Generic LLM-based evaluation helper using GPT-4o
+Generic LLM-based evaluation helper using GPT-4o or Claude
 
 This module provides a generic interface for evaluating scientific visualizations
 using Large Language Models. It can be used by any test case evaluator.
+Supports both OpenAI and Anthropic models.
 """
 from openai import OpenAI
 import base64
@@ -13,7 +14,19 @@ from typing import List, Dict, Any
 
 class LLMEvaluator:
     # OpenAI model pricing (per 1M tokens) as of September 2025
+    # Anthropic model pricing (per 1M tokens) as of March 2026
     MODEL_PRICING = {
+    # Anthropic Claude models
+    "claude-opus-4.6": {"input": 15.00, "cached_input": 1.50, "output": 75.00, "provider": "anthropic"},
+    "claude-opus-4-6": {"input": 15.00, "cached_input": 1.50, "output": 75.00, "provider": "anthropic"},
+    "claude-sonnet-4.6": {"input": 3.00, "cached_input": 0.30, "output": 15.00, "provider": "anthropic"},
+    "claude-sonnet-4-6": {"input": 3.00, "cached_input": 0.30, "output": 15.00, "provider": "anthropic"},
+    "claude-sonnet-4.5": {"input": 3.00, "cached_input": 0.30, "output": 15.00, "provider": "anthropic"},
+    "claude-sonnet-4-5": {"input": 3.00, "cached_input": 0.30, "output": 15.00, "provider": "anthropic"},
+    "claude-haiku-4.5": {"input": 0.80, "cached_input": 0.08, "output": 4.00, "provider": "anthropic"},
+    "claude-haiku-4-5": {"input": 0.80, "cached_input": 0.08, "output": 4.00, "provider": "anthropic"},
+
+    # OpenAI models
     # GPT-5 series
     "gpt-5.2": {"input": 1.75, "cached_input": 0.175, "output": 14.00},
     "gpt-5.1": {"input": 1.25, "cached_input": 0.125, "output": 10.00},
@@ -94,29 +107,50 @@ class LLMEvaluator:
         Initialize the LLM evaluator
 
         Args:
-            api_key (str): OpenAI API key. If None, will try to get from environment
-            model (str): OpenAI model to use
+            api_key (str): API key for OpenAI or Anthropic. If None, will try to get from environment
+                          (OPENAI_API_KEY or ANTHROPIC_API_KEY)
+            model (str): Model to use (OpenAI or Anthropic)
             max_tokens (int): Maximum tokens for response
             temperature (float): Temperature for response generation
             base_url (str): Optional custom API endpoint for OpenAI-compatible APIs.
                           Can be set via OPENAI_BASE_URL environment variable.
         """
-        api_key = api_key or os.getenv('OPENAI_API_KEY')
-        if not api_key:
-            raise ValueError("OpenAI API key not found. Please set OPENAI_API_KEY environment variable or pass api_key parameter.")
-
         # Validate model
         if model not in self.MODEL_PRICING:
             available_models = list(self.MODEL_PRICING.keys())
             raise ValueError(f"Unsupported model '{model}'. Supported models: {', '.join(available_models)}")
 
-        # Create OpenAI client with optional custom base_url
-        client_kwargs = {"api_key": api_key}
-        if base_url:
-            client_kwargs["base_url"] = base_url
-            print(f"Using custom OpenAI endpoint: {base_url}")
+        # Determine provider from model
+        model_info = self.MODEL_PRICING[model]
+        self.provider = model_info.get("provider", "openai")
 
-        self.client = OpenAI(**client_kwargs)
+        # Get API key based on provider
+        if api_key is None:
+            if self.provider == "anthropic":
+                api_key = os.getenv('ANTHROPIC_API_KEY')
+                if not api_key:
+                    raise ValueError("Anthropic API key not found. Please set ANTHROPIC_API_KEY environment variable or pass api_key parameter.")
+            else:
+                api_key = os.getenv('OPENAI_API_KEY')
+                if not api_key:
+                    raise ValueError("OpenAI API key not found. Please set OPENAI_API_KEY environment variable or pass api_key parameter.")
+
+        # Create appropriate client
+        if self.provider == "anthropic":
+            try:
+                import anthropic
+                self.client = anthropic.Anthropic(api_key=api_key)
+                print(f"Using Anthropic model: {model}")
+            except ImportError:
+                raise ImportError("anthropic package not found. Install it with: pip install anthropic")
+        else:
+            # Create OpenAI client with optional custom base_url
+            client_kwargs = {"api_key": api_key}
+            if base_url:
+                client_kwargs["base_url"] = base_url
+                print(f"Using custom OpenAI endpoint: {base_url}")
+            self.client = OpenAI(**client_kwargs)
+
         self.model = model
         self.max_tokens = max_tokens
         self.temperature = temperature
@@ -125,19 +159,19 @@ class LLMEvaluator:
     def get_evaluator_info(self) -> Dict[str, Any]:
         """
         Get information about the evaluator configuration
-        
+
         Returns:
             Dict: Evaluator metadata including model, settings, pricing, and version
         """
         pricing_info = self.MODEL_PRICING.get(self.model, {})
-        
+
         return {
             "evaluator_type": "llm",
             "model": self.model,
             "max_tokens": self.max_tokens,
             "temperature": self.temperature,
-            "provider": "openai",
-            "evaluator_version": "2.0.0",
+            "provider": self.provider,
+            "evaluator_version": "2.1.0",
             "pricing_per_1m_tokens": {
                 "input": pricing_info.get("input"),
                 "cached_input": pricing_info.get("cached_input"),
@@ -211,6 +245,7 @@ class LLMEvaluator:
             img_type = None
 
         # Supported formats by OpenAI: png, jpeg, gif, webp
+        # Supported formats by Anthropic: png, jpeg, gif, webp
         supported_formats = {'png', 'jpeg', 'gif', 'webp'}
 
         if img_type in supported_formats:
@@ -241,65 +276,112 @@ class LLMEvaluator:
             buffer.seek(0)
             encoded = base64.b64encode(buffer.read()).decode('utf-8')
             return encoded, "image/png"
-    
-    def evaluate_visualization(self, ground_truth_images: List[str], result_images: List[str], 
-                             evaluation_prompt: str) -> Dict[str, Any]:
+
+    def _call_llm(self, prompt: str, images: List[tuple]) -> str:
         """
-        Generic visualization evaluation using LLM
-        
+        Call the appropriate LLM API (OpenAI or Anthropic) with images.
+
         Args:
-            ground_truth_images (List[str]): Paths to ground truth screenshots
-            result_images (List[str]): Paths to result screenshots  
-            evaluation_prompt (str): The complete evaluation prompt to send to LLM
-            
+            prompt: The text prompt
+            images: List of (base64_string, mime_type) tuples
+
         Returns:
-            Dict: Evaluation results with scores and explanations
+            str: The LLM response text
         """
-        
-        # Prepare image content for the API call
-        image_content = []
-        
-        # Add ground truth images
-        for i, img_path in enumerate(ground_truth_images):
-            if os.path.exists(img_path):
-                encoded_image, mime_type = self.encode_image(img_path)
-                image_content.append({
+        if self.provider == "anthropic":
+            # Anthropic API format
+            content = [{"type": "text", "text": prompt}]
+
+            # Add images in Anthropic format
+            for base64_image, mime_type in images:
+                # Extract media type from mime_type (e.g., "image/png" -> "png")
+                media_type = mime_type.split('/')[-1]
+                if media_type == "jpg":
+                    media_type = "jpeg"
+                content.append({
+                    "type": "image",
+                    "source": {
+                        "type": "base64",
+                        "media_type": mime_type,
+                        "data": base64_image
+                    }
+                })
+
+            response = self.client.messages.create(
+                model=self.model,
+                max_tokens=self.max_tokens,
+                temperature=self.temperature,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": content
+                    }
+                ]
+            )
+
+            # Extract text from response
+            return response.content[0].text
+
+        else:
+            # OpenAI API format
+            content = [{"type": "text", "text": prompt}]
+
+            # Add images in OpenAI format
+            for base64_image, mime_type in images:
+                content.append({
                     "type": "image_url",
                     "image_url": {
-                        "url": f"data:{mime_type};base64,{encoded_image}",
+                        "url": f"data:{mime_type};base64,{base64_image}",
                         "detail": "high"
                     }
                 })
 
-        # Add result images
-        for i, img_path in enumerate(result_images):
-            if os.path.exists(img_path):
-                encoded_image, mime_type = self.encode_image(img_path)
-                image_content.append({
-                    "type": "image_url",
-                    "image_url": {
-                        "url": f"data:{mime_type};base64,{encoded_image}",
-                        "detail": "high"
-                    }
-                })
-
-        try:
-            print("Evaluating visualization quality with LLM...")
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
                     {
                         "role": "user",
-                        "content": [
-                            {"type": "text", "text": evaluation_prompt},
-                            *image_content
-                        ]
+                        "content": content
                     }
-                ]
+                ],
+                max_tokens=self.max_tokens,
+                temperature=self.temperature
             )
-            
-            # Parse the response
-            evaluation_text = response.choices[0].message.content
+
+            return response.choices[0].message.content
+    
+    def evaluate_visualization(self, ground_truth_images: List[str], result_images: List[str],
+                             evaluation_prompt: str) -> Dict[str, Any]:
+        """
+        Generic visualization evaluation using LLM
+
+        Args:
+            ground_truth_images (List[str]): Paths to ground truth screenshots
+            result_images (List[str]): Paths to result screenshots
+            evaluation_prompt (str): The complete evaluation prompt to send to LLM
+
+        Returns:
+            Dict: Evaluation results with scores and explanations
+        """
+
+        # Prepare images
+        images = []
+
+        # Add ground truth images
+        for img_path in ground_truth_images:
+            if os.path.exists(img_path):
+                encoded_image, mime_type = self.encode_image(img_path)
+                images.append((encoded_image, mime_type))
+
+        # Add result images
+        for img_path in result_images:
+            if os.path.exists(img_path):
+                encoded_image, mime_type = self.encode_image(img_path)
+                images.append((encoded_image, mime_type))
+
+        try:
+            print(f"Evaluating visualization quality with {self.provider} LLM ({self.model})...")
+            evaluation_text = self._call_llm(evaluation_prompt, images)
             
             # Try multiple strategies to extract and parse JSON
             json_result = None
@@ -356,47 +438,27 @@ class LLMEvaluator:
     def evaluate_visualization_result_only(self, result_images: List[str], evaluation_prompt: str) -> Dict[str, Any]:
         """
         Visualization evaluation using LLM with result images only (no ground truth)
-        
+
         Args:
             result_images (List[str]): Paths to result screenshots
             evaluation_prompt (str): The complete evaluation prompt to send to LLM
-            
+
         Returns:
             Dict: Evaluation results with scores and explanations
         """
-        
-        # Prepare image content for the API call
-        image_content = []
-        
+
+        # Prepare images
+        images = []
+
         # Add result images
-        for i, img_path in enumerate(result_images):
+        for img_path in result_images:
             if os.path.exists(img_path):
                 encoded_image, mime_type = self.encode_image(img_path)
-                image_content.append({
-                    "type": "image_url",
-                    "image_url": {
-                        "url": f"data:{mime_type};base64,{encoded_image}",
-                        "detail": "high"
-                    }
-                })
+                images.append((encoded_image, mime_type))
 
         try:
-            print("Evaluating visualization quality with LLM (result images only)...")
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": [
-                            {"type": "text", "text": evaluation_prompt},
-                            *image_content
-                        ]
-                    }
-                ]
-            )
-            
-            # Parse the response
-            evaluation_text = response.choices[0].message.content
+            print(f"Evaluating visualization quality with {self.provider} LLM (result images only)...")
+            evaluation_text = self._call_llm(evaluation_prompt, images)
             
             # Try multiple strategies to extract and parse JSON
             json_result = None

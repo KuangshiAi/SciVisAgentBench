@@ -9,6 +9,8 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime
 import shutil
 import base64
+import time
+import os
 
 
 class EvaluationReporter:
@@ -47,7 +49,21 @@ class EvaluationReporter:
         # Clean up output directory before generating new report
         if self.output_dir.exists():
             print(f"   Cleaning up existing output directory: {self.output_dir}")
-            shutil.rmtree(self.output_dir)
+            # Try multiple times with delays (Windows file locking issue)
+            max_attempts = 3
+            for attempt in range(max_attempts):
+                try:
+                    shutil.rmtree(self.output_dir)
+                    break
+                except PermissionError as e:
+                    if attempt < max_attempts - 1:
+                        print(f"   [WARNING] Permission denied, retrying in 2 seconds... (attempt {attempt + 1}/{max_attempts})")
+                        time.sleep(2)
+                    else:
+                        print(f"   [ERROR] Could not delete output directory after {max_attempts} attempts.")
+                        print(f"   [ERROR] Please close any browsers, file explorers, or servers using this directory.")
+                        print(f"   [ERROR] You can also manually delete: {self.output_dir}")
+                        raise
 
         self.output_dir.mkdir(parents=True, exist_ok=True)
 

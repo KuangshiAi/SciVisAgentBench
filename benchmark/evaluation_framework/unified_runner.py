@@ -520,6 +520,10 @@ class UnifiedTestRunner:
             if model_metadata:
                 result["model_metadata"] = model_metadata
 
+        # Add evaluation model to top level
+        if self.eval_model:
+            result["eval_model"] = self.eval_model
+
         with open(centralized_file, 'w', encoding='utf-8') as f:
             json.dump(result, f, indent=2, ensure_ascii=False)
 

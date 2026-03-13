@@ -91,6 +91,7 @@ exp*.sh
 !exp_vmd.sh
 exp*.ps1
 
-eval_reports/
+eval_reports_gpt5-2/
+eval_reports_claude-opus-4-6/
 
 src/gmx_vmd_mcp/.mcp

@@ -163,6 +163,11 @@ def parse_args():
     )
 
     parser.add_argument(
+        "--anthropic-api-key",
+        help="Anthropic API key (can also use ANTHROPIC_API_KEY env var)"
+    )
+
+    parser.add_argument(
         "--openai-base-url",
         help="Custom OpenAI-compatible API endpoint. Can also use OPENAI_BASE_URL env var."
     )
@@ -379,11 +384,21 @@ async def main():
         print("  Use --eval-only to run evaluation without agent execution")
         return 1
 
-    # Get OpenAI API key
+    # Get API keys
     openai_api_key = args.openai_api_key or os.getenv('OPENAI_API_KEY')
-    if not args.no_eval and not args.exe_only and not openai_api_key:
-        print("Warning: No OpenAI API key provided. Evaluation will be skipped.")
-        print("Set OPENAI_API_KEY environment variable or use --openai-api-key to enable evaluation.")
+    anthropic_api_key = args.anthropic_api_key or os.getenv('ANTHROPIC_API_KEY')
+
+    # Check if evaluation model requires specific API key
+    if not args.no_eval and not args.exe_only:
+        eval_model_lower = args.eval_model.lower()
+        if 'claude' in eval_model_lower or 'anthropic' in eval_model_lower:
+            if not anthropic_api_key:
+                print("Warning: No Anthropic API key provided. Evaluation will be skipped.")
+                print("Set ANTHROPIC_API_KEY environment variable or use --anthropic-api-key to enable evaluation.")
+        else:
+            if not openai_api_key:
+                print("Warning: No OpenAI API key provided. Evaluation will be skipped.")
+                print("Set OPENAI_API_KEY environment variable or use --openai-api-key to enable evaluation.")
 
     try:
         # Get agent class
@@ -407,6 +422,10 @@ async def main():
         agent = agent_class(config)
         print(f"Agent mode: {agent.agent_mode}")
 
+        # Determine which API key to pass based on eval model
+        eval_model_lower = args.eval_model.lower()
+        eval_api_key = anthropic_api_key if ('claude' in eval_model_lower or 'anthropic' in eval_model_lower) else openai_api_key
+
         # Create test runner (pass config for rate limiting)
         runner = UnifiedTestRunner(
             agent=agent,
@@ -414,7 +433,7 @@ async def main():
             cases_dir=args.cases,
             data_dir=args.data_dir,
             output_dir=args.output,
-            openai_api_key=openai_api_key,
+            openai_api_key=eval_api_key,  # Pass the appropriate API key for the eval model
             eval_model=args.eval_model,
             static_screenshot=args.static_screenshot,
             config=config,
@@ -454,9 +473,14 @@ async def main():
         # Handle --eval-only flag
         elif args.eval_only:
             print("\n📊 Evaluation-only mode: Skipping agent execution\n")
-            if not openai_api_key:
-                print("Error: --eval-only requires an OpenAI API key for evaluation")
-                print("Set OPENAI_API_KEY environment variable or use --openai-api-key")
+            if not eval_api_key:
+                eval_model_lower = args.eval_model.lower()
+                if 'claude' in eval_model_lower or 'anthropic' in eval_model_lower:
+                    print("Error: --eval-only requires an Anthropic API key for evaluation")
+                    print("Set ANTHROPIC_API_KEY environment variable or use --anthropic-api-key")
+                else:
+                    print("Error: --eval-only requires an OpenAI API key for evaluation")
+                    print("Set OPENAI_API_KEY environment variable or use --openai-api-key")
                 return 1
 
             # For eval-only mode, use agent_mode if provided, otherwise construct it
@@ -593,7 +617,7 @@ async def main():
                 result = await runner.run_single_test_case(target_case, save_result=False)
 
                 # Run evaluation if requested (skip if --exe-only is set)
-                if not args.no_eval and not args.exe_only and result.get("status") == "completed" and openai_api_key:
+                if not args.no_eval and not args.exe_only and result.get("status") == "completed" and eval_api_key:
                     eval_result = await runner.run_evaluation(target_case)
                     result["evaluation"] = eval_result
 
