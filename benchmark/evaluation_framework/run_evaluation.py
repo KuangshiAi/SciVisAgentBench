@@ -175,7 +175,8 @@ def parse_args():
     # Specific case
     parser.add_argument(
         "--case",
-        help="Run only a specific test case by name"
+        nargs='+',
+        help="Run only specific test case(s) by name. Can specify multiple cases separated by spaces."
     )
 
     parser.add_argument(
@@ -212,19 +213,27 @@ def parse_args():
     return parser.parse_args()
 
 
-def clear_case_results(cases_dir: str, case_name: str = None):
+def clear_case_results(cases_dir: str, case_names = None):
     """
     Clear agent execution results from test case directories.
 
     Args:
         cases_dir: Path to the cases directory
-        case_name: Optional specific case name. If None, clears all cases.
+        case_names: Optional specific case name(s). Can be a string, list of strings, or None for all cases.
     """
     cases_path = Path(cases_dir)
 
     if not cases_path.exists():
         print(f"Warning: Cases directory not found: {cases_dir}")
         return
+
+    # Normalize case_names to a list
+    if case_names is None:
+        case_names_list = None
+    elif isinstance(case_names, str):
+        case_names_list = [case_names]
+    else:
+        case_names_list = case_names
 
     # Directories to remove from each case
     dirs_to_remove = ["results", "evaluation_results", "test_results"]
@@ -233,13 +242,14 @@ def clear_case_results(cases_dir: str, case_name: str = None):
     # For bioimage_data, we need to handle nested structure: bioimage_data/eval_xxx/case_1
     cases_to_clear = []
 
-    if case_name:
-        # Specific case - need to find it in nested structure
-        for subdir in cases_path.iterdir():
-            if subdir.is_dir() and not subdir.name.startswith('.'):
-                case_path = subdir / case_name
-                if case_path.exists():
-                    cases_to_clear.append((subdir.name, case_name))
+    if case_names_list:
+        # Specific cases - need to find them in nested structure
+        for case_name in case_names_list:
+            for subdir in cases_path.iterdir():
+                if subdir.is_dir() and not subdir.name.startswith('.'):
+                    case_path = subdir / case_name
+                    if case_path.exists():
+                        cases_to_clear.append((subdir.name, case_name))
     else:
         # All cases - find all nested cases
         for subdir in cases_path.iterdir():
@@ -456,7 +466,7 @@ async def main():
         # Validate that --case and --start-from are mutually exclusive
         if args.case and args.start_from:
             print("Error: --case and --start-from cannot be used together")
-            print("  Use --case to run a single specific case")
+            print("  Use --case to run specific case(s)")
             print("  Use --start-from to resume from a case and run all subsequent cases")
             return 1
 
@@ -493,44 +503,51 @@ async def main():
 
             # Run evaluation on all cases
             if args.case:
-                # Find specific case
-                target_case = None
-                for case in test_cases:
-                    if case.case_name == args.case:
-                        target_case = case
-                        break
+                # Handle multiple cases
+                case_names = args.case if isinstance(args.case, list) else [args.case]
 
-                if not target_case:
-                    print(f"Error: Test case '{args.case}' not found")
-                    return 1
+                for case_name in case_names:
+                    # Find specific case
+                    target_case = None
+                    for case in test_cases:
+                        if case.case_name == case_name:
+                            target_case = case
+                            break
 
-                print(f"Evaluating existing results for: {args.case}")
-                eval_result = await runner.run_evaluation(target_case)
+                    if not target_case:
+                        print(f"Error: Test case '{case_name}' not found")
+                        print("Available cases:", [case.case_name for case in test_cases])
+                        continue
 
-                # Load previous test result if it exists
-                previous_result = runner.load_latest_result(target_case)
+                    print(f"\nEvaluating existing results for: {case_name}")
+                    eval_result = await runner.run_evaluation(target_case)
 
-                if previous_result:
-                    # Merge evaluation with existing test data
-                    result = previous_result.copy()
-                    result["evaluation"] = eval_result
-                    # Update status to indicate eval-only run
-                    result["status"] = "eval_only"
-                    # Update agent_mode if provided
-                    if args.agent_mode:
-                        result["agent_mode"] = eval_agent_mode
-                else:
-                    # No previous result found, create minimal result
-                    result = {
-                        "status": "eval_only",
-                        "case_name": args.case,
-                        "agent_mode": eval_agent_mode,
-                        "evaluation": eval_result
-                    }
+                    # Load previous test result if it exists
+                    previous_result = runner.load_latest_result(target_case)
 
-                await runner.save_centralized_result(target_case, result)
+                    if previous_result:
+                        # Merge evaluation with existing test data
+                        result = previous_result.copy()
+                        result["evaluation"] = eval_result
+                        # Update status to indicate eval-only run
+                        result["status"] = "eval_only"
+                        # Update agent_mode if provided
+                        if args.agent_mode:
+                            result["agent_mode"] = eval_agent_mode
+                    else:
+                        # No previous result found, create minimal result
+                        result = {
+                            "status": "eval_only",
+                            "case_name": case_name,
+                            "agent_mode": eval_agent_mode,
+                            "evaluation": eval_result
+                        }
 
-                print(f"\n✓ Evaluation complete for {args.case}")
+                    await runner.save_centralized_result(target_case, result)
+
+                    print(f"✓ Evaluation complete for {case_name}")
+
+                print(f"\n✓ All {len(case_names)} case(s) evaluated")
                 return 0
             else:
                 # Handle --start-from flag for eval-only mode
@@ -596,36 +613,52 @@ async def main():
 
         # Run specific case or all cases
         if args.case:
-            # Find specific case
-            target_case = None
-            for case in test_cases:
-                if case.case_name == args.case:
-                    target_case = case
-                    break
+            # Handle multiple cases
+            case_names = args.case if isinstance(args.case, list) else [args.case]
 
-            if not target_case:
-                print(f"Error: Test case '{args.case}' not found")
-                print("Available cases:", [case.case_name for case in test_cases])
+            # Find all target cases
+            target_cases = []
+            for case_name in case_names:
+                target_case = None
+                for case in test_cases:
+                    if case.case_name == case_name:
+                        target_case = case
+                        break
+
+                if not target_case:
+                    print(f"Error: Test case '{case_name}' not found")
+                    print("Available cases:", [case.case_name for case in test_cases])
+                else:
+                    target_cases.append(target_case)
+
+            if not target_cases:
+                print("Error: No valid test cases found")
                 return 1
 
             # Setup agent
             await agent.setup()
 
             try:
-                # Run single case without saving (we'll save after evaluation)
-                print(f"\nRunning single test case: {args.case}")
-                result = await runner.run_single_test_case(target_case, save_result=False)
+                all_success = True
+                for target_case in target_cases:
+                    # Run single case without saving (we'll save after evaluation)
+                    print(f"\nRunning test case: {target_case.case_name}")
+                    result = await runner.run_single_test_case(target_case, save_result=False)
 
-                # Run evaluation if requested (skip if --exe-only is set)
-                if not args.no_eval and not args.exe_only and result.get("status") == "completed" and eval_api_key:
-                    eval_result = await runner.run_evaluation(target_case)
-                    result["evaluation"] = eval_result
+                    # Run evaluation if requested (skip if --exe-only is set)
+                    if not args.no_eval and not args.exe_only and result.get("status") == "completed" and eval_api_key:
+                        eval_result = await runner.run_evaluation(target_case)
+                        result["evaluation"] = eval_result
 
-                # Save result with evaluation data
-                await runner.save_centralized_result(target_case, result)
+                    # Save result with evaluation data
+                    await runner.save_centralized_result(target_case, result)
 
-                print(f"\nCase result: {result.get('status')}")
-                return 0 if result.get('status') == 'completed' else 1
+                    print(f"Case result: {result.get('status')}")
+                    if result.get('status') != 'completed':
+                        all_success = False
+
+                print(f"\n✓ Completed {len(target_cases)} case(s)")
+                return 0 if all_success else 1
 
             finally:
                 await agent.teardown()
