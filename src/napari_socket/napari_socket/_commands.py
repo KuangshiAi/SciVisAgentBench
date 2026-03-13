@@ -368,47 +368,64 @@ def set_blending(
         viewer: Viewer,
         ):
     """Set how the layer blends with layers below it."""
-    layer = _get_layer(viewer, layer_name)
-    if hasattr(layer, 'blending'):
-        layer.blending = blending
-        return f"Blending mode for layer '{layer.name}' set to '{blending}'."
-    return f"Layer '{layer.name}' does not have a blending attribute."
+    try:
+        layer = _get_layer(viewer, layer_name)
+        if hasattr(layer, 'blending'):
+            layer.blending = blending
+            return f"Blending mode for layer '{layer.name}' set to '{blending}'."
+        return f"Layer '{layer.name}' does not have a blending attribute."
+    except (KeyError, IndexError) as e:
+        # Get available layer names for better error message
+        available_layers = [layer.name for layer in viewer.layers]
+        return f"Layer '{layer_name}' not found. Available layers: {available_layers}"
 
 def set_contrast_limits(
-    layer_name: str | int, 
-    contrast_min: float, 
-    contrast_max: float, 
+    layer_name: str | int,
+    contrast_min: float,
+    contrast_max: float,
     viewer: Viewer,
     ):
     """Set the min/max values for contrast scaling."""
-    layer = _get_layer(viewer, layer_name)
-    if hasattr(layer, 'contrast_limits'):
-        layer.contrast_limits = (contrast_min, contrast_max)
-        return f"Contrast limits for layer '{layer.name}' set to ({contrast_min}, {contrast_max})."
-    return f"Layer '{layer.name}' does not have a contrast_limits attribute."
+    try:
+        layer = _get_layer(viewer, layer_name)
+        if hasattr(layer, 'contrast_limits'):
+            layer.contrast_limits = (contrast_min, contrast_max)
+            return f"Contrast limits for layer '{layer.name}' set to ({contrast_min}, {contrast_max})."
+        return f"Layer '{layer.name}' does not have a contrast_limits attribute."
+    except (KeyError, IndexError) as e:
+        available_layers = [layer.name for layer in viewer.layers]
+        return f"Layer '{layer_name}' not found. Available layers: {available_layers}"
 
 def auto_contrast(
         layer_name: str | int,
-        viewer: Viewer, 
+        viewer: Viewer,
     ):
     """Automatically adjust contrast to fit the data range."""
-    layer = _get_layer(viewer, layer_name)
-    if hasattr(layer, 'reset_contrast_limits'):
-        layer.reset_contrast_limits()
-        return f"Auto-contrasted layer '{layer.name}'. New limits: {layer.contrast_limits}."
-    return f"Layer '{layer.name}' does not have auto-contrast capability."
+    try:
+        layer = _get_layer(viewer, layer_name)
+        if hasattr(layer, 'reset_contrast_limits'):
+            layer.reset_contrast_limits()
+            return f"Auto-contrasted layer '{layer.name}'. New limits: {layer.contrast_limits}."
+        return f"Layer '{layer.name}' does not have auto-contrast capability."
+    except (KeyError, IndexError) as e:
+        available_layers = [layer.name for layer in viewer.layers]
+        return f"Layer '{layer_name}' not found. Available layers: {available_layers}"
 
 def set_gamma(
-        layer_name: str | int, 
-        gamma: float, 
-        viewer: Viewer, 
+        layer_name: str | int,
+        gamma: float,
+        viewer: Viewer,
         ):
     """Adjust gamma correction for the layer."""
-    layer = _get_layer(viewer, layer_name)
-    if hasattr(layer, 'gamma'):
-        layer.gamma = gamma
-        return f"Gamma for layer '{layer.name}' set to {gamma}."
-    return f"Layer '{layer.name}' does not have a gamma attribute."
+    try:
+        layer = _get_layer(viewer, layer_name)
+        if hasattr(layer, 'gamma'):
+            layer.gamma = gamma
+            return f"Gamma for layer '{layer.name}' set to {gamma}."
+        return f"Layer '{layer.name}' does not have a gamma attribute."
+    except (KeyError, IndexError) as e:
+        available_layers = [layer.name for layer in viewer.layers]
+        return f"Layer '{layer_name}' not found. Available layers: {available_layers}"
 
 
 def set_timestep(
@@ -615,20 +632,24 @@ def get_layer_data(
     viewer: Viewer = None,
 ):
     """Extract layer data as numpy array."""
-    layer = _get_layer(viewer, layer_name)
-    
-    if hasattr(layer, 'data'):
-        data = layer.data
-        if hasattr(data, 'compute'):  # Handle dask arrays
-            data = data.compute()
-        return {
-            'data': to_serializable(data),
-            'shape': data.shape,
-            'dtype': str(data.dtype),
-            'layer_type': layer.__class__.__name__
-        }
-    else:
-        return f"Layer '{layer.name}' does not have data attribute."
+    try:
+        layer = _get_layer(viewer, layer_name)
+
+        if hasattr(layer, 'data'):
+            data = layer.data
+            if hasattr(data, 'compute'):  # Handle dask arrays
+                data = data.compute()
+            return {
+                'data': to_serializable(data),
+                'shape': data.shape,
+                'dtype': str(data.dtype),
+                'layer_type': layer.__class__.__name__
+            }
+        else:
+            return f"Layer '{layer.name}' does not have data attribute."
+    except (KeyError, IndexError) as e:
+        available_layers = [layer.name for layer in viewer.layers]
+        return f"Layer '{layer_name}' not found. Available layers: {available_layers}"
 
 # ----------------------------------------------------------------------
 # Advanced Visualization Controls
@@ -678,9 +699,13 @@ def set_layer_visibility(
     viewer: Viewer = None,
 ):
     """Set layer visibility."""
-    layer = _get_layer(viewer, layer_name)
-    layer.visible = visible
-    return f"Layer '{layer.name}' {'visible' if visible else 'hidden'}"
+    try:
+        layer = _get_layer(viewer, layer_name)
+        layer.visible = visible
+        return f"Layer '{layer.name}' {'visible' if visible else 'hidden'}"
+    except (KeyError, IndexError) as e:
+        available_layers = [layer.name for layer in viewer.layers]
+        return f"Layer '{layer_name}' not found. Available layers: {available_layers}"
 
 # ----------------------------------------------------------------------
 # Measurement & Analysis Functions
@@ -707,23 +732,27 @@ def get_layer_statistics(
     viewer: Viewer = None,
 ):
     """Get statistics for a layer."""
-    layer = _get_layer(viewer, layer_name)
-    
-    if hasattr(layer, 'data'):
-        data = layer.data
-        if hasattr(data, 'compute'):  # Handle dask arrays
-            data = data.compute()
-        
-        return {
-            'min': float(np.min(data)),
-            'max': float(np.max(data)),
-            'mean': float(np.mean(data)),
-            'std': float(np.std(data)),
-            'shape': data.shape,
-            'dtype': str(data.dtype)
-        }
-    else:
-        return f"Layer '{layer.name}' does not have data attribute."
+    try:
+        layer = _get_layer(viewer, layer_name)
+
+        if hasattr(layer, 'data'):
+            data = layer.data
+            if hasattr(data, 'compute'):  # Handle dask arrays
+                data = data.compute()
+
+            return {
+                'min': float(np.min(data)),
+                'max': float(np.max(data)),
+                'mean': float(np.mean(data)),
+                'std': float(np.std(data)),
+                'shape': data.shape,
+                'dtype': str(data.dtype)
+            }
+        else:
+            return f"Layer '{layer.name}' does not have data attribute."
+    except (KeyError, IndexError) as e:
+        available_layers = [layer.name for layer in viewer.layers]
+        return f"Layer '{layer_name}' not found. Available layers: {available_layers}"
 
 def crop_layer(
     layer_name: str | int,
@@ -731,26 +760,30 @@ def crop_layer(
     viewer: Viewer = None,
 ):
     """Crop layer to specific bounds."""
-    layer = _get_layer(viewer, layer_name)
-    
-    if hasattr(layer, 'data'):
-        # bounds should be [start_t, end_t, start_z, end_z, start_y, end_y, start_x, end_x]
-        if len(bounds) != 8:
-            return "Bounds must be a list of 8 values: [start_t, end_t, start_z, end_z, start_y, end_y, start_x, end_x]"
-        
-        # Create slice object
-        slices = tuple(slice(bounds[i], bounds[i+1]) for i in range(0, 8, 2))
-        
-        # Crop the data
-        cropped_data = layer.data[slices]
-        
-        # Add as new layer
-        new_name = f"{layer.name}_cropped"
-        viewer.add_image(cropped_data, name=new_name)
-        
-        return f"Cropped layer '{layer.name}' to shape {cropped_data.shape}, added as '{new_name}'"
-    else:
-        return f"Layer '{layer.name}' does not have data attribute."
+    try:
+        layer = _get_layer(viewer, layer_name)
+
+        if hasattr(layer, 'data'):
+            # bounds should be [start_t, end_t, start_z, end_z, start_y, end_y, start_x, end_x]
+            if len(bounds) != 8:
+                return "Bounds must be a list of 8 values: [start_t, end_t, start_z, end_z, start_y, end_y, start_x, end_x]"
+
+            # Create slice object
+            slices = tuple(slice(bounds[i], bounds[i+1]) for i in range(0, 8, 2))
+
+            # Crop the data
+            cropped_data = layer.data[slices]
+
+            # Add as new layer
+            new_name = f"{layer.name}_cropped"
+            viewer.add_image(cropped_data, name=new_name)
+
+            return f"Cropped layer '{layer.name}' to shape {cropped_data.shape}, added as '{new_name}'"
+        else:
+            return f"Layer '{layer.name}' does not have data attribute."
+    except (KeyError, IndexError) as e:
+        available_layers = [layer.name for layer in viewer.layers]
+        return f"Layer '{layer_name}' not found. Available layers: {available_layers}"
 
 # ----------------------------------------------------------------------
 # Time Series & Multi-dimensional Data

@@ -98,3 +98,5 @@ src/gmx_vmd_mcp/.mcp
 
 benchmark/human_judge/human_results
 benchmark/human_judge/llm_results
+
+test_results_gpt-5-2

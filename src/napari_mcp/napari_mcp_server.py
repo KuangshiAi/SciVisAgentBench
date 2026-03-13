@@ -120,6 +120,7 @@ def build_mcp(manager: NapariManager) -> FastMCP:
     """
     prompt = (
         "You control a remote napari GUI through a TCP socket. "
+        "You should always check what layers are currently loaded before trying to manipulate them. Using the wrong layer name will cause system failure. Always refer to the layer list to get the correct names.\n\n"
         "Use the get_screenshot tool to see the current viewport.\n\n"
         "Available tools:\n"
         "• open_file(path) - load image files (TIFF, PNG, ND2, NPZ, etc.)\n"
