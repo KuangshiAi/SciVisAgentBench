@@ -10,10 +10,10 @@ Skills are defined as Markdown files deployed to `~/.claude/commands/`. Once dep
 
 ```
 skills/
-├── README.md              # This file
-├── napari-viz.md          # Napari headless visualization
-├── vmd-viz.md             # (planned) VMD molecular visualization
-├── matplotlib-viz.md      # (planned) Matplotlib scientific plotting
+├── README.md                  # This file
+├── napari-viz.md              # Napari headless visualization
+├── vmd-mdanalysis-viz.md      # VMD molecular visualization + MDAnalysis trajectory analysis
+├── matplotlib-viz.md          # (planned) Matplotlib scientific plotting
 └── ...
 ```
 
@@ -74,6 +74,7 @@ Open a Claude Code session and run `/napari-viz Create a random 100x100 image an
 | Skill file | Command | Trigger condition |
 |------------|---------|-------------------|
 | `napari-viz.md` | `/napari-viz` | napari or scientific image visualization tasks |
+| `vmd-mdanalysis-viz.md` | `/vmd-mdanalysis-viz` | VMD molecular visualization, MDAnalysis trajectory analysis, or molecular dynamics tasks |
 
 ---
 
