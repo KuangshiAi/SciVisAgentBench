@@ -276,11 +276,14 @@ IMPORTANT: Don't read folder not specificed in the instruction, and you can neve
             # --dangerously-bypass-approvals-and-sandbox: Skip confirmations and run without sandbox
             # -C: Change to working directory
 
+            # Convert working_dir to absolute path to avoid relative path issues
+            working_dir_abs = working_dir.resolve()
+
             cmd = [
                 self.codex_path, "exec",
                 "--json",
                 "--ephemeral",
-                "-C", str(working_dir)
+                "-C", str(working_dir_abs)
             ]
 
             if self.auto_approve:
@@ -310,7 +313,7 @@ IMPORTANT: Don't read folder not specificed in the instruction, and you can neve
                 with open(prompt_file, 'r') as prompt_input:
                     process = subprocess.Popen(
                         cmd,
-                        cwd=str(working_dir),
+                        cwd=None,  # Run from current directory, let -C handle directory change
                         stdin=prompt_input,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.STDOUT,
@@ -495,7 +498,7 @@ IMPORTANT: Don't read folder not specificed in the instruction, and you can neve
                 with open(prompt_file, 'r') as prompt_input:
                     result = subprocess.run(
                         cmd,
-                        cwd=str(working_dir),
+                        cwd=None,  # Run from current directory, let -C handle directory change
                         stdin=prompt_input,
                         capture_output=True,
                         text=True,

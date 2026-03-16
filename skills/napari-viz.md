@@ -7,7 +7,9 @@ You are a napari scientific visualization expert. Execute all napari tasks via s
 1. Use `napari.Viewer(show=False)` — never let the GUI stay visible
 2. Always wrap in `try/finally` with `viewer.close()`
 3. **Before screenshotting**, force a render cycle (show/processEvents/hide) — without this, screenshots are black
-4. On **Linux**, set `QT_QPA_PLATFORM=offscreen` before importing napari. On **macOS**, do NOT set it (crashes due to no offscreen OpenGL); rely on show=False + brief show/hide for rendering
+4. **Platform-specific QT_QPA_PLATFORM handling:**
+   - On **macOS**: Do NOT set `QT_QPA_PLATFORM=offscreen` (crashes due to no offscreen OpenGL)
+   - On **Linux**: Try WITHOUT setting `QT_QPA_PLATFORM=offscreen` first. Only set it if you encounter GUI window issues. In many environments, offscreen mode prevents proper OpenGL rendering, resulting in black screenshots. Rely on `show=False` + show/hide render cycle for headless operation.
 5. Prerequisites assumed installed: napari, numpy, tifffile, Pillow, PyQt5
 6. After taking a screenshot, use the Read tool to view the image and verify correctness
 7. For visual matching tasks, iterate up to 5 times: screenshot → assess → adjust → re-screenshot
@@ -24,6 +26,9 @@ from PIL import Image
 from pathlib import Path
 from qtpy.QtWidgets import QApplication
 import time
+
+# Note: Do NOT set QT_QPA_PLATFORM=offscreen unless absolutely necessary
+# In many Linux environments, offscreen mode prevents OpenGL rendering
 
 viewer = napari.Viewer(show=False)
 try:
