@@ -210,7 +210,7 @@ class CodexCLIAgent(BaseAgent):
         context = f"""{custom_prefix}You are a general-purpose coding agent with access to scientific visualization tools.
 
 Environment:
-- Python environment with packages: paraview.simple, napari, numpy, scipy, matplotlib, vmd-python, ttk (topology tool-kit), GROMACS - gmx (non python CLI tool)
+- The current Python environment have packages (directly use python): paraview.simple, napari, numpy, scipy, matplotlib, vmd-python, ttk (topology tool-kit), GROMACS - gmx (non python CLI tool)
 - You can install additional packages if needed using pip
 - Working directory: {task_config.get('working_dir', 'current directory')}
 - Data directory: {task_config.get('data_dir', 'same as working directory')}
