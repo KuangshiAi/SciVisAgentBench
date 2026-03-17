@@ -182,5 +182,5 @@ When given $ARGUMENTS:
 2. Write a self-contained Python script following the template above
 3. Execute it with Bash
 4. Read the output image to verify correctness
-5. If the result needs adjustment, iterate (max 5 rounds)
+5. If the result needs adjustment, try iterate
 6. Report the result to the user
