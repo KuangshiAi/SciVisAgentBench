@@ -12,7 +12,7 @@
   "custom_system_prompt": "",
   "environment": {
     "type": "conda",
-    "name": "scivis_bench",
+    "name": "vmd",
     "packages": [
       "paraview",
       "napari",
@@ -22,7 +22,7 @@
     ]
   },
   "price": {
-    "input_per_1m_tokens": "$5.00",
-    "output_per_1m_tokens": "$15.00"
+    "input_per_1m_tokens": "$1.75",
+    "output_per_1m_tokens": "$14.00"
   }
 }
