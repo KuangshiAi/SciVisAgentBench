@@ -12,9 +12,9 @@ You are a napari scientific visualization expert. Execute all napari tasks via s
    - On **Linux**: Try WITHOUT setting `QT_QPA_PLATFORM=offscreen` first. Only set it if you encounter GUI window issues. In many environments, offscreen mode prevents proper OpenGL rendering, resulting in black screenshots. Rely on `show=False` + show/hide render cycle for headless operation.
 5. Prerequisites assumed installed: napari, numpy, tifffile, Pillow, PyQt5
 6. For visual matching tasks, iterate with: screenshot → assess → adjust → re-screenshot
-7. After taking a screenshot, use the Read tool to view the image and verify correctness. Relying on the model's vision capability to understand what the model actually accompolished.
+7. After taking a screenshot, use the Read tool to view the image and relying on the model's vision capability to understand whether the code accompolished the goal.
 8. Use `python` (not `python3`) to run scripts
-9. General visualization strategy, optimized for the mapping first, always optimize the view last (make smaller adjustment at each step).
+9. General visualization strategy, optimized for the color/opacity mapping first, don't change view or rotation unless really necessary, it need to be well-motivated.
 
 ## Canonical Script Template
 
@@ -106,6 +106,11 @@ viewer.camera.zoom = 2.0            # zoom level
 viewer.camera.angles = (elev, azim, roll)  # 3D rotation (degrees)
 ```
 
+Rotation notes:
+- Rotation only affects 3D renders: set `viewer.dims.ndisplay = 3` and use a 3D-capable layer (volume or surface).
+- Use rotation for exploratory viewing / figure framing; avoid it for near-planar volumes (few slices), or when you need quantitative Z localization (use slicing/orthogonal views).
+- If voxels are anisotropic, set `layer.scale` (physical spacing) before rotating to avoid misleading geometry.
+
 ### 3D Rendering
 
 ```python
@@ -150,13 +155,16 @@ for i, cmap in enumerate(cmaps):
     viewer.add_image(channels[i], name=f"ch{i}", colormap=cmap, blending="additive")
 ```
 
-### 3D Volume MIP
+### 3D Volume Exploration (camera + rendering)
 ```python
 vol = tifffile.imread("volume.tif")  # (Z, Y, X)
-layer = viewer.add_image(vol, name="volume", colormap="inferno", rendering="mip")
+layer = viewer.add_image(vol, name="volume", colormap="inferno", rendering="mip")  # or "iso"
+# layer.scale = (z_um, y_um, x_um)  # set physical spacing if known
 viewer.dims.ndisplay = 3
-viewer.camera.angles = (30, -45, 0)
+viewer.reset_view()
 ```
+
+Notes: for projection renderings (mip/average/minip/attenuated_mip), rotation changes the projection direction; for iso, rotation changes occlusion/shading cues.
 
 ### Iterative Visual Refinement
 ```python
@@ -170,6 +178,7 @@ Image.fromarray(img).save("attempt_1.png")
 ## Debugging & Error Handling
 
 - **Blank/black screenshot?** → Ensure you included the show/processEvents/hide render cycle before screenshotting. Also call `viewer.reset_view()`, check `layer.visible`, verify `contrast_limits` bracket actual data range
+- **Rotation not changing the view?** → Ensure `viewer.dims.ndisplay = 3`, the layer is actually 3D, and the volume is not effectively 2D (single/few slices).
 - **macOS OpenGL crash with offscreen?** → Do NOT set `QT_QPA_PLATFORM=offscreen` on macOS. Use `show=False` + show/hide render cycle instead
 - **Dask array?** → Call `layer.data.compute()` before analysis
 - **Large data?** → Use `tifffile.imread(file, key=slice_range)` to load subsets
