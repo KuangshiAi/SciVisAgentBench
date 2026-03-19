@@ -67,7 +67,8 @@ from evaluation_framework.agents import (
     ParaViewMCPAgent,
     NapariMCPAgent,
     ChatVisAgent,
-    TopoPilotMCPAgent
+    TopoPilotMCPAgent,
+    CodexCLIAgent
 )
 
 

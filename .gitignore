@@ -100,3 +100,13 @@ benchmark/human_judge/human_results
 benchmark/human_judge/llm_results
 
 test_results_gpt-5-2
+
+SciVisAgentBench-tasks-eval-exp-all
+
+eval_reports_claude_code_gpt-5.2
+
+eval_reports_gpt-5.2
+
+eval_reports_codex_cli_gpt5.2
+eval_reports_codex_claude-opus-4-6
+codex-eval-exp-all
