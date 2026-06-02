@@ -1,6 +1,6 @@
 # SciVisAgentBench
 
-**📝 Learn more or contribute to SciVisAgentBench through our [project page](https://scivisagentbench.github.io/).**
+**📄 [Paper](https://arxiv.org/abs/2603.29139) | 📝 [Project Page](https://scivisagentbench.github.io/) | 🤗 [Dataset](https://huggingface.co/datasets/SciVisAgentBench/SciVisAgentBench-tasks)**
 
 SciVisAgentBench is a comprehensive benchmark for evaluating scientific visualization agents. The benchmark supports evaluation of three autonomous agents, ParaView-MCP, bioimage-agent, and ChatVis, enabling users to create and manipulate scientific visualizations using natural language instead of complex commands or GUI operations. The benchmark uses YAML files compatible with [promptfoo](https://www.promptfoo.dev/) to store test cases and evaluation metrics. This initial version focuses on outcome-based evaluation, using both LLM-as-a-judge and quantitative metrics.
 
@@ -39,7 +39,7 @@ python -m benchmark.evaluation_framework.run_evaluation \
 
 ## Download Benchmark Tasks
 
-Download the benchmark tasks from our secondary huggingface dataset repo [KuangshiAi/SciVisAgentBench-tasks](https://huggingface.co/datasets/KuangshiAi/SciVisAgentBench-tasks) and place them in your workspace.
+Download the benchmark tasks from our secondary huggingface dataset repo [SciVisAgentBench/SciVisAgentBench-tasks](https://huggingface.co/datasets/SciVisAgentBench/SciVisAgentBench-tasks) and place them in your workspace.
 
 ```bash
 pip install huggingface_hub
@@ -481,3 +481,16 @@ Thomas Peterka (tpeterka@mcs.anl.gov), Kaiyuan Tang (ktang2@nd.edu), Nathaniel G
 
 © 2026 University of Notre Dame.  
 Released under the [License](./LICENSE).
+
+## Citation
+
+If you find SciVisAgentBench useful, please cite our paper:
+
+```bibtex
+@article{ai2026scivisagentbench,
+  title={SciVisAgentBench: A benchmark for evaluating scientific data analysis and visualization agents},
+  author={Ai, Kuangshi and Miao, Haichao and Tang, Kaiyuan and Gorski, Nathaniel and Sun, Jianxin and Liu, Guoxi and Ingolfsson, Helgi I and Lenz, David and Guo, Hanqi and Yu, Hongfeng and others},
+  journal={arXiv preprint arXiv:2603.29139},
+  year={2026}
+}
+```

@@ -3,7 +3,6 @@
   "model": "gpt-5.2",
   "eval_mode": "generic",
   "agent_name": "codex_cli",
-  "experiment_number": "exp1",
   "timeout_per_task": 600,
   "codex_cli_path": "codex",
   "preserve_workdir": false,

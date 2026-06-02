@@ -1,0 +1,458 @@
+# Comprehensive Test Cases for SciVisAgentBench Main Tasks
+# This test evaluates the ability to complete specific visualization tasks
+# with detailed requirements and evaluation criteria
+# Case 2: argon-bubble
+- vars:
+    question: |
+        Task:
+        Load the Argon Bubble dataset from "argon-bubble/data/argon-bubble_128x128x256_float32.vtk".
+        Generate a visualization image of the Argon Bubble scalar field dataset with the following visualization settings:
+        1) Create volume rendering
+        2) Set the opacity transfer function as a ramp function across values of the volumetric data, assigning opacity 0 to value 0 and assigning opacity 1 to value 1.
+        3) Set the color transfer function to assign a warm red color [0.71, 0.02, 0.15] to the highest value, a cool color [0.23, 0.29, 0.75] to the lowest value, and a grey color[0.87, 0.87, 0.87] to the midrange value
+        4) Set the viewpoint parameters as: [0, 450, 0] to position; [0, 0, -15] to focal point; [0, 0, -1] to camera up direction
+        5) Visualization image resolution is 1024x1024. White background. Shade turned off. Volume rendering ray casting sample distance is 0.1
+        6) Don't show color/scalar bar or coordinate axes.
+
+        Save the visualization image as "argon-bubble/results/{agent_mode}/argon-bubble.png".
+        (Optional, but must save if use paraview) Save the paraview state as "argon-bubble/results/{agent_mode}/argon-bubble.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "argon-bubble/results/{agent_mode}/argon-bubble.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "argon-bubble/results/{agent_mode}/argon-bubble.cxx"
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Does the visualization image clearly show the regions of cool, warm, and mild regions?
+
+          2. Does the blueish region show areas with low opacity?
+
+          3. Does the reddish region show areas with high opacity?
+
+# Case 4: bonsai
+- vars:
+    question: |
+        Task:
+
+        Load the bonsai dataset from "bonsai/data/bonsai_256x256x256_uint8.raw", the information about this dataset:
+        Bonsai (Scalar)
+        Data Scalar Type: unsigned char
+        Data Byte Order: little Endian
+        Data Spacing: 1x1x1
+        Data Extent: 256x256x256
+
+        Then visualize it with volume rendering, modify the transfer function and reach the visualization goal as: "A potted tree with brown pot silver branch and golden leaves."
+
+        Please think step by step and make sure to fulfill all the visualization goals mentioned above.
+
+        Use a white background. Render at 1280x1280. Do not show a color bar or coordinate axes.
+
+        Set the viewpoint parameters as: [-765.09, 413.55, 487.84] to position; [-22.76, 153.30, 157.32] to focal point; [0.30, 0.95, -0.07] to camera up direction.
+
+        Save the visualization image as "bonsai/results/{agent_mode}/bonsai.png".
+        (Optional, but must save if use paraview) Save the paraview state as "bonsai/results/{agent_mode}/bonsai.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "bonsai/results/{agent_mode}/bonsai.py".
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Overall Visualization Goal: How well does the result achieve the overall goal of showing a potted tree with the specified colors?
+
+          2. Brown Pot Visualization: Does the result show the pot portion in brown color?
+
+          3. Silver Branch Visualization: Does the result show the branch/trunk portion in silver color?
+
+          4. Golden Leaves Visualization: Does the result show the leaves portion in golden color?
+
+
+# Case 6: chameleon_isosurface
+- vars:
+    question: |
+        Task:
+        Load the chameleon dataset from "chameleon_isosurface/data/chameleon_isosurface_256x256x256_float32.vtk".
+        Generate a visualization image of 2 isosurfaces of the Chameleon scalar field dataset with the following visualization settings:
+        1) Create isosurfaces of Iso_1 with a value of 0.12 and Iso_2 with a value of 0.45
+        2) Assign RGB color of [0.0, 1.0, 0.0] to Iso_1, and color of [1.0, 1.0, 1.0] to Iso_2
+        3) Assign opacity of 0.1 to Iso_1, and opacity of 0.99 to Iso_2
+        4) Set the lighting parameter as: 0.1 to Ambient; 0.7 to Diffuse; 0.6 to Specular
+        5) Set the viewpoint parameters as: [600, 0, 0] to position; [0, 0, 0] to focal point; [0, -1, 0] to camera up direction
+        6) White background
+        7) Visualization image resolution is 1024x1024
+        8) Don't show color/scalar bar or coordinate axes.
+
+        Save the visualization image as "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.png".
+        (Optional, but must save if use paraview) Save the paraview state as "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "chameleon_isosurface/results/{agent_mode}/chameleon_isosurface.cxx"
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Does the result present 2 isosurfaces, one showing the inner part of the chameleon and one showing the outer part of the chameleon?
+
+          2. Is the skin of the Chameleon object of green color?
+
+          3. Is the bone of the Chameleon object of white color?
+
+
+# Case 8: engine
+- vars:
+    question: |
+        Task:
+
+        Load the vortex dataset from "engine/data/engine_256x256x128_uint8.raw", the information about this dataset:
+        engine (Scalar)
+        Data Scalar Type: float
+        Data Byte Order: little Endian
+        Data Extent: 256x256x128
+        Number of Scalar Components: 1
+
+        Instructions:
+
+        1. Load the dataset into ParaView.
+
+        2. Apply the volume rendering to visualize the engine dataset
+
+        3. Adjust the transfer function, let the outer part more transparent and the inner part more solid. Use light blue for the outer part and orange for the inner part.
+
+        4. Use a white background. Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.
+
+        5. Set the viewpoint parameters as: [-184.58, 109.48, -431.72] to position; [134.05, 105.62, 88.92] to focal point; [0.01, 1.0, -0.001] to camera up direction.
+
+        6. Save your work:
+        Save the visualization image as "engine/results/{agent_mode}/engine.png".
+        (Optional, but must save if use paraview) Save the paraview state as "engine/results/{agent_mode}/engine.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "engine/results/{agent_mode}/engine.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "engine/results/{agent_mode}/engine.cxx"
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Overall Visualization Goal: How well does the result use volume rendering to clearly present the internal and external structures of the engine dataset?
+
+          2. Structural Clarity: Does the visualization emphasize depth so that the outer layers do not obscure the inner structures?
+
+          3. Transfer Function Transparency: Is the outer region rendered with higher transparency and the inner region more solid, achieving a clear layering effect?
+
+          4. Transfer Function Color Mapping: Are colors correctly assigned so that the outer part is light blue and the inner part is orange, enhancing structural contrast?
+
+
+# Case 15: miranda
+- vars:
+    question: |
+        Task:
+        Load the Rayleigh-Taylor Instability dataset from "miranda/data/miranda_256x256x256_float32.vtk".
+        Generate a visualization image of the Rayleigh-Taylor Instability dataset, a time step of a density field in a simulation of the mixing transition in Rayleigh-Taylor instability, with the following visualization settings:
+        1) Create volume rendering
+        2) Set the opacity transfer function as a ramp function from value 0 to 1 of the volumetric data, assigning opacity 0 to value 0 and assigning opacity 1 to value 1.
+        3) Set the color transfer function following the 7 rainbow colors and assign a red color [1.0, 0.0, 0.0] to the highest value, a purple color [0.5, 0.0, 1.0] to the lowest value.
+        4) Set the viewpoint parameters as: [650, 650, 650] to position; [128, 128, 128] to focal point; [1, 0, 0] to camera up direction
+        5) Volume rendering ray casting sample distance is 0.1
+        6) White background
+        7) Visualization image resolution is 1024x1024
+        8) Don't show color/scalar bar or coordinate axes.
+        Save the visualization image as "miranda/results/{agent_mode}/miranda.png".
+        (Optional, but must save if use paraview) Save the paraview state as "miranda/results/{agent_mode}/miranda.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "miranda/results/{agent_mode}/miranda.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "miranda/results/{agent_mode}/miranda.cxx"
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Does the visualization image clearly show the regions from low to high intensity?
+
+          2. Does the purple region show areas with low opacity?
+
+          3. Does the red region show areas with high opacity?
+
+
+# Case 19: rti-velocity_slices
+- vars:
+    question: |
+        Load the Rayleigh-Taylor instability velocity field from "rti-velocity_slices/data/rti-velocity_slices.vti" (VTI format, 128x128x128).
+        Create three orthogonal slices: at x=64 (YZ-plane), y=64 (XZ-plane), and z=64 (XY-plane).
+        Color all three slices by velocity magnitude using the 'Turbo' colormap.
+        Add a color bar labeled 'Velocity Magnitude'.
+        Use a white background. Set an isometric camera view that shows all three slices. Render at 1024x1024.
+        Set the viewpoint parameters as: [200.0, 200.0, 200.0] to position; [63.5, 63.5, 63.5] to focal point; [0.0, 0.0, 1.0] to camera up direction.
+        Save the visualization image as "rti-velocity_slices/results/{agent_mode}/rti-velocity_slices.png".
+        (Optional, but must save if use paraview) Save the paraview state as "rti-velocity_slices/results/{agent_mode}/rti-velocity_slices.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "rti-velocity_slices/results/{agent_mode}/rti-velocity_slices.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "rti-velocity_slices/results/{agent_mode}/rti-velocity_slices.cxx"
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Slice Count and Orientation: Are there exactly three perpendicular slices (one horizontal XY-plane and two vertical XZ and YZ planes), matching the ground truth arrangement?
+          2. Color Mapping: Are the slices colored using a Turbo-like colormap (blue to green to yellow to red) mapped to velocity magnitude, with a similar color distribution as the ground truth?
+          3. Mixing Zone Pattern: Does the horizontal (XY) slice show a chaotic, high-velocity-magnitude mixing pattern in its center region, similar to the ground truth?
+
+
+# Case 22: supernova_isosurface
+- vars:
+    question: |
+        Task:
+
+        Load the supernova dataset from "supernova_isosurface/data/supernova_isosurface_256x256x256_float32.raw", the information about this dataset:
+        supernova (Scalar)
+        Data Scalar Type: float
+        Data Byte Order: little Endian
+        Data Spacing: 1x1x1
+        Data Extent: 256x256x256
+        Data loading is very important, make sure you correctly load the dataset according to their features.
+
+        Then visualize it and extract two isosurfaces. One of them use color red, showing areas with low density (isovalue 40 and opacity 0.2), while the other use color light blue, showing areas with high density (isovalue 150 and opacity 0.4).
+
+        Please think step by step and make sure to fulfill all the visualization goals mentioned above. Only make the two isosurfaces visible.
+
+        Use a white background. Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.
+
+        Set the viewpoint parameters as: [567.97, 80.17, 167.28] to position; [125.09, 108.83, 121.01] to focal point; [-0.11, -0.86, 0.50] to camera up direction.
+
+        Save the visualization image as "supernova_isosurface/results/{agent_mode}/supernova_isosurface.png".
+        (Optional, but must save if use paraview) Save the paraview state as "supernova_isosurface/results/{agent_mode}/supernova_isosurface.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "supernova_isosurface/results/{agent_mode}/supernova_isosurface.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "supernova_isosurface/results/{agent_mode}/supernova_isosurface.cxx"
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Overall Visualization Goal: How well does the result achieve the overall goal of showing the supernova structure with two distinct isosurfaces representing different density regions?
+
+          2. Does the red isosurface show low density areas (outside regions) with lower opacity?
+
+          3. Does the blue isosurface show high density areas (inside regions) with higher opacity?
+
+
+# Case 24: tangaroa_streamribbon
+- vars:
+    question: |
+        Task:
+
+        Load the tangaroa dataset from "tangaroa_streamribbon_300x180x120_float32_scalar3.raw", the information about this dataset:
+        tangaroa (Vector)
+        Data Scalar Type: float
+        Data Byte Order: little Endian
+        Data Extent: 300x180x120
+        Number of Scalar Components: 3
+        Data loading is very important, make sure you correctly load the dataset according to their features.
+
+        Apply "streamline tracer" filter, set the "Seed Type" to point cloud, turn off the "show sphere", set the center to [81.6814, 80.708, 23.5093], and radius to 29.9
+
+        Add "Ribbon" filter to the streamline tracer results and set width to 0.3, set the Display representation to Surface.
+
+        In pipeline browser panel, hide everything except the ribbon filter results.
+
+        Please think step by step and make sure to fulfill all the visualization goals mentioned above.
+
+        Use a white background. Find an optimal view. Render at 1280x1280. Do not show a color bar or coordinate axes.
+
+        Set the viewpoint parameters as: [372.27, 278.87, 214.44] to position; [169.85, 76.46, 12.02] to focal point; [-0.41, 0.82, -0.41] to camera up direction.
+
+        Save the visualization image as "tangaroa_streamribbon/results/{agent_mode}/tangaroa_streamribbon.png".
+        (Optional, but must save if use paraview) Save the paraview state as "tangaroa_streamribbon/results/{agent_mode}/tangaroa_streamribbon.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "tangaroa_streamribbon/results/{agent_mode}/tangaroa_streamribbon.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "tangaroa_streamribbon/results/{agent_mode}/tangaroa_streamribbon.cxx"
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Overall Visualization Goal: Does the result match the ground truth visualization of tangaroa flow structures using ribbon surfaces?
+
+          2. Flow Surface Patterns: Do the ribbon surfaces show similar flow patterns and structures as the ground truth?
+
+          3. Surface Coverage: Is the spatial distribution and coverage of the flow surfaces similar to the ground truth?
+
+          4. Visual Appearance: Do the ribbon surfaces appear similar in width and structure to the ground truth?
+
+# Case 26: tornado
+- vars:
+    question: |
+        Load the Tornado vector field from "tornado/data/tornado_64x64x64_float32_scalar3.raw", the information about this dataset:
+        Tornado (Vector)
+        Data Scalar Type: float
+        Data Byte Order: Little Endian
+        Data Extent: 64x64x64
+        Number of Scalar Components: 3
+        Data loading is very important, make sure you correctly load the dataset according to their features.
+
+        Create a streamline visualization using a "Stream Tracer" filter with "Point Cloud" seed type. Set the seed center to [31.5, 31.5, 47.25], radius 12.6, and maximum streamline length to 512.0. Add a "Tube" filter (radius 0.25) on the stream tracer. Color the tubes by Velocity magnitude using the 'Cool to Warm (Diverging)' colormap. Also display the stream tracer directly with line width 5.0 and "Render Lines As Tubes" enabled.
+
+        Add a "Glyph" filter on the original data using Arrow glyph type. Orient arrows by the Velocity vector and scale by Velocity magnitude with a scale factor of 25.0. Set maximum number of sample points to 2500. Color glyphs by Velocity magnitude using the same colormap.
+
+        Add an "Outline" filter to display the dataset bounding box (black).
+
+        Use a white background (RGB: 1.0, 1.0, 1.0). Find an optimal view. Render at 1280x1280. Show both color bar and coordinate axes.
+        Set the viewpoint parameters as: [142.01, -36.46, 93.96] to position; [31.5, 31.5, 31.5] to focal point; [-0.35, 0.25, 0.90] to camera up direction.
+        Save the visualization image as "tornado/results/{agent_mode}/tornado.png".
+        (Optional, but must save if use paraview) Save the paraview state as "tornado/results/{agent_mode}/tornado.pvsm".
+        (Optional, but must save if use pvpython script) Save the python script as "tornado/results/{agent_mode}/tornado.py".
+        (Optional, but must save if use VTK) Save the cxx code script as "tornado/results/{agent_mode}/tornado.cxx"
+        Do not save any other files, and always save the visualization image.
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Vortex Structure: Is a funnel-shaped vortex core visible with streamlines spiraling around a central vertical axis, matching the ground truth?
+          2. Glyph Presence: Are arrow glyphs distributed throughout the volume showing velocity direction, similar to the ground truth?
+          3. Color Mapping: Are both the streamline tubes and arrow glyphs colored by velocity magnitude using a blue-to-red diverging colormap, matching the ground truth color distribution?
+
+
+# Case 33: points-surf-clip
+- vars:
+    question: |
+          I would like to use ParaView to visualize a dataset.
+          Read in the file named "points-surf-clip/data/points-surf-clip.ex2".
+          Generate an 3d Delaunay triangulation of the dataset.
+          Clip the data with a y-z plane at x=0, keeping the -x half of the data and removing the +x half.
+          Render the image as a wireframe.
+          Save a screenshot of the result in the filename "points-surf-clip/results/{agent_mode}/points-surf-clip.png".
+          The rendered view and saved screenshot should be 1920 x 1080 pixels. Use a white background color.
+          (Optional, but must save if use paraview) Save the paraview state as "points-surf-clip/results/{agent_mode}/points-surf-clip.pvsm".
+          (Optional, but must save if use python script) Save the python script as "points-surf-clip/results/{agent_mode}/points-surf-clip.py".
+          Do not save any other files, and always save the visualization image.
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Delaunay Triangulation Quality: Is the 3D Delaunay triangulation properly generated creating a valid mesh structure from the point data?
+
+          2. Clipping Accuracy: Is the mesh correctly clipped by the y-z plane at x=0, with only the -x half of the data remaining visible?
+
+          3. Wireframe Representation: Is the result displayed as a clear wireframe showing the triangulated mesh structure with visible edges?
+
+          4. Geometric Integrity: Does the clipped wireframe maintain proper connectivity and show the expected geometric features without artifacts?
+
+# Case 34: shrink-sphere
+- vars:
+    question: |
+          Create a default sphere and then hide it.
+          Create a shrink filter from the sphere.
+          Double the sphere's theta resolution.
+          Divide the shrink filter's shrink factor in half.
+          Extract a wireframe from the sphere.
+          Group the shrink filter and wireframe together and show them.
+          Save a screenshot of the result in the filename "shrink-sphere/results/{agent_mode}/shrink-sphere.png".
+          The rendered view and saved screenshot should be 1920 x 1080 pixels and have a white background.
+          (Optional, but must save if use paraview) Save the paraview state as "shrink-sphere/results/{agent_mode}/shrink-sphere.pvsm".
+          (Optional, but must save if use python script) Save the python script as "shrink-sphere/results/{agent_mode}/shrink-sphere.py".
+          Do not save any other files, and always save the visualization image.
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Sphere Creation and Resolution: Is the sphere created with doubled theta resolution providing higher geometric detail and smoother curvature?
+
+          2. Shrink Filter Application: Is the shrink filter properly applied with halved shrink factor creating visible separation between mesh elements?
+
+          3. Dual Representation: Are both the wireframe sphere and shrink filter results simultaneously visible and properly grouped together?
+
+          4. Visual Quality: Does the visualization clearly show the contrast between the wireframe structure and the shrunken elements with appropriate white background?
+
+
+# Case 36: time-varying
+- vars:
+    question: |
+          Read the dataset in the file "time-varying/data/time-varying.ex2", and color the data by the EQPS variable.
+          Viewing in the +y direction, play an animation through the time steps, with visible color bar legend.
+          Rescale the data range to last time step, and play the animation again.
+          Create a second linked render view to the right of the first, applying a temporal interpolator to the second view.
+          Play the animation simultaneously in both views, and save the animation of both views in "time-varying/results/{agent_mode}/time-varying.avi".
+          Print the following statistics: average value of EQPS over all locations and all time steps, average value of EQPS over all locations in the first half of the time steps, average value of EQPS over all locations in the even numbered time steps, and variance of EQPS over all locations and all the time steps.
+          Save the last frame of the visualization image as "time-varying/results/{agent_mode}/time-varying.png".
+          (Optional, but must save if use paraview) Save the paraview state as "time-varying/results/{agent_mode}/time-varying.pvsm".
+          (Optional, but must save if use python script) Save the python script as "time-varying/results/{agent_mode}/time-varying.py".
+          Do not save any other files, and always save the visualization image.
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Temporal Animation Quality: Does the animation smoothly progress through all time steps showing the evolution of the EQPS variable over time?
+
+          2. Dual View Configuration: Are both render views properly configured with the second view showing temporal interpolation effects compared to the first?
+
+          3. Color Mapping and Legend: Is the EQPS variable properly color-mapped with an appropriate color bar legend visible throughout the animation?
+
+          4. View Direction and Layout: Is the +y direction view properly set and are both views arranged side-by-side in the correct layout configuration?
+
+# Case 37: chart-opacity
+- vars:
+    question: |
+          Create a wavelet object.
+          Create a plot over line chart from the wavelet with three paths: arc_length, Points_Z, and RTData variables with opacity for arc_length 1 and opacity for Points_Z and RTData 0.3.
+
+          Save the visualization image as "chart-opacity/results/{agent_mode}/chart-opacity.png".
+          (Optional, but must save if use paraview) Save the paraview state as "chart-opacity/results/{agent_mode}/chart-opacity.pvsm".
+          (Optional, but must save if use python script) Save the python script as "chart-opacity/results/{agent_mode}/chart-opacity.py".
+          Do not save any other files, and always save the visualization image.
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Chart Generation: Is the plot over line chart properly created from the wavelet data?
+
+          2. Variable Display: Are arc_length, Points_Z, and RTData variables all correctly plotted, showing all three specified variables and distinguishable in the chart?
+
+          3. Opacity Settings: Is the arc_length variable displayed with full opacity (1.0) while Points_Z and RTData show reduced opacity (0.3)?
+
+          4. Chart Clarity: Does the chart provide clear visualization of the data trends with appropriate axis scaling and readable formatting?
+
+
+# Case 43: reset-camera-direction
+- vars:
+    question: |
+          Create a Wavelet object, set its representation to "Surface with Edges", and set the camera direction to [0.5, 1, 0.5].
+          Save a screenshot to the file "reset-camera-direction/results/{agent_mode}/reset-camera-direction.png".
+          (Optional, but must save if use paraview) Save the paraview state as "reset-camera-direction/results/{agent_mode}/reset-camera-direction.pvsm".
+          (Optional, but must save if use python script) Save the python script as "reset-camera-direction/results/{agent_mode}/reset-camera-direction.py".
+          Do not save any other files, and always save the visualization image.
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Wavelet Creation: Is the Wavelet object properly created and displayed in the scene?
+
+          2. Surface with Edges Representation: Is the wavelet correctly displayed with "Surface with Edges" representation showing both surface and wireframe?
+
+          3. Camera Direction: Is the camera positioned according to the specified direction vector [0.5, 1, 0.5]?
+
+          4. View Quality: Does the visualization provide a clear view of the wavelet structure from the specified camera angle?
+
+# Case 48: materials
+- vars:
+    question: |
+          Compare two datasets in two views side by side each 900 pixels wide x 1400 pixels high.
+          Read the dataset "materials/data/materials_prediction.vtr" in the left view and "materials/data/materials_ground_truth.vtr" in the right view.
+          In both views, convert the "Intensity" and "Phase" variables from cell to point data.
+          In both views, take an isovolume of the "Intensity" variable in the range of [0.2, 1.0], clipped with a plane at (32.0, 32.0, 32.0) and +x normal direction.
+          Color both views with the Viridis (matplotlib) color map for the "Phase" variable, scaled to the data range, including a colormap legend in both views.
+          Label the left view "NN Prediction" and the right view "Ground Truth".
+          Orient the camera to look in the (-1, 0, -1) direction, with the datasets fitting in the views.
+          Save the visualization image as "materials/results/{agent_mode}/materials.png".
+          (Optional, but must save if use paraview) Save the paraview state as "materials/results/{agent_mode}/materials.pvsm".
+          (Optional, but must save if use python script) Save the python script as "materials/results/{agent_mode}/materials.py".
+          Do not save any other files, and always save the visualization image.
+
+  assert:
+    - type: llm-rubric
+      subtype: vision
+      value: |
+          1. Side-by-Side Comparison: Are both datasets properly displayed in side-by-side views with correct dimensions and labeling?
+
+          2. Data Conversion and Filtering: Are the Intensity and Phase variables correctly converted to point data and isovolume filtering applied?
+
+          3. Clipping and Color Mapping: Is the plane clipping correctly applied and Viridis colormap properly used for Phase variable?
+
+          4. Camera and Layout: Is the camera positioned correctly in (-1, 0, -1) direction with appropriate fitting and legends visible?

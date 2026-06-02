@@ -110,3 +110,5 @@ eval_reports_gpt-5.2
 eval_reports_codex_cli_gpt5.2
 eval_reports_codex_claude-opus-4-6
 codex-eval-exp-all
+bash_scripts
+skills
