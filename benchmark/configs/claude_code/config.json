@@ -8,6 +8,7 @@
   "claude_code_path": "claude",
   "preserve_workdir": false,
   "auto_approve": true,
+  "verbose": false,
   "custom_system_prompt": "",
   "environment": {
     "type": "conda",

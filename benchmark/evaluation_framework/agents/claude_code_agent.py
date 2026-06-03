@@ -155,7 +155,9 @@ class ClaudeCodeAgent(BaseAgent):
                     pass
 
             # Prepare response
-            response = output if success else f"Task failed: {output}"
+            # Non-verbose mode now returns JSON; extract the human-readable
+            # assistant text so the stored response stays clean.
+            response = self._extract_response_text(output) if success else f"Task failed: {output}"
 
             # Create result
             return AgentResult(
@@ -289,10 +291,15 @@ IMPORTANT: You should never check anything mark as GS (ground truth) for aidding
                 else:
                     cmd = [self.claude_path, "--print", "--verbose", "--output-format", "stream-json", prompt]
             else:
+                # Use --output-format json so the final result event (with token
+                # usage and cost) is available for accurate token accounting.
+                # Without this, plain --print emits text only and token extraction
+                # falls back to rough context estimates.
                 if self.auto_approve:
-                    cmd = [self.claude_path, "--print", "--dangerously-skip-permissions", prompt]
+                    cmd = [self.claude_path, "--print", "--output-format", "json",
+                           "--dangerously-skip-permissions", prompt]
                 else:
-                    cmd = [self.claude_path, "--print", prompt]
+                    cmd = [self.claude_path, "--print", "--output-format", "json", prompt]
 
             print(f"Invoking Claude Code...")
             print(f"Command: {' '.join(cmd[:3] if len(cmd) > 2 else cmd[:2])}...")  # Don't print full prompt
@@ -507,6 +514,32 @@ IMPORTANT: You should never check anything mark as GS (ground truth) for aidding
                 os.unlink(prompt_file)
             except Exception:
                 pass
+
+    def _extract_response_text(self, output: str) -> str:
+        """
+        Extract the human-readable assistant text from Claude Code output.
+
+        With --output-format json, the output is a JSON object containing a
+        "result" field with the final assistant message. Fall back to the raw
+        output if no JSON result event is present (e.g. plain --print output).
+
+        Args:
+            output: Claude Code stdout/stderr
+
+        Returns:
+            Clean assistant text, or the raw output if it can't be parsed.
+        """
+        for line in output.split('\n'):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                event = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(event, dict) and event.get("type") == "result" and "result" in event:
+                return event["result"]
+        return output
 
     def _extract_token_usage(self, output: str) -> Dict[str, Any]:
         """
