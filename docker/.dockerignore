@@ -1,0 +1,4 @@
+# Only environment.yml and entrypoint.sh are needed in the build context.
+*
+!environment.yml
+!entrypoint.sh

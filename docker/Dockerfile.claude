@@ -1,0 +1,35 @@
+# =============================================================================
+# Optional: Claude Code on top of the agent-free base image.
+# =============================================================================
+# The base `scivis-bench` image ships no agent (by design). This layer adds
+# Node.js + the Claude Code CLI so the existing `run_claude_code_eval.py`
+# orchestrator can run *inside* the container against the sanitized workspace.
+#
+# Build:  docker build -t scivis-bench:claude -f docker/Dockerfile.claude docker/
+# (build the base image first: ./docker/build.sh)
+# =============================================================================
+FROM scivis-bench:latest
+
+USER root
+
+# Node 20 (Ubuntu 22.04's apt node is too old for the CLI) + Claude Code, global
+# install so `claude` is on PATH for any UID (including `--user $(id -u)` runs).
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates gnupg \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && npm install -g @anthropic-ai/claude-code \
+    && npm cache clean --force \
+    && apt-get purge -y gnupg && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
+
+# Keep the CLI headless and reproducible during a benchmark run: no auto-update
+# or nonessential traffic. The orchestrator passes --print --dangerously-skip-permissions.
+ENV DISABLE_AUTOUPDATER=1 \
+    DISABLE_TELEMETRY=1 \
+    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+
+# Authenticate at runtime via ANTHROPIC_API_KEY (passed with `docker run -e`).
+RUN claude --version || true
+
+ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/entrypoint.sh"]
+CMD ["bash"]

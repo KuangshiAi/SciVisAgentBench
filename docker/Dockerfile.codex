@@ -1,0 +1,32 @@
+# =============================================================================
+# Optional: OpenAI Codex CLI on top of the agent-free base image.
+# =============================================================================
+# The base `scivis-bench` image ships no agent (by design). This layer adds
+# Node.js + the Codex CLI so the existing `run_codex_cli_eval.py` orchestrator
+# can run *inside* the container against the sanitized workspace.
+#
+# Build:  docker build -t scivis-bench:codex -f docker/Dockerfile.codex docker/
+# (build the base image first: ./docker/build.sh)
+# =============================================================================
+FROM scivis-bench:latest
+
+USER root
+
+# Node 20 (Ubuntu 22.04's apt node is too old) + the official Codex CLI, global
+# install so `codex` is on PATH for any UID (including `--user $(id -u)` runs).
+# The repo's codex_cli agent invokes `codex exec --json --ephemeral
+# --dangerously-bypass-approvals-and-sandbox`, which are flags of @openai/codex.
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates gnupg \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && npm install -g @openai/codex \
+    && npm cache clean --force \
+    && apt-get purge -y gnupg && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
+
+# Authenticate at runtime via OPENAI_API_KEY (passed with `docker run -e`).
+# `codex exec` is non-interactive; --ephemeral avoids persisting session files.
+RUN codex --version || true
+
+ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/entrypoint.sh"]
+CMD ["bash"]

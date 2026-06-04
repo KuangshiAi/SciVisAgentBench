@@ -2,17 +2,24 @@
 
 **📄 [Paper](https://arxiv.org/abs/2603.29139) | 📝 [Project Page](https://scivisagentbench.github.io/) | 🤗 [Dataset](https://huggingface.co/datasets/SciVisAgentBench/SciVisAgentBench-tasks)**
 
-SciVisAgentBench is a comprehensive benchmark for evaluating scientific visualization agents. The benchmark supports evaluation of three autonomous agents, ParaView-MCP, bioimage-agent, and ChatVis, enabling users to create and manipulate scientific visualizations using natural language instead of complex commands or GUI operations. The benchmark uses YAML files compatible with [promptfoo](https://www.promptfoo.dev/) to store test cases and evaluation metrics. This initial version focuses on outcome-based evaluation, using both LLM-as-a-judge and quantitative metrics.
+SciVisAgentBench is a comprehensive benchmark for evaluating scientific visualization agents. The benchmark supports evaluation of LLM agents across different interaction paradigms, such as CLIs, protocols like MCP, and Python APIs. These agents enable users to create and manipulate scientific visualizations using natural language instead of complex commands or GUI operations. The benchmark uses YAML files compatible with [promptfoo](https://www.promptfoo.dev/) to store test cases and evaluation metrics. This initial version focuses on outcome-based evaluation, using both LLM-as-a-judge and quantitative metrics.
+
+## 🐳 NEW: Run Agents in Docker
+
+A single image bundles the **entire visualization + evaluation toolchain** (ParaView, napari, VTK, TopologyToolKit, MDAnalysis/vmd-python, gudhi, CPU torch/lpips), so you can run a **coding agent** (Claude Code, Codex, …) on any platform. The agent runs entirely inside the container against a sanitized copy of the cases — walled off from both **your local file system** and the **ground truth**. So execution stays safe (no stray commands or writes reach your machine) and evaluation stays trustworthy (the agent can't peek at the GT answers).
+
+```bash
+./docker/build.sh && ./docker/build_claude.sh        # base image + Claude Code image
+./docker/run_eval_in_docker.sh --agent claude_code \
+    --yaml benchmark/eval_cases/paraview/paraview_subset_15.yaml \
+    --cases SciVisAgentBench-tasks/paraview --experiment-number exp1
+```
+
+**See [docker/RUNNING_AGENTS.md](docker/RUNNING_AGENTS.md)** for Claude Code & Codex examples (and [docker/README.md](docker/README.md) for the image + data-isolation model).
 
 ## 🚀 NEW: Easy Evaluation Framework
 
-We now provide a **high-level evaluation framework** that makes it dramatically easier to evaluate new agents!
-
-**Before:** Write 500+ lines of test runner code
-
-**After:** Implement one method and run a single command
-
-### Quick Example
+Evaluate a new agent by implementing **one method** instead of a 500+ line test runner:
 
 ```python
 from benchmark.evaluation_framework import BaseAgent, AgentResult, register_agent
@@ -20,19 +27,7 @@ from benchmark.evaluation_framework import BaseAgent, AgentResult, register_agen
 @register_agent("my_agent")
 class MyAgent(BaseAgent):
     async def run_task(self, task_description, task_config):
-        # Your agent logic here
         return AgentResult(success=True, response="Done", output_files={...})
-```
-
-Run evaluation:
-
-```bash
-python -m benchmark.evaluation_framework.run_evaluation \
-    --agent my_agent \
-    --config my_config.json \
-    --yaml benchmark/eval_cases/paraview/main_cases.yaml \
-    --cases SciVisAgentBench-tasks/main
-    --eval-model gpt-5.2
 ```
 
 **See [benchmark/evaluation_framework/README.md](benchmark/evaluation_framework/README.md) for details.**
@@ -63,7 +58,9 @@ SciVisAgentBench/
     └── molecular_vis/
 ```
 
-## ParaView-MCP, ChatVis, bioimage-agent, and GMX-VMD-MCP Installation
+## ParaView-MCP, ChatVis, bioimage-agent, and GMX-VMD-MCP Installation (Conda)
+The conda environments below are still the recommended way to run the **MCP-server-based agents** (which need a live ParaView/napari/TopoPilot GUI or server). For agent-agnostic coding-agent evaluation, prefer the [Docker environment](#-new-run-agents-in-docker) above.
+
 We provide out-of-box evaluation for ParaView-MCP, ChatVis, bioimage-agent, and GMX-VMD-MCP in SciVisAgentBench. We suggest installing them in seperated conda virtual environments (ParaView-MCP and ChatVis can share the same environment).
 
 ### To install ParaView, ParaView-MCP, and SciVisAgentBench requirements (it also works for ChatVis, make sure the ParaView version here is the same as your ParaView GUI):
